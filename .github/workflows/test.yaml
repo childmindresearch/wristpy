@@ -1,0 +1,54 @@
+name: Python Tests
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install poetry
+      run: pipx install poetry
+    - uses: actions/setup-python@v5
+      with:
+        python-version-file: pyproject.toml
+        cache: poetry
+    - name: Install dependencies
+      run: |
+        poetry install
+    - name: Run tests
+      id: run-tests
+      run: >
+        poetry run pytest \
+          --junitxml=pytest.xml \
+          --cov-report=term-missing:skip-covered \
+          --cov-report=xml:coverage.xml \
+          --cov=src tests \
+          --log-level=DEBUG \
+          --verbose
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: chartboost/ruff-action@v1
+
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install poetry
+      run: pipx install poetry
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: poetry
+    - run: |
+        poetry install
+        poetry run mypy .
