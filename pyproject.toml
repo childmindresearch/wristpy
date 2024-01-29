@@ -16,10 +16,10 @@ pytest = "^7.4.4"
 mypy = "^1.7.1"
 pre-commit = "^3.5.0"
 pytest-cov = "^4.1.0"
-ruff = "^0.1.9"
+ruff = "^0.1.14"
 
 [tool.poetry.group.docs.dependencies]
-pdoc = "^14.3.0"
+pdoc = "^14.4.0"
 
 [tool.pytest.ini_options]
 pythonpath = [
