@@ -2,11 +2,11 @@
 
 import os
 
-from actigrapy.io.model import ActigraphyData
+from actigrapy.common.data_model import OutputData
 
 
 def export(
-    data: ActigraphyData,
+    data: OutputData,
     path: str | os.PathLike[str],
 ) -> None:
     """Export data model to CSV files."""

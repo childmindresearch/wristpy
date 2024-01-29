@@ -4,12 +4,12 @@ import os
 
 import pygt3x.reader
 
-from actigrapy.io.model import ActigraphyData
+from actigrapy.common.data_model import InputData
 
 
 def load(
     path: str | os.PathLike[str],
-) -> ActigraphyData:
+) -> InputData:
     """Load actigraphy data from .gt3x file."""
     with pygt3x.reader.FileReader(str(path)) as reader:
         df = reader.to_pandas()
