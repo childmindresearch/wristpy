@@ -1,9 +1,8 @@
 """Main application code."""
 
-import pathlib as pl
+import pathlib
 
-import pandas as pd
-
+import actigrapy.common.data_model
 import actigrapy.ggir.calibration
 import actigrapy.io.exporters.csv
 import actigrapy.io.loaders.gt3x
@@ -11,13 +10,18 @@ import actigrapy.io.loaders.gt3x
 
 def main() -> None:
     """Dummy entry point for testing."""
-    input_data = actigrapy.io.loaders.gt3x.load("data/test_data.gt3x")
-    output_data = pd.DataFrame()
+    config = actigrapy.common.data_model.Config(
+        path_input=pathlib.Path("data/test_data.gt3x"),
+        path_output=pathlib.Path("data/test_output.csv"),
+    )
+
+    input_data = actigrapy.io.loaders.gt3x.load(config.path_input)
+    output_data = actigrapy.common.data_model.OutputData()
 
     print("Call your main application code here")
     actigrapy.ggir.calibration.dummy_calibration(input_data, output_data)
 
-    actigrapy.io.exporters.csv.export(output_data, path=pl.Path("data/test_output.csv"))
+    actigrapy.io.exporters.csv.export(output_data, path=config.path_output)
 
 
 if __name__ == "__main__":

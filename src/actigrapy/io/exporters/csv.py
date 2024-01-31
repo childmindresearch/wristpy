@@ -10,8 +10,4 @@ def export(
     path: str | os.PathLike[str],
 ) -> None:
     """Export data model to CSV files."""
-    data.to_csv(
-        path,
-        header=True,
-        index=False,
-    )
+    pass
