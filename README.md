@@ -16,12 +16,12 @@ Welcome to the CMI-DAIR Template Python Repository! This template is designed to
 
 # Project name
 
-[![Build](https://github.com/childmindresearch/actigrapy/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/childmindresearch/actigrapy/actions/workflows/test.yaml?query=branch%3Amain)
-[![codecov](https://codecov.io/gh/childmindresearch/actigrapy/branch/main/graph/badge.svg?token=22HWWFWPW5)](https://codecov.io/gh/childmindresearch/actigrapy)
+[![Build](https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml?query=branch%3Amain)
+[![codecov](https://codecov.io/gh/childmindresearch/wristpy/branch/main/graph/badge.svg?token=22HWWFWPW5)](https://codecov.io/gh/childmindresearch/wristpy)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![stability-stable](https://img.shields.io/badge/stability-stable-green.svg)
-[![LGPL--2.1 License](https://img.shields.io/badge/license-LGPL--2.1-blue.svg)](https://github.com/childmindresearch/actigrapy/blob/main/LICENSE)
-[![pages](https://img.shields.io/badge/api-docs-blue)](https://childmindresearch.github.io/actigrapy)
+[![LGPL--2.1 License](https://img.shields.io/badge/license-LGPL--2.1-blue.svg)](https://github.com/childmindresearch/wristpy/blob/main/LICENSE)
+[![pages](https://img.shields.io/badge/api-docs-blue)](https://childmindresearch.github.io/wristpy)
 
 What problem does this tool solve?
 
@@ -36,13 +36,13 @@ What problem does this tool solve?
 Install this package via :
 
 ```sh
-pip install actigrapy
+pip install wristpy
 ```
 
 Or get the newest development version via:
 
 ```sh
-pip install git+https://github.com/childmindresearch/actigrapy
+pip install git+https://github.com/childmindresearch/wristpy
 ```
 
 ## Quick start
@@ -50,9 +50,9 @@ pip install git+https://github.com/childmindresearch/actigrapy
 Short tutorial, maybe with a
 
 ```Python
-import actigrapy
+import wristpy
 
-actigrapy.short_example()
+wristpy.short_example()
 ```
 
 ## Links or References

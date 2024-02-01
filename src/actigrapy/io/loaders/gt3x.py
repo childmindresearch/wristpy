@@ -4,8 +4,7 @@ import pathlib
 
 import polars as pl
 import pygt3x.reader
-
-from actigrapy.common.data_model import InputData
+from wristpy.common.data_model import InputData
 
 
 def load(

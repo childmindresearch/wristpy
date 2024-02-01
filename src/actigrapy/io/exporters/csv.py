@@ -2,7 +2,7 @@
 
 import os
 
-from actigrapy.common.data_model import OutputData
+from wristpy.common.data_model import OutputData
 
 
 def export(
