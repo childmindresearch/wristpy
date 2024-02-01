@@ -17,7 +17,8 @@ def calc_base_metrics(raw_data: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: Returns a dataframe with ENMO and anglez columns. 
     """
     ENMO_calc = np.asarray(np.sqrt(np.square(raw_data).sum(axis =1))-1)
-    angle_z_raw = np.asarray(np.arctan(raw_data.Z / (np.sqrt( np.square(raw_data.X) + np.square(raw_data.Y)))) / (np.pi/180))
+    angle_z_raw = np.asarray(np.arctan(raw_data.Z / (np.sqrt( np.square(raw_data.X) + 
+                                                np.square(raw_data.Y)))) / (np.pi/180))
     calc_data = pd.DataFrame()
     calc_data['ENMO'] = ENMO_calc
     calc_data['Anglez'] = angle_z_raw
