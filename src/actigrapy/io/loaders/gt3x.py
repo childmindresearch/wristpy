@@ -2,9 +2,8 @@
 
 import pathlib
 
-import polars as pl
 import numpy as np
-
+import polars as pl
 import pygt3x.reader
 from wristpy.common.data_model import InputData
 
@@ -30,7 +29,7 @@ def load(
         sampling_rate=sampling_rate,
     )
 
-def timefix(raw_data: pd.DataFrame,sampling_rate: int) ->pd.DataFrame:
+def timefix(raw_data: InputData) ->InputData:
     """Add ms data to timestamp data.
     
     Currently pygt3x does not save the ms data, we make the assumption that
@@ -48,7 +47,7 @@ def timefix(raw_data: pd.DataFrame,sampling_rate: int) ->pd.DataFrame:
     timestamps = raw_data.index.to_numpy()
     time_fix = []
     for i in range(len(timestamps)):
-        tmp = (timestamps[0] + ((i)/sampling_rate))*1000
+        tmp = (timestamps[0] + ((i)/raw_data.sampling_rate))*1000
         time_fix.append(tmp)
     time_fix_test = np.asarray(time_fix, dtype='datetime64[ms]')
     raw_data['time'] = time_fix_test
