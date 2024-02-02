@@ -2,23 +2,24 @@
 
 import numpy as np
 import pandas as pd
+from numpy.linalg import norm
 
 from actigrapy.common.data_model import InputData, OutputData
 
 
-def calc_base_metrics(raw_data: pd.DataFrame) -> pd.DataFrame:
+def calc_base_metrics(accel_raw: pd.DataFrame) -> pd.DataFrame:
     """Calculate the basic metrics, ENMO and angle z, from raw accelerometer data.
 
     Args:
-        raw_data: The raw data containing columns 'X', 'Y', and 'Z' with
+        accel_raw: The raw data containing columns 'X', 'Y', and 'Z' with
         accelerometer data. 
     
     Returns:
-        pd.DataFrame: Returns a dataframe with ENMO and anglez columns. 
+        calc_data: Returns a dataframe with ENMO and anglez columns. 
     """
-    ENMO_calc = np.asarray(np.sqrt(np.square(raw_data).sum(axis =1))-1)
-    angle_z_raw = np.asarray(np.arctan(raw_data.Z / (np.sqrt( np.square(raw_data.X) + 
-                                                np.square(raw_data.Y)))) / (np.pi/180))
+    ENMO_calc = norm(accel_raw, axis =1) - 1
+    angle_z_raw = np.asarray(np.arctan(accel_raw.Z / (np.sqrt( np.square(accel_raw.X) + 
+                                                np.square(accel_raw.Y)))) / (np.pi/180))
     calc_data = pd.DataFrame()
     calc_data['ENMO'] = ENMO_calc
     calc_data['Anglez'] = angle_z_raw
