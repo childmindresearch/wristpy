@@ -1,15 +1,16 @@
 [tool.poetry]
-name = "actigrapy"
+name = "wristpy"
 version = "0.1.0"
 description = "A beautiful description."
 authors = ["Florian Rupprecht <florian.rupprecht@childmind.org>"]
 license = "LGPL-2.1"
 readme = "README.md"
-packages = [{include = "actigrapy", from = "src"}]
+packages = [{include = "wristpy", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "~3.11"
 pygt3x = "^0.5.2"
+polars = "^0.20.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.4"

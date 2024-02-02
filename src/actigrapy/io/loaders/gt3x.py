@@ -1,18 +1,18 @@
 """Loader for the .gt3x file format."""
 
-import os
+import pathlib
 
+import polars as pl
 import numpy as np
-import pandas as pd
-import pygt3x.reader
 
-from actigrapy.common.data_model import InputData
+import pygt3x.reader
+from wristpy.common.data_model import InputData
 
 
 def load(
-    path: str | os.PathLike[str],
+    path: pathlib.Path,
 ) -> InputData:
-    """Load actigraphy data from .gt3x file.
+    """Load input data from .gt3x file.
     
     Args:
         path: path to desired .gt3x file to process
@@ -22,10 +22,13 @@ def load(
         sample_rate: sampling rate in Hz
     """
     with pygt3x.reader.FileReader(str(path)) as reader:
-        df = reader.to_pandas()
-    sample_rate = reader.info.sample_rate
-    #TODO get temperature
-    return df, sample_rate
+        acceleration = pl.from_pandas(reader.to_pandas())
+        sampling_rate = reader.info.sample_rate
+
+    return InputData(
+        acceleration=acceleration,
+        sampling_rate=sampling_rate,
+    )
 
 def timefix(raw_data: pd.DataFrame,sampling_rate: int) ->pd.DataFrame:
     """Add ms data to timestamp data.

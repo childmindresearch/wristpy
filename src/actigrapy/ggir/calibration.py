@@ -1,6 +1,6 @@
 """Dummy placeholder."""
 
-from actigrapy.common.data_model import InputData, OutputData
+from wristpy.common.data_model import InputData, OutputData
 
 
 def dummy_calibration(

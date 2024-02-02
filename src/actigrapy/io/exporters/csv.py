@@ -2,7 +2,7 @@
 
 import os
 
-from actigrapy.common.data_model import OutputData
+from wristpy.common.data_model import OutputData
 
 
 def export(
@@ -10,8 +10,4 @@ def export(
     path: str | os.PathLike[str],
 ) -> None:
     """Export data model to CSV files."""
-    data.to_csv(
-        path,
-        header=True,
-        index=False,
-    )
+    pass

@@ -1,1 +1,1 @@
-"""Shared code for Actigrapy."""
+"""Shared code for wristpy."""
