@@ -26,6 +26,7 @@ class InputData:
 
     acceleration: pl.DataFrame
     sampling_rate: float
+    time: pl.DataFrame
 
 
 @dataclass
