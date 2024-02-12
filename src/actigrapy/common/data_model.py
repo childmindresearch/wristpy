@@ -37,4 +37,7 @@ class OutputData:
     It is mutated during processing.
     """
 
-    pass
+    cal_acceleration: pl.DataFrame
+    ENMO: pl.DataFrame
+    anglez: pl.DataFrame
+    time: pl.DataFrame
