@@ -5,7 +5,6 @@ from warnings import warn
 import numpy as np
 import polars as pl
 from sklearn.linear_model import LinearRegression
-
 from wristpy.common.data_model import InputData, OutputData
 from wristpy.ggir.metrics_calc import moving_mean, moving_std
 
