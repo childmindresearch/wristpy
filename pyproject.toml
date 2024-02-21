@@ -9,7 +9,7 @@ packages = [{include = "wristpy", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "~3.11"
-pygt3x = "^0.5.2"
+pygt3x = "0.5.1"
 polars = "^0.20.6"
 
 [tool.poetry.group.dev.dependencies]

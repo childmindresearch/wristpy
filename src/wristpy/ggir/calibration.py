@@ -5,6 +5,7 @@ from warnings import warn
 import numpy as np
 import polars as pl
 from sklearn.linear_model import LinearRegression
+
 from wristpy.common.data_model import InputData, OutputData
 from wristpy.ggir.metrics_calc import moving_mean, moving_std
 
@@ -78,6 +79,7 @@ def start_ggir_calibration(
 
     while not finished:
         accel_data_trimmed = accel_data[: nh + i_h * n12h]
+        time_data_trimmed = time_data[: nh + i_h * n12h]
         (
             finished,
             offset,
@@ -85,8 +87,23 @@ def start_ggir_calibration(
             cal_err_start,
             cal_err_end,
         ) = closest_point_fit(
-            accel_data_trimmed, time_data, s_r, sd_crit, sphere_crit, max_iter, tol
+            accel_data_trimmed,
+            time_data_trimmed,
+            s_r,
+            sd_crit,
+            sphere_crit,
+            max_iter,
+            tol,
         )
+        if not finished and (nh + i_h * n12h) >= accel_data.shape[0]:
+            finished = True
+            valid_calibration = False
+            warn(
+                f"Recalibration not done with {min_hours + (i_h - 1) * 12} - "
+                f"{min_hours + i_h * 12} hours due to insufficient non-movement "
+                f"data available"
+            )
+        i_h += 1
 
     if finished and valid_calibration:
         scaled_accel = apply_calibration(accel_data, scale, offset)
@@ -122,29 +139,29 @@ def closest_point_fit(
     sphere_crit: float,
     max_iter: int,
     tol: float,
-):
+) -> tuple:
     """Do the iterative closest point fit.
 
     Args:
-     accel_data:
-     time_data:
-     s_r:
-     sd_crit:
-     sphere_crit:
-     max_iter:
-     tol:
+     accel_data: Data frame with the three column acceleration data
+     time_data: Dat frame with the corrected time stamp data
+     s_r: sampling rate in Hz
+     sd_crit: Threshold to find no motion, as defined above
+     sphere_crit: Threshold for find no motion to have sparsely populated sphere
+     max_iter: Max number of iterations for closest point fit
+     tol: Change in residual tolerance to determine stopping
 
     Returns:
         Scale, offset, cal_error start, cal_error_end
 
     """
     # get the moving std and mean over a 10s window
-    acc_rsd = moving_std(accel_data, time_data, s_r, 10)
-    acc_rm = moving_mean(accel_data, time_data, s_r, 10)
+    RSD = moving_std(accel_data, time_data, s_r, 10)
+    RM = moving_mean(accel_data, time_data, s_r, 10)
 
     # grab only the accel data
-    acc_rsd = acc_rsd.select(["X_std", "Y_std", "Z_std"])
-    acc_rm = acc_rm.select(["X_mean", "Y_mean", "Z_mean"])
+    acc_rsd = RSD.select(["X_std", "Y_std", "Z_std"])
+    acc_rm = RM.select(["X_mean", "Y_mean", "Z_mean"])
     # find periods of no motion
     no_motion = np.all(acc_rsd < sd_crit, axis=1) & np.all(abs(acc_rm) < 2, axis=1)
 
@@ -175,12 +192,9 @@ def closest_point_fit(
     LR = LinearRegression()
 
     acc_nm_pd = acc_rm_nm.to_pandas()
-    curr = (acc_nm_pd * scale) + offset
-
-    max_iter = 1000
-    tol = 1e-10
-    weights = np.ones(curr.shape[0]) * 100
-    res = [np.Inf]
+    cal_err_start = np.round(
+        np.mean(abs(np.linalg.norm(acc_rm_nm, axis=1) - 1)), decimals=5
+    )
 
     for i in range(max_iter):
         curr = (acc_nm_pd * scale) + offset
@@ -212,6 +226,12 @@ def closest_point_fit(
             break
 
     acc_cal_pd = (acc_nm_pd * scale) + offset
-    cal_error_end = np.around(
+    cal_err_end = np.around(
         np.mean(abs(np.linalg.norm(acc_cal_pd, axis=1) - 1)), decimals=5
     )
+
+    # assess if calibration error has been significantly improved
+    if (cal_err_end < cal_err_start) and (cal_err_end < 0.01):
+        return True, offset, scale, cal_err_start, cal_err_end
+    else:
+        return False, offset, scale, cal_err_start, cal_err_end

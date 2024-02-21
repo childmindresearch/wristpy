@@ -2,7 +2,8 @@
 
 import numpy as np
 import polars as pl
-from data_model import InputData, OutputData
+
+from wristpy.common.data_model import InputData, OutputData
 
 
 def calc_base_metrics(accel_raw: InputData) -> OutputData:
