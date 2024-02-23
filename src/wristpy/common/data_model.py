@@ -1,6 +1,6 @@
 """Internal data model."""
 import pathlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import polars as pl
 
@@ -38,8 +38,10 @@ class OutputData:
     """
 
     cal_acceleration: pl.DataFrame
-    ENMO: pl.DataFrame
-    anglez: pl.DataFrame
-    time: pl.DataFrame
+    scale: float
+    offset: float
     cal_error_end: float
     cal_error_start: float
+    ENMO: pl.DataFrame = field(default_factory=pl.DataFrame)
+    anglez: pl.DataFrame = field(default_factory=pl.DataFrame)
+    time: pl.DataFrame = field(default_factory=pl.DataFrame)

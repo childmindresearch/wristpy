@@ -109,11 +109,12 @@ def start_ggir_calibration(
         scaled_accel = apply_calibration(accel_data, scale, offset)
 
     return OutputData(
-        cal_accel=scaled_accel,
+        cal_acceleration=scaled_accel,
         scale=scale,
         offset=offset,
         cal_error_start=cal_err_start,
         cal_error_end=cal_err_end,
+        time=time_data,
     )
 
 
@@ -163,10 +164,10 @@ def closest_point_fit(
     acc_rsd = RSD.select(["X_std", "Y_std", "Z_std"])
     acc_rm = RM.select(["X_mean", "Y_mean", "Z_mean"])
     # find periods of no motion
-    no_motion = np.all(acc_rsd < sd_crit, axis=1) & np.all(abs(acc_rm) < 2, axis=1)
+    no_motion = np.all(acc_rsd < sd_crit, axis=1) & np.all(np.abs(acc_rm) < 2, axis=1)
 
     # trim to no motion
-    acc_rm_nm = acc_rm[no_motion]
+    acc_rm_nm = acc_rm.filter(no_motion)
     acc_rsd_nm = acc_rsd.filter(no_motion)
 
     # initialize offset and scale

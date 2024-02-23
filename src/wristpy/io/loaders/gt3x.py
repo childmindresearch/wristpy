@@ -5,6 +5,7 @@ import pathlib
 import numpy as np
 import polars as pl
 import pygt3x.reader
+
 from wristpy.common.data_model import InputData
 
 
