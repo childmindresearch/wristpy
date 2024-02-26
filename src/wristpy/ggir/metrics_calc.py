@@ -6,26 +6,29 @@ import polars as pl
 from wristpy.common.data_model import InputData, OutputData
 
 
-def calc_base_metrics(accel_raw: InputData) -> OutputData:
+def calc_base_metrics(output_data: OutputData) -> OutputData:
     """Calculate the basic metrics, ENMO and angle z, from raw accelerometer data.
 
     Args:
-        accel_raw: The raw data containing columns 'X', 'Y', and 'Z' with
-        accelerometer data.
+        output_data: Output data class to grab the calibrated accel data.
 
     Returns:
         OutputData: Returns the outputData with the ENMO and anglez columns.
     """
-    ENMO_calc = np.linalg.norm(accel_raw, axis=1) - 1
+    accel_raw = output_data.cal_acceleration
+    output_data.enmo = pl.DataFrame(np.linalg.norm(accel_raw, axis=1) - 1)
+    output_data.enmo.rename({"column_0": "enmo"})
     df_rolled = rolling_median(accel_raw)
-    angle_z_raw = np.asarray(
-        np.arctan(
-            df_rolled.Z / (np.sqrt(np.square(df_rolled.X) + np.square(df_rolled.Y)))
+    output_data.anglez = pl.DataFrame(
+        np.asarray(
+            np.arctan(
+                df_rolled["Z"]
+                / (np.sqrt(np.square(df_rolled["X"]) + np.square(df_rolled["Y"])))
+            )
+            / (np.pi / 180)
         )
-        / (np.pi / 180)
     )
-
-    return OutputData(ENMO=ENMO_calc, anglez=angle_z_raw)
+    output_data.anglez.rename({"column_0": "angle_z"})
 
 
 def down_sample(
