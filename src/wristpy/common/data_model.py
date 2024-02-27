@@ -45,3 +45,4 @@ class OutputData:
     enmo: pl.DataFrame = field(default_factory=pl.DataFrame)
     anglez: pl.DataFrame = field(default_factory=pl.DataFrame)
     time: pl.DataFrame = field(default_factory=pl.DataFrame)
+    enmo_epoch1
