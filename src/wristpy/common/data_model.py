@@ -45,4 +45,6 @@ class OutputData:
     enmo: pl.DataFrame = field(default_factory=pl.DataFrame)
     anglez: pl.DataFrame = field(default_factory=pl.DataFrame)
     time: pl.DataFrame = field(default_factory=pl.DataFrame)
-    enmo_epoch1
+    enmo_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
+    anglez_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
+    time_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
