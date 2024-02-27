@@ -42,6 +42,7 @@ class OutputData:
     offset: float
     cal_error_end: float
     cal_error_start: float
+    sampling_rate: float
     enmo: pl.DataFrame = field(default_factory=pl.DataFrame)
     anglez: pl.DataFrame = field(default_factory=pl.DataFrame)
     time: pl.DataFrame = field(default_factory=pl.DataFrame)

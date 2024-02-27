@@ -112,6 +112,7 @@ def start_ggir_calibration(
         cal_acceleration=scaled_accel,
         scale=scale,
         offset=offset,
+        sampling_rate=s_r,
         cal_error_start=cal_err_start,
         cal_error_end=cal_err_end,
         time=time_data,
@@ -163,17 +164,17 @@ def closest_point_fit(
     # grab only the accel data
     acc_rsd = RSD.select(["X_std", "Y_std", "Z_std"])
     acc_rm = RM.select(["X_mean", "Y_mean", "Z_mean"])
+
     # find periods of no motion
     no_motion = np.all(acc_rsd < sd_crit, axis=1) & np.all(np.abs(acc_rm) < 2, axis=1)
 
     # trim to no motion
     acc_rm_nm = acc_rm.filter(no_motion)
-    acc_rsd_nm = acc_rsd.filter(no_motion)
 
-    # initialize offset and scale
     offset = np.zeros(3)
     scale = np.ones(3)
 
+    # check if each axis meets sphere_criteria
     tel = 0
     for col in acc_rm_nm.columns:
         tmp = (acc_rm_nm[col].min() < -sphere_crit) & (
@@ -204,10 +205,6 @@ def closest_point_fit(
         scalech = np.ones(3)
 
         for k in range(3):
-            # there was some code dropping NANs from closest point, but these should
-            # be taken care of in the original mask. Division by zero should also
-            # not be happening during motionless data, where 1 value should always be close
-            # to 1
             x_ = np.vstack((curr.iloc[:, k]))
             tmp_y = np.vstack((closest_point.iloc[:, k]))
             LR.fit(x_, tmp_y, sample_weight=weights)
@@ -218,6 +215,8 @@ def closest_point_fit(
 
         scale = scalech * scale
         offset = offsetch + (offset / scale)
+
+        ##GGIR definition of residual and new weight calculations
         res.append(
             3 * np.mean(weights[:, None] * (curr - closest_point) ** 2 / weights.sum())
         )
