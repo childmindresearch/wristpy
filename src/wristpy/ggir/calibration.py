@@ -69,7 +69,15 @@ def start_ggir_calibration(
             f"No Calibration performed",
             UserWarning,
         )
-        return {}
+        return OutputData(
+            cal_acceleration=accel_data,
+            scale=0,
+            offset=0,
+            sampling_rate=s_r,
+            cal_error_start=0,
+            cal_error_end=0,
+            time=time_data,
+        )
 
     # flags for finished and if cal is valid
     finished = False
@@ -97,9 +105,18 @@ def start_ggir_calibration(
             finished = True
             valid_calibration = False
             warn(
-                f"Recalibration not done with {min_hours + (i_h - 1) * 12} - "
+                f"Calibration not done with {min_hours + (i_h - 1) * 12} - "
                 f"{min_hours + i_h * 12} hours due to insufficient non-movement "
                 f"data available"
+            )
+            return OutputData(
+                cal_acceleration=accel_data,
+                scale=0,
+                offset=0,
+                sampling_rate=s_r,
+                cal_error_start=0,
+                cal_error_end=0,
+                time=time_data,
             )
         i_h += 1
 
