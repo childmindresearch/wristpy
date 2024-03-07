@@ -121,7 +121,7 @@ def rolling_median(df: pl.DataFrame, ws: int = 51) -> pl.DataFrame:
 
 def moving_std(
     df: pl.DataFrame,
-    time_samples: pl.DataFrame,
+    time_df: pl.DataFrame,
     sampling_rate: int,
     ws: int,
 ) -> pl.DataFrame:
@@ -132,7 +132,7 @@ def moving_std(
 
     Args:
         df: The data frame containing the signals to downsample
-        time_samples: The datetime series of timestamps for the df signals
+        time_df: The datetime series of timestamps for the df signals
         sampling_rate: The sampling rate data was collected at
         ws: The desired window size, in seconds
 
@@ -141,11 +141,8 @@ def moving_std(
         column, labeled as {column}_std, where column is the same as the column name
         in signal_columns. Time column with start of window as timestamp.
     """
-    time_df = pl.DataFrame(time_samples)
-    time_df = time_df.rename({"column_0": "time"})
-
     # Join the time DataFrame with the original DataFrame
-    full_df = pl.concat([df, time_df], how="horizontal")
+    full_df = pl.concat([df, pl.DataFrame(time_df)], how="horizontal")
 
     samples_per_window = int(ws * sampling_rate)
 
@@ -183,7 +180,7 @@ def moving_std(
 
 def moving_mean(
     df: pl.DataFrame,
-    time_samples: pl.DataFrame,
+    time_df: pl.DataFrame,
     sampling_rate: int,
     ws: int,
 ) -> pl.DataFrame:
@@ -194,7 +191,7 @@ def moving_mean(
 
     Args:
         df: The data frame containing the signals to compute moving mean
-        time_samples: The datetime series of timestamps for the df signals
+        time_df: The datetime series of timestamps for the df signals
         sampling_rate: The sampling rate data was collected at
         ws: The desired window size, in seconds
 
@@ -203,11 +200,8 @@ def moving_mean(
         {column}_mean where column is the same as the column name
         in signal_columns. Column for the new time window that has start of the window.
     """
-    time_df = pl.DataFrame(time_samples)
-    time_df = time_df.rename({"column_0": "time"})
-
     # Join the time DataFrame with the original DataFrame
-    full_df = pl.concat([df, time_df], how="horizontal")
+    full_df = pl.concat([df, pl.DataFrame(time_df)], how="horizontal")
 
     samples_per_window = int(ws * sampling_rate)
 

@@ -27,6 +27,7 @@ def load(
         time_init = reader.to_pandas().index.to_numpy()
 
     time = timefix(time_init, sampling_rate)
+    time = pl.Series(time).alias("time")
     return InputData(acceleration=acceleration, sampling_rate=sampling_rate, time=time)
 
 
@@ -67,7 +68,6 @@ def load_fast(
     Returns:
            InputData class
     """
-
     subject1 = actfast.read_actigraph_gt3x(path)
 
     acceleration = pl.from_dict(
@@ -81,7 +81,7 @@ def load_fast(
     sampling_rate = int(subject1["metadata"]["info"]["Sample Rate"])
 
     time_tmp = pl.Series(subject1["timeseries"]["acceleration"]["datetime"])
-    time_actfast = pl.from_epoch(time_tmp, time_unit="ns")
+    time_actfast = pl.from_epoch(time_tmp, time_unit="ns").alias("time")
 
     return InputData(
         acceleration=acceleration, sampling_rate=sampling_rate, time=time_actfast
