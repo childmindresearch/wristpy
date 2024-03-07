@@ -2,6 +2,7 @@
 
 import pathlib
 
+import actfast
 import numpy as np
 import polars as pl
 import pygt3x.reader
@@ -12,7 +13,14 @@ from wristpy.common.data_model import InputData
 def load(
     path: pathlib.Path,
 ) -> InputData:
-    """Load input data from .gt3x file."""
+    """Load input data from .gt3x file.
+
+    Args:
+        path: file path to the raw data to load
+
+    Returns:
+           InputData class
+    """
     with pygt3x.reader.FileReader(str(path)) as reader:
         acceleration = pl.from_pandas(reader.to_pandas())
         sampling_rate = reader.info.sample_rate
@@ -29,7 +37,8 @@ def timefix(time: np.array, sampling_rate: any) -> np.array:
     datapoints are saved sequentially so that each new data point is one sample
     away from the previous.
 
-    Args: original timestamp data from .gt3x reader
+    Args:
+        time: original timestamp data from .gt3x reader
         sampling_rate: sampling rate, in Hz, from .gt3x reader
 
     Returns:
@@ -45,3 +54,35 @@ def timefix(time: np.array, sampling_rate: any) -> np.array:
     time_fix_test = np.asarray(time_fix, dtype="datetime64[ms]")
 
     return time_fix_test
+
+
+def load_fast(
+    path: pathlib.Path,
+) -> InputData:
+    """Load input data from .gt3x file using actfast.
+
+    Args:
+        path: file path to the raw data to load
+
+    Returns:
+           InputData class
+    """
+
+    subject1 = actfast.read_actigraph_gt3x(path)
+
+    acceleration = pl.from_dict(
+        {
+            "X": subject1["timeseries"]["acceleration"]["acceleration"][:, 0],
+            "Y": subject1["timeseries"]["acceleration"]["acceleration"][:, 1],
+            "Z": subject1["timeseries"]["acceleration"]["acceleration"][:, 2],
+        }
+    )
+
+    sampling_rate = subject1["metadata"]["info"]["Sample Rate"]
+
+    time_tmp = pl.Series(subject1["timeseries"]["acceleration"]["datetime"])
+    time_actfast = pl.from_epoch(time_tmp, time_unit="ns")
+
+    return InputData(
+        acceleration=acceleration, sampling_rate=sampling_rate, time=time_actfast
+    )

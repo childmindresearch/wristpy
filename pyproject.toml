@@ -13,6 +13,7 @@ pygt3x = "0.5.1"
 polars = "^0.20.6"
 scikit-learn = "^1.4.1.post1"
 pyarrow = "^15.0.0"
+actfast = "^0.1.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

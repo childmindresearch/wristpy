@@ -57,10 +57,8 @@ def start_ggir_calibration(
     time_data = input_data.time
     s_r = input_data.sampling_rate
 
-    # parameters
-    # n10 = int(10 * s_r)  # samples in 10 seconds, not used because hardcoded 10s
-    nh = int(min_hours * 3600 * s_r)  # samples in min_hours
-    n12h = int(12 * 3600 * s_r)  # samples in 12 hours
+    nh = int(min_hours * 3600 * s_r)
+    n12h = int(12 * 3600 * s_r)
 
     i_h = 0  # keep track of number of extra 12 hour blocks used
 
@@ -184,7 +182,7 @@ def closest_point_fit(
             tel = tel + 1
 
     if tel != 3:
-        return False, offset, scale
+        return False, offset, scale, 0, 0
 
     offset = pl.Series(np.zeros(3))
     scale = pl.Series(np.ones(3).flatten())
