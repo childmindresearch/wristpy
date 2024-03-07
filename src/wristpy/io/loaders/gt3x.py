@@ -78,7 +78,7 @@ def load_fast(
         }
     )
 
-    sampling_rate = subject1["metadata"]["info"]["Sample Rate"]
+    sampling_rate = int(subject1["metadata"]["info"]["Sample Rate"])
 
     time_tmp = pl.Series(subject1["timeseries"]["acceleration"]["datetime"])
     time_actfast = pl.from_epoch(time_tmp, time_unit="ns")
