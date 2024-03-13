@@ -29,6 +29,57 @@ def load_ggir_output(filepath: pathlib.Path) -> pl.DataFrame:
     return ggir_data
 
 
+def select_dates(difference_df: pl.DataFrame,
+                    ggir_data: pl.DataFrame,
+                    outputdata_trimmed: pl.DataFrame,
+                    start:str = None,
+                    end:str = None
+                    )-> pl.DataFrame:
+    """A function to that returns data from the dates specified if a start and/or end is given.
+
+    Args:
+        difference_df: The dataframe created by taking the difference of of wristpy's
+        output and a ggir output
+        ggir_data: The output of ggir
+        outputdata_trimmed: The output of wristpy, trimmed to fit the length of ggir's output
+        start: The optional starting point for date selection. Data is entered in the format of:
+        %Y-%m-%d %H:%M:%S.
+        end: The optional ending point for date selection. Data is entered in the format of:
+        %Y-%m-%d %H:%M:%S.
+
+    Returns:
+        A subset of each of the three dataframes.
+    """  # noqa: E501
+    #create polars datetime version of start and end
+    if start:
+        start_datetime = pl.lit(start).str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S")
+    if end:
+        end_datetime = pl.lit(end).str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S")
+    
+    #depending on whether start and or end are provided, creates a filter that removes 
+    #all dates not in the subset. Differences in the names of columns prevents 
+    #consolidation, will refactor to use a mask that can be applied to all relevant
+    #dataframes.
+    if start and end:
+        difference_df = difference_df.filter(pl.col('time_trimmed').is_between(start_datetime, end_datetime, closed = "both"))  # noqa: E501
+        ggir_data = ggir_data.filter(pl.col("timestamp").is_between(start_datetime, end_datetime, closed = "both"))  # noqa: E501
+        outputdata_trimmed = outputdata_trimmed.filter(pl.col('trim_time').is_between(start_datetime, end_datetime, closed = "both"))  # noqa: E501
+    elif start:
+        difference_df = difference_df.filter(pl.col('time_trimmed') >= start_datetime)
+        ggir_data = ggir_data.filter(pl.col("timestamp") >= start_datetime)
+        outputdata_trimmed = outputdata_trimmed.filter(pl.col("trim_time") >= start_datetime)  # noqa: E501
+    elif end:
+        difference_df = difference_df.filter(pl.col('time_trimmed') <= end_datetime)
+        ggir_data = ggir_data.filter(pl.col("timestamp") <= end_datetime)
+        outputdata_trimmed = outputdata_trimmed.filter(pl.col("trim_time") <= end_datetime)  # noqa: E501
+    
+
+    
+    return difference_df, ggir_data, outputdata_trimmed
+
+
+
+
 def compare(
     ggir_dataframe: pl.DataFrame, wristpy_dataframe: OutputData
 ) -> pl.DataFrame:
