@@ -113,7 +113,11 @@ def rolling_median(df: pl.DataFrame, ws: int = 51) -> pl.DataFrame:
 
     # Iterate over each column and apply the rolling median
     for col in df.columns:
-        rolled_col = df[col].rolling_median(window_size=ws, min_periods=1).alias(col)
+        rolled_col = (
+            df[col]
+            .rolling_median(window_size=ws, min_periods=1, center=True)
+            .alias(col)
+        )
         df_rolled = df_rolled.with_columns(rolled_col)
 
     return df_rolled
@@ -235,3 +239,71 @@ def moving_mean(
     )
 
     return moving_mean_df
+
+
+def moving_mean_fast(
+    data_df: pl.DataFrame,
+    time_df: pl.DataFrame,
+    ws: int,
+) -> pl.DataFrame:
+    """Mean over specific window size, based on timestamps.
+
+    This is a moving mean calculation, with non-overlapping windows. It will create a
+    downsampled signal of the original input, includes a new time output series.
+
+    Args:
+        data_df: the data to take the mean of
+        time_df: the timestamps df
+        ws: The desired window size, in seconds
+
+    Returns:
+        dataframe with the moving mean of signals in each column, labeled as
+        {column}_mean where column is the same as the column name
+        in signal_columns. Column for the new time window that has start of the window.
+    """
+    ws_s = str(ws) + "s"
+
+    full_df = pl.concat([data_df, pl.DataFrame(time_df)], how="horizontal")
+
+    full_df = full_df.with_columns(pl.col("time").set_sorted())
+    df_mean = full_df.group_by_dynamic(index_column="time", every=ws_s).agg(
+        [
+            pl.all().exclude(["time"]).mean().name.suffix("_mean"),
+        ]
+    )
+
+    return df_mean
+
+
+def moving_SD_fast(
+    data_df: pl.DataFrame,
+    time_df: pl.DataFrame,
+    ws: int,
+) -> pl.DataFrame:
+    """Standard deviation over specific window size, based on timestamps.
+
+    This is a moving SD calculation, with non-overlapping windows. It will create a
+    downsampled signal of the original input, includes a new time output series.
+
+    Args:
+        data_df: the data to take the mean of
+        time_df: the timestamps df
+        ws: The desired window size, in seconds
+
+    Returns:
+        dataframe with the moving SD of signals in each column, labeled as
+        {column}_SD where column is the same as the column name
+        in signal_columns. Column for the new time window that has start of the window.
+    """
+    ws_s = str(ws) + "s"
+
+    full_df = pl.concat([data_df, pl.DataFrame(time_df)], how="horizontal")
+
+    full_df = full_df.with_columns(pl.col("time").set_sorted())
+    df_SD = full_df.group_by_dynamic(index_column="time", every=ws_s).agg(
+        [
+            pl.all().exclude(["time"]).std().name.suffix("_SD"),
+        ]
+    )
+
+    return df_SD
