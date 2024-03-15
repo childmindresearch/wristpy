@@ -3,7 +3,6 @@
 import pathlib
 
 import numpy as np
-import plotly.express as px
 import plotly.graph_objects as go
 import polars as pl
 import statsmodels.api as sm
@@ -61,21 +60,71 @@ def select_dates(difference_df: pl.DataFrame,
     #consolidation, will refactor to use a mask that can be applied to all relevant
     #dataframes.
     if start and end:
-        difference_df = difference_df.filter(pl.col('time_trimmed').is_between(start_datetime, end_datetime, closed = "both"))  # noqa: E501
+        difference_df = difference_df.filter(pl.col('timestamp').is_between(start_datetime, end_datetime, closed = "both"))  # noqa: E501
         ggir_data = ggir_data.filter(pl.col("timestamp").is_between(start_datetime, end_datetime, closed = "both"))  # noqa: E501
-        outputdata_trimmed = outputdata_trimmed.filter(pl.col('trim_time').is_between(start_datetime, end_datetime, closed = "both"))  # noqa: E501
+        outputdata_trimmed = outputdata_trimmed.filter(pl.col('timestamp').is_between(start_datetime, end_datetime, closed = "both"))  # noqa: E501
     elif start:
-        difference_df = difference_df.filter(pl.col('time_trimmed') >= start_datetime)
+        difference_df = difference_df.filter(pl.col('timestamp') >= start_datetime)
         ggir_data = ggir_data.filter(pl.col("timestamp") >= start_datetime)
-        outputdata_trimmed = outputdata_trimmed.filter(pl.col("trim_time") >= start_datetime)  # noqa: E501
+        outputdata_trimmed = outputdata_trimmed.filter(pl.col("timestamp") >= start_datetime)  # noqa: E501
     elif end:
-        difference_df = difference_df.filter(pl.col('time_trimmed') <= end_datetime)
+        difference_df = difference_df.filter(pl.col('timestamp') <= end_datetime)
         ggir_data = ggir_data.filter(pl.col("timestamp") <= end_datetime)
-        outputdata_trimmed = outputdata_trimmed.filter(pl.col("trim_time") <= end_datetime)  # noqa: E501
+        outputdata_trimmed = outputdata_trimmed.filter(pl.col("timestamp") <= end_datetime)  # noqa: E501
     
 
     
     return difference_df, ggir_data, outputdata_trimmed
+
+
+
+def select_days(df: pl.DataFrame, start_day: int = 0, end_day: int = None)-> pl.DataFrame:
+    """Selects a subset of the dataframes, from days start:end, based on user input.
+
+    Args:
+        df: the given dataframe from which we will take data from the given data range.
+        start_day: The int specifying on which day the user would like to begin taking 
+        data from. If no date is given, data begins from the first day. Day 1 begins at 
+        an arbitrary hour, any other start_day will begin at midnight.
+        end_day: the int specifying on which day the user would like to stop taking data
+        If no date is given, data is extracted through the end. The last day present in
+        the dataframe ends at an arbbitrary hour, any other end_day will end just
+        before midnight. 
+
+    Returns:
+        filtered_df = the subset of the input dataframe, based on the date range given.
+    """
+    df = df.with_columns(pl.col('timestamp').cast(pl.Datetime))
+    min_timestamp = df['timestamp'].min()
+    max_timestamp = df["timestamp"].max()
+    final_day = (max_timestamp - min_timestamp).days + 1
+
+    if start_day == 0:
+        start_timestamp = min_timestamp
+    else:
+        start_timestamp = min_timestamp + pl.duration(days=start_day - 1)
+        # Adjust start_timestamp to midnight
+        start_timestamp = pl.datetime(
+            start_timestamp.dt.year(),
+            start_timestamp.dt.month(),
+            start_timestamp.dt.day()
+        )
+
+    if end_day is not None and end_day < final_day:
+        end_timestamp = min_timestamp + pl.duration(days=end_day - 1)
+        # Adjust end_timestamp to just before midnight
+        end_timestamp = pl.datetime(
+            end_timestamp.dt.year(),
+            end_timestamp.dt.month(),
+            end_timestamp.dt.day()
+        ) - pl.duration(microseconds=1)
+    else:
+        end_timestamp = max_timestamp
+
+    filtered_df = df.filter(pl.col('timestamp').is_between(start_timestamp, end_timestamp))
+    return filtered_df
+    
+
 
 
 
@@ -104,13 +153,13 @@ def compare(
     idx = np.searchsorted(tmp_time, ggir_time[0])
     outputdata_trimmed = pl.DataFrame(
         {
-            "trim_time": pl.Series(wristpy_dataframe.time_epoch1).slice(
+            "timestamp": pl.Series(wristpy_dataframe.time_epoch1).slice(
                 idx, len(ggir_time)
             ),
-            "trim_enmo": pl.Series(wristpy_dataframe.enmo_epoch1).slice(
+            "ENMO": pl.Series(wristpy_dataframe.enmo_epoch1).slice(
                 idx, len(ggir_time)
             ),
-            "trim_anglez": pl.Series(wristpy_dataframe.anglez_epoch1).slice(
+            "anglez": pl.Series(wristpy_dataframe.anglez_epoch1).slice(
                 idx, len(ggir_time)
             ),
         }
@@ -118,13 +167,13 @@ def compare(
 
     difference_df = pl.DataFrame(
         {
-            "enmo_diff": pl.Series(
-                outputdata_trimmed["trim_enmo"] - ggir_dataframe["ENMO"]
+            "ENMO": pl.Series(
+                outputdata_trimmed["ENMO"] - ggir_dataframe["ENMO"]
             ),
-            "anglez_diff": pl.Series(
-                outputdata_trimmed["trim_anglez"] - ggir_dataframe["anglez"]
+            "anglez": pl.Series(
+                outputdata_trimmed["anglez"] - ggir_dataframe["anglez"]
             ),
-            "time_trimmed": pl.Series(outputdata_trimmed["trim_time"]),
+            "timestamp": pl.Series(outputdata_trimmed["timestamp"]),
         }
     )
 
@@ -145,7 +194,8 @@ def plot_enmo(
 
     Args:
         difference_df: Dataframe with time and error difference
-        outputdata_trimmed: Dataframe with the outputData class trimmed for GGIR comparison
+        outputdata_trimmed: Dataframe with the outputData class trimmed for GGIR
+        comparison
         ggir_dataframe: Dataframe with ggir data
         indices: user defined indices to plot
         opacity: For data overlay visibility
@@ -155,24 +205,24 @@ def plot_enmo(
     fig = go.Figure()
 
     # Add the trimmed ENMO from outputdata_trimmed
-    fig.add_trace(go.Scatter(x=difference_df["time_trimmed"],
-                            y=outputdata_trimmed["trim_enmo"],
+    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
+                            y=outputdata_trimmed["ENMO"],
                             mode='lines',
                             line=dict(color='green', width=2),
                             name='Wristpy ENMO (Trimmed)',
                             opacity=opacity))
 
     # Add the ENMO from ggir_dataframe
-    fig.add_trace(go.Scatter(x=difference_df["time_trimmed"],
+    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
                             y=ggir_dataframe["ENMO"],
-                            mode='lines+markers', # Change to 'lines' if you don't want markers
+                            mode='lines+markers', 
                             line=dict(color='red', dash='dash', width=2),
                             name='GGIR ENMO',
                             opacity=opacity))
 
     # Add the ENMO difference
-    fig.add_trace(go.Scatter(x=difference_df["time_trimmed"],
-                            y=difference_df["enmo_diff"],
+    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
+                            y=difference_df["ENMO"],
                             mode='lines',
                             line=dict(color='black', width=2),
                             name='ENMO Difference'))
@@ -207,15 +257,15 @@ def plot_anglez(
     fig = go.Figure()
 
     # Add the trimmed anglez from outputdata_trimmed
-    fig.add_trace(go.Scatter(x=difference_df["time_trimmed"],
-                            y=outputdata_trimmed["trim_anglez"],
+    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
+                            y=outputdata_trimmed["anglez"],
                             mode='lines',
                             line=dict(color='green', width=2),
                             name='Wristpy Anglez (Trimmed)',
                             opacity=opacity))
 
     # Add the anglez from ggir_dataframe
-    fig.add_trace(go.Scatter(x=difference_df["time_trimmed"],
+    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
                             y=ggir_dataframe["anglez"],
                             mode='lines+markers', # Change to 'lines' if you don't want markers
                             line=dict(color='red', dash='dash', width=2),
@@ -224,8 +274,8 @@ def plot_anglez(
                             ))
 
     # Add the anglez difference
-    fig.add_trace(go.Scatter(x=difference_df["time_trimmed"],
-                            y=difference_df["anglez_diff"],
+    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
+                            y=difference_df["anglez"],
                             mode='lines',
                             line=dict(color='black', width=2),
                             name='Anglez Difference'))
@@ -243,7 +293,7 @@ def plot_qq(
         output_data_trimmed: pl.DataFrame,
         ggir_data1: pl.DataFrame
 )->None:
-    pp_x = sm.ProbPlot(output_data_trimmed['trim_enmo'])
+    pp_x = sm.ProbPlot(output_data_trimmed['ENMO'])
     pp_y = sm.ProbPlot(ggir_data1['ENMO'])
     qqplot_2samples(pp_x, pp_y, line="r")
     plt.show()
@@ -254,7 +304,7 @@ def plot_ba(
 )->None:
     opac_dict = dict(alpha=0.5)
     f, ax = plt.subplots(1, figsize = (8,5))
-    sm.graphics.mean_diff_plot(np.asarray(output_data_trimmed['trim_enmo']), np.asarray(ggir_data1['ENMO']), ax = ax, scatter_kwds=opac_dict)
+    sm.graphics.mean_diff_plot(np.asarray(output_data_trimmed['ENMO']), np.asarray(ggir_data1['ENMO']), ax = ax, scatter_kwds=opac_dict)
     plt.show()
     
 
