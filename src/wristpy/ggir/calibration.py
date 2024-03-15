@@ -7,7 +7,7 @@ import polars as pl
 from sklearn.linear_model import LinearRegression
 
 from wristpy.common.data_model import InputData, OutputData
-from wristpy.ggir.metrics_calc import moving_mean, moving_std
+from wristpy.ggir.metrics_calc import moving_mean_fast, moving_SD_fast
 
 
 def start_ggir_calibration(
@@ -173,11 +173,11 @@ def closest_point_fit(
 
     """
     # get the moving std and mean over a 10s window
-    RSD = moving_std(accel_data, time_data, s_r, 10)
-    RM = moving_mean(accel_data, time_data, s_r, 10)
+    RSD = moving_SD_fast(accel_data, time_data, 10)
+    RM = moving_mean_fast(accel_data, time_data, 10)
 
     # grab only the accel data
-    acc_rsd = RSD.select(["X_std", "Y_std", "Z_std"])
+    acc_rsd = RSD.select(["X_SD", "Y_SD", "Z_SD"])
     acc_rm = RM.select(["X_mean", "Y_mean", "Z_mean"])
 
     # find periods of no motion
