@@ -9,6 +9,7 @@
     - [**References**](#references)
 - [Calcuate metrics](#calcuate-metrics)
   - [Queries](#queries)
+- [**Non-wear time**](#non-wear-time)
     - [**References**](#references-1)
 
 
@@ -68,6 +69,15 @@ Key note about ENMO: default in GGIR and scikit is to trim any negative values t
 - Other desirable metrics, there is a long list included in GGIR, including filtering methods? are these used in literature?
 - GGIR calculates the anglez metric using a rolling median of acc(x,y,z). This rolling median is calculated over a window that is defined as: 5* sampling_rate +1, unless sampling_rate is > 10, then it is hardcoded to 5*10 +1. Scikit does not do this (and in my preliminary test I did not either and it didn’t seem to cause any issues). Not sure the need for this, especially since angle_z is downsampled after being calculated.
 
+
+# **Non-wear time**
+
+From the scikit paper for the DETACH algorithm
+
+"Final algorithm rules
+Based on constraints of the CART approach and observations made via edge cases, the outputs of the decisions tree classifiers were supplemented to produce a more intuitive and robust algorithm that was not specific to GENEActiv devices [37]. Specifically, conditions of the decision tree analysis required that each axis of accelerometry be considered separately within both non-wear start and non-wear end. A recent paper by [26] however, demonstrated that using two or three axes within the parameter set optimizes non-wear detection. As such, the DETACH algorithm was refined to include acceleration features for multiple, non-specific, axes for both start and end of non-wear. Given the number of axes considered within the final set of rules, the threshold for SD of acceleration was increased slightly from 7 to 8 mg. Specifically, for non-wear start, SD of acceleration over the following minute for 2 or more axes was set to be < 8 mg. This was combined with the need for the SD of acceleration of 2 or more axes to be 8 mg for at least 90% of the following 5 minutes. The 90% requirement was intended to avoid cases where spurious movement occurring during non-wear (e.g., a device being bumped) would be misinterpreted as wear. Additionally, the rate-of-change in temperature criterion for non-wear start was modified slightly from − 0.27 to − 0.2 but the absolute temperature threshold remained < 30 °C (rounded). To detect a non-wear end event, SD of acceleration during the previous minute was set to be > 8 mg for all axes, combined with a SD of acceleration > 8 mg for two or more axes for at least 50% of the following 5-minute window. This SD condition for non-wear end is followed by the need for the 5-minute temperature rate-of-change to be > 0.1 °C/minute.
+
+Visual inspection of non-wear periods in the test dataset that were not detected using the above pathways revealed cases in which the ambient temperature was close to the near-body temperature at the start of a non-wear period or rate-of-change didn’t meet the threshold of a minimum 0.2 °C decrease per minute. To address these possibilities, additional non-wear criteria focusing on absolute temperature were created to accompany the rate-of-change criteria. While maintaining the rules for accelerometry, the additional criteria serve to identify periods where temperature is below 26 °C for the start of a non-wear period or above 26 °C for non-wear end. Table 1 summarizes the non-wear rules based on decision tree classifiers, published literature, and edge case observations (algorithm available, see data availability statement)."
 
 ### **References**
 GGIR source : https://rdrr.io/cran/GGIR/src/R/g.applymetrics.R
