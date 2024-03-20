@@ -57,11 +57,13 @@ def run(args:str =None) -> None:  # noqa: D103
                         sure that file path is properly configured in config.json file.\
                         Modify path with --config or -c as needed.", type = str)
     
-    parser.add_argument("-s", "--start", type = str, help= "The first date you want data\
-                         from in the format of YYYY-MM-DD HH:MM:SS leave empty to select all dates.")  # noqa: E501
+    parser.add_argument("-s", "--start", type = int, help= "The first day you want data\
+                         as an int, e.g. 4 means the data starts on Day 4. Leave empty \
+                        to start data from beginning")
     
-    parser.add_argument("-e", "--end", type = str, help = "The last date you want data \
-                         from in the format of YYYY-MM-DD HH:MM:SS leave empty to select all dates.")  # noqa: E501
+    parser.add_argument("-e", "--end", type = int, help = "The last day you want data\
+                         as an int, e.g. 4 means the data selection ends on Day 4. \
+                        Leave empty to select data through to the end.")   
     
     parser.add_argument("-m", "--measures", choices = ['ENMO', 'anglez', 'qq', 'ba'], nargs= "+",  # noqa: E501
                         help = "Select which measures you would liketo plot. Options \
@@ -87,7 +89,7 @@ def run(args:str =None) -> None:  # noqa: D103
     ggir_output_path = path_dict['ggir_output'] + arguments.ggirfile
 
     test_config = wristpy.common.data_model.Config(gt3x_raw_path, gt3x_raw_path)  # noqa: E501
-    test_data = gt3x.load(test_config.path_input)
+    test_data = gt3x.load_fast(test_config.path_input)
     test_output = calibration.start_ggir_calibration(test_data)
 
     metrics_calc.calc_base_metrics(test_output)
@@ -104,19 +106,22 @@ def run(args:str =None) -> None:  # noqa: D103
     
     #If subset of dates given, select data for those dates only.
     if arguments.start or arguments.end:
-        diff_df_slice, ggir_df_slice, wristpy_df_slice= compare_dataframes.select_dates(
-            difference_df=difference_df, 
-            outputdata_trimmed=outputdata_trimmed,
-            ggir_data=ggir_data,
-            start=arguments.start,
-            end=arguments.end
-            )
+        difference_df = compare_dataframes.select_days(df = difference_df,
+                                                       start_day = arguments.start, 
+                                                       end_day = arguments.end)
+        ggir_data = compare_dataframes.select_days(df = ggir_data,
+                                                   start_day=  arguments.start,
+                                                   end_day= arguments.end)
+        outputdata_trimmed = compare_dataframes.select_days(df = outputdata_trimmed,
+                                                            start_day= arguments.start,
+                                                            end_day= arguments.end)
+        
         
         for measure in arguments.measures:
             compare_dataframes.plot_diff(
-                outputdata_trimmed = wristpy_df_slice, 
-                ggir_dataframe = ggir_df_slice, 
-                difference_df = diff_df_slice,
+                outputdata_trimmed = outputdata_trimmed, 
+                ggir_dataframe = ggir_data, 
+                difference_df = difference_df,
                 measures=measure, 
                 opacity= 0.5)
     #If not use the entire dataframes.            

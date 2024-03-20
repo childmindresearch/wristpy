@@ -78,7 +78,7 @@ def select_dates(difference_df: pl.DataFrame,
 
 
 
-def select_days(df: pl.DataFrame, start_day: int = 0, end_day: int = None)-> pl.DataFrame:
+def select_days(df: pl.DataFrame, start_day: int = 0, end_day: int = None)-> pl.DataFrame:  # noqa: E501
     """Selects a subset of the dataframes, from days start:end, based on user input.
 
     Args:
@@ -94,7 +94,9 @@ def select_days(df: pl.DataFrame, start_day: int = 0, end_day: int = None)-> pl.
     Returns:
         filtered_df = the subset of the input dataframe, based on the date range given.
     """
+    #Make sure we're dealing with dt objects.
     df = df.with_columns(pl.col('timestamp').cast(pl.Datetime))
+
     min_timestamp = df['timestamp'].min()
     max_timestamp = df["timestamp"].max()
     final_day = (max_timestamp - min_timestamp).days + 1
@@ -120,8 +122,10 @@ def select_days(df: pl.DataFrame, start_day: int = 0, end_day: int = None)-> pl.
         ) - pl.duration(microseconds=1)
     else:
         end_timestamp = max_timestamp
+        if end_day > final_day:
+            print(f'End Day entered is outside of data range. Last available date is {max_timestamp} which corresponds to Day {final_day}.')  # noqa: E501
 
-    filtered_df = df.filter(pl.col('timestamp').is_between(start_timestamp, end_timestamp))
+    filtered_df = df.filter(pl.col('timestamp').is_between(start_timestamp, end_timestamp))  # noqa: E501
     return filtered_df
     
 
