@@ -101,6 +101,7 @@ def select_days(df: pl.DataFrame, start_day: int = 0, end_day: int = None)-> pl.
     max_timestamp = df["timestamp"].max()
     final_day = (max_timestamp - min_timestamp).days + 1
 
+    
     if start_day is None or start_day == 0:
         start_timestamp = min_timestamp
     else:
@@ -122,7 +123,7 @@ def select_days(df: pl.DataFrame, start_day: int = 0, end_day: int = None)-> pl.
         ) - pl.duration(microseconds=1)
     else:
         end_timestamp = max_timestamp
-        if end_day > final_day:
+        if end_day and end_day > final_day:
             print(f'End Day entered is outside of data range. Last available date is {max_timestamp} which corresponds to Day {final_day}.')  # noqa: E501
 
     filtered_df = df.filter(pl.col('timestamp').is_between(start_timestamp, end_timestamp))  # noqa: E501

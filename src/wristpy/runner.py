@@ -84,6 +84,10 @@ def run(args:str =None) -> None:  # noqa: D103
             ggir_path= new_ggir_path)
         path_dict = load_config('config.json')
 
+    if arguments.start is not None and arguments.end is not None:
+        if arguments.start > arguments.end:
+            raise ValueError("the start day cannot be greater than the end day")
+
     
     gt3x_raw_path = path_dict['gt3x_raw'] + arguments.gt3xfile
     ggir_output_path = path_dict['ggir_output'] + arguments.ggirfile
