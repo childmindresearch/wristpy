@@ -101,7 +101,7 @@ def select_days(df: pl.DataFrame, start_day: int = 0, end_day: int = None)-> pl.
     max_timestamp = df["timestamp"].max()
     final_day = (max_timestamp - min_timestamp).days + 1
 
-    if start_day == 0:
+    if start_day is None or start_day == 0:
         start_timestamp = min_timestamp
     else:
         start_timestamp = min_timestamp + pl.duration(days=start_day - 1)
