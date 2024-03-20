@@ -1,4 +1,5 @@
 """Internal data model."""
+
 import pathlib
 from dataclasses import dataclass, field
 
@@ -37,15 +38,15 @@ class OutputData:
     It is mutated during processing.
     """
 
-    cal_acceleration: pl.DataFrame
-    scale: float
-    offset: float
-    cal_error_end: float
-    cal_error_start: float
-    sampling_rate: float
-    enmo: pl.DataFrame = field(default_factory=pl.DataFrame)
+    cal_acceleration: pl.DataFrame = field(default_factory=pl.DataFrame)
     anglez: pl.DataFrame = field(default_factory=pl.DataFrame)
-    time: pl.DataFrame = field(default_factory=pl.DataFrame)
-    enmo_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
     anglez_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
+    cal_error_end: float = 0.0
+    cal_error_start: float = 0.0
+    enmo: pl.DataFrame = field(default_factory=pl.DataFrame)
+    enmo_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
+    offset: float = 0.0
+    sampling_rate: float = 0.0
+    scale: float = 0.0
+    time: pl.DataFrame = field(default_factory=pl.DataFrame)
     time_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)

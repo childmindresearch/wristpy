@@ -169,7 +169,7 @@ def closest_point_fit(
      tol: Change in residual tolerance to determine stopping
 
     Returns:
-        Scale, offset, cal_error start, cal_error_end
+        Finished, Scale, offset, cal_error start, cal_error_end
 
     """
     # get the moving std and mean over a 10s window
