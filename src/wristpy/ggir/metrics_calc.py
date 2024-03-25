@@ -51,42 +51,6 @@ def calc_epoch1_metrics(output_data: OutputData) -> None:
     output_data.anglez_epoch1 = anglez_tmp["angle_z_mean"]
 
 
-def down_sample(
-    df: pl.DataFrame, signal_columns: list, sample_rate: int, ws: int
-) -> OutputData:
-    """Downsample the input signal to a desired window size, in seconds.
-
-    This is essentially a moving mean of window length ws seconds.
-
-    Args:
-        df: The data frame containing the signals to downsample
-        signal_columns: List of column names to downsample
-        sample_rate: The sampling rate data was collected at
-        ws: The desired window size, in seconds, of the downsampled
-
-    Returns:
-        df_ds: dataframe with the downsampled signals in each column, labeled as
-        downsample_{column}, where column is the same as the column name
-        in signal_columns.
-    """
-    ##NEEDS ERROR HANDLING FOR BAD INPUTS
-
-    samples_per_window = int(sample_rate * ws)
-
-    df_ds = pl.DataFrame()
-
-    # downsample each specified column
-    for column in signal_columns:
-        df_ds[f"downsampled_{column}"] = (
-            df[column]
-            .groupby(df.index // samples_per_window)
-            .mean()
-            .reset_index(drop=True)
-        )
-
-    return df_ds
-
-
 def rolling_median(df: pl.DataFrame, window_size: int = 51) -> pl.DataFrame:
     """Rolling median GGIR uses for anglez calculation.
 
@@ -95,9 +59,8 @@ def rolling_median(df: pl.DataFrame, window_size: int = 51) -> pl.DataFrame:
         window_size: The desired window size, in samples, defaults to 51 samples
 
     Returns:
-        df_rolled: dataframe with the downsampled signals in each column, labeled as
-        downsample_{column}, where column is the same as the column name
-        in signal_columns.
+        df_rolled: dataframe with the rolling median computed of the raw signals in each
+        column.
     """
     # Ensure the window size is odd, as per GGIR calculation
     if window_size % 2 == 0:
@@ -106,6 +69,7 @@ def rolling_median(df: pl.DataFrame, window_size: int = 51) -> pl.DataFrame:
     df_lazy = df.lazy()
 
     def _col_rolling_median(df: pl.DataFrame, window_size: int) -> pl.DataFrame:
+        """Helper function to calculate rolling median."""
         return df.select(
             [
                 pl.col(column)
@@ -123,18 +87,18 @@ def moving_std(
     df: pl.DataFrame,
     time_df: pl.DataFrame,
     sampling_rate: int,
-    ws: int,
+    window_size: int,
 ) -> pl.DataFrame:
     """Standard deviation over specific window size.
 
-    This is a moving STD calculation, with non-overlapping windows. It will create a
+    This is a moving STD calculation, with non-overlapping window. It will create a
     downsampled signal of the original input, includes a new time output series.
 
     Args:
         df: The data frame containing the signals to downsample
         time_df: The datetime series of timestamps for the df signals
         sampling_rate: The sampling rate data was collected at
-        ws: The desired window size, in seconds
+        window_size: The desired window size, in seconds
 
     Returns:
         moving_std_df: dataframe with the moving SD computed of the raw signals in each
@@ -144,15 +108,15 @@ def moving_std(
     # Join the time DataFrame with the original DataFrame
     full_df = pl.concat([df, pl.DataFrame(time_df)], how="horizontal")
 
-    samples_per_window = int(ws * sampling_rate)
+    samples_per_window = int(window_size * sampling_rate)
 
-    # Ensure that the number of rows in the dataframe is a
+    # Ensure that the number of rowindow_size in the dataframe is a
     # multiple of samples_per_window
-    num_rows = full_df.height
-    num_full_windows = num_rows // samples_per_window
-    trimmed_length = num_full_windows * samples_per_window
+    num_rowindow_size = full_df.height
+    num_full_windowindow_size = num_rowindow_size // samples_per_window
+    trimmed_length = num_full_windowindow_size * samples_per_window
 
-    # Trim the dataframe to include only full windows
+    # Trim the dataframe to include only full windowindow_size
     trimmed_df = full_df.head(trimmed_length)
 
     # Compute the moving standard deviation for each window
@@ -182,18 +146,18 @@ def moving_mean(
     df: pl.DataFrame,
     time_df: pl.DataFrame,
     sampling_rate: int,
-    ws: int,
+    window_size: int,
 ) -> pl.DataFrame:
     """Mean over specific window size.
 
-    This is a moving mean calculation, with non-overlapping windows. It will create a
+    This is a moving mean calculation, with non-overlapping window. It will create a
     downsampled signal of the original input, includes a new time output series.
 
     Args:
         df: The data frame containing the signals to compute moving mean
         time_df: The datetime series of timestamps for the df signals
         sampling_rate: The sampling rate data was collected at
-        ws: The desired window size, in seconds
+        window_size: The desired window size, in seconds
 
     Returns:
         dataframe with the moving mean of signals in each column, labeled as
@@ -203,13 +167,13 @@ def moving_mean(
     # Join the time DataFrame with the original DataFrame
     full_df = pl.concat([df, pl.DataFrame(time_df)], how="horizontal")
 
-    samples_per_window = int(ws * sampling_rate)
+    samples_per_window = int(window_size * sampling_rate)
 
     # Ensure that the number of rows in the dataframe is a
     # multiple of samples_per_window
-    num_rows = full_df.height
-    num_full_windows = num_rows // samples_per_window
-    trimmed_length = num_full_windows * samples_per_window
+    num_rowindow_size = full_df.height
+    num_full_windowindow_size = num_rowindow_size // samples_per_window
+    trimmed_length = num_full_windowindow_size * samples_per_window
 
     # Trim the dataframe to include only full windows
     trimmed_df = full_df.head(trimmed_length)
@@ -255,7 +219,8 @@ def moving_mean_fast(
     Returns:
         dataframe with the moving mean of signals in each column, labeled as
         {column}_mean where column is the same as the column name
-        in signal_columns. Column for the new time window that has start of the window.
+        in signal_columns. New time column that indicates the start time of
+        the window that the data was averaged over.
     """
     window_size_s = str(window_size) + "s"
 
@@ -279,7 +244,7 @@ def moving_SD_fast(
 ) -> pl.DataFrame:
     """Standard deviation over specific window size, based on timestamps.
 
-    This is a moving SD calculation, with non-overlapping windows. It will create a
+    This is a moving SD calculation, with non-overlapping windowindows. It will create a
     downsampled signal of the original input, includes a new time output series.
 
     Args:
@@ -290,7 +255,8 @@ def moving_SD_fast(
     Returns:
         dataframe with the moving SD of signals in each column, labeled as
         {column}_SD where column is the same as the column name
-        in signal_columns. Column for the new time window that has start of the window.
+        in signal_columns. New time column that indicates the start time of
+        the window that the data was averaged over.
     """
     window_size_s = str(window_size) + "s"
 
@@ -309,22 +275,56 @@ def moving_SD_fast(
     return df_SD
 
 
-def set_nonwear_flag(output_data: OutputData, window_size: int) -> pl.DataFrame:
+def set_nonwear_flag(
+    output_data: OutputData,
+    window_size: int,
+    window_size_long: int = 3600,
+    sd_crit: float = 0.013,
+    ra_crit: float = 0.05,
+) -> pl.DataFrame:
     """Set non-wear flag based on accelerometer data.
+
+    This implements GGIR "2023" non-wear detection algorithm.
+    Briefly, the algorithm, creates a sliding window of length "long_window" that steps
+    forward by the short_window time.
+    It checks if the acceleration data in that long window, for each axis, meets certain
+    criteria thresholds to compute a non-wear value.
+    And then applies that non-wear value to all the short windows that make up the long
+    window. Additionally, if any of the overlapping windows have a non-wear value, that
+    value is kept. Finally, there is a pass to find isolated "1s" in the non-wear value,
+    and set them to 2 if surrounded by >1 values.
+
 
     Args:
         output_data: OutputData object containing accelerometer data
         window_size: Window size in seconds for grouping the data
+        window_size_long: The long window size in seconds for non-wear detection
+        sd_crit: Threshold criteria for standard deviation
+        ra_crit: Threshold criteria for range of acceleration
+
 
     Returns:
-        DataFrame with non-wear flag indicating periods of non-wear
+        DataFrame with non-wear flag indicating periods of non-wear and the time intervals
     """
-    # GGIR uses these thresholds for non-wear, sd_crit and ra_crit are criteria for STD
-    # change and range of acceleration
-    sd_crit = 0.013
-    ra_crit = 0.05
-
     window_size_s = str(window_size) + "s"
+
+    num_short_windows = int(window_size_long / window_size)
+
+    def _nonwear_cond(
+        df_NW: pl.DataFrame, sd_crit: float, ra_crit: float
+    ) -> pl.DataFrame:
+        """Helper function to calculate non-wear criteria values."""
+        tmp_bool = (df_NW["X_SD"] < sd_crit) & (df_NW["range_X"] < ra_crit)
+        tmp_X = tmp_bool.cast(pl.Int32)
+
+        tmp_bool = (df_NW["Y_SD"] < sd_crit) & (df_NW["range_Y"] < ra_crit)
+        tmp_Y = tmp_bool.cast(pl.Int32)
+
+        tmp_bool = (df_NW["Z_SD"] < sd_crit) & (df_NW["range_Z"] < ra_crit)
+        tmp_Z = tmp_bool.cast(pl.Int32)
+        NW_val = tmp_X + tmp_Y + tmp_Z
+
+        return NW_val
 
     accel_time_data = pl.DataFrame(
         {
@@ -336,55 +336,87 @@ def set_nonwear_flag(output_data: OutputData, window_size: int) -> pl.DataFrame:
     )
     accel_time_data = accel_time_data.with_columns(pl.col("time_val").set_sorted())
 
-    """create dataframe with the moving SD of signals in each column, labeled as
-     {column}_SD and the range of each column, as these are the features GGIR uses 
-    for non-wear detection"""
-    df_NW = accel_time_data.group_by_dynamic(
+    # group the acceleration data by short window length
+    df_short_window = accel_time_data.group_by_dynamic(
         index_column="time_val", every=window_size_s
-    ).agg(
-        [
-            pl.all().exclude(["time_val"]).std().name.suffix("_SD"),
-            (pl.max("X") - pl.min("X")).alias("range_X"),
-            (pl.max("Y") - pl.min("X")).alias("range_Y"),
-            (pl.max("Z") - pl.min("X")).alias("range_Z"),
+    ).agg([pl.all().exclude(["time_val"])])
+
+    NW_val = np.zeros(len(df_short_window))
+
+    for win_num in range(len(df_short_window) - num_short_windows + 1):
+        # Select the rows from df_short_window to match long_window
+        # GGIR uses metrics from long windows to calculate non-wear criteria
+
+        # get the short window data that makes up the long window
+        df_short_window_selected = df_short_window[
+            win_num : win_num + num_short_windows
         ]
-    )
 
-    def _nonwear_cond(
-        df_NW: pl.DataFrame, sd_crit: float, ra_crit: float
-    ) -> pl.DataFrame:
-        """Comopute non-wear condition based on GGIR criteria."""
-        tmp_bool = (df_NW["X_SD"] < sd_crit) & (df_NW["range_X"] < ra_crit)
-        tmp_X = tmp_bool.cast(pl.Int32)
+        # get the SD and range data for the long window length
+        X_vals = pl.DataFrame()
+        Y_vals = pl.DataFrame()
+        Z_vals = pl.DataFrame()
+        for curr_win in range(num_short_windows):
+            X_vals = pl.concat(
+                [X_vals, pl.DataFrame(df_short_window_selected["X"][curr_win])],
+                how="vertical",
+            )
+            Y_vals = pl.concat(
+                [Y_vals, pl.DataFrame(df_short_window_selected["Y"][curr_win])],
+                how="vertical",
+            )
+            Z_vals = pl.concat(
+                [Z_vals, pl.DataFrame(df_short_window_selected["Z"][curr_win])],
+                how="vertical",
+            )
+        X_SD = X_vals.std()
+        Y_SD = Y_vals.std()
+        Z_SD = Z_vals.std()
+        X_range = X_vals.max() - X_vals.min()
+        Y_range = Y_vals.max() - Y_vals.min()
+        Z_range = Z_vals.max() - Z_vals.min()
 
-        tmp_bool = (df_NW["Y_SD"] < sd_crit) & (df_NW["range_Y"] < ra_crit)
-        tmp_Y = tmp_bool.cast(pl.Int32)
-
-        tmp_bool = (df_NW["Z_SD"] < sd_crit) & (df_NW["range_Z"] < ra_crit)
-        tmp_Z = tmp_bool.cast(pl.Int32)
-        NW_val = tmp_X + tmp_Y + tmp_Z
-
-        #  GGIR code to find ones that are isolated, and set them to 2
-        flags = (NW_val == 1).arg_true()
-
-        for iidx in flags:
-            if iidx == 0:
-                continue
-            if iidx == len(NW_val) - 1:
-                continue
-            if (NW_val[iidx - 1] > 1) and (NW_val[iidx + 1] > 1):
-                NW_val[iidx] = 2
-
-        NW_flag = df_NW.select(
-            pl.when(NW_val >= 2).then(1).otherwise(0).alias("Non-wear flag")
+        df_long_crit = pl.DataFrame(
+            {
+                "X_SD": X_SD,
+                "Y_SD": Y_SD,
+                "Z_SD": Z_SD,
+                "range_X": X_range,
+                "range_Y": Y_range,
+                "range_Z": Z_range,
+            }
         )
 
-        return NW_flag
+        # Apply _nonwear_cond to the filtered long window data
+        NW_flag_temp = _nonwear_cond(df_long_crit, sd_crit, ra_crit)
 
-    # find non-wear condition
-    NW_flag = _nonwear_cond(df_NW, sd_crit, ra_crit)
+        # GGIR uses a sliding window with overlap, and compares each overlapping of the
+        # short window length, if any of the overlaps have a non-wear flag it stays.
+        # Thus for each iteration we take the max value from the current window and the previous window.  # noqa: E501
+        max_value = np.maximum(
+            NW_val[win_num : win_num + num_short_windows],
+            np.repeat(NW_flag_temp, num_short_windows),
+        )
+        NW_val[win_num : win_num + num_short_windows] = max_value
 
-    # return the nonwear flag and time columns
-    NW_flag = NW_flag.with_columns(df_NW["time_val"])
+    # GGIR search for all cases where the non-wear value is 1, and then checks if the
+    # surrounding values are > 1. If so, it sets the value to 2.
+    flag_ones = np.where(NW_val == 1)[0]
 
-    return NW_flag
+    for iidx in flag_ones:
+        if iidx == 0:
+            continue
+        if iidx == len(NW_val) - 1:
+            continue
+        if (NW_val[iidx - 1] > 1) and (NW_val[iidx + 1] > 1):
+            NW_val[iidx] = 2
+
+    NW_val_df = pl.DataFrame({"NW_val": NW_val})
+
+    # Finally to create the non-wear flag, we set the flag to 1 if the NW_val is >= 2
+    # (two out of three axes are non-wear, besides some of the rewriting GGIR does)
+    NW_flag_df = NW_val_df.select(
+        pl.when(pl.col("NW_val") >= 2).then(1).otherwise(0).alias("Non-wear flag")
+    )
+    NW_flag_df = NW_flag_df.with_columns(df_short_window["time_val"])
+    return NW_flag_df

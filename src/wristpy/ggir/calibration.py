@@ -55,17 +55,17 @@ def start_ggir_calibration(
     """  # noqa: E501
     accel_data = input_data.acceleration
     time_data = input_data.time
-    s_r = input_data.sampling_rate
+    sampling_rate = input_data.sampling_rate
 
-    nh = int(min_hours * 3600 * s_r)
-    n12h = int(12 * 3600 * s_r)
+    nh = int(min_hours * 3600 * sampling_rate)
+    n12h = int(12 * 3600 * sampling_rate)
 
     i_h = 0  # keep track of number of extra 12 hour blocks used
 
     # check if enough data
     if accel_data.height < nh:
         warn(
-            f"Less than {min_hours} hours of data ({accel_data.height / (s_r * 3600)} hours). "  # noqa: E501
+            f"Less than {min_hours} hours of data ({accel_data.height / (sampling_rate * 3600)} hours). "  # noqa: E501
             f"No Calibration performed",
             UserWarning,
         )
@@ -73,7 +73,7 @@ def start_ggir_calibration(
             cal_acceleration=accel_data,
             scale=0,
             offset=0,
-            sampling_rate=s_r,
+            sampling_rate=sampling_rate,
             cal_error_start=0,
             cal_error_end=0,
             time=time_data,
@@ -95,7 +95,6 @@ def start_ggir_calibration(
         ) = closest_point_fit(
             accel_data_trimmed,
             time_data_trimmed,
-            s_r,
             sd_crit,
             sphere_crit,
             max_iter,
@@ -113,7 +112,7 @@ def start_ggir_calibration(
                 cal_acceleration=accel_data,
                 scale=0,
                 offset=0,
-                sampling_rate=s_r,
+                sampling_rate=sampling_rate,
                 cal_error_start=0,
                 cal_error_end=0,
                 time=time_data,
@@ -127,7 +126,7 @@ def start_ggir_calibration(
         cal_acceleration=scaled_accel,
         scale=scale,
         offset=offset,
-        sampling_rate=s_r,
+        sampling_rate=sampling_rate,
         cal_error_start=cal_err_start,
         cal_error_end=cal_err_end,
         time=time_data,
@@ -151,7 +150,6 @@ def apply_calibration(
 def closest_point_fit(
     accel_data: pl.DataFrame,
     time_data: pl.DataFrame,
-    s_r: int,
     sd_crit: float,
     sphere_crit: float,
     max_iter: int,
@@ -159,10 +157,15 @@ def closest_point_fit(
 ) -> tuple:
     """Do the iterative closest point fit.
 
+    Finds the periods of no motion in acceleration data, as defined by GGIR criteria for
+    mean and SD of acceleration.
+    Then performs an iterative closest point fit (minimizing distance to the unit sphere
+    of the three axis accleretaion data) to find the scale and offset to calibrate the
+    data.
+
     Args:
      accel_data: Data frame with the three column acceleration data
      time_data: Dat frame with the corrected time stamp data
-     s_r: sampling rate in Hz
      sd_crit: Threshold to find no motion, as defined above
      sphere_crit: Threshold for find no motion to have sparsely populated sphere
      max_iter: Max number of iterations for closest point fit
@@ -173,48 +176,49 @@ def closest_point_fit(
 
     """
     # get the moving std and mean over a 10s window
-    RSD = moving_SD_fast(accel_data, time_data, 10)
-    RM = moving_mean_fast(accel_data, time_data, 10)
+    rolling_SD = moving_SD_fast(accel_data, time_data, 10)
+    rolling_Mean = moving_mean_fast(accel_data, time_data, 10)
 
     # grab only the accel data
-    acc_rsd = RSD.select(["X_SD", "Y_SD", "Z_SD"])
-    acc_rm = RM.select(["X_mean", "Y_mean", "Z_mean"])
+    acc_SD = rolling_SD.select(["X_SD", "Y_SD", "Z_SD"])
+    acc_mean = rolling_Mean.select(["X_mean", "Y_mean", "Z_mean"])
 
     # find periods of no motion
-    no_motion = np.all(acc_rsd < sd_crit, axis=1) & np.all(np.abs(acc_rm) < 2, axis=1)
+    no_motion = np.all(acc_SD < sd_crit, axis=1) & np.all(np.abs(acc_mean) < 2, axis=1)
 
     # trim to no motion
-    acc_rm_nm = acc_rm.filter(no_motion)
+    acc_mean_noMotion = acc_mean.filter(no_motion)
 
     offset = np.zeros(3)
     scale = np.ones(3)
 
     # check if each axis meets sphere_criteria
-    tel = 0
-    for col in acc_rm_nm.columns:
-        tmp = (acc_rm_nm[col].min() < -sphere_crit) & (
-            acc_rm_nm[col].max() > sphere_crit
+    GGIR_check = 0
+    for col in acc_mean_noMotion.columns:
+        tmp = (acc_mean_noMotion[col].min() < -sphere_crit) & (
+            acc_mean_noMotion[col].max() > sphere_crit
         )
         if tmp:
-            tel = tel + 1
+            GGIR_check = GGIR_check + 1
 
-    if tel != 3:
+    if GGIR_check != 3:
         return False, offset, scale, 0, 0
 
     offset = pl.Series(np.zeros(3))
     scale = pl.Series(np.ones(3).flatten())
 
-    weights = np.ones(acc_rm_nm.shape[0]) * 100
-    res = [np.Inf]
+    # GGIR weights and residual definition
+    weights = np.ones(acc_mean_noMotion.shape[0]) * 100
+    residual = [np.Inf]
     LR = LinearRegression()
 
-    acc_nm_pd = acc_rm_nm.to_pandas()
+    acc_noMotion_pd = acc_mean_noMotion.to_pandas()
     cal_err_start = np.round(
-        np.mean(abs(np.linalg.norm(acc_rm_nm, axis=1) - 1)), decimals=5
+        np.mean(abs(np.linalg.norm(acc_mean_noMotion, axis=1) - 1)), decimals=5
     )
 
     for i in range(max_iter):
-        curr = (acc_nm_pd * scale) + offset
+        curr = (acc_noMotion_pd * scale) + offset
         closest_point = curr / np.linalg.norm(curr, axis=1, keepdims=True)
         offsetch = np.zeros(3)
         scalech = np.ones(3)
@@ -228,24 +232,25 @@ def closest_point_fit(
             scalech[k] = LR.coef_[0]
             curr.iloc[:, k] = x_ @ LR.coef_
 
+        # GGIR modification of scale and offset for next search point
         scale = scalech * scale
         offset = offsetch + (offset / scale)
 
         ##GGIR definition of residual and new weight calculations
-        res.append(
+        residual.append(
             3 * np.mean(weights[:, None] * (curr - closest_point) ** 2 / weights.sum())
         )
         weights = np.minimum(1 / np.linalg.norm(curr - closest_point, axis=1), 100)
 
-        if abs(res[i] - res[i - 1]) < tol:
+        if abs(residual[i] - residual[i - 1]) < tol:
             break
 
-    acc_cal_pd = (acc_nm_pd * scale) + offset
+    acc_cal_pd = (acc_noMotion_pd * scale) + offset
     cal_err_end = np.around(
         np.mean(abs(np.linalg.norm(acc_cal_pd, axis=1) - 1)), decimals=5
     )
 
-    # assess if calibration error has been significantly improved
+    # assess if calibration error has been sufficiently improved
     if (cal_err_end < cal_err_start) and (cal_err_end < 0.01):
         return True, offset, scale, cal_err_start, cal_err_end
     else:
