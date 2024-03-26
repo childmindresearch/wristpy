@@ -39,12 +39,14 @@ class OutputData:
     """
 
     cal_acceleration: pl.DataFrame = field(default_factory=pl.DataFrame)
+    accel_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
     anglez: pl.DataFrame = field(default_factory=pl.DataFrame)
     anglez_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
     cal_error_end: float = 0.0
     cal_error_start: float = 0.0
     enmo: pl.DataFrame = field(default_factory=pl.DataFrame)
     enmo_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
+    non_wear_flag_epoch1: int = 0
     offset: float = 0.0
     sampling_rate: float = 0.0
     scale: float = 0.0

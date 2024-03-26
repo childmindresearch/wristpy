@@ -51,6 +51,19 @@ def calc_epoch1_metrics(output_data: OutputData) -> None:
     output_data.anglez_epoch1 = anglez_tmp["angle_z_mean"]
 
 
+def calc_epoch1_raw(output_data: OutputData) -> None:
+    """Calculate mean raw acceleration signal in 5s windows, hardcoded 5s for now.
+
+    Args:
+        output_data: Output data class to grab the calibrated base metrics data.
+                     The OutputData class object will be modified inplace to include
+                     the new epoch1 data.
+    """
+    output_data.accel_epoch1 = moving_mean_fast(
+        output_data.cal_acceleration, output_data.time, 5
+    )
+
+
 def rolling_median(df: pl.DataFrame, window_size: int = 51) -> pl.DataFrame:
     """Rolling median GGIR uses for anglez calculation.
 
@@ -79,8 +92,8 @@ def rolling_median(df: pl.DataFrame, window_size: int = 51) -> pl.DataFrame:
             ]
         )
 
-    result = df_lazy.map_batches(lambda df: _col_rolling_median(df, window_size))
-    return result.collect()
+    time_match_NW = df_lazy.map_batches(lambda df: _col_rolling_median(df, window_size))
+    return time_match_NW.collect()
 
 
 def moving_std(
@@ -305,7 +318,8 @@ def set_nonwear_flag(
 
     Returns:
         DataFrame with non-wear flag indicating periods of non-wear and the time intervals
-    """
+        Add the non-wear flag to the output_data object to match the epoch1 interval
+    """  # noqa: E501
     window_size_s = str(window_size) + "s"
 
     num_short_windows = int(window_size_long / window_size)
@@ -419,4 +433,33 @@ def set_nonwear_flag(
         pl.when(pl.col("NW_val") >= 2).then(1).otherwise(0).alias("Non-wear flag")
     )
     NW_flag_df = NW_flag_df.with_columns(df_short_window["time_val"])
+
+    # Add the non-wear flag to the output_data object to match the epoch_time1 interval
+    # this is achieved by upsamlpling to match the temporal resolution of epoch1, and
+    # then padding the last known value to non-wear flag if there is a length mismatch
+
+    upsample_NW = NW_flag_df.upsample(
+        time_column="time_val", every="5s", maintain_order=True
+    ).select(pl.all().forward_fill())
+
+    time_epoch1_df = pl.DataFrame({"time_epoch1": output_data.time_epoch1})
+
+    time_match_NW = upsample_NW.join(
+        time_epoch1_df, left_on="time_val", right_on="time_epoch1", how="inner"
+    )
+    if len(time_epoch1_df) > len(time_match_NW):
+        diff = len(time_epoch1_df) - len(time_match_NW)
+        last_value = time_match_NW["Non-wear flag"].tail(1)
+        # Append the rows of time_epoch1 corresponding to the difference
+        time_epoch1_diff = time_epoch1_df.tail(diff)
+
+        fill_df = pl.DataFrame(
+            {
+                "time_val": time_epoch1_diff,
+                "Non-wear flag": np.repeat(last_value, diff),
+            }
+        )
+        output_data.non_wear_flag_epoch1 = pl.concat(
+            [time_match_NW, fill_df], how="vertical"
+        )["Non-wear flag"]
     return NW_flag_df
