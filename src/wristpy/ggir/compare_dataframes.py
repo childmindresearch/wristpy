@@ -188,158 +188,111 @@ def compare(
     return epoch1_data_time_match
 
 
-def plot_enmo(
-    difference_df: pl.DataFrame,
-    outputdata_trimmed: pl.DataFrame,
-    ggir_dataframe: pl.DataFrame,
-    opacity: float,
-    indices: slice = slice(None),
-) -> None:
-    """Plot difference graphs for enmo, with user defined indices and opacity.
+
+
+
+
+
+def plot_qq(
+        output_data_trimmed: pl.DataFrame,
+        ggir_data1: pl.DataFrame,
+        measure: str
+)->None:
+    """Create a Quantile-Quantile plot comparing the two samples from wristpy and ggir.
 
     Args:
-        difference_df: Dataframe with time and error difference
-        outputdata_trimmed: Dataframe with the outputData class trimmed for GGIR
-        comparison
-        ggir_dataframe: Dataframe with ggir data
-        indices: user defined indices to plot
-        opacity: For data overlay visibility
-
-        Returns:None
+        output_data_trimmed: A dataframe with wristpy output data. Plotted on x-axis
+        ggir_data1: A dataframe with ggir output data. Plotted on y-axis
+        measure: The name of the measure to be compared within each dataframe
+    
+    Returns:
+        None
     """
-    fig = go.Figure()
+    pp_x = sm.ProbPlot(output_data_trimmed[measure])
+    pp_y = sm.ProbPlot(ggir_data1[measure])
+    qqplot_2samples(pp_x, pp_y, line="r")
+    plt.title(f'QQ plot - {measure}')
+    plt.xlabel('wristpy')
+    plt.ylabel('ggir')
+    plt.show()
 
-    # Add the trimmed ENMO from outputdata_trimmed
-    fig.add_trace(
-        go.Scatter(
-            x=difference_df["timestamp"],
-            y=outputdata_trimmed["ENMO"],
-            mode="lines",
-            line=dict(color="green", width=2),
-            name="Wristpy ENMO (Trimmed)",
-            opacity=opacity,
-        )
-    )
+    
 
-    # Add the ENMO from ggir_dataframe
-    fig.add_trace(
-        go.Scatter(
-            x=difference_df["timestamp"],
-            y=ggir_dataframe["ENMO"],
-            mode="lines+markers",
-            line=dict(color="red", dash="dash", width=2),
-            name="GGIR ENMO",
-            opacity=opacity,
-        )
-    )
+def plot_ba(
+        output_data_trimmed: pl.DataFrame,
+        ggir_data1: pl.DataFrame,
+        measure: str
+)->None:
+    """Bland Altman plot comparing differences and means of two samples.
 
-    # Add the ENMO difference
-    fig.add_trace(
-        go.Scatter(
-            x=difference_df["timestamp"],
-            y=difference_df["ENMO"],
-            mode="lines",
-            line=dict(color="black", width=2),
-            name="ENMO Difference",
-        )
-    )
+    Args:
+        output_data_trimmed: A dataframe with wristpy output data. 
+        ggir_data1: A dataframe with ggir output data.
+        measure: The name of the measure to be compared within each dataframe
 
-    # Update layout if needed (e.g., titles, axes labels)
-    fig.update_layout(
-        title="ENMO Comparison",
-        xaxis_title="Time",
-        yaxis_title="ENMO Values",
-        legend_title="Legend",
-    )
-
-    # Show the figure
-    fig.show()
+    Returns:
+        None.
+    """
+    opac_dict = dict(alpha=0.5)
+    f, ax = plt.subplots(1, figsize = (8,5))
+    sm.graphics.mean_diff_plot(np.asarray(output_data_trimmed[measure]), np.asarray(ggir_data1[measure]), ax = ax, scatter_kwds=opac_dict)
+    plt.title(f'BA plot - {measure}')
+    plt.show()    
 
 
-def plot_anglez(
+def plot_measure(
     difference_df: pl.DataFrame,
     outputdata_trimmed: pl.DataFrame,
     ggir_dataframe: pl.DataFrame,
     opacity: float,
-    indices: slice = slice(None),
+    measure: str,
 ) -> None:
-    """Plot difference graphs for angelz, with user defined indices and opacity.
+    """Plot the time series for a given measure.
 
     Args:
         difference_df: Dataframe with time and error difference
-        outputdata_trimmed: Dataframe with the outputData class trimmed for GGIR comparison
+        outputdata_trimmed: Dataframe with the outputData class trimmed for comparison
         ggir_dataframe: Dataframe with ggir data
-        indices: user defined indices to plot
         opacity: For data overlay visibility
+        measure: measure being plotted. 
 
         Returns:None
     """
     fig = go.Figure()
 
     # Add the trimmed anglez from outputdata_trimmed
-    fig.add_trace(
-        go.Scatter(
-            x=difference_df["timestamp"],
-            y=outputdata_trimmed["anglez"],
-            mode="lines",
-            line=dict(color="green", width=2),
-            name="Wristpy Anglez (Trimmed)",
-            opacity=opacity,
-        )
-    )
+    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
+                            y=outputdata_trimmed[measure],
+                            mode='lines',
+                            line=dict(color='green', width=2),
+                            name=f'Wristpy {measure} (Trimmed)',
+                            opacity=opacity))
 
     # Add the anglez from ggir_dataframe
-    fig.add_trace(
-        go.Scatter(
-            x=difference_df["timestamp"],
-            y=ggir_dataframe["anglez"],
-            mode="lines+markers",  # Change to 'lines' if you don't want markers
-            line=dict(color="red", dash="dash", width=2),
-            name="GGIR Anglez",
-            opacity=opacity,
-        )
-    )
+    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
+                            y=ggir_dataframe[measure],
+                            mode='lines+markers', # Change to 'lines' if you don't want markers
+                            line=dict(color='red', dash='dash', width=2),
+                            name=f'GGIR {measure}',
+                            opacity=opacity
+                            ))
 
     # Add the anglez difference
-    fig.add_trace(
-        go.Scatter(
-            x=difference_df["timestamp"],
-            y=difference_df["anglez"],
-            mode="lines",
-            line=dict(color="black", width=2),
-            name="Anglez Difference",
-        )
-    )
+    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
+                            y=difference_df[measure],
+                            mode='lines',
+                            line=dict(color='black', width=2),
+                            name=f'{measure} Difference'))
 
     # Update the layout with titles and labels
-    fig.update_layout(
-        title="Anglez Comparison",
-        xaxis_title="Time",
-        yaxis_title="Anglez Values",
-        legend_title="Legend",
-    )
+    fig.update_layout(title=f'{measure} Comparison',
+                    xaxis_title='Time',
+                    yaxis_title=f'{measure} Values',
+                    legend_title='Legend')
 
     # Show the figure
     fig.show()
-
-
-def plot_qq(output_data_trimmed: pl.DataFrame, ggir_data1: pl.DataFrame) -> None:
-    pp_x = sm.ProbPlot(output_data_trimmed["ENMO"])
-    pp_y = sm.ProbPlot(ggir_data1["ENMO"])
-    qqplot_2samples(pp_x, pp_y, line="r")
-    plt.show()
-
-
-def plot_ba(output_data_trimmed: pl.DataFrame, ggir_data1: pl.DataFrame) -> None:
-    opac_dict = dict(alpha=0.5)
-    f, ax = plt.subplots(1, figsize=(8, 5))
-    sm.graphics.mean_diff_plot(
-        np.asarray(output_data_trimmed["ENMO"]),
-        np.asarray(ggir_data1["ENMO"]),
-        ax=ax,
-        scatter_kwds=opac_dict,
-    )
-    plt.show()
+    
 
 
 def plot_diff(
@@ -347,40 +300,43 @@ def plot_diff(
     outputdata_trimmed: pl.DataFrame,
     ggir_dataframe: pl.DataFrame,
     opacity: float,
-    measures: str,
-    indices: slice = slice(None),
+    measure: str,
+    plot: str,
 ) -> None:
     """Plot difference graphs, with user defined indices, opacity and measures.
 
     Args:
         difference_df: Dataframe with time and error difference
-        outputdata_trimmed: Dataframe with the outputData class trimmed for GGIR comparison
+        outputdata_trimmed: Dataframe with the outputData class trimmed for comparison
         ggir_dataframe: Dataframe with ggir data
-        indices: user defined indices to plot
         opacity: For data overlay visibility
-        measures: user defined measure to plot and compare.
+        measure: user defined measure to plot and compare.
+        plot: The type of plot type specified by the user. ts will plot the timeseries
+        data of wristpy output, ggir output and the differences between the two. ba 
+        will create a Bland Altman plot, qq will create a Quantile-Quantile plot.
 
-        Returns:None
+    Returns:
+            None
     """
-    if measures == "ENMO":
-        plot_enmo(
-            difference_df=difference_df,
-            outputdata_trimmed=outputdata_trimmed,
-            ggir_dataframe=ggir_dataframe,
-            indices=indices,
-            opacity=opacity,
+    if plot == 'ts':
+        plot_measure(
+            difference_df= difference_df,
+            outputdata_trimmed= outputdata_trimmed,
+            ggir_dataframe= ggir_dataframe,
+            measure = measure,
+            opacity = opacity
+            )
+    elif plot == 'ba':
+            plot_ba(
+            output_data_trimmed= outputdata_trimmed,
+            ggir_data1= ggir_dataframe,
+            measure = measure
         )
-    elif measures == "anglez":
-        plot_anglez(
-            difference_df=difference_df,
-            outputdata_trimmed=outputdata_trimmed,
-            ggir_dataframe=ggir_dataframe,
-            indices=indices,
-            opacity=opacity,
+    elif plot == 'qq':
+        plot_qq(
+             output_data_trimmed= outputdata_trimmed,
+             ggir_data1= ggir_dataframe,
+             measure = measure
         )
-    elif measures == "qq":
-        plot_qq(output_data_trimmed=outputdata_trimmed, ggir_data1=ggir_dataframe)
-    elif measures == "ba":
-        plot_ba(output_data_trimmed=outputdata_trimmed, ggir_data1=ggir_dataframe)
     else:
-        print("YOU DID NOT SELECT A MEASURE!")
+        print("YOU DID NOT SELECT A PLOT!")

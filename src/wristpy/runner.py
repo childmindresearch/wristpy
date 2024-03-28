@@ -49,11 +49,11 @@ def run(args:str =None) -> None:  # noqa: D103
                             output file for comparison.Please double check that \
                             default file paths are appropriately configured.")
     
-    parser.add_argument("-f","--gt3xfile", help= "file name for gt3x file. Make sure \
+    parser.add_argument("gt3xfile", help= "file name for gt3x file. Make sure \
                         file path is properly configured in config.json file. Modify \
                         path with --config or -c as needed", type = str)
     
-    parser.add_argument("-g","--ggirfile", help= "file name for ggir output file. Make\
+    parser.add_argument("ggirfile", help= "file name for ggir output file. Make\
                         sure that file path is properly configured in config.json file.\
                         Modify path with --config or -c as needed.", type = str)
     
@@ -65,17 +65,25 @@ def run(args:str =None) -> None:  # noqa: D103
                          as an int, e.g. 4 means the data selection ends on Day 4. \
                         Leave empty to select data through to the end.")   
     
-    parser.add_argument("-m", "--measures", choices = ['ENMO', 'anglez', 'qq', 'ba'], nargs= "+",  # noqa: E501
+    parser.add_argument("-m", "--measures", choices = ['ENMO', 'anglez'], nargs= "+",  # noqa: E501
                         help = "Select which measures you would liketo plot. Options \
-                        include ENMO, anglez, qq, ba")
+                        include ENMO, anglez")
     
     parser.add_argument('-c', '--config', type = str, help = " Change file paths for \
-                        gt3x raw file and ggir output file, in that order.")
+                        gt3x raw file and ggir output file, in that order.", nargs = 2)
+    
+    parser.add_argument('-p', '--plot', type = str, choices = ['ba', 'qq', 'ts'],
+                        nargs = '+', help = 'the type of plot to be displayed. Select \
+                        from "ba"(bland altman plot), "qq"(quantile-quantile plot) or \
+                        ts (timeseries data).')
+    
+    
     
     arguments = parser.parse_args(args) if args else parser.parse_args()
 
     path_dict = load_config('config.json')
 
+    #If new configuration is given, update and load the new one
     if arguments.config:
         new_gt3x_path, new_ggir_path = arguments.config
         update_config(
@@ -84,6 +92,7 @@ def run(args:str =None) -> None:  # noqa: D103
             ggir_path= new_ggir_path)
         path_dict = load_config('config.json')
 
+    #Start day must be before End day, if both are given
     if arguments.start is not None and arguments.end is not None:
         if arguments.start > arguments.end:
             raise ValueError("the start day cannot be greater than the end day")
@@ -97,7 +106,6 @@ def run(args:str =None) -> None:  # noqa: D103
     test_output = calibration.start_ggir_calibration(test_data)
 
     metrics_calc.calc_base_metrics(test_output)
-
     metrics_calc.calc_epoch1_metrics(test_output)
 
     ggir_data = compare_dataframes.load_ggir_output(ggir_output_path)
@@ -120,23 +128,28 @@ def run(args:str =None) -> None:  # noqa: D103
                                                             start_day= arguments.start,
                                                             end_day= arguments.end)
         
-        
+        #for each measure type, and plot type, make the
         for measure in arguments.measures:
-            compare_dataframes.plot_diff(
-                outputdata_trimmed = outputdata_trimmed, 
-                ggir_dataframe = ggir_data, 
-                difference_df = difference_df,
-                measures=measure, 
-                opacity= 0.5)
+            for plot in arguments.plot:
+                compare_dataframes.plot_diff(
+                    outputdata_trimmed = outputdata_trimmed, 
+                    ggir_dataframe = ggir_data, 
+                    difference_df = difference_df,
+                    measure=measure,
+                    plot = plot, 
+                    opacity= 0.5)
+            
     #If not use the entire dataframes.            
     else:
         for measure in arguments.measures:
-            compare_dataframes.plot_diff(
-                outputdata_trimmed = outputdata_trimmed, 
-                ggir_dataframe = ggir_data, 
-                difference_df = difference_df,
-                measures=measure, 
-                opacity= 0.5)
+            for plot in arguments.plot:
+                compare_dataframes.plot_diff(
+                    outputdata_trimmed = outputdata_trimmed, 
+                    ggir_dataframe = ggir_data, 
+                    difference_df = difference_df,
+                    measure=measure,
+                    plot = plot,
+                    opacity= 0.5)
 
 if __name__ == "__main__":
     run()
