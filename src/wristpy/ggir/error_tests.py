@@ -17,7 +17,7 @@ from wristpy.io.loaders import gt3x
 warnings.filterwarnings("always")
 
 
-def proccess_file(file_name: str, output_path: str) -> OutputData:
+def process_file(file_name: str, output_path: str) -> OutputData:
     """Process a gt3x file with wristpy, write csv output.
 
     Args:
@@ -80,25 +80,17 @@ def compute_error(
     Returns:
         A tuple containing the mean squared error for anglez, mean squared error for ENMO, and the median difference of anglez.
     """  # noqa: E501
-    difference_df, outputdata_trimmed = compare_dataframes.compare(
+    epoch1_data = compare_dataframes.compare(
         ggir_dataframe=ggir_data, wristpy_dataframe=wristpy_data
     )
 
-    outputdata_trimmed = outputdata_trimmed.with_columns(
-        ggir_data["ENMO"].alias("GGIR_ENMO"), ggir_data["anglez"].alias("GGIR_anglez")
-    )
-
     # extend non-wear flag to smooth out edges
-    NW_flag_rolling_mean = outputdata_trimmed["non-wear flag"].rolling_mean(
-        window_size=2160
-    )
+    NW_flag_rolling_mean = epoch1_data["non_wear_flag"].rolling_mean(window_size=2160)
     NW_flag_rolling_mean = NW_flag_rolling_mean.map_elements(
         lambda x: 1 if x > 0.25 else 0
     )
 
-    metrics_calc_nonwear = outputdata_trimmed.filter(
-        outputdata_trimmed["non-wear flag"] == 0
-    )
+    metrics_calc_nonwear = epoch1_data.filter(epoch1_data["non_wear_flag"] == 0)
 
     def _compute_mse(df: pl.DataFrame, col1: str, col2: str) -> float:
         """Helper function to compute mean squared error."""
@@ -106,9 +98,11 @@ def compute_error(
         mse = squared_error.mean()
         return mse
 
-    mse_anglez = _compute_mse(metrics_calc_nonwear, "anglez", "GGIR_anglez")
-    mse_enmo = _compute_mse(metrics_calc_nonwear, "ENMO", "GGIR_ENMO")
+    mse_anglez = _compute_mse(metrics_calc_nonwear, "anglez_wristpy", "anglez_ggir")
+    mse_enmo = _compute_mse(metrics_calc_nonwear, "enmo_wristpy", "enmo_ggir")
 
-    angz_diff = metrics_calc_nonwear["anglez"] - metrics_calc_nonwear["GGIR_anglez"]
+    angz_diff = (
+        metrics_calc_nonwear["anglez_wristpy"] - metrics_calc_nonwear["anglez_ggir"]
+    )
 
     return mse_anglez, mse_enmo, angz_diff.median()

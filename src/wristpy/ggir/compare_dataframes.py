@@ -156,39 +156,36 @@ def compare(
 
 
     Returns:
-        A difference dataframe that has the trimmed timestamps, and difference between
-        GGIR output and the outputData Class enmo and anglez
+        epoch1_data_time_match: A dataframe with epoch1 timestamps that are matched
+        between wristpy and GGIR, contains enmo, anglez for both processing tools, as
+        well as the non-wear flag from wristpy.
     """
-    ggir_time = np.asarray(ggir_dataframe["timestamp"], dtype="datetime64[ms]")
-    tmp_time = np.asarray(wristpy_dataframe.time_epoch1, dtype="datetime64[ms]")
+    ggir_time = pl.Series(ggir_dataframe["timestamp"])
 
-    idx = np.searchsorted(tmp_time, ggir_time[0])
-    outputdata_trimmed = pl.DataFrame(
+    ggir_datetime = ggir_time.str.to_datetime(time_unit="ns")
+
+    epoch1_wristpy = pl.DataFrame(
         {
-            "timestamp": pl.Series(wristpy_dataframe.time_epoch1).slice(
-                idx, len(ggir_time)
-            ),
-            "ENMO": pl.Series(wristpy_dataframe.enmo_epoch1).slice(idx, len(ggir_time)),
-            "anglez": pl.Series(wristpy_dataframe.anglez_epoch1).slice(
-                idx, len(ggir_time)
-            ),
-            "non-wear flag": pl.Series(wristpy_dataframe.non_wear_flag_epoch1).slice(
-                idx, len(ggir_time)
-            ),
+            "time_epoch1": wristpy_dataframe.time_epoch1,
+            "enmo_wristpy": wristpy_dataframe.enmo_epoch1,
+            "anglez_wristpy": wristpy_dataframe.anglez_epoch1,
+            "non_wear_flag": wristpy_dataframe.non_wear_flag_epoch1,
         }
     )
 
-    difference_df = pl.DataFrame(
+    epoch1_ggir = pl.DataFrame(
         {
-            "ENMO": pl.Series(outputdata_trimmed["ENMO"] - ggir_dataframe["ENMO"]),
-            "anglez": pl.Series(
-                outputdata_trimmed["anglez"] - ggir_dataframe["anglez"]
-            ),
-            "timestamp": pl.Series(outputdata_trimmed["timestamp"]),
+            "time_epoch1": ggir_datetime,
+            "enmo_ggir": ggir_dataframe["ENMO"],
+            "anglez_ggir": ggir_dataframe["anglez"],
         }
     )
 
-    return difference_df, outputdata_trimmed
+    epoch1_data_time_match = epoch1_wristpy.join(
+        epoch1_ggir, left_on="time_epoch1", right_on="time_epoch1", how="inner"
+    )
+
+    return epoch1_data_time_match
 
 
 def plot_enmo(

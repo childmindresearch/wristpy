@@ -241,7 +241,7 @@ def moving_mean_fast(
 
     full_df = full_df.with_columns(pl.col("time").set_sorted())
     windowed_group = [
-        pl.all().exclude(["time"]).mean().name.suffix("_mean"),
+        pl.all().exclude(["time"]).drop_nans().mean().name.suffix("_mean"),
     ]
     df_mean = full_df.group_by_dynamic(index_column="time", every=window_size_s).agg(
         windowed_group
@@ -295,7 +295,7 @@ def set_nonwear_flag(
     sd_crit: float = 0.013,
     ra_crit: float = 0.05,
 ) -> pl.DataFrame:
-    """Set non-wear flag based on accelerometer data.
+    """Set non_wear_flag based on accelerometer data.
 
     This implements GGIR "2023" non-wear detection algorithm.
     Briefly, the algorithm, creates a sliding window of length "long_window" that steps
@@ -317,8 +317,8 @@ def set_nonwear_flag(
 
 
     Returns:
-        DataFrame with non-wear flag indicating periods of non-wear and the time intervals
-        Add the non-wear flag to the output_data object to match the epoch1 interval
+        DataFrame with non_wear_flag indicating periods of non-wear and the time intervals
+        Add the non_wear_flag to the output_data object to match the epoch1 interval
     """  # noqa: E501
     window_size_s = str(window_size) + "s"
 
@@ -405,7 +405,7 @@ def set_nonwear_flag(
         NW_flag_temp = _nonwear_cond(df_long_crit, sd_crit, ra_crit)
 
         # GGIR uses a sliding window with overlap, and compares each overlapping of the
-        # short window length, if any of the overlaps have a non-wear flag it stays.
+        # short window length, if any of the overlaps have a non_wear_flag it stays.
         # Thus for each iteration we take the max value from the current window and the previous window.  # noqa: E501
         max_value = np.maximum(
             NW_val[win_num : win_num + num_short_windows],
@@ -427,16 +427,16 @@ def set_nonwear_flag(
 
     NW_val_df = pl.DataFrame({"NW_val": NW_val})
 
-    # Finally to create the non-wear flag, we set the flag to 1 if the NW_val is >= 2
+    # Finally to create the non_wear_flag, we set the flag to 1 if the NW_val is >= 2
     # (two out of three axes are non-wear, besides some of the rewriting GGIR does)
     NW_flag_df = NW_val_df.select(
-        pl.when(pl.col("NW_val") >= 2).then(1).otherwise(0).alias("Non-wear flag")
+        pl.when(pl.col("NW_val") >= 2).then(1).otherwise(0).alias("non_wear_flag")
     )
     NW_flag_df = NW_flag_df.with_columns(df_short_window["time_val"])
 
-    # Add the non-wear flag to the output_data object to match the epoch_time1 interval
+    # Add the non_wear_flag to the output_data object to match the epoch_time1 interval
     # this is achieved by upsamlpling to match the temporal resolution of epoch1, and
-    # then padding the last known value to non-wear flag if there is a length mismatch
+    # then padding the last known value to non_wear_flag if there is a length mismatch
 
     upsample_NW = NW_flag_df.upsample(
         time_column="time_val", every="5s", maintain_order=True
@@ -449,17 +449,18 @@ def set_nonwear_flag(
     )
     if len(time_epoch1_df) > len(time_match_NW):
         diff = len(time_epoch1_df) - len(time_match_NW)
-        last_value = time_match_NW["Non-wear flag"].tail(1)
+        last_value = time_match_NW["non_wear_flag"].tail(1)
         # Append the rows of time_epoch1 corresponding to the difference
         time_epoch1_diff = time_epoch1_df.tail(diff)
 
         fill_df = pl.DataFrame(
             {
                 "time_val": time_epoch1_diff,
-                "Non-wear flag": np.repeat(last_value, diff),
+                "non_wear_flag": np.repeat(last_value, diff),
             }
         )
         output_data.non_wear_flag_epoch1 = pl.concat(
             [time_match_NW, fill_df], how="vertical"
-        )["Non-wear flag"]
+        )["non_wear_flag"]
+
     return NW_flag_df
