@@ -15,7 +15,6 @@ def calc_base_metrics(output_data: OutputData) -> None:
 
     """
     accel_raw = output_data.cal_acceleration
-
     # GGIR truncates ENMO to 0 prior to downsampling, use np, then cast to pl.DataFrame
     output_data.enmo = pl.DataFrame(
         np.maximum(np.linalg.norm(accel_raw, axis=1) - 1, 0)
