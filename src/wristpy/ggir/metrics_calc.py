@@ -3,7 +3,7 @@
 import numpy as np
 import polars as pl
 
-from wristpy.common.data_model import OutputData
+from wristpy.common.data_model import InputData, OutputData
 
 
 def calc_base_metrics(output_data: OutputData) -> None:
@@ -63,6 +63,70 @@ def calc_epoch1_raw(output_data: OutputData) -> None:
     )
 
 
+def calc_epoch1_light(input_data: InputData, output_data: OutputData) -> None:
+    """Calculate mean light signal in 5s windows, hardcoded 5s for now.
+
+    Args:
+        input_data: Input data class to grab the raw light data.
+        output_data: The OutputData class object will be modified inplace to include
+                     the new epoch1 data.
+    """
+    lux_mean_df = moving_mean_fast(
+        pl.DataFrame(input_data.lux_df["lux"]), input_data.lux_df["time"], 5
+    )
+
+    lux_mean_df = lux_mean_df.with_columns(pl.col("time").set_sorted())
+
+    # swap columns due to upsample format
+    lux_mean_df = lux_mean_df.select(["lux_mean", "time"])
+    time_match_lux, fill_df = upsample_time_match_helper(lux_mean_df, output_data)
+    output_data.lux_epoch1 = pl.concat([time_match_lux, fill_df], how="vertical")[
+        "lux_mean"
+    ]
+
+
+def calc_epoch1_battery(input_data: InputData, output_data: OutputData) -> None:
+    """Calculate battery signal in 5s windows, hardcoded 5s for now.
+
+    Args:
+        input_data: Input data class to grab the raw battery data.
+        output_data: The OutputData class object will be modified inplace to include
+                     the new epoch1 data.
+    """
+    battery_df = input_data.battery_df
+
+    battery_df = battery_df.with_columns(pl.col("time").set_sorted())
+
+    # swap columns due to upsample format
+    battery_df = battery_df.select(["battery_voltage", "time"])
+    time_match_battery, fill_df = upsample_time_match_helper(battery_df, output_data)
+    output_data.battery_upsample_epoch1 = pl.concat(
+        [time_match_battery, fill_df], how="vertical"
+    )["battery_voltage"]
+
+
+def calc_epoch1_cap_sensor(input_data: InputData, output_data: OutputData) -> None:
+    """Calculate capactive sensor in 5s windows, hardcoded 5s for now.
+
+    Args:
+        input_data: Input data class to grab the raw cap sense data.
+        output_data: The OutputData class object will be modified inplace to include
+                     the new epoch1 data.
+    """
+    cap_sense_df = input_data.capsense_df
+
+    cap_sense_df = cap_sense_df.with_columns(pl.col("time").set_sorted())
+
+    # swap columns due to upsample format
+    cap_sense_df = cap_sense_df.select(["cap_sense", "time"])
+    time_match_cap_sense, fill_df = upsample_time_match_helper(
+        cap_sense_df, output_data
+    )
+    output_data.capsense_upsample_epoch1 = pl.concat(
+        [time_match_cap_sense, fill_df], how="vertical"
+    )["cap_sense"]
+
+
 def rolling_median(df: pl.DataFrame, window_size: int = 51) -> pl.DataFrame:
     """Rolling median GGIR uses for anglez calculation.
 
@@ -91,8 +155,8 @@ def rolling_median(df: pl.DataFrame, window_size: int = 51) -> pl.DataFrame:
             ]
         )
 
-    time_match_NW = df_lazy.map_batches(lambda df: _col_rolling_median(df, window_size))
-    return time_match_NW.collect()
+    df_rolled = df_lazy.map_batches(lambda df: _col_rolling_median(df, window_size))
+    return df_rolled.collect()
 
 
 def moving_std(
@@ -344,15 +408,15 @@ def set_nonwear_flag(
             "X": output_data.cal_acceleration["X"],
             "Y": output_data.cal_acceleration["Y"],
             "Z": output_data.cal_acceleration["Z"],
-            "time_val": output_data.time,
+            "time": output_data.time,
         }
     )
-    accel_time_data = accel_time_data.with_columns(pl.col("time_val").set_sorted())
+    accel_time_data = accel_time_data.with_columns(pl.col("time").set_sorted())
 
     # group the acceleration data by short window length
     df_short_window = accel_time_data.group_by_dynamic(
-        index_column="time_val", every=window_size_s
-    ).agg([pl.all().exclude(["time_val"])])
+        index_column="time", every=window_size_s
+    ).agg([pl.all().exclude(["time"])])
 
     NW_val = np.zeros(len(df_short_window))
 
@@ -431,35 +495,53 @@ def set_nonwear_flag(
     NW_flag_df = NW_val_df.select(
         pl.when(pl.col("NW_val") >= 2).then(1).otherwise(0).alias("non_wear_flag")
     )
-    NW_flag_df = NW_flag_df.with_columns(df_short_window["time_val"])
+    NW_flag_df = NW_flag_df.with_columns(df_short_window["time"])
 
     # Add the non_wear_flag to the output_data object to match the epoch_time1 interval
     # this is achieved by upsamlpling to match the temporal resolution of epoch1, and
     # then padding the last known value to non_wear_flag if there is a length mismatch
+    time_match_NW, fill_df = upsample_time_match_helper(NW_flag_df, output_data)
 
-    upsample_NW = NW_flag_df.upsample(
-        time_column="time_val", every="5s", maintain_order=True
-    ).select(pl.all().forward_fill())
+    output_data.non_wear_flag_epoch1 = pl.concat(
+        [time_match_NW, fill_df], how="vertical"
+    )["non_wear_flag"]
+
+    return NW_flag_df
+
+
+def upsample_time_match_helper(
+    data_to_upsample: pl.DataFrame, output_data: OutputData
+) -> pl.DataFrame:
+    """Helper function to upsample data and then to match the accel epoch1 data length.
+
+    Args:
+        data_to_upsample: DataFrame with
+        output_data: OutputData object containing the epoch1 time data
+    """
+    upsampled_data = data_to_upsample.upsample(
+        time_column="time", every="5s", maintain_order=True
+    ).select(pl.all().interpolate())
 
     time_epoch1_df = pl.DataFrame({"time_epoch1": output_data.time_epoch1})
 
-    time_match_NW = upsample_NW.join(
-        time_epoch1_df, left_on="time_val", right_on="time_epoch1", how="inner"
+    time_match_df = upsampled_data.join(
+        time_epoch1_df, left_on="time", right_on="time_epoch1", how="inner"
     )
-    if len(time_epoch1_df) > len(time_match_NW):
-        diff = len(time_epoch1_df) - len(time_match_NW)
-        last_value = time_match_NW["non_wear_flag"].tail(1)
+
+    col_name = data_to_upsample.columns[0]
+    if len(time_epoch1_df) > len(time_match_df):
+        diff = len(time_epoch1_df) - len(time_match_df)
+        last_value = time_match_df[col_name].tail(1)
         # Append the rows of time_epoch1 corresponding to the difference
         time_epoch1_diff = time_epoch1_df.tail(diff)
 
         fill_df = pl.DataFrame(
             {
-                "time_val": time_epoch1_diff,
-                "non_wear_flag": np.repeat(last_value, diff),
+                "time": time_epoch1_diff,
+                col_name: np.repeat(last_value, diff),
             }
         )
-        output_data.non_wear_flag_epoch1 = pl.concat(
-            [time_match_NW, fill_df], how="vertical"
-        )["non_wear_flag"]
+    else:
+        fill_df = pl.DataFrame({col: [] for col in time_match_df.columns})
 
-    return NW_flag_df
+    return time_match_df, fill_df

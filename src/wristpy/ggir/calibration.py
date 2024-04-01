@@ -77,12 +77,6 @@ def start_ggir_calibration(
             cal_error_start=0,
             cal_error_end=0,
             time=time_data,
-            lux_df = input_data.lux_df,
-            lux_df_mean = input_data.lux_df_mean,
-            battery_df = input_data.battery_df,
-            battery_df_upsample  = input_data.battery_df_upsample,
-            capsense_df = input_data.capsense_df,
-            capsense_df_upsample = input_data.capsense_df_upsample
         )
 
     # flags for finished and if cal is valid
@@ -122,13 +116,7 @@ def start_ggir_calibration(
                 cal_error_start=0,
                 cal_error_end=0,
                 time=time_data,
-                lux_df = input_data.lux_df,
-                lux_df_mean = input_data.lux_df_mean,
-                battery_df = input_data.battery_df,
-                battery_df_upsample  = input_data.battery_df_upsample,
-                capsense_df = input_data.capsense_df,
-                capsense_df_upsample = input_data.capsense_df_upsample
-                )
+            )
         i_h += 1
 
     if finished and valid_calibration:
@@ -142,13 +130,7 @@ def start_ggir_calibration(
         cal_error_start=cal_err_start,
         cal_error_end=cal_err_end,
         time=time_data,
-        lux_df = input_data.lux_df,
-        lux_df_mean = input_data.lux_df_mean,
-        battery_df = input_data.battery_df,
-        battery_df_upsample  = input_data.battery_df_upsample,
-        capsense_df = input_data.capsense_df,
-        capsense_df_upsample = input_data.capsense_df_upsample
-        )
+    )
 
 
 def apply_calibration(

@@ -29,11 +29,8 @@ class InputData:
     sampling_rate: int
     time: pl.DataFrame
     lux_df: pl.DataFrame
-    lux_df_mean: pl.DataFrame
-    battery_df : pl.DataFrame
-    battery_df_upsample  : pl.DataFrame
-    capsense_df : pl.DataFrame
-    capsense_df_upsample : pl.DataFrame
+    battery_df: pl.DataFrame
+    capsense_df: pl.DataFrame
 
 
 @dataclass
@@ -58,9 +55,6 @@ class OutputData:
     scale: float = 0.0
     time: pl.DataFrame = field(default_factory=pl.DataFrame)
     time_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
-    lux_df: pl.DataFrame = field(default_factory=pl.DataFrame)
-    lux_df_mean: pl.DataFrame = field(default_factory=pl.DataFrame)
-    battery_df : pl.DataFrame = field(default_factory=pl.DataFrame)
-    battery_df_upsample  : pl.DataFrame = field(default_factory=pl.DataFrame)
-    capsense_df : pl.DataFrame = field(default_factory=pl.DataFrame)
-    capsense_df_upsample : pl.DataFrame = field(default_factory=pl.DataFrame)
+    lux_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
+    battery_upsample_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
+    capsense_upsample_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)

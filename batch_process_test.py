@@ -1,15 +1,14 @@
-import glob
+import glob  # noqa: D100
 import os
 import warnings
-
-import polars as pl
 
 from wristpy.ggir import processor
 
 warnings.filterwarnings("always")
 
 
-def main():
+def main() -> None:
+    """Main function for batch processing."""
     file_path = "/app/data/"
     output_dir = "/app/output/"
     file_name = sorted(
@@ -21,6 +20,7 @@ def main():
     for file in file_name:
         input_path = file_path + file + ".gt3x"
         output_path = output_dir + file + "_output/"
+        print(f"Processing {input_path}")
         processor.process_file(input_path, output_path)
 
 

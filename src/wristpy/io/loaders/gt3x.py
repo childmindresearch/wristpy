@@ -63,6 +63,8 @@ def load_fast(
 ) -> InputData:
     """Load input data from .gt3x file using actfast.
 
+        This loads the acceleration, lux, battery voltage, and capsense data.
+
     Args:
         path: file path to the raw data to load
 
@@ -84,57 +86,33 @@ def load_fast(
     time_tmp = pl.Series(subject1["timeseries"]["acceleration"]["datetime"])
     time_actfast = pl.from_epoch(time_tmp, time_unit="ns").alias("time")
 
-    lux_values = subject1['timeseries']['lux']['lux']
-    lux_time = subject1['timeseries']['lux']['datetime']
-    lux_datetime = pl.from_epoch(lux_time, time_unit= 'ns').alias('time')
-    lux_df = pl.DataFrame(
-        {
-            'lux': lux_values,
-            'time': lux_datetime
-        }
-    )
-    #temporal resolution, hardcoded to 5 seconds for now 
-    lux_df_mean = metrics_calc.moving_mean_fast(pl.DataFrame(lux_df['lux']), lux_df['time'], 5)
+    ## this should probably be a check to see if lux, battery, capsense data is present
 
-    #battery voltage dataframe
-    battery_data = subject1['timeseries']['battery_voltage']['battery_voltage']
-    battery_time = subject1['timeseries']['battery_voltage']['datetime']
-    battery_datetime = pl.from_epoch(battery_time, time_unit= 'ns').alias('time')
+    # light dataframe, load light data +light time
+    lux_values = subject1["timeseries"]["lux"]["lux"]
+    lux_time = subject1["timeseries"]["lux"]["datetime"]
+    lux_datetime = pl.from_epoch(lux_time, time_unit="ns").alias("time")
+    lux_df = pl.DataFrame({"lux": lux_values, "time": lux_datetime})
+
+    # battery voltage dataframe, load battery data + battery time
+    battery_data = subject1["timeseries"]["battery_voltage"]["battery_voltage"]
+    battery_time = subject1["timeseries"]["battery_voltage"]["datetime"]
+    battery_datetime = pl.from_epoch(battery_time, time_unit="ns").alias("time")
     battery_df = pl.DataFrame(
-        {
-            'battery_voltage': battery_data,
-            "time": battery_datetime
-        }
-    )
-    #set flag to sorted for upsampling function
-    battery_df = battery_df.set_sorted(column='time')
-    #upsample so we have a temporal resolution of 5s (previously 1 minute)
-    battery_df_upsample = battery_df.upsample(time_column= 'time', every = '5s', maintain_order= True).select(pl.all().forward_fill())
-
-
-    #capsense dataframe 
-    capsense_data = subject1['timeseries']['capsense']['capsense']
-    capsense_time = subject1['timeseries']['capsense']['datetime']
-    capsense_datetime = pl.from_epoch(capsense_time, time_unit = 'ns').alias('time')
-    capsense_df = pl.DataFrame(
-        {
-            'capsense' : capsense_data,
-            'time' : capsense_datetime
-        }
+        {"battery_voltage": battery_data, "time": battery_datetime}
     )
 
-    capsense_df = capsense_df.set_sorted(column='time')
-    capsense_df_upsample = capsense_df.upsample(time_column= 'time', every = '5s', maintain_order= True).select(pl.all().forward_fill())
-
+    # capsense dataframe, load capsense data + capsense time
+    capsense_data = subject1["timeseries"]["capsense"]["capsense"]
+    capsense_time = subject1["timeseries"]["capsense"]["datetime"]
+    capsense_datetime = pl.from_epoch(capsense_time, time_unit="ns").alias("time")
+    capsense_df = pl.DataFrame({"cap_sense": capsense_data, "time": capsense_datetime})
 
     return InputData(
-        acceleration=acceleration, 
-        sampling_rate=sampling_rate, 
-        time=time_actfast, 
-        lux_df= lux_df,
-        lux_df_mean= lux_df_mean,
-        battery_df = battery_df,
-        battery_df_upsample  = battery_df_upsample,
-        capsense_df = capsense_df,
-        capsense_df_upsample = capsense_df_upsample
+        acceleration=acceleration,
+        sampling_rate=sampling_rate,
+        time=time_actfast,
+        lux_df=lux_df,
+        battery_df=battery_df,
+        capsense_df=capsense_df,
     )

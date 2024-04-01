@@ -30,6 +30,8 @@ def process_file(file_name: str, output_path: str) -> OutputData:
     metrics_calc.calc_epoch1_metrics(test_output)
     metrics_calc.calc_epoch1_raw(test_output)
     metrics_calc.set_nonwear_flag(test_output, 900)
+    metrics_calc.calc_epoch1_light(test_data, test_output)
+    metrics_calc.calc_epoch1_battery(test_data, test_output)
     output_data_csv = pl.DataFrame(
         {
             "time": test_output.time_epoch1,
@@ -39,6 +41,8 @@ def process_file(file_name: str, output_path: str) -> OutputData:
             "enmo": test_output.enmo_epoch1,
             "anglez": test_output.anglez_epoch1,
             "Non-wear Flag": test_output.non_wear_flag_epoch1,
+            "light": test_output.lux_epoch1,
+            "battery voltage": test_output.battery_upsample_epoch1,
         }
     )
 
