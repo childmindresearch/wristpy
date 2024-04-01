@@ -230,7 +230,10 @@ def closest_point_fit(
 
             offsetch[k] = LR.intercept_
             scalech[k] = LR.coef_[0]
-            curr.iloc[:, k] = x_ @ LR.coef_
+            curr.iloc[:, k] = (x_ @ LR.coef_).flatten()
+            
+
+            
 
         # GGIR modification of scale and offset for next search point
         scale = scalech * scale
