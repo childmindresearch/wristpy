@@ -115,11 +115,54 @@ def calc_epoch1_cap_sensor(input_data: InputData, output_data: OutputData) -> No
     """
     cap_sense_df = input_data.capsense_df
 
+    if cap_sense_df.is_empty():
+        output_data.capsense_upsample_epoch1 = pl.Series(
+            "cap_sense", np.zeros(len(output_data.time_epoch1))
+        )
+        return  # Do not proceed with processing if there is null data
+
     cap_sense_df = cap_sense_df.with_columns(pl.col("time").set_sorted())
+
+    def _upsample_time_match_helper(
+        data_to_upsample: pl.DataFrame, output_data: OutputData
+    ) -> pl.DataFrame:
+        """Special helper for boolean cap sense data.
+
+        Args:
+            data_to_upsample: DataFrame with
+            output_data: OutputData object containing the epoch1 time data
+        """
+        upsampled_data = data_to_upsample.upsample(
+            time_column="time", every="5s", maintain_order=True
+        ).select(pl.all().forward_fill())
+
+        time_epoch1_df = pl.DataFrame({"time_epoch1": output_data.time_epoch1})
+
+        time_match_df = upsampled_data.join(
+            time_epoch1_df, left_on="time", right_on="time_epoch1", how="inner"
+        )
+
+        col_name = data_to_upsample.columns[0]
+        if len(time_epoch1_df) > len(time_match_df):
+            diff = len(time_epoch1_df) - len(time_match_df)
+            last_value = time_match_df[col_name].tail(1)
+            # Append the rows of time_epoch1 corresponding to the difference
+            time_epoch1_diff = time_epoch1_df.tail(diff)
+
+            fill_df = pl.DataFrame(
+                {
+                    "time": time_epoch1_diff,
+                    col_name: np.repeat(last_value, diff).astype(bool),
+                }
+            )
+        else:
+            fill_df = pl.DataFrame({col: [] for col in time_match_df.columns})
+
+        return time_match_df, fill_df
 
     # swap columns due to upsample format
     cap_sense_df = cap_sense_df.select(["cap_sense", "time"])
-    time_match_cap_sense, fill_df = upsample_time_match_helper(
+    time_match_cap_sense, fill_df = _upsample_time_match_helper(
         cap_sense_df, output_data
     )
     output_data.capsense_upsample_epoch1 = pl.concat(

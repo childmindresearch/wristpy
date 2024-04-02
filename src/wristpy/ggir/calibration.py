@@ -228,12 +228,9 @@ def closest_point_fit(
             tmp_y = np.vstack((closest_point.iloc[:, k]))
             LR.fit(x_, tmp_y, sample_weight=weights)
 
-            offsetch[k] = LR.intercept_
-            scalech[k] = LR.coef_[0]
+            offsetch[k] = LR.intercept_[0]
+            scalech[k] = LR.coef_[0, 0]
             curr.iloc[:, k] = (x_ @ LR.coef_).flatten()
-            
-
-            
 
         # GGIR modification of scale and offset for next search point
         scale = scalech * scale
