@@ -71,6 +71,13 @@ def calc_epoch1_light(input_data: InputData, output_data: OutputData) -> None:
         output_data: The OutputData class object will be modified inplace to include
                      the new epoch1 data.
     """
+    lux_df = input_data.lux_df
+    # Do not proceed with processing if there is null data
+    if lux_df["lux"].is_empty() or lux_df["time"].is_empty():
+        output_data.lux_upsample_epoch1 = pl.Series(
+            "lux", np.zeros(len(output_data.time_epoch1))
+        )
+        return
     lux_mean_df = moving_mean_fast(
         pl.DataFrame(input_data.lux_df["lux"]), input_data.lux_df["time"], 5
     )
@@ -94,6 +101,12 @@ def calc_epoch1_battery(input_data: InputData, output_data: OutputData) -> None:
                      the new epoch1 data.
     """
     battery_df = input_data.battery_df
+    # Do not proceed with processing if there is null data
+    if battery_df["battery_voltage"].is_empty() or battery_df["time"].is_empty():
+        output_data.battery_upsample_epoch1 = pl.Series(
+            "battery_voltage", np.zeros(len(output_data.time_epoch1))
+        )
+        return
 
     battery_df = battery_df.with_columns(pl.col("time").set_sorted())
 
@@ -114,12 +127,12 @@ def calc_epoch1_cap_sensor(input_data: InputData, output_data: OutputData) -> No
                      the new epoch1 data.
     """
     cap_sense_df = input_data.capsense_df
-
-    if cap_sense_df.is_empty():
+    # Do not proceed with processing if there is null data
+    if cap_sense_df["cap_sense"].is_empty() or cap_sense_df["time"].is_empty():
         output_data.capsense_upsample_epoch1 = pl.Series(
             "cap_sense", np.zeros(len(output_data.time_epoch1))
         )
-        return  # Do not proceed with processing if there is null data
+        return
 
     cap_sense_df = cap_sense_df.with_columns(pl.col("time").set_sorted())
 
@@ -135,6 +148,7 @@ def calc_epoch1_cap_sensor(input_data: InputData, output_data: OutputData) -> No
         upsampled_data = data_to_upsample.upsample(
             time_column="time", every="5s", maintain_order=True
         ).select(pl.all().forward_fill())
+        upsampled_data = upsampled_data.with_columns(pl.col("time").dt.round("5s"))
 
         time_epoch1_df = pl.DataFrame({"time_epoch1": output_data.time_epoch1})
 

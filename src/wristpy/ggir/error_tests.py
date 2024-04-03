@@ -26,6 +26,7 @@ def process_file(file_name: str, output_path: str) -> OutputData:
     """
     test_config = wristpy.common.data_model.Config(file_name, output_path)
     test_data = gt3x.load_fast(test_config.path_input)
+    print(test_data.sampling_rate)
     test_output = calibration.start_ggir_calibration(test_data)
     metrics_calc.calc_base_metrics(test_output)
     metrics_calc.calc_epoch1_metrics(test_output)
