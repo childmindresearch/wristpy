@@ -8,7 +8,6 @@ import polars as pl
 import pygt3x.reader
 
 from wristpy.common.data_model import InputData
-from wristpy.ggir import metrics_calc
 
 
 def load(
@@ -32,7 +31,7 @@ def load(
     return InputData(acceleration=acceleration, sampling_rate=sampling_rate, time=time)
 
 
-def timefix(time: np.array, sampling_rate: any) -> np.array:
+def timefix(time: np.ndarray, sampling_rate: int) -> np.ndarray:
     """Add ms data to timestamp data.
 
     Currently pygt3x does not save the ms data, we make the assumption that

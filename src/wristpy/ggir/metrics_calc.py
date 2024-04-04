@@ -116,7 +116,7 @@ def calc_epoch1_battery(input_data: InputData, output_data: OutputData) -> None:
     time_match_battery, fill_df = upsample_time_match_helper(battery_df, output_data)
     output_data.battery_upsample_epoch1 = pl.concat(
         [time_match_battery, fill_df], how="vertical"
-    )["battery_voltage"]
+    ).select("battery_voltage")
 
 
 def calc_epoch1_cap_sensor(input_data: InputData, output_data: OutputData) -> None:
@@ -139,7 +139,7 @@ def calc_epoch1_cap_sensor(input_data: InputData, output_data: OutputData) -> No
 
     def _upsample_time_match_helper(
         data_to_upsample: pl.DataFrame, output_data: OutputData
-    ) -> pl.DataFrame:
+    ) -> tuple[pl.DataFrame, pl.DataFrame]:
         """Special helper for boolean cap sense data.
 
         Args:
@@ -445,9 +445,7 @@ def set_nonwear_flag(
 
     num_short_windows = int(window_size_long / window_size)
 
-    def _nonwear_cond(
-        df_NW: pl.DataFrame, sd_crit: float, ra_crit: float
-    ) -> pl.DataFrame:
+    def _nonwear_cond(df_NW: pl.DataFrame, sd_crit: float, ra_crit: float) -> pl.Series:
         """Helper function to calculate non-wear criteria values."""
         tmp_bool = (df_NW["X_SD"] < sd_crit) & (df_NW["range_X"] < ra_crit)
         tmp_X = tmp_bool.cast(pl.Int32)
@@ -569,7 +567,7 @@ def set_nonwear_flag(
 
 def upsample_time_match_helper(
     data_to_upsample: pl.DataFrame, output_data: OutputData
-) -> pl.DataFrame:
+) -> tuple[pl.DataFrame, pl.DataFrame]:
     """Helper function to upsample data and then to match the accel epoch1 data length.
 
     Args:

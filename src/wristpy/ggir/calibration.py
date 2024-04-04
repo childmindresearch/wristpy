@@ -134,7 +134,7 @@ def start_ggir_calibration(
 
 
 def apply_calibration(
-    accel_raw: pl.DataFrame, scale: float, offset: float
+    accel_raw: pl.DataFrame, scale: pl.Series, offset: pl.Series
 ) -> pl.DataFrame:
     """Apply calibration to raw data."""
     scaled_accel = accel_raw.select(

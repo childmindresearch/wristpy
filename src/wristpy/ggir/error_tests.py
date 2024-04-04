@@ -2,7 +2,6 @@
 
 import os
 import warnings
-from typing import Tuple
 
 import polars as pl
 
