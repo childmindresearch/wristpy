@@ -108,6 +108,7 @@ def calc_epoch1_battery(input_data: InputData, output_data: OutputData) -> None:
         )
         return
 
+    battery_df = battery_df.with_columns(pl.col("time").dt.round("5s"))
     battery_df = battery_df.with_columns(pl.col("time").set_sorted())
 
     # swap columns due to upsample format
