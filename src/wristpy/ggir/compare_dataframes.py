@@ -1,6 +1,7 @@
 """Comparing GGIR outputs to wristpy outputs for epoch 1."""
 
 import pathlib
+from datetime import timedelta
 
 import numpy as np
 import plotly.graph_objects as go
@@ -28,72 +29,10 @@ def load_ggir_output(filepath: pathlib.Path) -> pl.DataFrame:
     return ggir_data
 
 
-def select_dates(
-    difference_df: pl.DataFrame,
-    ggir_data: pl.DataFrame,
-    outputdata_trimmed: pl.DataFrame,
-    start: str = None,
-    end: str = None,
-) -> pl.DataFrame:
-    """A function to that returns data from the dates specified if any.
-
-    Args:
-        difference_df: The dataframe created by taking the difference of of wristpy's
-        output and a ggir output
-
-        ggir_data: The output of ggir
-
-        outputdata_trimmed: The output of wristpy, trimmed to fit the length of ggir's
-        output
-
-        start: The optional starting point for date selection. Data is entered in the
-        format of: %Y-%m-%d %H:%M:%S.
-
-        end: The optional ending point for date selection. Data is entered in the format
-        of: %Y-%m-%d %H:%M:%S.
-
-    Returns:
-        A subset of each of the three dataframes.
-    """ 
-    # create polars datetime version of start and end
-    if start:
-        start_datetime = pl.lit(start).str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S")
-    if end:
-        end_datetime = pl.lit(end).str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S")
-
-    # depending on whether start and or end are provided, creates a filter that removes
-    # all dates not in the subset. Differences in the names of columns prevents
-    # consolidation, will refactor to use a mask that can be applied to all relevant
-    # dataframes.
-    if start and end:
-        difference_df = difference_df.filter(
-            pl.col("timestamp").is_between(start_datetime, end_datetime, closed="both")
-        )  # noqa: E501
-        ggir_data = ggir_data.filter(
-            pl.col("timestamp").is_between(start_datetime, end_datetime, closed="both")
-        )  # noqa: E501
-        outputdata_trimmed = outputdata_trimmed.filter(
-            pl.col("timestamp").is_between(start_datetime, end_datetime, closed="both")
-        )  # noqa: E501
-    elif start:
-        difference_df = difference_df.filter(pl.col("timestamp") >= start_datetime)
-        ggir_data = ggir_data.filter(pl.col("timestamp") >= start_datetime)
-        outputdata_trimmed = outputdata_trimmed.filter(
-            pl.col("timestamp") >= start_datetime
-        )  # noqa: E501
-    elif end:
-        difference_df = difference_df.filter(pl.col("timestamp") <= end_datetime)
-        ggir_data = ggir_data.filter(pl.col("timestamp") <= end_datetime)
-        outputdata_trimmed = outputdata_trimmed.filter(
-            pl.col("timestamp") <= end_datetime
-        )  # noqa: E501
-
-    return difference_df, ggir_data, outputdata_trimmed
-
 
 def select_days(
-    df: pl.DataFrame, start_day: int = 0, end_day: int = None
-) -> pl.DataFrame:  # noqa: E501
+    df: pl.DataFrame, start_day: int = 0, end_day: int | None = None
+) -> pl.DataFrame:  
     """Selects a subset of the dataframes, from days start:end, based on user input.
 
     Args:
@@ -111,41 +50,42 @@ def select_days(
     Returns:
         filtered_df = the subset of the input dataframe, based on the date range given.
     """
-    # Make sure we're dealing with dt objects.
-    df = df.with_columns(pl.col("timestamp").cast(pl.Datetime))
+    min_timestamp = df["time"].min()
+    max_timestamp = df["time"].max()
+    # Calculate the total days spanned by the data.
+    total_days = (max_timestamp - min_timestamp).days + 1
 
-    min_timestamp = df["timestamp"].min()
-    max_timestamp = df["timestamp"].max()
-    final_day = (max_timestamp - min_timestamp).days + 1
-
-    if start_day is None or start_day == 0:
-        start_timestamp = min_timestamp
-    else:
-        start_timestamp = min_timestamp + pl.duration(days=start_day - 1)
-        # Adjust start_timestamp to midnight
-        start_timestamp = pl.datetime(
-            start_timestamp.dt.year(),
-            start_timestamp.dt.month(),
-            start_timestamp.dt.day(),
+    # Determine the start timestamp.
+    if start_day > 1:
+        start_timestamp = (
+            min_timestamp + timedelta(days=start_day - 1)
+            ).replace(
+                hour=0, 
+                minute=0,
+                second=0, 
+                microsecond=0
         )
+    else:
+        start_timestamp = min_timestamp
 
-    if end_day is not None and end_day < final_day:
-        end_timestamp = min_timestamp + pl.duration(days=end_day - 1)
-        # Adjust end_timestamp to just before midnight
-        end_timestamp = pl.datetime(
-            end_timestamp.dt.year(), end_timestamp.dt.month(), end_timestamp.dt.day()
-        ) - pl.duration(microseconds=1)
+    # Determine the end timestamp.
+    if end_day and end_day < total_days:
+        end_timestamp = (
+            min_timestamp + timedelta(days=end_day)
+            ).replace(
+                hour=0, 
+                minute=0, 
+                second=0, 
+                microsecond=0) - timedelta(microseconds=1)
     else:
         end_timestamp = max_timestamp
-        if end_day and end_day > final_day:
-            print(
-                f"End Day entered is outside of data range. Last available date is:\
-                      {max_timestamp} which corresponds to Day: {final_day}."
-            ) 
 
+
+    # Filter the dataframe based on calculated timestamps.
     filtered_df = df.filter(
-        pl.col("timestamp").is_between(start_timestamp, end_timestamp)
-    ) 
+        (pl.col("time") >= start_timestamp) & (pl.col("time") <= end_timestamp)
+    )
+    
     return filtered_df
 
 
