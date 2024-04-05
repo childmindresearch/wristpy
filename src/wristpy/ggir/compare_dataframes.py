@@ -1,7 +1,7 @@
 """Comparing GGIR outputs to wristpy outputs for epoch 1."""
 
 import pathlib
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import numpy as np
 import plotly.graph_objects as go
@@ -56,6 +56,7 @@ def select_days(
     total_days = (max_timestamp - min_timestamp).days + 1
 
     # Determine the start timestamp.
+    # If it's not day 1, make sure the day starts at midnight.
     if start_day > 1:
         start_timestamp = (
             min_timestamp + timedelta(days=start_day - 1)
@@ -69,6 +70,7 @@ def select_days(
         start_timestamp = min_timestamp
 
     # Determine the end timestamp.
+    # If not the last day, make sure you take data through the end of the day.
     if end_day and end_day < total_days:
         end_timestamp = (
             min_timestamp + timedelta(days=end_day)
@@ -224,7 +226,10 @@ def plot_ba(
     """
     opac_dict = dict(alpha=0.5)
     f, ax = plt.subplots(1, figsize = (8,5))
-    sm.graphics.mean_diff_plot(np.asarray(output_data_trimmed[measure]), np.asarray(ggir_data1[measure]), ax = ax, scatter_kwds=opac_dict)
+    sm.graphics.mean_diff_plot(np.asarray(output_data_trimmed[measure]), 
+                               np.asarray(ggir_data1[measure]), 
+                               ax = ax, 
+                               scatter_kwds=opac_dict)
     plt.title(f'BA plot - {measure}')
     plt.show()    
 
@@ -249,7 +254,7 @@ def plot_measure(
     """
     fig = go.Figure()
 
-    # Add the trimmed anglez from outputdata_trimmed
+    # Add the trimmed measure from outputdata_trimmed
     fig.add_trace(go.Scatter(x=difference_df["timestamp"],
                             y=outputdata_trimmed[measure],
                             mode='lines',
@@ -257,16 +262,16 @@ def plot_measure(
                             name=f'Wristpy {measure} (Trimmed)',
                             opacity=opacity))
 
-    # Add the anglez from ggir_dataframe
+    # Add the measure from ggir_dataframe
     fig.add_trace(go.Scatter(x=difference_df["timestamp"],
                             y=ggir_dataframe[measure],
-                            mode='lines+markers', # Change to 'lines' if you don't want markers
+                            mode='lines+markers', 
                             line=dict(color='red', dash='dash', width=2),
                             name=f'GGIR {measure}',
                             opacity=opacity
                             ))
 
-    # Add the anglez difference
+    # Add the measure difference
     fig.add_trace(go.Scatter(x=difference_df["timestamp"],
                             y=difference_df[measure],
                             mode='lines',
