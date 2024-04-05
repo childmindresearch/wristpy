@@ -1,9 +1,9 @@
+"""Process gt3x data and run main plotting functionality."""
 import json
 import warnings
 from argparse import ArgumentParser
 
 import wristpy
-from wristpy.common import data_model
 from wristpy.ggir import calibration, compare_dataframes, metrics_calc
 from wristpy.io.loaders import gt3x
 
@@ -43,7 +43,22 @@ def update_config(filepath: str, gt3x_path: str, ggir_path: str)-> None:
         json.dump(new_config, f)
 
 
-def run(args:str =None) -> None:  # noqa: D103
+def run(args: str | None = None) -> None:
+    """Loads, processes and plots data based on user input.
+    
+    This function loads, processes and plots data from raw gt3x files and previously
+    generated GGIR outputs. The function supports a number of user-defined options for
+    selecting subsets of the data by day, choosing measure types to analyze, plots to 
+    generate, and configuring file paths. These arguments can be accepted though the
+    command line or programmatically via the function's arg parameter. 
+
+    Args:
+        args: arguments fed to argparser. Default is None in the event that function
+        is run via CLI. 
+    
+    Returns:
+        None.
+    """ 
     parser = ArgumentParser( description= "This is wristpy, a work in progress. At the \
                             moment you have to put in both a raw file, and a ggir \
                             output file for comparison.Please double check that \
@@ -65,7 +80,7 @@ def run(args:str =None) -> None:  # noqa: D103
                          as an int, e.g. 4 means the data selection ends on Day 4. \
                         Leave empty to select data through to the end.")   
     
-    parser.add_argument("-m", "--measures", choices = ['ENMO', 'anglez'], nargs= "+",  # noqa: E501
+    parser.add_argument("-m", "--measures", choices = ['ENMO', 'anglez'], nargs= "+", 
                         help = "Select which measures you would liketo plot. Options \
                         include ENMO, anglez")
     
@@ -101,7 +116,7 @@ def run(args:str =None) -> None:  # noqa: D103
     gt3x_raw_path = path_dict['gt3x_raw'] + arguments.gt3xfile
     ggir_output_path = path_dict['ggir_output'] + arguments.ggirfile
 
-    test_config = wristpy.common.data_model.Config(gt3x_raw_path, gt3x_raw_path)  # noqa: E501
+    test_config = wristpy.common.data_model.Config(gt3x_raw_path, gt3x_raw_path) 
     test_data = gt3x.load_fast(test_config.path_input)
     test_output = calibration.start_ggir_calibration(test_data)
 
