@@ -189,8 +189,8 @@ def closest_point_fit(
     # trim to no motion
     acc_mean_noMotion = acc_mean.filter(no_motion)
 
-    offset = pl.Series(np.zeros(3))
-    scale = pl.Series(np.ones(3).flatten())
+    offset = np.zeros(3)
+    scale = np.ones(3).flatten()
 
     # check if each axis meets sphere_criteria
     GGIR_check = 0

@@ -77,14 +77,17 @@ def compute_error(
     Returns:
         A tuple containing the mean squared error for anglez, mean squared error for ENMO, and the median difference of anglez.
     """  # noqa: E501
-    epoch1_data = compare_dataframes.compare(
+    epoch1_data = compare_dataframes.compare_csv(
         ggir_dataframe=ggir_data, wristpy_dataframe=wristpy_data
     )
 
     # extend non-wear flag to smooth out edges
-    NW_flag_rolling_mean = epoch1_data["non_wear_flag"].rolling_mean(window_size=2160)
-    NW_flag_rolling_mean = NW_flag_rolling_mean.map_elements(
-        lambda x: 1 if x > 0.25 else 0
+    epoch1_data = epoch1_data.with_columns(pl.col("time_epoch1").set_sorted())
+    NW_flag_rolling_mean = epoch1_data.group_by_dynamic(
+        index_column="time_epoch1", every="3h"
+    ).agg(pl.col("non_wear_flag").mean())
+    NW_flag_rolling_mean = NW_flag_rolling_mean["non_wear_flag"].map_elements(
+        lambda x: 1 if x > 0.25 else 0, return_dtype=pl.Float64, skip_nulls=False
     )
 
     metrics_calc_nonwear = epoch1_data.filter(epoch1_data["non_wear_flag"] == 0)
@@ -92,7 +95,7 @@ def compute_error(
     def _compute_mse(df: pl.DataFrame, col1: str, col2: str) -> float:
         """Helper function to compute mean squared error."""
         squared_error = (df[col1] - df[col2]) ** 2
-        mse = squared_error.mean().cast(pl.Float32)
+        mse = squared_error.mean()
         return mse
 
     mse_anglez = _compute_mse(metrics_calc_nonwear, "anglez_wristpy", "anglez_ggir")
