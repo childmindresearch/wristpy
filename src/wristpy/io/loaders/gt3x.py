@@ -26,8 +26,8 @@ def load(
         sampling_rate = reader.info.sample_rate
         time_init = reader.to_pandas().index.to_numpy()
 
-    time = timefix(time_init, sampling_rate)
-    time = pl.Series(time).alias("time")
+    time_tmp = timefix(time_init, sampling_rate)
+    time = pl.Series(time_tmp).alias("time")
     return InputData(acceleration=acceleration, sampling_rate=sampling_rate, time=time)
 
 
@@ -84,8 +84,6 @@ def load_fast(
 
     time_tmp = pl.Series(subject1["timeseries"]["acceleration"]["datetime"])
     time_actfast = pl.from_epoch(time_tmp, time_unit="ns").alias("time")
-
-    ## this should probably be a check to see if lux, battery, capsense data is present
 
     # light dataframe, load light data +light time
     lux_values = subject1["timeseries"]["lux"]["lux"]
