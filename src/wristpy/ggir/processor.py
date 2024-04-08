@@ -45,8 +45,8 @@ def process_file(file_name: str, output_path: str) -> OutputData:
             "battery voltage": test_output.battery_upsample_epoch1,
         }
     )
-
-    output_file_path = test_config.path_output + "metrics_out.csv"
+    file_name_out = os.path.splitext(os.path.basename(test_config.path_input))[0]
+    output_file_path = test_config.path_output + file_name_out + "_metrics_out.csv"
 
     # Check if the directory already exists
     if not os.path.exists(test_config.path_output):

@@ -90,7 +90,7 @@ def compute_error(
         lambda x: 1 if x > 0.25 else 0, return_dtype=pl.Float64, skip_nulls=False
     )
 
-    metrics_calc_nonwear = epoch1_data.filter(epoch1_data["non_wear_flag"] == 0)
+    metrics_calc_wear = epoch1_data.filter(epoch1_data["non_wear_flag"] == 0)
 
     def _compute_mse(df: pl.DataFrame, col1: str, col2: str) -> float:
         """Helper function to compute mean squared error."""
@@ -98,11 +98,9 @@ def compute_error(
         mse = squared_error.mean()
         return mse
 
-    mse_anglez = _compute_mse(metrics_calc_nonwear, "anglez_wristpy", "anglez_ggir")
-    mse_enmo = _compute_mse(metrics_calc_nonwear, "enmo_wristpy", "enmo_ggir")
+    mse_anglez = _compute_mse(metrics_calc_wear, "anglez_wristpy", "anglez_ggir")
+    mse_enmo = _compute_mse(metrics_calc_wear, "enmo_wristpy", "enmo_ggir")
 
-    angz_diff = (
-        metrics_calc_nonwear["anglez_wristpy"] - metrics_calc_nonwear["anglez_ggir"]
-    )
+    angz_diff = metrics_calc_wear["anglez_wristpy"] - metrics_calc_wear["anglez_ggir"]
 
     return mse_anglez, mse_enmo, angz_diff.median()
