@@ -23,16 +23,15 @@ def load_ggir_output(filepath: pathlib.Path) -> pl.DataFrame:
         A polars data frame with the GGIR enmo, anglez, and timestamps. Timestamps have
         been sliced to remove timezone information
     """
-    ggir_data = pl.read_csv(filepath, dtypes={"ENMO": pl.Float64})
+    ggir_data = pl.read_csv(filepath, dtypes={"ENMO": pl.Float64, "anglez": pl.Float64})
     ggir_data = ggir_data.with_columns(pl.col("timestamp").str.slice(0, 19))
 
     return ggir_data
 
 
-
 def select_days(
     df: pl.DataFrame, start_day: int = 0, end_day: int | None = None
-) -> pl.DataFrame:  
+) -> pl.DataFrame:
     """Selects a subset of the dataframes, from days start:end, based on user input.
 
     Args:
@@ -58,13 +57,8 @@ def select_days(
     # Determine the start timestamp.
     # If it's not day 1, make sure the day starts at midnight.
     if start_day > 1:
-        start_timestamp = (
-            min_timestamp + timedelta(days=start_day - 1)
-            ).replace(
-                hour=0, 
-                minute=0,
-                second=0, 
-                microsecond=0
+        start_timestamp = (min_timestamp + timedelta(days=start_day - 1)).replace(
+            hour=0, minute=0, second=0, microsecond=0
         )
     else:
         start_timestamp = min_timestamp
@@ -72,22 +66,17 @@ def select_days(
     # Determine the end timestamp.
     # If not the last day, make sure you take data through the end of the day.
     if end_day and end_day < total_days:
-        end_timestamp = (
-            min_timestamp + timedelta(days=end_day)
-            ).replace(
-                hour=0, 
-                minute=0, 
-                second=0, 
-                microsecond=0) - timedelta(microseconds=1)
+        end_timestamp = (min_timestamp + timedelta(days=end_day)).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        ) - timedelta(microseconds=1)
     else:
         end_timestamp = max_timestamp
-
 
     # Filter the dataframe based on calculated timestamps.
     filtered_df = df.filter(
         (pl.col("time") >= start_timestamp) & (pl.col("time") <= end_timestamp)
     )
-    
+
     return filtered_df
 
 
@@ -216,7 +205,7 @@ def plot_ba(
     """Bland Altman plot comparing differences and means of two samples.
 
     Args:
-        output_data_trimmed: A dataframe with wristpy output data. 
+        output_data_trimmed: A dataframe with wristpy output data.
         ggir_data1: A dataframe with ggir output data.
 
         measure: The name of the measure to be compared within each dataframe
@@ -225,13 +214,15 @@ def plot_ba(
         None.
     """
     opac_dict = dict(alpha=0.5)
-    f, ax = plt.subplots(1, figsize = (8,5))
-    sm.graphics.mean_diff_plot(np.asarray(output_data_trimmed[measure]), 
-                               np.asarray(ggir_data1[measure]), 
-                               ax = ax, 
-                               scatter_kwds=opac_dict)
-    plt.title(f'BA plot - {measure}')
-    plt.show()    
+    f, ax = plt.subplots(1, figsize=(8, 5))
+    sm.graphics.mean_diff_plot(
+        np.asarray(output_data_trimmed[measure]),
+        np.asarray(ggir_data1[measure]),
+        ax=ax,
+        scatter_kwds=opac_dict,
+    )
+    plt.title(f"BA plot - {measure}")
+    plt.show()
 
 
 def plot_measure(
@@ -255,28 +246,39 @@ def plot_measure(
     fig = go.Figure()
 
     # Add the trimmed measure from outputdata_trimmed
-    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
-                            y=outputdata_trimmed[measure],
-                            mode='lines',
-                            line=dict(color='green', width=2),
-                            name=f'Wristpy {measure} (Trimmed)',
-                            opacity=opacity))
+    fig.add_trace(
+        go.Scatter(
+            x=difference_df["timestamp"],
+            y=outputdata_trimmed[measure],
+            mode="lines",
+            line=dict(color="green", width=2),
+            name=f"Wristpy {measure} (Trimmed)",
+            opacity=opacity,
+        )
+    )
 
     # Add the measure from ggir_dataframe
-    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
-                            y=ggir_dataframe[measure],
-                            mode='lines+markers', 
-                            line=dict(color='red', dash='dash', width=2),
-                            name=f'GGIR {measure}',
-                            opacity=opacity
-                            ))
+    fig.add_trace(
+        go.Scatter(
+            x=difference_df["timestamp"],
+            y=ggir_dataframe[measure],
+            mode="lines+markers",
+            line=dict(color="red", dash="dash", width=2),
+            name=f"GGIR {measure}",
+            opacity=opacity,
+        )
+    )
 
     # Add the measure difference
-    fig.add_trace(go.Scatter(x=difference_df["timestamp"],
-                            y=difference_df[measure],
-                            mode='lines',
-                            line=dict(color='black', width=2),
-                            name=f'{measure} Difference'))
+    fig.add_trace(
+        go.Scatter(
+            x=difference_df["timestamp"],
+            y=difference_df[measure],
+            mode="lines",
+            line=dict(color="black", width=2),
+            name=f"{measure} Difference",
+        )
+    )
 
     # Update the layout with titles and labels
     fig.update_layout(
