@@ -1,7 +1,8 @@
 """Comparing GGIR outputs to wristpy outputs for epoch 1."""
 
+import datetime
 import pathlib
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import numpy as np
 import plotly.graph_objects as go
@@ -28,29 +29,28 @@ def load_ggir_output(filepath: pathlib.Path) -> pl.DataFrame:
 
     return ggir_data
 
-
-def select_days(
-    df: pl.DataFrame, start_day: int = 0, end_day: int | None = None
-) -> pl.DataFrame:
-    """Selects a subset of the dataframes, from days start:end, based on user input.
+def pick_timestamps(time_vector: pl.Series, 
+                    start_day: int = 0, 
+                    end_day:int | None = None
+                    ) -> tuple[datetime.datetime, datetime.datetime]:
+    """Find the appropriate Start and End timestamp to filter the dataframes with.
 
     Args:
-        df: the given dataframe from which we will take data from the given data range.
-
-        start_day: The int specifying on which day the user would like to begin taking
-        data from. If no date is given, data begins from the first day. Day 1 begins at
-        an arbitrary hour, any other start_day will begin at midnight.
-
-        end_day: the int specifying on which day the user would like to stop taking data
-        If no date is given, data is extracted through the end. The last day present in
-        the dataframe ends at an arbbitrary hour, any other end_day will end just
-        before midnight.
+        time_vector: The vector of timestamps from a DataFrame that is to be filtered.
+        The vector contains only datetime objects.
+        start_day: The start day given by user input. If no start day is given the 
+        time series will begin at the earliest timestamp.
+        end_day: The end day given by user input. If no end day is given the timeseries
+        will end at the final timestamp.
 
     Returns:
-        filtered_df = the subset of the input dataframe, based on the date range given.
+        start_timestamp: the datetime.datetime time stamp that will be used to filter the 
+        DataFrame.
+        end_timestamp: the datetime.datetime time stamp that will be used to filter the 
+        DataFrame. 
     """
-    min_timestamp = df["time"].min()
-    max_timestamp = df["time"].max()
+    min_timestamp : datetime.datetime  = time_vector.min()
+    max_timestamp : datetime.datetime = time_vector.max()
     # Calculate the total days spanned by the data.
     total_days = (max_timestamp - min_timestamp).days + 1
 
@@ -71,14 +71,39 @@ def select_days(
         ) - timedelta(microseconds=1)
     else:
         end_timestamp = max_timestamp
+        if end_day > total_days:
+            print(f'The end day selected is beyond the range of the data. The last day\
+                  in the DataFrame is day {total_days}.')
 
     # Filter the dataframe based on calculated timestamps.
+    return start_timestamp, end_timestamp
+
+def select_days(df: pl.DataFrame, start_day: int = 0, end_day:int | None = None
+                )-> pl.DataFrame:
+    """Filteres DataFrame based on user input and returns that subsect of the data.
+
+    Args:
+        df: The dataframe being filtered. The dataframe being filtered must have a time
+        column from which to derive time stamps.
+        start_day: The user inputted date to start the timeseries from. If no entry, or 
+        an entry <1 is given, the data will begin with the very first timestamp.
+        end_day: The user inputted date to end the timeseries at. If no entry or if the 
+        entry given is beyond the range of the data, the data will end with the final 
+        time point. 
+    
+    Returns:
+        Returns the filtered dataframe.
+    """
+    df = df.with_columns(pl.col("time").cast(pl.Datetime))
+    start_timestamp, end_timestamp = pick_timestamps(
+                                                time_vector= df['time'], 
+                                                start_day= start_day, 
+                                                end_day= end_day
+                                                )
     filtered_df = df.filter(
         (pl.col("time") >= start_timestamp) & (pl.col("time") <= end_timestamp)
     )
-
     return filtered_df
-
 
 def compare(
     ggir_dataframe: pl.DataFrame, wristpy_dataframe: OutputData
@@ -99,7 +124,7 @@ def compare(
         between wristpy and GGIR, contains enmo, anglez for both processing tools, as
         well as the non-wear flag from wristpy.
     """
-    ggir_time = pl.Series(ggir_dataframe["timestamp"])
+    ggir_time = pl.Series(ggir_dataframe["time"])
 
     ggir_datetime = ggir_time.str.to_datetime(time_unit="ns")
 
@@ -248,7 +273,7 @@ def plot_measure(
     # Add the trimmed measure from outputdata_trimmed
     fig.add_trace(
         go.Scatter(
-            x=difference_df["timestamp"],
+            x=difference_df["time"],
             y=outputdata_trimmed[measure],
             mode="lines",
             line=dict(color="green", width=2),
@@ -260,7 +285,7 @@ def plot_measure(
     # Add the measure from ggir_dataframe
     fig.add_trace(
         go.Scatter(
-            x=difference_df["timestamp"],
+            x=difference_df["time"],
             y=ggir_dataframe[measure],
             mode="lines+markers",
             line=dict(color="red", dash="dash", width=2),
@@ -272,7 +297,7 @@ def plot_measure(
     # Add the measure difference
     fig.add_trace(
         go.Scatter(
-            x=difference_df["timestamp"],
+            x=difference_df["time"],
             y=difference_df[measure],
             mode="lines",
             line=dict(color="black", width=2),
