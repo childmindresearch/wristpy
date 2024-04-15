@@ -44,8 +44,8 @@ def pick_timestamps(time_vector: pl.Series,
         will end at the final timestamp.
 
     Returns:
-        start_timestamp: the datetime.datetime time stamp that will be used to filter the 
-        DataFrame.
+        start_timestamp: the datetime.datetime time stamp that will be used to filter 
+        the DataFrame.
         end_timestamp: the datetime.datetime time stamp that will be used to filter the 
         DataFrame. 
     """
@@ -56,6 +56,7 @@ def pick_timestamps(time_vector: pl.Series,
 
     # Determine the start timestamp.
     # If it's not day 1, make sure the day starts at midnight.
+    # Day 1 will start time will vary. 
     if start_day > 1:
         start_timestamp = (min_timestamp + timedelta(days=start_day - 1)).replace(
             hour=0, minute=0, second=0, microsecond=0
@@ -64,18 +65,14 @@ def pick_timestamps(time_vector: pl.Series,
         start_timestamp = min_timestamp
 
     # Determine the end timestamp.
-    # If not the last day, make sure you take data through the end of the day.
+    # If the end_day >= total_days, just take the last time stamp
     if end_day and end_day < total_days:
         end_timestamp = (min_timestamp + timedelta(days=end_day)).replace(
             hour=0, minute=0, second=0, microsecond=0
         ) - timedelta(microseconds=1)
     else:
         end_timestamp = max_timestamp
-        if end_day > total_days:
-            print(f'The end day selected is beyond the range of the data. The last day\
-                  in the DataFrame is day {total_days}.')
 
-    # Filter the dataframe based on calculated timestamps.
     return start_timestamp, end_timestamp
 
 def select_days(df: pl.DataFrame, start_day: int = 0, end_day:int | None = None
