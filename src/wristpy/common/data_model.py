@@ -25,12 +25,13 @@ class InputData:
     It must not be mutated during processing.
     """
 
-    acceleration: pl.DataFrame
-    sampling_rate: int
-    time: pl.DataFrame
-    lux_df: pl.DataFrame
-    battery_df: pl.DataFrame
-    capsense_df: pl.DataFrame
+    acceleration: pl.DataFrame = field(default_factory=pl.DataFrame)
+    sampling_rate: int = 0
+    time: pl.DataFrame = field(default_factory=pl.DataFrame)
+    lux_df: pl.DataFrame = field(default_factory=pl.DataFrame)
+    battery_df: pl.DataFrame = field(default_factory=pl.DataFrame)
+    capsense_df: pl.DataFrame = field(default_factory=pl.DataFrame)
+    temperature_df: pl.DataFrame = field(default_factory=pl.DataFrame)
 
 
 @dataclass
@@ -53,6 +54,8 @@ class OutputData:
     offset: float = 0.0
     sampling_rate: float = 0.0
     scale: float = 0.0
+    temperature: pl.DataFrame = field(default_factory=pl.DataFrame)
+    temperature_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
     time: pl.DataFrame = field(default_factory=pl.DataFrame)
     time_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
     lux_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
