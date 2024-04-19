@@ -29,34 +29,34 @@ def load_ggir_output(filepath: pathlib.Path) -> pl.DataFrame:
 
     return ggir_data
 
-def pick_timestamps(time_vector: pl.Series, 
-                    start_day: int = 0, 
-                    end_day:int | None = None
-                    ) -> tuple[datetime.datetime, datetime.datetime]:
+
+def pick_timestamps(
+    time_vector: pl.Series, start_day: int = 0, end_day: int | None = None
+) -> tuple[datetime.datetime, datetime.datetime]:
     """Find the appropriate Start and End timestamp to filter the dataframes with.
 
     Args:
         time_vector: The vector of timestamps from a DataFrame that is to be filtered.
         The vector contains only datetime objects.
-        start_day: The start day given by user input. If no start day is given the 
+        start_day: The start day given by user input. If no start day is given the
         time series will begin at the earliest timestamp.
         end_day: The end day given by user input. If no end day is given the timeseries
         will end at the final timestamp.
 
     Returns:
-        start_timestamp: the datetime.datetime time stamp that will be used to filter 
+        start_timestamp: the datetime.datetime time stamp that will be used to filter
         the DataFrame.
-        end_timestamp: the datetime.datetime time stamp that will be used to filter the 
-        DataFrame. 
+        end_timestamp: the datetime.datetime time stamp that will be used to filter the
+        DataFrame.
     """
-    min_timestamp : datetime.datetime  = time_vector.min()
-    max_timestamp : datetime.datetime = time_vector.max()
+    min_timestamp: datetime.datetime = time_vector.min()  # type: ignore[assignment]
+    max_timestamp: datetime.datetime = time_vector.max()  # type: ignore[assignment]
     # Calculate the total days spanned by the data.
     total_days = (max_timestamp - min_timestamp).days + 1
 
     # Determine the start timestamp.
     # If it's not day 1, make sure the day starts at midnight.
-    # Day 1 will start time will vary. 
+    # Day 1 will start time will vary.
     if start_day > 1:
         start_timestamp = (min_timestamp + timedelta(days=start_day - 1)).replace(
             hour=0, minute=0, second=0, microsecond=0
@@ -75,32 +75,33 @@ def pick_timestamps(time_vector: pl.Series,
 
     return start_timestamp, end_timestamp
 
-def select_days(df: pl.DataFrame, start_day: int = 0, end_day:int | None = None
-                )-> pl.DataFrame:
+
+def select_days(
+    df: pl.DataFrame, start_day: int = 0, end_day: int | None = None
+) -> pl.DataFrame:
     """Filteres DataFrame based on user input and returns that subsect of the data.
 
     Args:
         df: The dataframe being filtered. The dataframe being filtered must have a time
         column from which to derive time stamps.
-        start_day: The user inputted date to start the timeseries from. If no entry, or 
+        start_day: The user inputted date to start the timeseries from. If no entry, or
         an entry <1 is given, the data will begin with the very first timestamp.
-        end_day: The user inputted date to end the timeseries at. If no entry or if the 
-        entry given is beyond the range of the data, the data will end with the final 
-        time point. 
-    
+        end_day: The user inputted date to end the timeseries at. If no entry or if the
+        entry given is beyond the range of the data, the data will end with the final
+        time point.
+
     Returns:
         Returns the filtered dataframe.
     """
     df = df.with_columns(pl.col("time").cast(pl.Datetime))
     start_timestamp, end_timestamp = pick_timestamps(
-                                                time_vector= df['time'], 
-                                                start_day= start_day, 
-                                                end_day= end_day
-                                                )
+        time_vector=df["time"], start_day=start_day, end_day=end_day
+    )
     filtered_df = df.filter(
         (pl.col("time") >= start_timestamp) & (pl.col("time") <= end_timestamp)
     )
     return filtered_df
+
 
 def compare(
     ggir_dataframe: pl.DataFrame, wristpy_dataframe: OutputData

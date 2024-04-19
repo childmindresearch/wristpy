@@ -3,7 +3,6 @@
 import pathlib
 
 import actfast
-import numpy as np
 import polars as pl
 
 from wristpy.common.data_model import InputData

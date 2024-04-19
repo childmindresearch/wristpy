@@ -31,8 +31,7 @@ def start_ggir_calibration(
         min_hours : int, optional
             Ideal minimum hours of data to use for the calibration. Any values not
             factors of 12 are rounded up to the nearest factor. Default is 72. If less
-            than this amout of data is avialable (but still more than 12 hours),
-            calibration will still be performed on all the data. If the calibration
+            than this amout of data is avialable calibration will not be performed. If the calibration
             error is not under 0.01g after these hours, more data will be used in 12 hour increments.
 
         sd_crit: float, optional

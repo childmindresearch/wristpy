@@ -217,124 +217,6 @@ def rolling_median(df: pl.DataFrame, window_size: int = 51) -> pl.DataFrame:
     return df_rolled.collect()
 
 
-def moving_std(
-    df: pl.DataFrame,
-    time_df: pl.DataFrame,
-    sampling_rate: int,
-    window_size: int,
-) -> pl.DataFrame:
-    """Standard deviation over specific window size.
-
-    This is a moving STD calculation, with non-overlapping window. It will create a
-    downsampled signal of the original input, includes a new time output series.
-
-    Args:
-        df: The data frame containing the signals to downsample
-        time_df: The datetime series of timestamps for the df signals
-        sampling_rate: The sampling rate data was collected at
-        window_size: The desired window size, in seconds
-
-    Returns:
-        moving_std_df: dataframe with the moving SD computed of the raw signals in each
-        column, labeled as {column}_std, where column is the same as the column name
-        in signal_columns. Time column with start of window as timestamp.
-    """
-    # Join the time DataFrame with the original DataFrame
-    full_df = pl.concat([df, pl.DataFrame(time_df)], how="horizontal")
-
-    samples_per_window = int(window_size * sampling_rate)
-
-    # Ensure that the number of rowindow_size in the dataframe is a
-    # multiple of samples_per_window
-    num_rowindow_size = full_df.height
-    num_full_windowindow_size = num_rowindow_size // samples_per_window
-    trimmed_length = num_full_windowindow_size * samples_per_window
-
-    # Trim the dataframe to include only full windowindow_size
-    trimmed_df = full_df.head(trimmed_length)
-
-    # Compute the moving standard deviation for each window
-    # get window indexes and create window column with these indices, based on
-    # counting number of samples per window computed above
-
-    windowed_df = trimmed_df.with_row_index().with_columns(
-        (pl.col("index") / samples_per_window).cast(pl.Int32).alias("window")
-    )
-
-    # For each window, get the start time, and compute SD over all columns for those samples  # noqa: E501
-    moving_std_df = (
-        windowed_df.group_by("window")
-        .agg(
-            [
-                pl.col("time").first().alias("window_start"),
-                pl.all().exclude(["time", "index"]).std().name.suffix("_std"),
-            ]
-        )
-        .sort("window")
-    )
-
-    return moving_std_df
-
-
-def moving_mean(
-    df: pl.DataFrame,
-    time_df: pl.DataFrame,
-    sampling_rate: int,
-    window_size: int,
-) -> pl.DataFrame:
-    """Mean over specific window size.
-
-    This is a moving mean calculation, with non-overlapping window. It will create a
-    downsampled signal of the original input, includes a new time output series.
-
-    Args:
-        df: The data frame containing the signals to compute moving mean
-        time_df: The datetime series of timestamps for the df signals
-        sampling_rate: The sampling rate data was collected at
-        window_size: The desired window size, in seconds
-
-    Returns:
-        dataframe with the moving mean of signals in each column, labeled as
-        {column}_mean where column is the same as the column name
-        in signal_columns. Column for the new time window that has start of the window.
-    """
-    # Join the time DataFrame with the original DataFrame
-    full_df = pl.concat([df, pl.DataFrame(time_df)], how="horizontal")
-
-    samples_per_window = int(window_size * sampling_rate)
-
-    # Ensure that the number of rows in the dataframe is a
-    # multiple of samples_per_window
-    num_rowindow_size = full_df.height
-    num_full_windowindow_size = num_rowindow_size // samples_per_window
-    trimmed_length = num_full_windowindow_size * samples_per_window
-
-    # Trim the dataframe to include only full windows
-    trimmed_df = full_df.head(trimmed_length)
-
-    # Compute the moving standard deviation for each window
-    # get window indexes and create window column with these indices, based on
-    # counting number of samples per window computed above
-
-    windowed_df = trimmed_df.with_row_index().with_columns(
-        (pl.col("index") / samples_per_window).cast(pl.Int32).alias("window")
-    )
-
-    # For each window, get the start time, and compute mean over all columns for those samples  # noqa: E501
-    moving_mean_df = (
-        windowed_df.group_by("window")
-        .agg(
-            [
-                pl.col("time").first().alias("window_start"),
-                pl.all().exclude(["time", "index"]).mean().name.suffix("_mean"),
-            ]
-        )
-        .sort("window")
-    )
-
-    return moving_mean_df
-
-
 def moving_mean_fast(
     data_df: pl.DataFrame,
     time_df: pl.Series,
@@ -382,7 +264,7 @@ def moving_SD_fast(
     downsampled signal of the original input, includes a new time output series.
 
     Args:
-        data_df: the data to take the mean of
+        data_df: the data to take the standard deviation of
         time_df: the timestamps df
         window_size: The desired window size, in seconds
 
@@ -571,7 +453,8 @@ def upsample_time_match_helper(
     """Helper function to upsample data and then to match the accel epoch1 data length.
 
     Args:
-        data_to_upsample: DataFrame with
+        data_to_upsample: DataFrame with the low frequency information that needs to be
+        upsampled
         output_data: OutputData object containing the epoch1 time data
     """
     upsampled_data = data_to_upsample.upsample(

@@ -95,8 +95,8 @@ def compute_error(
     def _compute_mse(df: pl.DataFrame, col1: str, col2: str) -> float:
         """Helper function to compute mean squared error."""
         squared_error = (df[col1] - df[col2]) ** 2
-        mse = squared_error.mean().get_or_else(0.0)
-        return mse
+        mse = squared_error.mean()
+        return mse  # type: ignore[return-value]
 
     mse_anglez = _compute_mse(metrics_calc_wear, "anglez_wristpy", "anglez_ggir")
     mse_enmo = _compute_mse(metrics_calc_wear, "enmo_wristpy", "enmo_ggir")
