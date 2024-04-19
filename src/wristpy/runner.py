@@ -3,13 +3,13 @@
 import json
 import warnings
 from argparse import ArgumentParser
+from typing import Dict
 
 import polars as pl
 
 import wristpy
 from wristpy.ggir import calibration, compare_dataframes, metrics_calc
 from wristpy.io.loaders import gt3x
-from typing import Dict
 
 warnings.filterwarnings("ignore")
 
