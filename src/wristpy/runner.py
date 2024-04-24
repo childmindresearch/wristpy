@@ -83,7 +83,7 @@ def run(args: str | None = None) -> None:
     parser = ArgumentParser(
         description="This is wristpy, a work in progress. At the \
                             moment you have to put in both a raw file, and a ggir \
-                            output file for comparison.Please double check that \
+                            output file for comparison. Please double check that \
                             default file paths are appropriately configured."
     )
 
