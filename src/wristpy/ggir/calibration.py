@@ -232,7 +232,7 @@ def closest_point_fit(
         scale = scalech * scale
         offset = offsetch + (offset / scale)
 
-        ##GGIR definition of residual and new weight calculations
+        # GGIR definition of residual and new weight calculations
         residual.append(
             3 * np.mean(weights[:, None] * (curr - closest_point) ** 2 / weights.sum())
         )
@@ -247,7 +247,5 @@ def closest_point_fit(
     )
 
     # assess if calibration error has been sufficiently improved
-    if (cal_err_end < cal_err_start) and (cal_err_end < 0.01):
-        return True, offset, scale, cal_err_start, cal_err_end
-    else:
-        return False, offset, scale, cal_err_start, cal_err_end
+    finished = (cal_err_end < cal_err_start) and (cal_err_end < 0.01)
+    return finished, offset, scale, cal_err_start, cal_err_end
