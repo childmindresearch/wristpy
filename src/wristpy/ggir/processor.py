@@ -56,13 +56,12 @@ def process_file(file_name: str, output_path: str) -> OutputData:
 
     if os.path.exists(output_file_path):
         # Generate a new filename, this only allows one copy of _new....
+        # TODO: Warn user?
         base_filename = os.path.basename(output_file_path)
         filename, extension = os.path.splitext(base_filename)
         new_filename = filename + "_new" + extension
+        output_file_path = os.path.join(test_config.path_output, new_filename)
 
-        # Write the CSV file with the new filename
-        output_data_csv.write_csv(os.path.join(test_config.path_output, new_filename))
-    else:
-        output_data_csv.write_csv(output_file_path)
+    output_data_csv.write_csv(output_file_path)
 
     return test_output
