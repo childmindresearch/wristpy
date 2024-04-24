@@ -60,9 +60,8 @@ def validate_days(start: int | None, end: int | None) -> None:
     Returns:
         None.
     """
-    if start is not None and end is not None:
-        if start > end:
-            raise ValueError("the start day cannot be greater than the end day")
+    if start is not None and end is not None and start > end:
+        raise ValueError("the start day cannot be greater than the end day")
 
 
 def run(args: str | None = None) -> None:
