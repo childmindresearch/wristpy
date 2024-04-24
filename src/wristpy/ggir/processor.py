@@ -1,7 +1,6 @@
-"""Compute error for ristpy vs GGIR."""
+"""Compute error for wristpy vs GGIR."""
 
 import os
-import warnings
 
 import polars as pl
 
@@ -9,8 +8,6 @@ import wristpy
 from wristpy.common.data_model import OutputData
 from wristpy.ggir import calibration, metrics_calc
 from wristpy.io.loaders import gt3x
-
-warnings.filterwarnings("always")
 
 
 def process_file(file_name: str, output_path: str) -> OutputData:

@@ -54,8 +54,7 @@ class OutputData:
     offset: float = 0.0
     sampling_rate: float = 0.0
     scale: float = 0.0
-    temperature: pl.DataFrame = field(default_factory=pl.DataFrame)
-    temperature_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
+    temperature_upsample_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
     time: pl.DataFrame = field(default_factory=pl.DataFrame)
     time_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)
     lux_epoch1: pl.DataFrame = field(default_factory=pl.DataFrame)

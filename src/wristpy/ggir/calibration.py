@@ -1,5 +1,6 @@
 """Implement the GGIR calibration process."""
 
+from dataclasses import dataclass
 from warnings import warn
 
 import numpy as np
@@ -8,6 +9,25 @@ from sklearn.linear_model import LinearRegression
 
 from wristpy.common.data_model import InputData, OutputData
 from wristpy.ggir.metrics_calc import moving_mean_fast, moving_SD_fast
+
+
+@dataclass
+class ClosestPointFitResult:
+    """Result of the closest point fit estimation.
+
+    Attributes:
+        finished_status (bool): True if the closest point fit could be estimated.
+        scale (float): Scale factor for calibration.
+        offset (float): Offset for calibration.
+        cal_error_start (float): Calibration error at the start.
+        cal_error_end (float): Calibration error at the end.
+    """
+
+    finished_status: bool
+    scale: pl.Series
+    offset: pl.Series
+    cal_error_start: float
+    cal_error_end: float
 
 
 def start_ggir_calibration(
@@ -56,13 +76,13 @@ def start_ggir_calibration(
     time_data = input_data.time
     sampling_rate = input_data.sampling_rate
 
-    nh = int(min_hours * 3600 * sampling_rate)
-    n12h = int(12 * 3600 * sampling_rate)
+    min_samples = int(min_hours * 3600 * sampling_rate)
+    samples_12h = int(12 * 3600 * sampling_rate)
 
-    i_h = 0  # keep track of number of extra 12 hour blocks used
+    chunk_12h = 0  # keep track of number of extra 12 hour blocks used
 
     # check if enough data
-    if accel_data.height < nh:
+    if accel_data.height < min_samples:
         warn(
             f"Less than {min_hours} hours of data ({accel_data.height / (sampling_rate * 3600)} hours). "  # noqa: E501
             f"No Calibration performed",
@@ -83,15 +103,9 @@ def start_ggir_calibration(
     valid_calibration = True
 
     while not finished:
-        accel_data_trimmed = accel_data[: nh + i_h * n12h]
-        time_data_trimmed = time_data[: nh + i_h * n12h]
-        (
-            finished,
-            offset,
-            scale,
-            cal_err_start,
-            cal_err_end,
-        ) = closest_point_fit(
+        accel_data_trimmed = accel_data[: min_samples + chunk_12h * samples_12h]
+        time_data_trimmed = time_data[: min_samples + chunk_12h * samples_12h]
+        closest_point_fit_result = closest_point_fit(
             accel_data_trimmed,
             time_data_trimmed,
             sd_crit,
@@ -99,12 +113,16 @@ def start_ggir_calibration(
             max_iter,
             tol,
         )
-        if not finished and (nh + i_h * n12h) >= accel_data.shape[0]:
+        finished = closest_point_fit_result.finished_status
+        if (
+            not finished
+            and (min_samples + chunk_12h * samples_12h) >= accel_data.shape[0]
+        ):
             finished = True
             valid_calibration = False
             warn(
-                f"Calibration not done with {min_hours + (i_h - 1) * 12} - "
-                f"{min_hours + i_h * 12} hours due to insufficient non-movement "
+                f"Calibration not done with {min_hours + (chunk_12h - 1) * 12} - "
+                f"{min_hours + chunk_12h * 12} hours due to insufficient non-movement "
                 f"data available"
             )
             return OutputData(
@@ -116,18 +134,20 @@ def start_ggir_calibration(
                 cal_error_end=0,
                 time=time_data,
             )
-        i_h += 1
+        chunk_12h += 1
 
     if finished and valid_calibration:
-        scaled_accel = apply_calibration(accel_data, scale, offset)
+        scaled_accel = apply_calibration(
+            accel_data, closest_point_fit_result.scale, closest_point_fit_result.offset
+        )
 
     return OutputData(
         cal_acceleration=scaled_accel,
-        scale=scale,
-        offset=offset,
+        scale=closest_point_fit_result.scale,
+        offset=closest_point_fit_result.offset,
         sampling_rate=sampling_rate,
-        cal_error_start=cal_err_start,
-        cal_error_end=cal_err_end,
+        cal_error_start=closest_point_fit_result.cal_error_start,
+        cal_error_end=closest_point_fit_result.cal_error_end,
         time=time_data,
     )
 
@@ -153,7 +173,7 @@ def closest_point_fit(
     sphere_crit: float,
     max_iter: int,
     tol: float,
-) -> tuple:
+) -> ClosestPointFitResult:
     """Do the iterative closest point fit.
 
     Finds the periods of no motion in acceleration data, as defined by GGIR criteria for
@@ -171,46 +191,53 @@ def closest_point_fit(
      tol: Change in residual tolerance to determine stopping
 
     Returns:
+        ClosestPointFitResult data class that contains
         Finished, Scale, offset, cal_error start, cal_error_end
 
     """
     # get the moving std and mean over a 10s window
-    rolling_SD = moving_SD_fast(accel_data, time_data, 10)
-    rolling_Mean = moving_mean_fast(accel_data, time_data, 10)
+    rolling_sd = moving_SD_fast(accel_data, time_data, 10)
+    rolling_mean = moving_mean_fast(accel_data, time_data, 10)
 
     # grab only the accel data
-    acc_SD = rolling_SD.select(["X_SD", "Y_SD", "Z_SD"])
-    acc_mean = rolling_Mean.select(["X_mean", "Y_mean", "Z_mean"])
+    acc_SD = rolling_sd.select(["X_SD", "Y_SD", "Z_SD"])
+    acc_mean = rolling_mean.select(["X_mean", "Y_mean", "Z_mean"])
 
     # find periods of no motion
     no_motion = np.all(acc_SD < sd_crit, axis=1) & np.all(np.abs(acc_mean) < 2, axis=1)
 
     # trim to no motion
-    acc_mean_noMotion = acc_mean.filter(no_motion)
+    acc_mean_no_motion = acc_mean.filter(no_motion)
 
     offset = np.zeros(3)
     scale = np.ones(3).flatten()
 
     # check if each axis meets sphere_criteria
-    GGIR_check = 0
-    for col in acc_mean_noMotion.columns:
-        tmp = (acc_mean_noMotion[col].min() < -sphere_crit) & (
-            acc_mean_noMotion[col].max() > sphere_crit
+    ggir_check = 0
+    for col in acc_mean_no_motion.columns:
+        tmp = (acc_mean_no_motion[col].min() < -sphere_crit) & (
+            acc_mean_no_motion[col].max() > sphere_crit
         )
         if tmp:
-            GGIR_check = GGIR_check + 1
+            ggir_check = ggir_check + 1
 
-    if GGIR_check != 3:
-        return False, offset, scale, 0, 0
+    if ggir_check != 3:
+        return ClosestPointFitResult(
+            finished_status=False,
+            offset=pl.Series(offset),
+            scale=pl.Series(scale),
+            cal_error_start=0,
+            cal_error_end=0,
+        )
 
     # GGIR weights and residual definition
-    weights = np.ones(acc_mean_noMotion.shape[0]) * 100
+    weights = np.ones(acc_mean_no_motion.shape[0]) * 100
     residual = [np.Inf]
-    LR = LinearRegression()
+    linear_regression_model = LinearRegression()
 
-    acc_noMotion_pd = acc_mean_noMotion.to_pandas()
+    acc_noMotion_pd = acc_mean_no_motion.to_pandas()
     cal_err_start = np.round(
-        np.mean(abs(np.linalg.norm(acc_mean_noMotion, axis=1) - 1)), decimals=5
+        np.mean(abs(np.linalg.norm(acc_mean_no_motion, axis=1) - 1)), decimals=5
     )
 
     for i in range(max_iter):
@@ -222,11 +249,11 @@ def closest_point_fit(
         for k in range(3):
             x_ = np.vstack((curr.iloc[:, k]))
             tmp_y = np.vstack((closest_point.iloc[:, k]))
-            LR.fit(x_, tmp_y, sample_weight=weights)
+            linear_regression_model.fit(x_, tmp_y, sample_weight=weights)
 
-            offsetch[k] = LR.intercept_[0]
-            scalech[k] = LR.coef_[0, 0]
-            curr.iloc[:, k] = (x_ @ LR.coef_).flatten()
+            offsetch[k] = linear_regression_model.intercept_[0]
+            scalech[k] = linear_regression_model.coef_[0, 0]
+            curr.iloc[:, k] = (x_ @ linear_regression_model.coef_).flatten()
 
         # GGIR modification of scale and offset for next search point
         scale = scalech * scale
@@ -248,4 +275,10 @@ def closest_point_fit(
 
     # assess if calibration error has been sufficiently improved
     finished = (cal_err_end < cal_err_start) and (cal_err_end < 0.01)
-    return finished, offset, scale, cal_err_start, cal_err_end
+    return ClosestPointFitResult(
+        finished_status=finished,
+        offset=pl.Series(offset),
+        scale=pl.Series(scale),
+        cal_error_start=cal_err_start,
+        cal_error_end=cal_err_end,
+    )

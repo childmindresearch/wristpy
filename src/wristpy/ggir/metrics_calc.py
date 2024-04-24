@@ -185,6 +185,34 @@ def calc_epoch1_cap_sensor(input_data: InputData, output_data: OutputData) -> No
     )["cap_sense"]
 
 
+def calc_epoch1_temp(input_data: InputData, output_data: OutputData) -> None:
+    """Get the temperature data from the input data and resample to epoch1.
+
+    Args:
+        input_data: InputData object containing the temperature data.
+        output_data: OutputData object to store the resampled temperature data.
+    """
+    temperature_df = input_data.temperature_df
+    # Do not proceed with processing if there is null data
+    if temperature_df["temperature"].is_empty() or temperature_df["time"].is_empty():
+        output_data.temperature_upsample_epoch1 = pl.Series(
+            "temperature", np.zeros(len(output_data.time_epoch1))
+        )
+        return
+
+    temperature_df = temperature_df.with_columns(pl.col("time").dt.round("5s"))
+    temperature_df = temperature_df.with_columns(pl.col("time").set_sorted())
+
+    # swap columns due to upsample format
+    temperature_df = temperature_df.select(["temperature", "time"])
+    time_match_temperature, fill_df = upsample_time_match_helper(
+        temperature_df, output_data
+    )
+    output_data.temperature_upsample_epoch1 = pl.concat(
+        [time_match_temperature, fill_df], how="vertical"
+    ).select("temperature")
+
+
 def rolling_median(df: pl.DataFrame, window_size: int = 51) -> pl.DataFrame:
     """Rolling median GGIR uses for anglez calculation.
 
