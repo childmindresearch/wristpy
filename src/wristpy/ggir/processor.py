@@ -1,4 +1,4 @@
-"""Compute error for wristpy vs GGIR."""
+"""Process a gt3x file with wristpy, write csv output."""
 
 import os
 
