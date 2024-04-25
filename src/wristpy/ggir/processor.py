@@ -11,7 +11,9 @@ from wristpy.io.loaders import gt3x
 
 
 def process_file(file_name: str, output_path: str) -> OutputData:
-    """Process a gt3x file with wristpy, write csv output.
+    """Process a gt3x file with wristpy, write csv output, and return the outputData.
+
+    Currently this skips capsense data due to unreliability of the sensor.
 
     Args:
         file_name: The path of the input file.
