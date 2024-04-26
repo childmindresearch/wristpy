@@ -355,15 +355,17 @@ def set_nonwear_flag(
 
     num_short_windows = int(window_size_long / window_size)
 
-    def _nonwear_cond(df_NW: pl.DataFrame, sd_crit: float, ra_crit: float) -> pl.Series:
+    def _nonwear_cond(
+        df_non_wear: pl.DataFrame, sd_crit: float, ra_crit: float
+    ) -> pl.Series:
         """Helper function to calculate non-wear criteria values."""
-        tmp_bool = (df_NW["X_SD"] < sd_crit) & (df_NW["range_X"] < ra_crit)
+        tmp_bool = (df_non_wear["X_SD"] < sd_crit) & (df_non_wear["range_X"] < ra_crit)
         tmp_X = tmp_bool.cast(pl.Int32)
 
-        tmp_bool = (df_NW["Y_SD"] < sd_crit) & (df_NW["range_Y"] < ra_crit)
+        tmp_bool = (df_non_wear["Y_SD"] < sd_crit) & (df_non_wear["range_Y"] < ra_crit)
         tmp_Y = tmp_bool.cast(pl.Int32)
 
-        tmp_bool = (df_NW["Z_SD"] < sd_crit) & (df_NW["range_Z"] < ra_crit)
+        tmp_bool = (df_non_wear["Z_SD"] < sd_crit) & (df_non_wear["range_Z"] < ra_crit)
         tmp_Z = tmp_bool.cast(pl.Int32)
         NW_val = tmp_X + tmp_Y + tmp_Z
 
@@ -466,10 +468,10 @@ def set_nonwear_flag(
     # Add the non_wear_flag to the output_data object to match the epoch_time1 interval
     # this is achieved by upsamlpling to match the temporal resolution of epoch1, and
     # then padding the last known value to non_wear_flag if there is a length mismatch
-    time_match_NW, fill_df = upsample_time_match_helper(NW_flag_df, output_data)
+    time_match_non_wear, fill_df = upsample_time_match_helper(NW_flag_df, output_data)
 
     output_data.non_wear_flag_epoch1 = pl.concat(
-        [time_match_NW, fill_df], how="vertical"
+        [time_match_non_wear, fill_df], how="vertical"
     )["non_wear_flag"]
 
     return NW_flag_df
