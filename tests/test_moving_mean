@@ -1,0 +1,23 @@
+import pandas as pd
+import polars as pl
+import pytest
+from metrics_calc import moving_mean_fast
+
+
+def test_moving_mean_fast():
+    # Create a simple data frame
+    data_df = pl.DataFrame({"column1": [1, 2, 3, 4, 5], "column2": [2, 3, 4, 5, 6]})
+    time_df = pl.Series("time", pd.date_range(start="1/1/2022", periods=5, freq="S"))
+
+    # Calculate the moving mean with a window size of 2 seconds
+    result = moving_mean_fast(data_df, time_df, 2)
+
+    # Check the result
+    expected = pl.DataFrame(
+        {
+            "column1_mean": [1.5, 3.5, 5.0],
+            "column2_mean": [2.5, 4.5, 6.0],
+            "time": pd.date_range(start="1/1/2022", periods=3, freq="2S"),
+        }
+    )
+    assert result.frame_equal(expected, null_equal=True)

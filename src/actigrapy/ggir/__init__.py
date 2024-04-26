@@ -1,1 +1,0 @@
-"""Algorithms ported from GGIR."""
