@@ -2,8 +2,12 @@
 
 import pathlib
 from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Optional, Tuple
 
+import numpy as np
 import polars as pl
+from pydantic import BaseModel
 
 
 @dataclass
