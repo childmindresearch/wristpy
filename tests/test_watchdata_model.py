@@ -15,8 +15,8 @@ def create_mock_measurement(measurements: np.ndarray, time: np.ndarray) -> Measu
         time: Array of time values.
     """
     time = time * 1000000
-    time = pl.from_epoch(pl.Series(time), time_unit="us")
-    return Measurement(measurements=measurements, time=time)
+    time_series = pl.from_epoch(pl.Series(time), time_unit="us")
+    return Measurement(measurements=measurements, time=time_series)
 
 
 @pytest.mark.parametrize(
