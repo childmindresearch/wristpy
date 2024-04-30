@@ -1,11 +1,10 @@
 """Internal data model."""
 
-from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional
 
 import numpy as np
 import polars as pl
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class Measurement(BaseModel):
@@ -18,6 +17,12 @@ class Measurement(BaseModel):
         """Config to allow for ndarray as input."""
 
         arbitrary_types_allowed = True
+
+    @validator("time")
+    def validate_time(cls, v):  # noqa: ANN201, D102
+        if not isinstance(v.dtype, pl.datatypes.Datetime):
+            raise ValueError("time must be a datetime series")
+        return v
 
 
 class WatchData(BaseModel):

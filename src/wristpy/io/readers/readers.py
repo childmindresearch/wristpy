@@ -4,7 +4,6 @@ import pathlib
 
 import actfast
 import polars as pl
-import pandas as pd
 
 from wristpy.common.models import Measurement, WatchData
 
@@ -23,9 +22,9 @@ def read_watch_data(file_name: pathlib.Path | str) -> WatchData:
     """
     filename = pathlib.Path(file_name)
     if filename.suffix == ".gt3x":
-        input_data = gt3x_loader(filename.as_posix())
+        input_data = gt3x_loader(filename)
     elif filename.suffix == ".bin":
-        input_data = geneActiv_loader(filename.as_posix())
+        input_data = geneActiv_loader(filename)
     else:
         raise ValueError(f"Unsupported file extension: {filename.suffix}")
 
@@ -33,7 +32,7 @@ def read_watch_data(file_name: pathlib.Path | str) -> WatchData:
 
 
 def gt3x_loader(
-    path: str,
+    path: pathlib.Path | str,
 ) -> WatchData:
     """Load input data from .gt3x file using actfast.
 
@@ -45,7 +44,7 @@ def gt3x_loader(
     Returns:
            WatchData class
     """
-    subject1 = actfast.read_actigraph_gt3x(path)
+    subject1 = actfast.read_actigraph_gt3x(str(path))
 
     acceleration_tmp = subject1["timeseries"]["acceleration"]["acceleration"]
 
@@ -78,7 +77,7 @@ def gt3x_loader(
 
 
 def geneActiv_loader(
-    path: str,
+    path: pathlib.Path | str,
 ) -> WatchData:
     """Load input data from GeneActiv .bin file using actfast.
 
@@ -90,7 +89,7 @@ def geneActiv_loader(
     Returns:
            InputData class
     """
-    subject1 = actfast.read_geneactiv_bin(path)
+    subject1 = actfast.read_geneactiv_bin(str(path))
 
     acceleration_tmp = subject1["timeseries"]["hf"]["acceleration"]
 
