@@ -4,7 +4,7 @@ from typing import Optional
 
 import numpy as np
 import polars as pl
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
 
 
 class Measurement(BaseModel):
@@ -18,7 +18,7 @@ class Measurement(BaseModel):
 
         arbitrary_types_allowed = True
 
-    @validator("time")
+    @field_validator("time")
     def validate_time(cls, v):  # noqa: ANN201, D102
         if not isinstance(v.dtype, pl.datatypes.Datetime):
             raise ValueError("time must be a datetime series")
