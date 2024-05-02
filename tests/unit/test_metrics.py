@@ -20,7 +20,7 @@ TEST_LENGTH = 100
         ]
 )
 def test_euclidean_norm(
-        x: np.array, y: np.array, z: np.array, expected_enmo: float
+        x: np.ndarray, y: np.ndarray, z: np.ndarray, expected_enmo: float
         )->None:
     """Tests the euclidean norm function."""
     dummy_date = datetime(2024, 5, 2)

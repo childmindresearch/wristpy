@@ -19,7 +19,7 @@ class Measurement(BaseModel):
         arbitrary_types_allowed = True
 
     @field_validator("time")
-    def validate_time(cls, v):  # noqa: ANN201, D102
+    def validate_time(cls, v):  # noqa: ANN201, D102, ANN001
         if not isinstance(v.dtype, pl.datatypes.Datetime):
             raise ValueError("time must be a datetime series")
         return v
