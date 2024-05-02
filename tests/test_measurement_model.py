@@ -7,34 +7,43 @@ import pytest
 from wristpy.core.models import Measurement
 
 
-@pytest.mark.parametrize(
-    "sensor_data, time_data, should_raise",
-    [
-        (np.array([1, 2, 3]), np.array([1704110400, 1704110401, 1704110402]), False),
-        (np.array([1, 2, 3]), np.array([1704110400, 1704110401, 1704110402]), True),
-    ],
-)
-def test_measurement_model(
-    sensor_data: np.ndarray, time_data: np.ndarray | pl.Series, should_raise: bool
-) -> None:
-    """Test the ability to create a Measurement instance.
+@pytest.fixture
+def create_mock_measurement() -> Measurement:
+    """Create a mock measurement instance."""
 
-    Args:
-        sensor_data: The sensor data.
-        time_data: The time data.
-        should_raise: Whether an error should be raised.
-    """
-    if should_raise:
-        with pytest.raises(ValueError):
-            Measurement(measurements=sensor_data, time=time_data)
-        return
-    # Assert that the data was stored correctly
-    else:
-        # Convert time data to a polars series of datetime in us
-        time_data = time_data * 1000000
-        time_data_datetime = pl.from_epoch(pl.Series(time_data), time_unit="us")
+    def _create_mock_measurement(
+        measurements: np.ndarray, time: np.ndarray
+    ) -> Measurement:
+        time = time * 1000000
+        time_series = pl.from_epoch(pl.Series(time), time_unit="us")
+        return Measurement(measurements=measurements, time=time_series)
 
-        measurement = Measurement(measurements=sensor_data, time=time_data_datetime)
+    return _create_mock_measurement
 
-        assert np.array_equal(measurement.measurements, sensor_data)
-        assert np.array_equal(measurement.time.dt.timestamp().to_numpy(), time_data)
+
+def test_measurement_model_time_type() -> None:
+    """Test the error when time is not a datetime series."""
+    with pytest.raises(ValueError):
+        time = pl.Series([1, 2, 3])
+        Measurement(measurements=np.array([1, 2, 3]), time=time)
+
+
+def test_measurement_model_time_sorted() -> None:
+    """Test the error when time is not sorted."""
+    with pytest.raises(ValueError):
+        time = np.array([1704110409, 1704110410, 1704110403])
+        time = time * 1000000
+        time_series = pl.from_epoch(pl.Series(time), time_unit="us")
+        Measurement(measurements=np.array([1, 2, 3]), time=time_series)
+
+
+def test_measurement_model(create_mock_measurement: Measurement) -> None:
+    """Test the Measurement model."""
+    measurement = create_mock_measurement(
+        np.array([1, 2, 3]), np.array([1704110400, 1704110401, 1704110402])
+    )
+    assert np.array_equal(measurement.measurements, np.array([1, 2, 3]))
+    assert np.array_equal(
+        measurement.time.dt.timestamp().to_numpy(),
+        np.array([1704110400, 1704110401, 1704110402]) * 1000000,
+    )

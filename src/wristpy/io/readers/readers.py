@@ -5,7 +5,7 @@ import pathlib
 import actfast
 import polars as pl
 
-from wristpy.common.models import Measurement, WatchData
+from wristpy.core.models import Measurement, WatchData
 
 
 def read_watch_data(file_name: pathlib.Path | str) -> WatchData:
@@ -81,7 +81,7 @@ def geneActiv_loader(
 ) -> WatchData:
     """Load input data from GeneActiv .bin file using actfast.
 
-        This loads the acceleration, lux, battery voltage, and capsense data.
+        This loads the acceleration, lux, battery voltage, and temperature data.
 
     Args:
         path: file path to the raw data to load

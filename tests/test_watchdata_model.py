@@ -7,71 +7,60 @@ import pytest
 from wristpy.core.models import Measurement, WatchData
 
 
-def create_mock_measurement(measurements: np.ndarray, time: np.ndarray) -> Measurement:
-    """Create a mock measurement instance.
+@pytest.fixture
+def create_mock_measurement() -> Measurement:
+    """Create a mock measurement instance."""
 
-    Args:
-        measurements: Array of measurements.
-        time: Array of time values.
-    """
-    time = time * 1000000
-    time_series = pl.from_epoch(pl.Series(time), time_unit="us")
-    return Measurement(measurements=measurements, time=time_series)
+    def _create_mock_measurement(
+        measurements: np.ndarray, time: np.ndarray
+    ) -> Measurement:
+        time = time * 1000000
+        time_series = pl.from_epoch(pl.Series(time), time_unit="us")
+        return Measurement(measurements=measurements, time=time_series)
+
+    return _create_mock_measurement
 
 
-@pytest.mark.parametrize(
-    "acceleration_measurements, acceleration_time, lux_measurements, lux_time, temperature_measurements, temperature_time",  # noqa: E501
-    [
-        (
-            np.array([1, 2, 3]),
-            np.array([1704110400, 1704110401, 1704110402]),
-            np.array([1, 1, 3000]),
-            np.array([1704110409, 1704110410, 1704110403]),
-            np.array([27.2, 24.1, 30]),
-            np.array([1704110404, 1704110405, 1704110406]),
-        ),
-        (
-            np.array([0.1, -1, 1]),
-            np.array([1704110400, 1704110401, 1704110402]),
-            np.array([-1, 10.3, 3000]),
-            np.array([1704110403, 1704110404, 1704110405]),
-            np.array([27.2, 24.5, 36]),
-            np.array([1704110406, 1704110407, 1704110408]),
-        ),
-    ],
-)
-def test_watchdata_model(
-    acceleration_measurements: np.ndarray,
-    acceleration_time: np.ndarray,
-    lux_measurements: np.ndarray,
-    lux_time: np.ndarray,
-    temperature_measurements: np.ndarray,
-    temperature_time: np.ndarray,
+def test_watchdata_model_1D_acceleration(create_mock_measurement: Measurement) -> None:
+    """Test the WatchData to catch 1D error in acceleration."""
+    sensor_data = np.array([1, 2, 3])
+    time = np.array([1704110400, 1704110401, 1704110402])
+    with pytest.raises(ValueError):
+        acceleration = create_mock_measurement(sensor_data, time)
+        WatchData(acceleration=acceleration)
+
+
+def test_watchdata_model_acceleration_three_columns(
+    create_mock_measurement: Measurement,
 ) -> None:
-    """Test the WatchData model.
+    """Test the WatchData to catch 3 columns error in acceleration."""
+    with pytest.raises(ValueError):
+        acceleration = create_mock_measurement(
+            np.array([[1, 2], [4, 5]]), np.array([1, 2])
+        )
+        WatchData(acceleration=acceleration)
 
-    Args:
-        acceleration_measurements: Array of acceleration measurements.
-        acceleration_time: pl.Series of datetime .
-        lux_measurements: Array of lux measurements.
-        lux_time: Array of lux time values.
-        temperature_measurements: Array of temperature measurements.
-        temperature_time: Array of temperature time values.
-    """
-    acceleration = create_mock_measurement(acceleration_measurements, acceleration_time)
-    lux = create_mock_measurement(lux_measurements, lux_time)
-    temp = create_mock_measurement(temperature_measurements, temperature_time)
+
+def test_watchdata_model(
+    create_mock_measurement: Measurement,
+) -> None:
+    """Test the WatchData model."""
+    accel_data = np.array([[1, 2, 3], [4, 5, 6]])
+    accel_time = np.array([1704110400, 1704110401])
+    sensor_data = np.array([1, 2, 3])
+    time = np.array([1704110400, 1704110401, 1704110402])
+    acceleration = create_mock_measurement(accel_data, accel_time)
+    lux = create_mock_measurement(sensor_data, time)
+    temp = create_mock_measurement(sensor_data, time)
 
     # Create a WatchData instance
     watch_data = WatchData(acceleration=acceleration, lux=lux, temperature=temp)
 
     # Assert that the data was stored correctly
-    assert np.array_equal(
-        watch_data.acceleration.measurements, acceleration_measurements
-    )
-    assert np.array_equal(watch_data.lux.measurements, lux_measurements)
-    assert np.array_equal(watch_data.temperature.measurements, temperature_measurements)
+    assert np.array_equal(watch_data.acceleration.measurements, accel_data)
+    assert np.array_equal(watch_data.lux.measurements, sensor_data)
+    assert np.array_equal(watch_data.temperature.measurements, sensor_data)
     assert np.array_equal(
         watch_data.temperature.time.dt.timestamp().to_numpy(),
-        temperature_time * 1000000,
+        time * 1000000,
     )
