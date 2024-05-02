@@ -1,4 +1,4 @@
-"""Test the read_watch_data wrapper function"""
+"""Test the read_watch_data wrapper function."""
 
 import pathlib
 
