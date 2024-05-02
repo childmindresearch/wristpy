@@ -2,8 +2,6 @@
 
 import pathlib
 
-import pytest
-
 from wristpy.core.models import Measurement, WatchData
 from wristpy.io.readers import readers
 
