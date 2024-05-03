@@ -45,7 +45,7 @@ class WatchData(BaseModel):
     temperature: Optional[Measurement] = None
 
     @field_validator("acceleration")
-    def validate_acceleration(cls, v: np.ndarray) -> np.ndarray:
+    def validate_acceleration(cls, v: Measurement) -> Measurement:
         """Validate the acceleration data.
 
         Ensure that the acceleration data is a 2D array with 3 columns.

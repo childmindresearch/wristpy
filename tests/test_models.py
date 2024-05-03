@@ -12,7 +12,7 @@ def unix_epoch_time_converter_to_polars_seconds(time: np.ndarray) -> pl.Series:
 
     This helper function is specific to the test file using seconds.
     """
-    return pl.from_epoch(time, time_unit="s")
+    return pl.from_epoch(pl.Series(time), time_unit="s")
 
 
 def test_watchdata_model_1D_acceleration() -> None:
