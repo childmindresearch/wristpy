@@ -23,6 +23,16 @@ class Measurement(BaseModel):
         """Validate the time series.
 
         Check that the time series is a datetime series and sorted.
+
+        Args:
+            cls: The class.
+            v: The time series to validate.
+
+        Returns:
+            v: The time series if it is valid.
+
+        Raises:
+            ValueError: If the time series is not a datetime series or is not sorted.
         """
         if not isinstance(v.dtype, pl.datatypes.Datetime):
             raise ValueError("time must be a datetime series")
@@ -49,6 +59,16 @@ class WatchData(BaseModel):
         """Validate the acceleration data.
 
         Ensure that the acceleration data is a 2D array with 3 columns.
+
+        Args:
+            cls: The class.
+            v: The acceleration data to validate.
+
+        Returns:
+            v: The acceleration data if it is valid.
+
+        Raises:
+            ValueError: If the acceleration data is not a 2D array with 3 columns.
         """
         if len(v.measurements.shape) < 2 or v.measurements.shape[1] != 3:
             raise ValueError("acceleration must be a 2D array with 3 columns")

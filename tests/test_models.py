@@ -82,6 +82,9 @@ def test_measurement_model() -> None:
     measurement = Measurement(measurements=np.array([1, 2, 3]), time=time)
 
     assert np.array_equal(measurement.measurements, np.array([1, 2, 3]))
+
+    """the polars.dt.timestamp() method does not support returns in seconds, 
+    the default is microseconds, thus we multiple by 1e6"""
     assert np.array_equal(
         measurement.time.dt.timestamp().to_numpy(),
         np.array([1, 2, 3]) * 1000000,
