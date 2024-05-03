@@ -46,8 +46,8 @@ def gt3x_loader(
            WatchData class
 
     Raises:
-        ValueError: if the file extension is not .gt3x
-        FileNotFoundError: if the file does not exist
+        FileNotFoundError: if the file does not exist.
+        ValueError: if the file extension is not .gt3x.
     """
     file_path = pathlib.Path(path)
 
@@ -108,8 +108,8 @@ def geneActiv_loader(
            WatchData class
 
     Raises:
-        ValueError: if the file extension is not .gt3x
-        FileNotFoundError: if the file does not exist
+        FileNotFoundError: if the file does not exist.
+        ValueError: if the file extension is not .bin.
     """
     file_path = pathlib.Path(path)
 
