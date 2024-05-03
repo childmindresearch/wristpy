@@ -19,7 +19,11 @@ class Measurement(BaseModel):
         arbitrary_types_allowed = True
 
     @field_validator("time")
-    def validate_time(cls, v):  # noqa: ANN201, D102, ANN001
+    def validate_time(cls, v: pl.Series) -> pl.Series:
+        """Validate the time series.
+
+        Check that the time series is a datetime series and sorted.
+        """
         if not isinstance(v.dtype, pl.datatypes.Datetime):
             raise ValueError("time must be a datetime series")
         if not v.is_sorted():
@@ -41,7 +45,11 @@ class WatchData(BaseModel):
     temperature: Optional[Measurement] = None
 
     @field_validator("acceleration")
-    def validate_acceleration(cls, v):  # noqa: ANN201, D102, ANN001
+    def validate_acceleration(cls, v: np.ndarray) -> np.ndarray:
+        """Validate the acceleration data.
+
+        Ensure that the acceleration data is a 2D array with 3 columns.
+        """
         if len(v.measurements.shape) < 2 or v.measurements.shape[1] != 3:
             raise ValueError("acceleration must be a 2D array with 3 columns")
         return v
