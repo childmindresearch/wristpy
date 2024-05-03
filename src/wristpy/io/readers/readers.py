@@ -1,6 +1,7 @@
 """Function to read accelermoeter data from a file."""
 
 import pathlib
+from typing import Literal
 
 import actfast
 import numpy as np
@@ -151,7 +152,7 @@ def geneActiv_loader(
 
 
 def unix_epoch_time_converter_to_polars_nanoseconds(
-    time: np.ndarray, units: str = "ns"
+    time: np.ndarray, units: Literal["ns", "us", "ms", "s", "d"] = "ns"
 ) -> pl.Series:
     """Convert unix epoch time to polars Series.
 
@@ -160,4 +161,5 @@ def unix_epoch_time_converter_to_polars_nanoseconds(
         units: The units to convert the time to ('s', 'ms', 'us', or 'ns'). Default
         value is 'ns'.
     """
-    return pl.from_epoch((time), time_unit=units).alias("time")
+    time_series = pl.Series(time)
+    return pl.from_epoch(time_series, time_unit=units).alias("time")
