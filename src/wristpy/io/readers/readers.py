@@ -60,7 +60,7 @@ def gt3x_loader(
     subject1 = actfast.read_actigraph_gt3x(str(path))
 
     acceleration_tmp = subject1["timeseries"]["acceleration"]["acceleration"]
-    time_actfast = unix_epoch_time_converter_to_polars_nanoseconds(
+    time_actfast = unix_epoch_time_to_polars_datetime(
         subject1["timeseries"]["acceleration"]["datetime"]
     )
 
@@ -68,14 +68,14 @@ def gt3x_loader(
 
     # light dataframe, load light data +light time
     lux_values = subject1["timeseries"]["lux"]["lux"]
-    lux_datetime = unix_epoch_time_converter_to_polars_nanoseconds(
+    lux_datetime = unix_epoch_time_to_polars_datetime(
         subject1["timeseries"]["lux"]["datetime"]
     )
 
     lux = Measurement(measurements=lux_values, time=lux_datetime)
 
     battery_data = subject1["timeseries"]["battery_voltage"]["battery_voltage"]
-    battery_datetime = unix_epoch_time_converter_to_polars_nanoseconds(
+    battery_datetime = unix_epoch_time_to_polars_datetime(
         subject1["timeseries"]["battery_voltage"]["datetime"]
     )
 
@@ -83,7 +83,7 @@ def gt3x_loader(
 
     # capsense (skin/wear detection) dataframe, load capsense data + capsense time
     capsense_data = subject1["timeseries"]["capsense"]["capsense"]
-    capsense_datetime = unix_epoch_time_converter_to_polars_nanoseconds(
+    capsense_datetime = unix_epoch_time_to_polars_datetime(
         subject1["timeseries"]["capsense"]["datetime"]
     )
 
@@ -100,6 +100,8 @@ def geneActiv_loader(
     """Load input data from GeneActiv .bin file using actfast.
 
         This loads the acceleration, lux, battery voltage, and temperature data.
+        geneActiv bin file has two different time scales for different sensors, we load
+        them here as fast (higher sampling rate) and slow (lower sampling rate).
 
     Args:
         path: file path to the raw data to load
@@ -121,12 +123,10 @@ def geneActiv_loader(
 
     subject1 = actfast.read_geneactiv_bin(str(path))
 
-    """geneActiv bin file has two different time scales for different sensors, we load 
-    them here as fast (higher sampling rate) and slow (lower sampling rate)"""
-    time_fast = unix_epoch_time_converter_to_polars_nanoseconds(
+    time_fast = unix_epoch_time_to_polars_datetime(
         subject1["timeseries"]["hf"]["datetime"]
     )
-    time_slow = unix_epoch_time_converter_to_polars_nanoseconds(
+    time_slow = unix_epoch_time_to_polars_datetime(
         subject1["timeseries"]["lf"]["datetime"]
     )
 
@@ -151,10 +151,10 @@ def geneActiv_loader(
     )
 
 
-def unix_epoch_time_converter_to_polars_nanoseconds(
+def unix_epoch_time_to_polars_datetime(
     time: np.ndarray, units: Literal["ns", "us", "ms", "s", "d"] = "ns"
 ) -> pl.Series:
-    """Convert unix epoch time to polars Series.
+    """Convert unix epoch time to polars Series of datetime.
 
     Args:
         time: The unix epoch timestamps to convert.
