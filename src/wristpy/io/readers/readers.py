@@ -1,11 +1,13 @@
 """Function to read accelermoeter data from a file."""
 
 import pathlib
+from typing import Literal
 
 import actfast
+import numpy as np
 import polars as pl
 
-from wristpy.common.models import Measurement, WatchData
+from wristpy.core.models import Measurement, WatchData
 
 
 def read_watch_data(file_name: pathlib.Path | str) -> WatchData:
@@ -18,17 +20,16 @@ def read_watch_data(file_name: pathlib.Path | str) -> WatchData:
         file_name: The filename to read the watch data from.
 
     Returns:
-        input_data: The raw sensor data.
+        WatchData class
+
+    Raises: ValueError if the file extension is not supported.
     """
     filename = pathlib.Path(file_name)
     if filename.suffix == ".gt3x":
-        input_data = gt3x_loader(filename)
+        return gt3x_loader(filename)
     elif filename.suffix == ".bin":
-        input_data = geneActiv_loader(filename)
-    else:
-        raise ValueError(f"Unsupported file extension: {filename.suffix}")
-
-    return input_data
+        return geneActiv_loader(filename)
+    raise ValueError(f"Unsupported file extension: {filename.suffix}")
 
 
 def gt3x_loader(
@@ -43,32 +44,49 @@ def gt3x_loader(
 
     Returns:
            WatchData class
+
+    Raises:
+        FileNotFoundError: if the file does not exist.
+        ValueError: if the file extension is not .gt3x.
     """
+    file_path = pathlib.Path(path)
+
+    if not file_path.exists():
+        raise FileNotFoundError(f"The file {file_path} does not exist.")
+
+    if file_path.suffix != ".gt3x":
+        raise ValueError(f"The file {file_path} is not a .gt3x file.")
+
     subject1 = actfast.read_actigraph_gt3x(str(path))
 
     acceleration_tmp = subject1["timeseries"]["acceleration"]["acceleration"]
-
-    time_tmp = pl.Series(subject1["timeseries"]["acceleration"]["datetime"])
-    time_actfast = pl.from_epoch(time_tmp, time_unit="ns").alias("time")
+    time_actfast = unix_epoch_time_to_polars_datetime(
+        subject1["timeseries"]["acceleration"]["datetime"]
+    )
 
     acceleration = Measurement(measurements=acceleration_tmp, time=time_actfast)
 
     # light dataframe, load light data +light time
     lux_values = subject1["timeseries"]["lux"]["lux"]
-    lux_time = subject1["timeseries"]["lux"]["datetime"]
-    lux_datetime = pl.from_epoch(lux_time, time_unit="ns").alias("time")
+    lux_datetime = unix_epoch_time_to_polars_datetime(
+        subject1["timeseries"]["lux"]["datetime"]
+    )
+
     lux = Measurement(measurements=lux_values, time=lux_datetime)
 
-    # battery voltage dataframe, load battery data + battery time
     battery_data = subject1["timeseries"]["battery_voltage"]["battery_voltage"]
-    battery_time = subject1["timeseries"]["battery_voltage"]["datetime"]
-    battery_datetime = pl.from_epoch(battery_time, time_unit="ns").alias("time")
+    battery_datetime = unix_epoch_time_to_polars_datetime(
+        subject1["timeseries"]["battery_voltage"]["datetime"]
+    )
+
     battery = Measurement(measurements=battery_data, time=battery_datetime)
 
-    # capsense dataframe, load capsense data + capsense time
+    # capsense (skin/wear detection) dataframe, load capsense data + capsense time
     capsense_data = subject1["timeseries"]["capsense"]["capsense"]
-    capsense_time = subject1["timeseries"]["capsense"]["datetime"]
-    capsense_datetime = pl.from_epoch(capsense_time, time_unit="ns").alias("time")
+    capsense_datetime = unix_epoch_time_to_polars_datetime(
+        subject1["timeseries"]["capsense"]["datetime"]
+    )
+
     cap_sense = Measurement(measurements=capsense_data, time=capsense_datetime)
 
     return WatchData(
@@ -81,35 +99,47 @@ def geneActiv_loader(
 ) -> WatchData:
     """Load input data from GeneActiv .bin file using actfast.
 
-        This loads the acceleration, lux, battery voltage, and capsense data.
+        This loads the acceleration, lux, battery voltage, and temperature data.
+        geneActiv bin file has two different time scales for different sensors, we load
+        them here as fast (higher sampling rate) and slow (lower sampling rate).
 
     Args:
         path: file path to the raw data to load
 
     Returns:
-           InputData class
+           WatchData class
+
+    Raises:
+        FileNotFoundError: if the file does not exist.
+        ValueError: if the file extension is not .bin.
     """
+    file_path = pathlib.Path(path)
+
+    if not file_path.exists():
+        raise FileNotFoundError(f"The file {file_path} does not exist.")
+
+    if file_path.suffix != ".bin":
+        raise ValueError(f"The file {file_path} is not a .bin file.")
+
     subject1 = actfast.read_geneactiv_bin(str(path))
 
+    time_fast = unix_epoch_time_to_polars_datetime(
+        subject1["timeseries"]["hf"]["datetime"]
+    )
+    time_slow = unix_epoch_time_to_polars_datetime(
+        subject1["timeseries"]["lf"]["datetime"]
+    )
+
     acceleration_tmp = subject1["timeseries"]["hf"]["acceleration"]
-
-    time_tmp = pl.Series(subject1["timeseries"]["hf"]["datetime"])
-    time_fast = pl.from_epoch(time_tmp, time_unit="ns").alias("time")
-
     acceleration = Measurement(measurements=acceleration_tmp, time=time_fast)
 
     # light dataframe, load light data +light time
     lux_values = subject1["timeseries"]["hf"]["light"]
     lux = Measurement(measurements=lux_values, time=time_fast)
 
-    time_tmp_slow = pl.Series(subject1["timeseries"]["lf"]["datetime"])
-    time_slow = pl.from_epoch(time_tmp_slow, time_unit="ns").alias("time")
-
-    # battery voltage dataframe, load battery data + battery time
     battery_data = subject1["timeseries"]["lf"]["battery_voltage"]
     battery = Measurement(measurements=battery_data, time=time_slow)
 
-    # temperature dataframe, load temperature data + temperature time
     temperature_data = subject1["timeseries"]["lf"]["temperature"]
     temperature = Measurement(measurements=temperature_data, time=time_slow)
 
@@ -119,3 +149,17 @@ def geneActiv_loader(
         battery=battery,
         temperature=temperature,
     )
+
+
+def unix_epoch_time_to_polars_datetime(
+    time: np.ndarray, units: Literal["ns", "us", "ms", "s", "d"] = "ns"
+) -> pl.Series:
+    """Convert unix epoch time to polars Series of datetime.
+
+    Args:
+        time: The unix epoch timestamps to convert.
+        units: The units to convert the time to ('s', 'ms', 'us', or 'ns'). Default
+        value is 'ns'.
+    """
+    time_series = pl.Series(time)
+    return pl.from_epoch(time_series, time_unit=units).alias("time")
