@@ -47,8 +47,10 @@ jobs:
     - name: Install dependencies
       run: |
         poetry install
-    - name: Run Ruff tests
+    - name: Ruff format
       run: poetry run ruff format --check
+    - name: Ruff check
+      run: poetry run ruff check
 
   mypy:
     runs-on: ubuntu-latest
