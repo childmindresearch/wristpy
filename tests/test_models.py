@@ -5,20 +5,13 @@ import polars as pl
 import pytest
 
 from wristpy.core.models import Measurement, WatchData
-
-
-def unix_epoch_time_converter_to_polars_seconds(time: np.ndarray) -> pl.Series:
-    """Convert unix epoch time to polars Series.
-
-    This helper function is specific to the test file using seconds.
-    """
-    return pl.from_epoch(pl.Series(time), time_unit="s")
+from wristpy.io.readers import readers
 
 
 def test_watchdata_model_1D_acceleration() -> None:
     """Test the WatchData to catch 1D error in acceleration."""
     sensor_data = np.array([1, 2, 3])
-    time = unix_epoch_time_converter_to_polars_seconds(np.array([1, 2, 3]))
+    time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
 
     acceleration = Measurement(measurements=sensor_data, time=time)
 
@@ -29,7 +22,7 @@ def test_watchdata_model_1D_acceleration() -> None:
 def test_watchdata_model_acceleration_three_columns() -> None:
     """Test the WatchData to catch 3 columns error in acceleration."""
     sensor_data = np.array([[1, 2], [3, 4]])
-    time = unix_epoch_time_converter_to_polars_seconds(np.array([1, 2]))
+    time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2]), "s")
 
     acceleration = Measurement(measurements=sensor_data, time=time)
 
@@ -40,9 +33,9 @@ def test_watchdata_model_acceleration_three_columns() -> None:
 def test_watchdata_model() -> None:
     """Test the WatchData model."""
     accel_data = np.array([[1, 2, 3], [4, 5, 6]])
-    accel_time = unix_epoch_time_converter_to_polars_seconds(np.array([1, 2]))
+    accel_time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2]), "s")
     sensor_data = np.array([1, 2, 3])
-    time = unix_epoch_time_converter_to_polars_seconds(np.array([1, 2, 3]))
+    time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
 
     acceleration = Measurement(measurements=accel_data, time=accel_time)
     lux = Measurement(measurements=sensor_data, time=time)
@@ -69,22 +62,40 @@ def test_measurement_model_time_type() -> None:
 
 def test_measurement_model_time_sorted() -> None:
     """Test the error when time is not sorted."""
-    time = unix_epoch_time_converter_to_polars_seconds(np.array([2, 1, 3]))
+    time = readers.unix_epoch_time_to_polars_datetime(np.array([2, 1, 3]), "s")
 
     with pytest.raises(ValueError):
         Measurement(measurements=np.array([1, 2, 3]), time=time)
 
 
+def test_measurement_model_time_empty() -> None:
+    """Test the error when time is empty."""
+    time = readers.unix_epoch_time_to_polars_datetime(np.array([]), "s")
+
+    with pytest.raises(ValueError):
+        Measurement(measurements=np.array([1, 2, 3]), time=time)
+
+
+def test_measurement_model_measurements_empty() -> None:
+    """Test the error when measurements is empty."""
+    time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
+
+    with pytest.raises(ValueError):
+        Measurement(measurements=np.array([]), time=time)
+
+
 def test_measurement_model() -> None:
-    """Test the Measurement model."""
-    time = unix_epoch_time_converter_to_polars_seconds(np.array([1, 2, 3]))
+    """Test the Measurement model.
+
+    Note that the polars.dt.timestamp() method does not support returns in seconds,
+    the default is microseconds, thus we multiple by 1e6 in the comparison.
+    """
+    time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
 
     measurement = Measurement(measurements=np.array([1, 2, 3]), time=time)
 
     assert np.array_equal(measurement.measurements, np.array([1, 2, 3]))
 
-    """the polars.dt.timestamp() method does not support returns in seconds, 
-    the default is microseconds, thus we multiple by 1e6"""
     assert np.array_equal(
         measurement.time.dt.timestamp().to_numpy(),
         np.array([1, 2, 3]) * 1000000,

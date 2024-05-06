@@ -18,6 +18,24 @@ class Measurement(BaseModel):
 
         arbitrary_types_allowed = True
 
+    @field_validator("measurements")
+    def validate_measurements_not_empty(cls, v: np.ndarray) -> np.ndarray:
+        """Validate that the measurements array is not empty.
+
+        Args:
+            cls: The class.
+            v: The measurements array to validate.
+
+        Returns:
+            v: The measurements array if it is not empty.
+
+        Raises:
+            ValueError: If the measurements array is empty.
+        """
+        if v.size == 0:
+            raise ValueError("measurements array must not be empty")
+        return v
+
     @field_validator("time")
     def validate_time(cls, v: pl.Series) -> pl.Series:
         """Validate the time series.
@@ -32,12 +50,15 @@ class Measurement(BaseModel):
             v: The time series if it is valid.
 
         Raises:
-            ValueError: If the time series is not a datetime series or is not sorted.
+            ValueError: If the time series is not a datetime series or is not sorted,
+            or is empty.
         """
         if not isinstance(v.dtype, pl.datatypes.Datetime):
-            raise ValueError("time must be a datetime series")
+            raise ValueError("Time must be a datetime series")
         if not v.is_sorted():
-            raise ValueError("time series must be sorted")
+            raise ValueError("Time series must be sorted")
+        if v.is_empty():
+            raise ValueError("Time series cannot be empty")
         return v
 
 
@@ -70,6 +91,6 @@ class WatchData(BaseModel):
         Raises:
             ValueError: If the acceleration data is not a 2D array with 3 columns.
         """
-        if len(v.measurements.shape) < 2 or v.measurements.shape[1] != 3:
+        if v.measurements.ndim != 2 or v.measurements.shape[1] != 3:
             raise ValueError("acceleration must be a 2D array with 3 columns")
         return v
