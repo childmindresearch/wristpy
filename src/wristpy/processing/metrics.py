@@ -1,7 +1,8 @@
 """Calculate base metrics, enmo, anglez, and non-wear detection."""
 
-import polars as pl
 import warnings
+
+import polars as pl
 
 from wristpy.core.models import Measurement
 
