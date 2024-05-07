@@ -1,6 +1,7 @@
 """Calculate base metrics, enmo, anglez, and non-wear detection."""
 
 import polars as pl
+import warnings
 
 from wristpy.core.models import Measurement
 
@@ -22,8 +23,12 @@ def moving_mean(array: Measurement, epoch_length: int = 5) -> Measurement:
     Returns:
         The moving mean of the array in a new Measurement instance.
     """
-    if not isinstance(array, Measurement):
-        raise ValueError("Input must be a Measurement instance")
+    if not isinstance(array, Measurement) or array.measurements.size == 0:
+        warnings.warn(
+            "Input is not a Measurement or is an empty Measurement. "
+            "Returning the input."
+        )
+        return array
     if not isinstance(epoch_length, int):
         raise ValueError("Epoch length must be an integer")
     if epoch_length < 1:

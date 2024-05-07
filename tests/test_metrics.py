@@ -20,8 +20,22 @@ def test_moving_mean_is_measurement() -> None:
 
 def test_moving_mean_is_not_measurement() -> None:
     """Test error for non-measurement input."""
-    with pytest.raises(ValueError):
-        metrics.moving_mean(np.array([1, 2, 3, 4, 5]))
+    input_data = np.array([1, 2, 3, 4, 5])
+
+    with pytest.warns(UserWarning):
+        result = metrics.moving_mean(input_data)
+
+    assert np.array_equal(result, input_data)
+
+
+def test_moving_mean_input_is_not_empty() -> None:
+    """Test error for empty input."""
+    input_data = np.array([])
+
+    with pytest.warns(UserWarning):
+        result = metrics.moving_mean(input_data)
+
+    assert np.array_equal(result, input_data)
 
 
 def test_moving_mean_epoch_length_is_int() -> None:
