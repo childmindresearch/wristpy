@@ -21,7 +21,7 @@ TEST_LENGTH = 100
         (np.ones(TEST_LENGTH), np.ones(TEST_LENGTH) * 2, np.ones(TEST_LENGTH) * 2, 2),
     ],
 )
-def test_euclidean_norm_min_one(
+def test_euclidean_norm_minus_one(
     x: np.ndarray, y: np.ndarray, z: np.ndarray, expected_enmo: float
 ) -> None:
     """Tests the euclidean norm function."""

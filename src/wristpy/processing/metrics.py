@@ -5,11 +5,11 @@ import numpy as np
 from wristpy.core.models import Measurement
 
 
-def euclidean_norm_min_one(acceleration: Measurement) -> Measurement:
+def euclidean_norm_minus_one(acceleration: Measurement) -> Measurement:
     """Compute ENMO, the Euclidean Norm Minus One (1 standard gravity unit).
 
     Negative values of ENMO are set to zero because ENMO is meant as a measure of
-    physival activity. Negative values steming from low levels of activity or noise from
+    physival activity. Negative values steming from imperfect calibration or noise from
     the device would have no meaningful interpretation in this context and would be
     detrimental to the intended analysis.
 
