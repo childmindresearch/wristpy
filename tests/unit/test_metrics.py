@@ -7,7 +7,7 @@ import polars as pl
 import pytest
 
 from wristpy.core.models import Measurement
-from wristpy.processing.metrics import euclidean_norm_min_one
+from wristpy.processing.metrics import euclidean_norm_minus_one
 
 TEST_LENGTH = 100
 
@@ -31,7 +31,7 @@ def test_euclidean_norm_minus_one(
         measurements=np.column_stack((x, y, z)), time=dummy_datetime
     )
 
-    enmo_results = euclidean_norm_min_one(test_acceleration)
+    enmo_results = euclidean_norm_minus_one(test_acceleration)
 
     assert np.all(
         np.isclose(enmo_results.measurements, expected_enmo)
