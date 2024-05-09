@@ -1,4 +1,4 @@
-"""Calculate base metrics, enmo, anglez, and non-wear detection."""
+"""This module will contain functions to compute statistics on the sensor data."""
 
 import polars as pl
 

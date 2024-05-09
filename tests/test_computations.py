@@ -41,10 +41,12 @@ def test_moving_mean_one_column() -> None:
     test_measurement_mean = computations.moving_mean(test_measurement, epoch_length=5)
 
     assert np.allclose(test_measurement_mean.measurements, expected_mean)
+    assert test_measurement_mean.measurements.ndim == expected_mean.ndim
+    assert np.isclose(test_measurement_mean.time.shape[0], (test_time.shape[0] / 5))
 
 
 def test_moving_mean_three_columns() -> None:
-    """Test the functionality of the moving mean function for 3D Measurement."""
+    """Test the functionality of the moving mean function for three column array."""
     signal_length = 20
     test_data = np.arange(0, signal_length * 3).reshape(signal_length, 3)
     test_time = readers.unix_epoch_time_to_polars_datetime(
@@ -59,3 +61,4 @@ def test_moving_mean_three_columns() -> None:
 
     assert np.allclose(test_measurement_mean.measurements, expected_mean)
     assert test_measurement_mean.measurements.shape[1] == test_data.shape[1]
+    assert np.isclose(test_measurement_mean.time.shape[0], (test_time.shape[0] / 5))
