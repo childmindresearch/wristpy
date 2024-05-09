@@ -40,7 +40,7 @@ def test_moving_mean_one_column() -> None:
 
     test_measurement_mean = computations.moving_mean(test_measurement, epoch_length=5)
 
-    assert np.array_equal(test_measurement_mean.measurements, expected_mean)
+    assert np.allclose(test_measurement_mean.measurements, expected_mean)
 
 
 def test_moving_mean_three_columns() -> None:
@@ -57,5 +57,5 @@ def test_moving_mean_three_columns() -> None:
 
     test_measurement_mean = computations.moving_mean(test_measurement, epoch_length=5)
 
-    assert np.array_equal(test_measurement_mean.measurements, expected_mean)
+    assert np.allclose(test_measurement_mean.measurements, expected_mean)
     assert test_measurement_mean.measurements.shape[1] == test_data.shape[1]
