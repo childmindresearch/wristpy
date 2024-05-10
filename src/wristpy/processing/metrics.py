@@ -44,13 +44,20 @@ def angle_relative_to_horizontal(
     Returns:
         A Measurement instance containing the values of the angle relative to the
         horizontal plane and the associated timestamps taken from the input unaltered.
+        The angle is measured in degrees.
     """
     acceleration_data = acceleration.measurements
 
     xy_projection_magnitute = np.sqrt(
         (acceleration_data[:, 0] ** 2) + (acceleration_data[:, 1] ** 2)
     )
-    angle_z_radians = np.arctan(acceleration_data[:, 2] / xy_projection_magnitute)
-    angle_z_degrees = np.degrees(angle_z_radians)
+    angle_relative_to_horizontal_radians = np.arctan(
+        acceleration_data[:, 2] / xy_projection_magnitute
+    )
+    angle_relative_to_horizontal_degrees = np.degrees(
+        angle_relative_to_horizontal_radians
+    )
 
-    return models.Measurement(measurements=angle_z_degrees, time=acceleration.time)
+    return models.Measurement(
+        measurements=angle_relative_to_horizontal_degrees, time=acceleration.time
+    )
