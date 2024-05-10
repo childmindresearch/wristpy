@@ -28,3 +28,27 @@ def euclidean_norm_minus_one(acceleration: Measurement) -> Measurement:
     enmo = np.maximum(enmo, 0)
 
     return Measurement(measurements=enmo, time=acceleration.time)
+
+
+def angle_relative_to_horizontal(acceleration: Measurement) -> Measurement:
+    """Calculate the angle of the acceleration vector relative to the horizontal plane.
+
+    Args:
+        acceleration: the three dimensional accelerometer data. A Measurement object,
+        it will have two attributes. 1) measurements, containing the three dimensional
+        accelerometer data in an np.array and 2) time, a pl.Series containing
+        datetime.datetime objects.
+
+    Returns:
+        A Measurement instance containing the values of the angle relative to the
+        horizontal plane and the associated timestamps taken from the input unaltered.
+    """
+    acceleration_data = acceleration.measurements
+
+    xy_projection_magnitute = np.sqrt(
+        (acceleration_data[:, 0] ** 2) + (acceleration_data[:, 1] ** 2)
+    )
+    angle_z_radians = np.arctan(acceleration_data[:, 2] / xy_projection_magnitute)
+    angle_z_degrees = np.degrees(angle_z_radians)
+
+    return Measurement(measurements=angle_z_degrees, time=acceleration.time)
