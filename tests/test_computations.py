@@ -43,7 +43,6 @@ def test_moving_mean_one_column() -> None:
 
 def test_moving_mean_three_columns() -> None:
     """Test the functionality of the moving mean function for three column array."""
-
     test_data = np.arange(0, SIGNAL_LENGTH * 3).reshape(SIGNAL_LENGTH, 3)
     test_time = readers.unix_epoch_time_to_polars_datetime(
         np.arange(0, SIGNAL_LENGTH), "s"
