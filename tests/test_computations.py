@@ -8,16 +8,6 @@ from wristpy.core.models import Measurement
 from wristpy.io.readers import readers
 
 
-def test_moving_mean_epoch_length_is_int() -> None:
-    """Test error for non-integer epoch length."""
-    tmp_data = np.array([1, 2, 3])
-    time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
-    tmp_Measurement = Measurement(measurements=tmp_data, time=time)
-
-    with pytest.raises(ValueError):
-        computations.moving_mean(tmp_Measurement, epoch_length=5.5)
-
-
 def test_moving_mean_epoch_length_is_negative() -> None:
     """Test error if the epoch length is negative."""
     tmp_data = np.array([1, 2, 3])
@@ -48,6 +38,7 @@ def test_moving_mean_one_column() -> None:
 def test_moving_mean_three_columns() -> None:
     """Test the functionality of the moving mean function for three column array."""
     signal_length = 20
+    epoch_length = 5
     test_data = np.arange(0, signal_length * 3).reshape(signal_length, 3)
     test_time = readers.unix_epoch_time_to_polars_datetime(
         np.arange(0, signal_length), "s"
@@ -57,8 +48,12 @@ def test_moving_mean_three_columns() -> None:
     )
     test_measurement = Measurement(measurements=test_data, time=test_time)
 
-    test_measurement_mean = computations.moving_mean(test_measurement, epoch_length=5)
+    test_measurement_mean = computations.moving_mean(
+        test_measurement, epoch_length=epoch_length
+    )
 
     assert np.allclose(test_measurement_mean.measurements, expected_mean)
     assert test_measurement_mean.measurements.shape[1] == test_data.shape[1]
-    assert np.isclose(test_measurement_mean.time.shape[0], (test_time.shape[0] / 5))
+    assert np.isclose(
+        test_measurement_mean.time.shape[0], (test_time.shape[0] / epoch_length)
+    )

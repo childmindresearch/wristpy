@@ -18,8 +18,6 @@ def moving_mean(array: Measurement, epoch_length: int = 5) -> Measurement:
     Raises:
         ValueError: If the epoch length is not an integer or is less than 1.
     """
-    if not isinstance(epoch_length, int):
-        raise ValueError("Epoch length must be an integer")
     if epoch_length < 1:
         raise ValueError("Epoch length must be greater than 0")
 
