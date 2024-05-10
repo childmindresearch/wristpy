@@ -14,7 +14,7 @@ def euclidean_norm_minus_one(acceleration: models.Measurement) -> models.Measure
     detrimental to the intended analysis.
 
     Args:
-        acceleration: the three dimensional accelerometer data. A models.Measuremen object,
+        acceleration: the three dimensional accelerometer data. A Measurement object,
         it will have two attributes. 1) measurements, containing the three dimensional
         accelerometer data in an np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
