@@ -2,10 +2,10 @@
 
 import polars as pl
 
-from wristpy.core.models import Measurement
+from wristpy.core import models
 
 
-def moving_mean(array: Measurement, epoch_length: int = 5) -> Measurement:
+def moving_mean(array: models.Measurement, epoch_length: int = 5) -> models.Measurement:
     """Calculate the moving mean of the sensor data in array.
 
     Args:
@@ -43,13 +43,13 @@ def moving_mean(array: Measurement, epoch_length: int = 5) -> Measurement:
     if array.measurements.ndim == 1:
         measurements_mean_array = measurements_mean_array.flatten()
 
-    return Measurement(
+    return models.Measurement(
         measurements=measurements_mean_array,
         time=measurement_df_mean["time"],
     )
 
 
-def moving_std(array: Measurement, epoch_length: int = 5) -> Measurement:
+def moving_std(array: models.Measurement, epoch_length: int = 5) -> models.Measurement:
     """Calculate the moving standard deviation (std) of the sensor data in array.
 
     Args:
@@ -87,7 +87,7 @@ def moving_std(array: Measurement, epoch_length: int = 5) -> Measurement:
     if array.measurements.ndim == 1:
         measurements_std_array = measurements_std_array.flatten()
 
-    return Measurement(
+    return models.Measurement(
         measurements=measurements_std_array,
         time=measurement_df_std["time"],
     )

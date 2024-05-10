@@ -2,10 +2,10 @@
 
 import numpy as np
 
-from wristpy.core.models import Measurement
+from wristpy.core import models
 
 
-def euclidean_norm_minus_one(acceleration: Measurement) -> Measurement:
+def euclidean_norm_minus_one(acceleration: models.Measurement) -> models.Measurement:
     """Compute ENMO, the Euclidean Norm Minus One (1 standard gravity unit).
 
     Negative values of ENMO are set to zero because ENMO is meant as a measure of
@@ -27,4 +27,4 @@ def euclidean_norm_minus_one(acceleration: Measurement) -> Measurement:
 
     enmo = np.maximum(enmo, 0)
 
-    return Measurement(measurements=enmo, time=acceleration.time)
+    return models.Measurement(measurements=enmo, time=acceleration.time)

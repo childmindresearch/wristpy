@@ -7,10 +7,10 @@ import actfast
 import numpy as np
 import polars as pl
 
-from wristpy.core.models import Measurement, WatchData
+from wristpy.core import models
 
 
-def read_watch_data(file_name: pathlib.Path | str) -> WatchData:
+def read_watch_data(file_name: pathlib.Path | str) -> models.WatchData:
     """Read watch data from a file.
 
     This function selects the correct loader based on the file extension.
@@ -34,7 +34,7 @@ def read_watch_data(file_name: pathlib.Path | str) -> WatchData:
 
 def gt3x_loader(
     path: pathlib.Path | str,
-) -> WatchData:
+) -> models.WatchData:
     """Load input data from .gt3x file using actfast.
 
         This loads the acceleration, lux, battery voltage, and capsense data.
@@ -64,7 +64,7 @@ def gt3x_loader(
         subject1["timeseries"]["acceleration"]["datetime"]
     )
 
-    acceleration = Measurement(measurements=acceleration_tmp, time=time_actfast)
+    acceleration = models.Measurement(measurements=acceleration_tmp, time=time_actfast)
 
     # light dataframe, load light data +light time
     lux_values = subject1["timeseries"]["lux"]["lux"]
@@ -72,14 +72,14 @@ def gt3x_loader(
         subject1["timeseries"]["lux"]["datetime"]
     )
 
-    lux = Measurement(measurements=lux_values, time=lux_datetime)
+    lux = models.Measurement(measurements=lux_values, time=lux_datetime)
 
     battery_data = subject1["timeseries"]["battery_voltage"]["battery_voltage"]
     battery_datetime = unix_epoch_time_to_polars_datetime(
         subject1["timeseries"]["battery_voltage"]["datetime"]
     )
 
-    battery = Measurement(measurements=battery_data, time=battery_datetime)
+    battery = models.Measurement(measurements=battery_data, time=battery_datetime)
 
     # capsense (skin/wear detection) dataframe, load capsense data + capsense time
     capsense_data = subject1["timeseries"]["capsense"]["capsense"]
@@ -87,16 +87,16 @@ def gt3x_loader(
         subject1["timeseries"]["capsense"]["datetime"]
     )
 
-    cap_sense = Measurement(measurements=capsense_data, time=capsense_datetime)
+    cap_sense = models.Measurement(measurements=capsense_data, time=capsense_datetime)
 
-    return WatchData(
+    return models.WatchData(
         acceleration=acceleration, lux=lux, battery=battery, capsense=cap_sense
     )
 
 
 def geneActiv_loader(
     path: pathlib.Path | str,
-) -> WatchData:
+) -> models.WatchData:
     """Load input data from GeneActiv .bin file using actfast.
 
         This loads the acceleration, lux, battery voltage, and temperature data.
@@ -131,19 +131,19 @@ def geneActiv_loader(
     )
 
     acceleration_tmp = subject1["timeseries"]["hf"]["acceleration"]
-    acceleration = Measurement(measurements=acceleration_tmp, time=time_fast)
+    acceleration = models.Measurement(measurements=acceleration_tmp, time=time_fast)
 
     # light dataframe, load light data +light time
     lux_values = subject1["timeseries"]["hf"]["light"]
-    lux = Measurement(measurements=lux_values, time=time_fast)
+    lux = models.Measurement(measurements=lux_values, time=time_fast)
 
     battery_data = subject1["timeseries"]["lf"]["battery_voltage"]
-    battery = Measurement(measurements=battery_data, time=time_slow)
+    battery = models.Measurement(measurements=battery_data, time=time_slow)
 
     temperature_data = subject1["timeseries"]["lf"]["temperature"]
-    temperature = Measurement(measurements=temperature_data, time=time_slow)
+    temperature = models.Measurement(measurements=temperature_data, time=time_slow)
 
-    return WatchData(
+    return models.WatchData(
         acceleration=acceleration,
         lux=lux,
         battery=battery,

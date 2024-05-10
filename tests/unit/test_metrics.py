@@ -6,8 +6,8 @@ import numpy as np
 import polars as pl
 import pytest
 
-from wristpy.core.models import Measurement
-from wristpy.processing.metrics import euclidean_norm_minus_one
+from wristpy.core import models
+from wristpy.processing import metrics
 
 TEST_LENGTH = 100
 
@@ -27,11 +27,11 @@ def test_euclidean_norm_minus_one(
     """Tests the euclidean norm function."""
     dummy_date = datetime(2024, 5, 2)
     dummy_datetime = pl.Series("time", [dummy_date] * TEST_LENGTH)
-    test_acceleration = Measurement(
+    test_acceleration = models.Measurement(
         measurements=np.column_stack((x, y, z)), time=dummy_datetime
     )
 
-    enmo_results = euclidean_norm_minus_one(test_acceleration)
+    enmo_results = metrics.euclidean_norm_minus_one(test_acceleration)
 
     assert np.all(
         np.isclose(enmo_results.measurements, expected_enmo)
