@@ -1,6 +1,7 @@
 """Calculate base metrics, anglez and enmo."""
 
 import numpy as np
+from numpy.lib import stride_tricks
 
 from wristpy.core import models
 
@@ -61,3 +62,32 @@ def angle_relative_to_horizontal(
     return models.Measurement(
         measurements=angle_relative_to_horizontal_degrees, time=acceleration.time
     )
+
+
+def rolling_median(
+    acceleration: models.Measurement, window_size: int = 51
+) -> models.Measurement:
+    """Applies rolling mean to acceleration data.
+
+    Args:
+        acceleration: _
+        window_size: default is 51,
+
+    Returns:
+        accel_rolling_mean = the Measurement object with rolling mean applied.
+    """
+    radius = window_size // 2
+    raw_data = acceleration.measurements
+
+    padded_array = np.pad(
+        raw_data, ((radius, radius), (0, 0)), mode="constant", constant_values=np.nan
+    )
+
+    transposed_array = padded_array.T
+
+    windowed_data = stride_tricks.sliding_window_view(
+        transposed_array, window_shape=(window_size,), axis=1
+    )
+    result = np.nanmedian(windowed_data, axis=-1)
+
+    return models.Measurement(measurements=result.T, time=acceleration.time)
