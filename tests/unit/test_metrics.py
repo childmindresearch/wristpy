@@ -110,7 +110,7 @@ def test_rolling_median_window_size() -> None:
         (2, np.array([[5, 3.5, 2], [4, 5, 1], [6.5, 6.5, 1]])),
     ],
 )
-def test_rolling_median(window_size: int, expected_output: np.ndarray) -> np.ndarray:
+def test_rolling_median(window_size: int, expected_output: np.ndarray) -> None:
     """Testing proper function of rolling median function."""
     dummy_date = datetime(2024, 5, 2)
     dummy_datetime = pl.Series("time", [dummy_date] * 3)
