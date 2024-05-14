@@ -1,5 +1,7 @@
 """Calculate base metrics, anglez and enmo."""
 
+import warnings
+
 import numpy as np
 from numpy.lib import stride_tricks
 
@@ -69,13 +71,40 @@ def rolling_median(
 ) -> models.Measurement:
     """Applies rolling mean to acceleration data.
 
+    The rolling window is applied in a centered fashion, and the acceleration data will
+    retain the same shape. As such, in order to deal with edge cases given these
+    constraints, The data will be padded with nan values before the window is applied.
+    The median operation done on each window will ignore these np.nan values.
+    Given all the above the window_size must always be odd, and will be adjusted when an
+    even number is given.
+
     Args:
-        acceleration: _
-        window_size: default is 51,
+        acceleration: the three dimensional accelerometer data. A Measurement object,
+        it will have two attributes. 1) measurements, containing the three dimensional
+        accelerometer data in an np.array and 2) time, a pl.Series containing
+        datetime.datetime objects.
+
+        window_size: The overlapping window within which the median will be applied.
+        Must awlays be odd.
 
     Returns:
-        accel_rolling_mean = the Measurement object with rolling mean applied.
+        accel_rolling_mean = the Measurement object with rolling mean applied. The
+        measurements data will retain it's shape, and the time data will be returned
+        unaltered.
     """
+    if acceleration.measurements.ndim <= 1:
+        raise ValueError("the input arrary must be more than 1 dimension")
+
+    if window_size <= 1:
+        raise ValueError("window size must be greater than 1.")
+
+    if window_size % 2 == 0:
+        window_size += 1
+        warnings.warn(
+            f"window size must be odd, adjusting window size to be {window_size}",
+            UserWarning,
+        )
+
     radius = window_size // 2
     raw_data = acceleration.measurements
 
