@@ -80,7 +80,7 @@ def rolling_median(
         Must awlays be odd.
 
     Returns:
-        accel_rolling_mean = the Measurement object with rolling mean applied. The
+        Measurement object with rolling mean applied to the measurement data. The
         measurements data will retain it's shape, and the time data will be returned
         unaltered.
     """
