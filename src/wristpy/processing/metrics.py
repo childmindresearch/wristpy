@@ -1,9 +1,7 @@
 """Calculate base metrics, anglez and enmo."""
 
-import warnings
 
 import numpy as np
-from numpy.lib import stride_tricks
 
 from wristpy.core import models
 
@@ -56,59 +54,3 @@ def angle_relative_to_horizontal(
     angle_degrees = np.degrees(angle_radians)
 
     return models.Measurement(measurements=angle_degrees, time=acceleration.time)
-
-
-def rolling_median(
-    acceleration: models.Measurement, window_size: int = 51
-) -> models.Measurement:
-    """Applies rolling mean to acceleration data.
-
-    The rolling window is applied in a centered fashion, and the acceleration data will
-    retain the same shape. As such, in order to deal with edge cases given these
-    constraints, The data will be padded with nan values before the window is applied.
-    The median operation done on each window will ignore these np.nan values.
-    Given all the above the window_size must always be odd, and will be adjusted when an
-    even number is given.
-
-    Args:
-        acceleration: the three dimensional accelerometer data. A Measurement object,
-        it will have two attributes. 1) measurements, containing the three dimensional
-        accelerometer data in an np.array and 2) time, a pl.Series containing
-        datetime.datetime objects.
-
-        window_size: The overlapping window within which the median will be applied.
-        Must awlays be odd.
-
-    Returns:
-        Measurement object with rolling mean applied to the measurement data. The
-        measurements data will retain it's shape, and the time data will be returned
-        unaltered.
-    """
-    if acceleration.measurements.ndim <= 1:
-        raise ValueError("the input arrary must be more than 1 dimension")
-
-    if window_size <= 1:
-        raise ValueError("window size must be greater than 1.")
-
-    if window_size % 2 == 0:
-        window_size += 1
-        warnings.warn(
-            f"window size must be odd, adjusting window size to be {window_size}",
-            UserWarning,
-        )
-
-    radius = window_size // 2
-    raw_data = acceleration.measurements
-
-    padded_array = np.pad(
-        raw_data, ((radius, radius), (0, 0)), mode="constant", constant_values=np.nan
-    )
-
-    transposed_array = padded_array.T
-
-    windowed_data = stride_tricks.sliding_window_view(
-        transposed_array, window_shape=(window_size,), axis=1
-    )
-    result = np.nanmedian(windowed_data, axis=-1)
-
-    return models.Measurement(measurements=result.T, time=acceleration.time)
