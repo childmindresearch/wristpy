@@ -61,7 +61,7 @@ def moving_median(
         datetime.datetime objects.
 
         window_size: The size of the overlapping window within which the median will be
-        applied. Measured in seconds.
+        applied. Rolling median window is centered. Measured in seconds.
 
 
     Returns:
