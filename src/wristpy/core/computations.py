@@ -54,14 +54,16 @@ def moving_median(
 ) -> models.Measurement:
     """Applies moving median to acceleration data.
 
+    Step size for the window is hard-coded to 1 sample.
+
     Args:
         acceleration: the three dimensional accelerometer data. A Measurement object,
         it will have two attributes. 1) measurements, containing the three dimensional
         accelerometer data in an np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
 
-        window_size: The size of the overlapping window within which the median will be
-        applied. Rolling median window is centered. Measured in seconds.
+        window_size: Size of the moving median window. Rolling median window is centered.
+        Measured in seconds.
 
 
     Returns:
@@ -78,19 +80,13 @@ def moving_median(
     offset_str = str(offset) + "s"
     moving_median_df = measurements_polars_df.select(
         [
-            pl.median("column_0").rolling(
+            pl.median("*").rolling(
                 index_column="time", period=f"{window_size}s", offset=offset_str
-            ),
-            pl.median("column_1").rolling(
-                index_column="time", period=f"{window_size}s", offset=offset_str
-            ),
-            pl.median("column_2").rolling(
-                index_column="time", period=f"{window_size}s", offset=offset_str
-            ),
+            )
         ]
     )
 
     return models.Measurement(
-        measurements=moving_median_df.to_numpy(),
+        measurements=moving_median_df.drop("time").to_numpy(),
         time=measurements_polars_df["time"],
     )
