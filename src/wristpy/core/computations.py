@@ -62,7 +62,7 @@ def moving_median(
         accelerometer data in an np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
 
-        window_size: Size of the moving median window. Rolling median window is centered.
+        window_size: Size of the moving median window. Window is centered.
         Measured in seconds.
 
 
