@@ -1,7 +1,9 @@
 """Test the function of computations module."""
 
+from datetime import datetime, timedelta
 
 import numpy as np
+import polars as pl
 import pytest
 
 from wristpy.core import computations, models
@@ -129,3 +131,38 @@ def test_moving_std_three_columns(
     assert np.allclose(test_measurement_std.measurements, expected_std)
     assert test_measurement_std.measurements.shape[1] == test_data.shape[1]
     assert test_measurement_std.time.shape[0] == expected_time_shape
+
+
+@pytest.mark.parametrize(
+    "window_size, expected_output",
+    [
+        (3, np.array([[5, 3.5, 2], [4, 5, 1], [6.5, 6.5, 1]])),
+        (2, np.array([[1, 2, 3], [5, 3.5, 2], [6.5, 6.5, 1]])),
+    ],
+)
+def test_moving_median(window_size: int, expected_output: np.ndarray) -> None:
+    """Testing proper function of moving median function."""
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(3)]
+    dummy_datetime_pl = pl.Series("time", dummy_datetime_list)
+    test_matrix = np.array(
+        [
+            [1.0, 2.0, 3.0],
+            [9.0, 5.0, 1.0],
+            [4.0, 8.0, 1.0],
+        ]
+    )
+
+    test_measurement = models.Measurement(
+        measurements=test_matrix, time=dummy_datetime_pl
+    )
+
+    test_result = computations.moving_median(test_measurement, window_size=window_size)
+
+    assert test_result.measurements.shape == expected_output.shape, (
+        f"measurements array are not the same shape. Expected {expected_output.shape}, "
+        f"instead got: {test_result.measurements.shape}"
+    )
+    assert np.all(
+        np.isclose(test_result.measurements, expected_output)
+    ), "Test results do not match the expected output"
