@@ -7,7 +7,6 @@ import polars as pl
 import pytest
 
 from wristpy.core import computations, models
-from wristpy.io.readers import readers
 
 SIGNAL_LENGTH = 20
 EPOCH_LENGTH = 5
@@ -16,7 +15,9 @@ EPOCH_LENGTH = 5
 def test_moving_mean_epoch_length_is_negative() -> None:
     """Test error if the epoch length is negative."""
     tmp_data = np.array([1, 2, 3])
-    time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(3)]
+    time = pl.Series("time", dummy_datetime_list)
     tmp_Measurement = models.Measurement(measurements=tmp_data, time=time)
 
     with pytest.raises(ValueError):
@@ -26,9 +27,11 @@ def test_moving_mean_epoch_length_is_negative() -> None:
 def test_moving_mean_one_column() -> None:
     """Test the functionality of the moving mean function for 1D Measurement."""
     test_data = np.arange(0, SIGNAL_LENGTH)
-    test_time = readers.unix_epoch_time_to_polars_datetime(
-        np.arange(0, SIGNAL_LENGTH), "s"
-    )
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + timedelta(seconds=i) for i in range(SIGNAL_LENGTH)
+    ]
+    test_time = pl.Series("time", dummy_datetime_list)
     expected_time_shape = test_time.shape[0] / EPOCH_LENGTH
     expected_mean = np.array([2.0, 7.0, 12.0, 17.0])
     test_measurement = models.Measurement(measurements=test_data, time=test_time)
@@ -45,9 +48,11 @@ def test_moving_mean_one_column() -> None:
 def test_moving_mean_three_columns() -> None:
     """Test the functionality of the moving mean function for three column array."""
     test_data = np.arange(0, SIGNAL_LENGTH * 3).reshape(SIGNAL_LENGTH, 3)
-    test_time = readers.unix_epoch_time_to_polars_datetime(
-        np.arange(0, SIGNAL_LENGTH), "s"
-    )
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + timedelta(seconds=i) for i in range(SIGNAL_LENGTH)
+    ]
+    test_time = pl.Series("time", dummy_datetime_list)
     expected_time_shape = test_time.shape[0] / EPOCH_LENGTH
     expected_mean = np.array(
         ([[6.0, 7.0, 8.0], [21.0, 22.0, 23.0], [36.0, 37.0, 38.0], [51.0, 52.0, 53.0]])
@@ -66,7 +71,9 @@ def test_moving_mean_three_columns() -> None:
 def test_moving_std_epoch_length_is_negative() -> None:
     """Test error if the epoch length is negative."""
     tmp_data = np.array([1, 2, 3])
-    time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(3)]
+    time = pl.Series("time", dummy_datetime_list)
     tmp_Measurement = models.Measurement(measurements=tmp_data, time=time)
 
     with pytest.raises(ValueError):
@@ -87,9 +94,11 @@ def test_moving_std_one_column(
     test_array: np.ndarray, expected_std: np.ndarray
 ) -> None:
     """Test the functionality of the moving std function for 1D Measurement."""
-    test_time = readers.unix_epoch_time_to_polars_datetime(
-        np.arange(0, SIGNAL_LENGTH), "s"
-    )
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + timedelta(seconds=i) for i in range(SIGNAL_LENGTH)
+    ]
+    test_time = pl.Series("time", dummy_datetime_list)
     expected_time_shape = int(test_time.shape[0] / EPOCH_LENGTH)
     test_measurement = models.Measurement(measurements=test_array, time=test_time)
 
@@ -117,9 +126,11 @@ def test_moving_std_three_columns(
 ) -> None:
     """Test the functionality of the moving std function for three column array."""
     test_data = np.column_stack([test_data] * 3)
-    test_time = readers.unix_epoch_time_to_polars_datetime(
-        np.arange(0, SIGNAL_LENGTH), "s"
-    )
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + timedelta(seconds=i) for i in range(SIGNAL_LENGTH)
+    ]
+    test_time = pl.Series("time", dummy_datetime_list)
     expected_time_shape = int(test_time.shape[0] / EPOCH_LENGTH)
     expected_std = np.column_stack([expected_std])
     test_measurement = models.Measurement(measurements=test_data, time=test_time)
