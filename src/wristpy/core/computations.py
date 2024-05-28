@@ -60,7 +60,7 @@ def moving_std(array: models.Measurement, epoch_length: int = 5) -> models.Measu
         The moving std of the array in a new Measurement instance.
 
     Raises:
-        ValueError: If the epoch length is not an integer or is less than 1.
+        ValueError: If the epoch length is less than 1.
     """
     if epoch_length < 1:
         raise ValueError("Epoch length must be greater than 0")
