@@ -1,6 +1,5 @@
 """Calculate base metrics, anglez and enmo."""
 
-
 import numpy as np
 
 from wristpy.core import models
