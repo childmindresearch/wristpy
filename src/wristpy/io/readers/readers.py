@@ -57,7 +57,7 @@ def gt3x_loader(
     if file_path.suffix != ".gt3x":
         raise ValueError(f"The file {file_path} is not a .gt3x file.")
 
-    subject1 = actfast.read_actigraph_gt3x(str(path))
+    subject1 = actfast.read(file_path)
 
     acceleration_tmp = subject1["timeseries"]["acceleration"]["acceleration"]
     time_actfast = unix_epoch_time_to_polars_datetime(
@@ -67,9 +67,9 @@ def gt3x_loader(
     acceleration = models.Measurement(measurements=acceleration_tmp, time=time_actfast)
 
     # light dataframe, load light data +light time
-    lux_values = subject1["timeseries"]["lux"]["lux"]
+    lux_values = subject1["timeseries"]["light"]["light"]
     lux_datetime = unix_epoch_time_to_polars_datetime(
-        subject1["timeseries"]["lux"]["datetime"]
+        subject1["timeseries"]["light"]["datetime"]
     )
 
     lux = models.Measurement(measurements=lux_values, time=lux_datetime)
@@ -121,26 +121,26 @@ def geneActiv_loader(
     if file_path.suffix != ".bin":
         raise ValueError(f"The file {file_path} is not a .bin file.")
 
-    subject1 = actfast.read_geneactiv_bin(str(path))
+    subject1 = actfast.read(file_path)
 
     time_fast = unix_epoch_time_to_polars_datetime(
-        subject1["timeseries"]["hf"]["datetime"]
+        subject1["timeseries"]["high_frequency"]["datetime"]
     )
     time_slow = unix_epoch_time_to_polars_datetime(
-        subject1["timeseries"]["lf"]["datetime"]
+        subject1["timeseries"]["low_frequency"]["datetime"]
     )
 
-    acceleration_tmp = subject1["timeseries"]["hf"]["acceleration"]
+    acceleration_tmp = subject1["timeseries"]["high_frequency"]["acceleration"]
     acceleration = models.Measurement(measurements=acceleration_tmp, time=time_fast)
 
     # light dataframe, load light data +light time
-    lux_values = subject1["timeseries"]["hf"]["light"]
+    lux_values = subject1["timeseries"]["high_frequency"]["light"]
     lux = models.Measurement(measurements=lux_values, time=time_fast)
 
-    battery_data = subject1["timeseries"]["lf"]["battery_voltage"]
+    battery_data = subject1["timeseries"]["low_frequency"]["battery_voltage"]
     battery = models.Measurement(measurements=battery_data, time=time_slow)
 
-    temperature_data = subject1["timeseries"]["lf"]["temperature"]
+    temperature_data = subject1["timeseries"]["low_frequency"]["temperature"]
     temperature = models.Measurement(measurements=temperature_data, time=time_slow)
 
     return models.WatchData(
