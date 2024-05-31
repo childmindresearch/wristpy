@@ -37,10 +37,10 @@ def read_watch_data(file_name: pathlib.Path | str) -> models.WatchData:
             "capsense",
             "temperature",
         ]:
-            measurements = timeseries.get(sensor)
-            if measurements is not None:
+            values = timeseries.get(sensor)
+            if values is not None:
                 measurements[sensor] = models.Measurement(
-                    measurements=measurements, time=time
+                    measurements=values, time=time
                 )
 
     return models.WatchData(
