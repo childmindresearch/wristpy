@@ -34,7 +34,7 @@ def test_read_invalid_extenstion() -> None:
 def test_gt3x_loader() -> None:
     """Test the gt3x loader."""
     test_file = pathlib.Path(__file__).parent / "sample_data" / "example_actigraph.gt3x"
-    watch_data = readers.gt3x_loader(test_file)
+    watch_data = readers.read_watch_data(test_file)
     assert isinstance(watch_data, WatchData)
     assert isinstance(watch_data.acceleration, Measurement)
     assert isinstance(watch_data.lux, Measurement)
@@ -43,21 +43,21 @@ def test_gt3x_loader() -> None:
 
 def test_gt3x_loader_nonexistent_file() -> None:
     """Test the correct error is raised for nonexistent file."""
-    with pytest.raises(FileNotFoundError):
-        readers.gt3x_loader("nonexistent_file.gt3x")
+    with pytest.raises(ValueError):
+        readers.read_watch_data("nonexistent_file.gt3x")
 
 
 def test_gt3x_loader_wrong_extension() -> None:
     """Test the correct error is raised for wrong file extension."""
     test_file = pathlib.Path(__file__).parent / "sample_data" / "example_text.txt"
     with pytest.raises(ValueError):
-        readers.gt3x_loader(test_file)
+        readers.read_watch_data(test_file)
 
 
 def test_geneactiv_bin_loader() -> None:
     """Test the geneActiv bin loader."""
     test_file = pathlib.Path(__file__).parent / "sample_data" / "example_geneactiv.bin"
-    watch_data = readers.geneActiv_loader(test_file)
+    watch_data = readers.read_watch_data(test_file)
     assert isinstance(watch_data, WatchData)
     assert isinstance(watch_data.acceleration, Measurement)
     assert isinstance(watch_data.lux, Measurement)
@@ -67,12 +67,12 @@ def test_geneactiv_bin_loader() -> None:
 
 def test_bin_loader_nonexistent_file() -> None:
     """Test the correct error is raised for nonexistent file."""
-    with pytest.raises(FileNotFoundError):
-        readers.geneActiv_loader("nonexistent_file.bin")
+    with pytest.raises(ValueError):
+        readers.read_watch_data("nonexistent_file.bin")
 
 
 def test_bin_loader_wrong_extension() -> None:
     """Test the correct error is raised for wrong file extension."""
     test_file = pathlib.Path(__file__).parent / "sample_data" / "example_text.txt"
     with pytest.raises(ValueError):
-        readers.geneActiv_loader(test_file)
+        readers.read_watch_data(test_file)
