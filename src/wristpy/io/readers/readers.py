@@ -24,7 +24,7 @@ def read_watch_data(file_name: pathlib.Path | str) -> models.WatchData:
     try:
         data = actfast.read(file_name)
     except Exception as e:
-        raise ValueError(f"Error reading file: {e}") from e
+        raise ValueError(f"Error reading file: {e}. File type is unsupported.") from e
 
     measurements: dict[str, models.Measurement] = {}
 
