@@ -13,6 +13,8 @@ from wristpy.core import models
 def read_watch_data(file_name: pathlib.Path | str) -> models.WatchData:
     """Read watch data from a file.
 
+    Currently supported watch types are Actigraph .gt3x and GeneActiv .bin.
+
     Args:
         file_name: The filename to read the watch data from.
 
