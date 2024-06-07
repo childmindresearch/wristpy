@@ -128,9 +128,9 @@ def detect_nonwear(
             nonwear_value_array[window_n : window_n + n_short_epoch_in_long_epoch],
             np.repeat(calculated_nonwear_value, n_short_epoch_in_long_epoch),
         )
-        nonwear_value_array[window_n : window_n + n_short_epoch_in_long_epoch] = (
-            max_window_value
-        )
+        nonwear_value_array[
+            window_n : window_n + n_short_epoch_in_long_epoch
+        ] = max_window_value
 
     nonwear_ones = np.where(nonwear_value_array == 1)[0]
 
