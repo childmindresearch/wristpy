@@ -1,6 +1,6 @@
 """Testing functions of metrics module."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import numpy as np
 import polars as pl
@@ -10,6 +10,23 @@ from wristpy.core import models
 from wristpy.processing import metrics
 
 TEST_LENGTH = 100
+
+
+@pytest.fixture(scope="module")
+def create_acceleration() -> pl.DataFrame:
+    """Fixture to create a dummy acceleration DataFrame to be used in multiple tests."""
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(10000)]
+    test_time = pl.Series("time", dummy_datetime_list)
+    acceleration_polars_df = pl.DataFrame(
+        {
+            "X": np.ones(10000),
+            "Y": np.ones(10000),
+            "Z": np.ones(10000),
+            "time": test_time,
+        }
+    )
+    return acceleration_polars_df
 
 
 @pytest.mark.parametrize(
@@ -79,3 +96,64 @@ def test_angle_relative_to_horizontal(
     assert angle_z_results.measurements.shape == (1,), (
         f"Expected anglez shape: {(1,)}," f"got({angle_z_results.measurements.shape})"
     )
+
+
+@pytest.mark.parametrize(
+    "modifier, expected_result",
+    [
+        (1, 1),
+        (0, 0),
+    ],
+)
+def test_compute_nonwear_value_per_axis(
+    create_acceleration: pl.DataFrame, modifier: int, expected_result: int
+) -> None:
+    """Test the nonwear value per axis function."""
+    std_criteria = modifier
+    range_criteria = modifier
+    acceleration = create_acceleration
+    acceleration = acceleration.with_columns(pl.col("time").set_sorted())
+    acceleration_grouped = acceleration.group_by_dynamic(
+        index_column="time", every="5s"
+    ).agg([pl.all().exclude(["time"])])
+
+    test_result = metrics._compute_nonwear_value_per_axis(
+        acceleration_grouped["X"], std_criteria, range_criteria
+    )
+
+    assert (
+        test_result == expected_result
+    ), f"Expected {expected_result}, got: {test_result}"
+
+
+@pytest.mark.parametrize(
+    "modifier, expected_result",
+    [
+        (1, 1),
+        (0, 0),
+    ],
+)
+def test_detect_nonwear(
+    create_acceleration: pl.DataFrame, modifier: int, expected_result: int
+) -> None:
+    """Test the detect nonwear function."""
+    short_epoch_length = 5
+    long_epoch_length = 20
+    std_criteria = modifier
+    range_criteria = modifier
+    acceleration_df = create_acceleration
+    acceleration = models.Measurement(
+        measurements=acceleration_df.select(["X", "Y", "Z"]).to_numpy(),
+        time=acceleration_df["time"],
+    )
+
+    test_result = metrics.detect_nonwear(
+        acceleration,
+        short_epoch_length,
+        long_epoch_length,
+        std_criteria,
+        range_criteria,
+    )
+    assert np.all(
+        test_result.measurements == modifier
+    ), f"Expected non-wear flag value to be {expected_result}, got: {test_result}"
