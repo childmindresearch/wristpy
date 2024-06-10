@@ -81,7 +81,8 @@ def detect_nonwear(
         acceleration: The Measurment instance that contains the calibrated acceleration
         data
         short_epoch_length: The short window size, in seconds, for non-wear detection
-        long_epoch_length: The long window size, in seconds, for non-wear detection
+        long_epoch_length: The long window size, in seconds, for non-wear detection.
+        Ideally, it should be a multiple of short_epoch_length.
         std_criteria: Threshold criteria for standard deviation
         range_criteria: Threshold criteria for range of acceleration
 
@@ -132,9 +133,9 @@ def detect_nonwear(
             window_n : window_n + n_short_epoch_in_long_epoch
         ] = max_window_value
 
-    nonwear_ones = np.where(nonwear_value_array == 1)[0]
+    nonwear_values_is_one = np.where(nonwear_value_array == 1)[0]
 
-    for ones_index in nonwear_ones:
+    for ones_index in nonwear_values_is_one:
         if ones_index == 0:
             continue
         if ones_index == len(nonwear_value_array) - 1:
