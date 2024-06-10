@@ -1,10 +1,10 @@
 """Testing functions of metrics module."""
 
+import math
 from datetime import datetime, timedelta
 
 import numpy as np
 import polars as pl
-import math
 import pytest
 
 from wristpy.core import models
