@@ -21,29 +21,21 @@ def read_watch_data(file_name: pathlib.Path | str) -> models.WatchData:
     Returns:
         WatchData class
 
-    Raises: ValueError if the file extension is not supported.
+    Raises: IOError if the file extension is not supported or doesn't exist.
     """
     try:
         data = actfast.read(file_name)
     except Exception as e:
-        raise ValueError(f"Error reading file: {e}. File type is unsupported.") from e
+        raise IOError(f"Error reading file: {e}. File type is unsupported.") from e
 
     measurements: dict[str, models.Measurement] = {}
 
     for timeseries in data["timeseries"].values():
         time = unix_epoch_time_to_polars_datetime(timeseries["datetime"])
-        for sensor in [
-            "acceleration",
-            "light",
-            "battery_voltage",
-            "capsense",
-            "temperature",
-        ]:
-            values = timeseries.get(sensor)
-            if values is not None:
-                measurements[sensor] = models.Measurement(
-                    measurements=values, time=time
-                )
+        for sensor_name, sensor_values in timeseries.items():
+            measurements[sensor_name] = models.Measurement(
+                measurements=sensor_values, time=time
+            )
 
     return models.WatchData(
         acceleration=measurements["acceleration"],
@@ -62,7 +54,7 @@ def unix_epoch_time_to_polars_datetime(
     Args:
         time: The unix epoch timestamps to convert.
         units: The units to convert the time to ('s', 'ms', 'us', or 'ns'). Default
-        value is 'ns'.
+            value is 'ns'.
     """
     time_series = pl.Series(time)
     return pl.from_epoch(time_series, time_unit=units).alias("time")
