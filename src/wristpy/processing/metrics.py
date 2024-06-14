@@ -148,7 +148,7 @@ def _compute_nonwear_value_array(
     n_short_epoch_in_long_epoch: int,
     std_criteria: float,
     range_criteria: float,
-) -> np.array:
+) -> np.ndarray:
     """Helper function to calculate the nonwear criteria per axis.
 
     Args:
@@ -211,7 +211,7 @@ def _compute_nonwear_value_per_axis(
     return int(criteria_boolean)
 
 
-def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.array) -> np.array:
+def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.ndarray:
     """Helper function to cleanup isolated ones in nonwear value array.
 
     This function finds isolated ones in the nonwear value array and
