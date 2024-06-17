@@ -1,6 +1,5 @@
 """Test the function of computations module."""
 
-
 import math
 from datetime import datetime, timedelta
 
