@@ -66,7 +66,7 @@ def detect_nonwear(
     """Set non_wear_flag based on accelerometer data.
 
     This implements GGIR "2023" non-wear detection algorithm.
-    Briefly, the algorithm, creates a sliding window of long epoech length that steps
+    Briefly, the algorithm, creates a sliding window of long epoch length that steps
     forward by the short epoch length.
     It checks if the acceleration data in that long window, for each axis, meets certain
     criteria thresholds to compute a non-wear value.
@@ -224,9 +224,9 @@ def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.
     Returns:
         The modified nonwear value array.
     """
-    nonwear_values_is_one = np.where(nonwear_value_array == 1)[0]
+    nonwear_value_is_one = np.where(nonwear_value_array == 1)[0]
 
-    for ones_index in nonwear_values_is_one:
+    for ones_index in nonwear_value_is_one:
         if ones_index == 0 or ones_index == len(nonwear_value_array) - 1:
             continue
         if (nonwear_value_array[ones_index - 1] > 1) and (

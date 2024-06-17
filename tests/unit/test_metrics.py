@@ -126,17 +126,19 @@ def test_cleanup_isolated_ones_nonwear_value(
 def test_group_acceleration_data_by_time() -> None:
     """Test the group acceleration data by time function."""
     dummy_date = datetime(2024, 5, 2)
-    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(1000)]
+    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(1001)]
     test_time = pl.Series(dummy_datetime_list)
-    measurements = np.ones((1000, 3))
+    measurements = np.ones((1001, 3))
     acceleration = models.Measurement(measurements=measurements, time=test_time)
     window_length = int(10)
-    expected_time_length = len(test_time) / window_length
+    expected_time_length = math.ceil(len(test_time) / window_length)
+    expected_result_shape = acceleration.measurements.shape[1] + 1
 
     result = metrics._group_acceleration_data_by_time(acceleration, window_length)
 
     assert isinstance(result, pl.DataFrame)
     assert result.shape[0] == expected_time_length
+    assert result.shape[1] == expected_result_shape
 
 
 @pytest.mark.parametrize(
