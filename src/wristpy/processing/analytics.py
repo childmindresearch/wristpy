@@ -8,7 +8,6 @@ import numpy as np
 import polars as pl
 
 from wristpy.core import computations, models
-from wristpy.processing import metrics
 
 
 @dataclass
@@ -35,13 +34,14 @@ class SleepDetection:
         self.nonwear = nonwear
         self.method = method
 
-    def run(self, method: str) -> tuple[models.Measurement, models.Measurement]:
+    def run(self, method: str) -> SleepWindow:
         """Run the sleep detection algorithm."""
-        spt_window = self._spt_window()
-        sib_periods = self._calculate_sib_periods()
+        if method == "GGIR":
+            spt_periods = self._spt_window()
+            sib_periods = self._calculate_sib_periods()
+            sleep_onset_wakeup = self._find_onset_wakeup_times(spt_periods, sib_periods)
 
-        # Return the results
-        return spt_window, sib_periods
+        return sleep_onset_wakeup
 
     def _spt_window(
         self, anglez_data: models.Measurement, threshold: float = 0.13
@@ -56,7 +56,7 @@ class SleepDetection:
         We then fill gaps that are less than 60 minutes.
 
         Args:
-            anglez_data: the raw anglez data, calculated from calibrated acceleration data.
+            anglez_data: the raw anglez data, calculated from calibrated acceleration.
             threshold: the threshold for the distribution of z angle.
 
         Returns:
@@ -87,17 +87,21 @@ class SleepDetection:
         )
 
     def _calculate_sib_periods(
-        self, anglez_data: models.Measurement, threshold_degrees: int
+        self, anglez_data: models.Measurement, threshold_degrees: int = 5
     ) -> models.Measurement:
         """Find the sustained inactivity bouts.
 
+        This function finds the absolute dtifference of the anglez data over 5s windows.
+        We then find the 5-minute windows where all of the differences are below a
+        threshold (defaults to 5 degrees).
+
         Args:
-            anglez_data: the raw anglez data, calculated from calibrated acceleration data.
+            anglez_data: the raw anglez data, calculated from calibrated acceleration.
             threshold_degrees: the threshold, in degrees, for inactivity.
 
         Returns:
-            A Measurement instance with values set to 1 indicating identified SIB periods
-            and corresponding time stamps.
+            A Measurement instance with values set to 1 indicating identified SIB
+            windows, and corresponding time stamps.
         """
         anglez_abs_diff = self._compute_abs_diff_mean_anglez(anglez_data)
 
@@ -120,7 +124,7 @@ class SleepDetection:
     def _compute_abs_diff_mean_anglez(
         self, anglez_data: models.Measurement, window_size_seconds: int = 5
     ) -> models.Measurement:
-        """Helper function to compute the absolute difference of the averaged anglez data.
+        """Helper function to compute the absolute difference of averaged anglez data.
 
         Args:
             anglez_data: the raw anglez data.
@@ -137,7 +141,7 @@ class SleepDetection:
         return models.Measurement(measurements=absolute_diff, time=anglez_data.time[1:])
 
     def _find_onset_wakeup_times(
-        self, spt_windows: models.Measurement, sib_periods: models.Measurement
+        self, spt_periods: models.Measurement, sib_periods: models.Measurement
     ) -> SleepWindow:
         """Find the sleep onset and wake up times.
 
@@ -149,7 +153,7 @@ class SleepDetection:
         Sleep wakeup is the end of the last sib that overlaps with a spt window.
 
         Args:
-            spt_windows: the sleep period time windows.
+            spt_periods: the sleep period guider windows.
             sib_periods: the sustained inactivity bouts.
 
         Returns:
@@ -157,9 +161,6 @@ class SleepDetection:
             If there is no overlap between spt_windows and sib_periods,
             the onset and wakeup lists will be empty.
         """
-        spt_periods = self._find_periods(spt_windows)
-        sib_periods = self._find_periods(sib_periods)
-
         onset = []
         wakeup = []
         for spt in spt_periods:
@@ -190,7 +191,8 @@ class SleepDetection:
                 either the spt_window or sib_period.
 
         Returns:
-            A list of tuples, where each tuple contains the start and end times of a period.
+            A list of tuples, where each tuple contains the start and end times of
+            a period.
         """
         periods = []
         start_time = None
