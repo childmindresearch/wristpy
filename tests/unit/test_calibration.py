@@ -73,6 +73,26 @@ def test_extract_no_motion_sphere_error() -> None:
         calibrator._extract_no_motion(acceleration=dummy_measure)
 
 
+def test_extract_no_motion() -> None:
+    """Check extract no motion."""
+    date = datetime.now()
+    delta = timedelta(seconds=1)
+    dummy_datetime = [date + (i * delta) for i in range(60)]
+    sphere_check_data = np.full((60, 3), 0.31)
+    sphere_check_data[30:] = -sphere_check_data[30:]
+
+    dummy_measure = models.Measurement(
+        measurements=sphere_check_data, time=pl.Series(dummy_datetime).alias("time")
+    )
+    calibrator = calibration.Calibration()
+
+    no_motion_data = calibrator._extract_no_motion(dummy_measure)
+
+    assert no_motion_data.shape[0] > 0, "No non-motion epochs found"
+    assert np.all(no_motion_data.min(axis=0) <= -calibrator.min_acceleration)
+    assert np.all(no_motion_data.max(axis=0) >= calibrator.min_acceleration)
+
+
 def test_closest_point_fit() -> None:
     """Test closest point fit."""
     dummy_no_motion = np.full((100, 3), (1 / np.sqrt(3)))
@@ -140,6 +160,18 @@ def test_take_chunk(chunk_num: int, expected_len: int) -> None:
 
     assert len(subset.measurements) == expected_len
     assert len(subset.time) == expected_len
+
+
+def test_chunked_calibration_fail() -> None:
+    """Test chunked calibration failure."""
+    dummy_measurement = create_dummy_measurement(sampling_rate=1, duration_hours=84)
+
+    calibrator = calibration.Calibration(
+        chunked=True, min_calibration_hours=72, max_iterations=5, min_error=0.00001
+    )
+
+    with pytest.raises(calibration.CalibrationError):
+        calibrator.run(dummy_measurement)
 
 
 def test_chunked_calibration_fail_and_succeed() -> None:
