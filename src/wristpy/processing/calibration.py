@@ -1,6 +1,7 @@
 """Calibrate accelerometer data."""
 
 import math
+import typing
 
 import numpy as np
 from sklearn import linear_model
@@ -151,7 +152,7 @@ class Calibration:
 
     def _chunked_calibration(
         self, acceleration: models.Measurement
-    ) -> dict[str, float]:
+    ) -> dict[str, np.ndarray]:
         """Chunks the data into subsets, to calibrate on smaller sections of data.
 
         Args:
@@ -159,7 +160,7 @@ class Calibration:
             data and time stamps.
 
         Returns:
-            A dictionary with type str:float. Contains two keys labeled `scale` and
+            A dictionary with type str: ndarray. Contains two keys labeled `scale` and
             `offset`.
         """
         chunk_num = 0
@@ -207,7 +208,7 @@ class Calibration:
             time=acceleration.time[:current_sample],
         )
 
-    def _calibrate(self, acceleration: models.Measurement) -> dict[str, float]:
+    def _calibrate(self, acceleration: models.Measurement) -> dict[str, np.ndarray]:
         """Calibrates data and returns scale and offset values.
 
         If error is low enough, the linear transformation is returned in a dict,
@@ -218,7 +219,7 @@ class Calibration:
             data and time stamps.
 
         Returns:
-            A dictionary with type str:float. Contains two keys labeled `scale` and
+            A dictionary with type str: ndarray. Contains two keys labeled `scale` and
             `offset`.
         """
         no_motion_data = self._extract_no_motion(acceleration=acceleration)
@@ -273,7 +274,7 @@ class Calibration:
         else:
             return no_motion_data
 
-    def _closest_point_fit(self, no_motion_data: np.ndarray) -> dict[str, float]:
+    def _closest_point_fit(self, no_motion_data: np.ndarray) -> dict[str, np.ndarray]:
         """Applies closest point fit to no motion data.
 
         Args:
@@ -281,7 +282,7 @@ class Calibration:
             motion, in order to determine scale and offset.
 
         Returns:
-            A dictionary with type str:float. Contains two keys labeled `scale` and
+            A dictionary with type str: ndarray. Contains two keys labeled `scale` and
             `offset`.
         """
         weights = np.ones(no_motion_data.shape[0]) * 100
@@ -298,8 +299,17 @@ class Calibration:
             scale_change = np.ones(3)
 
             for k in range(3):
-                x_ = np.vstack((current[:, k]))
-                tmp_y = np.vstack((closest_point[:, k]))
+                x_ = np.vstack(
+                    typing.cast(
+                        typing.Sequence[np.ndarray], (current[:, k].reshape(-1, 1))
+                    )
+                )
+                tmp_y = np.vstack(
+                    typing.cast(
+                        typing.Sequence[np.ndarray],
+                        (closest_point[:, k].reshape(-1, 1)),
+                    )
+                )
                 linear_regression_model.fit(x_, tmp_y, sample_weight=weights)
 
                 offset_change[k] = linear_regression_model.intercept_[0]
