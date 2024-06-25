@@ -306,7 +306,7 @@ class Calibration:
                 scale_change[k] = linear_regression_model.coef_[0, 0]
                 current[:, k] = (x_ @ linear_regression_model.coef_).flatten()
 
-            scale = scale_change * scale
+            scale = np.where(scale_change == 0, 1e-8, scale_change) * scale
             offset = offset_change + (offset / scale)
 
             residual.append(

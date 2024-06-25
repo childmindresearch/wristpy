@@ -86,9 +86,9 @@ def test_closest_point_fit() -> None:
 
 def test_calibrate_calibration_error() -> None:
     """Test failure due to calibration error."""
-    no_motion_data = np.full((3600, 3), (1 / np.sqrt(3))) + 0.3
+    no_motion_data = np.full((3600, 3), 1.0)
     dummy_measure = create_dummy_measurement(
-        sampling_rate=1, duration_hours=1, all_same_num=(1 / np.sqrt(3)) + 0.3
+        sampling_rate=1, duration_hours=1, all_same_num=1.0
     )
     calibrator = calibration.Calibration(min_error=0.0001, max_iterations=5)
 
