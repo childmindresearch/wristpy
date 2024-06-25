@@ -37,8 +37,8 @@ class SleepDetection:
     def run(self, method: str) -> SleepWindow:
         """Run the sleep detection algorithm."""
         if method == "GGIR":
-            spt_periods = self._spt_window()
-            sib_periods = self._calculate_sib_periods()
+            spt_periods = self._spt_window(self.anglez)
+            sib_periods = self._calculate_sib_periods(self.anglez)
             sleep_onset_wakeup = self._find_onset_wakeup_times(spt_periods, sib_periods)
 
         return sleep_onset_wakeup
@@ -46,14 +46,15 @@ class SleepDetection:
     def _spt_window(
         self, anglez_data: models.Measurement, threshold: float = 0.13
     ) -> models.Measurement:
-        """Implement GGIR Heuristic distribution of z angle.
+        """Implement GGIR Heuristic distribution of z angle for SPT window detection.
 
         This function finds the absolute difference of the anglez data over 5s windows.
-        We then find when the 5-minute rolling median of that difference is below a
-        threshold (chosen middle point of GGIR range).
+        We find when the 5-minute rolling median of that difference is below a
+        threshold (default set to minimum in GGIR range).
         We then find blocks of 30 minutes (360 blocks of 5s) where the rolling median is
         below the threshold.
-        We then fill gaps that are less than 60 minutes.
+        Any gaps in SPT windows that are less than a specified window length
+        (default 60 minutes) are filled.
 
         Args:
             anglez_data: the raw anglez data, calculated from calibrated acceleration.
@@ -65,33 +66,66 @@ class SleepDetection:
         """
         anglez_abs_diff = self._compute_abs_diff_mean_anglez(anglez_data)
         anglez_median_long_epoch = computations.moving_median(anglez_abs_diff, 300)
-        below_threshold = (anglez_median_long_epoch.measurements < threshold).astype(
-            int
+        below_threshold = (
+            (anglez_median_long_epoch.measurements < threshold).astype(int).flatten()
         )
 
-        block_length = 360
+        sleep_idx_array = self._find_long_blocks(below_threshold)
+
+        sleep_idx_array_filled = self._fill_short_blocks(sleep_idx_array)
+
+        return models.Measurement(
+            measurements=sleep_idx_array_filled, time=anglez_median_long_epoch.time
+        )
+
+    def _find_long_blocks(
+        self, below_threshold: np.ndarray, block_length: int = 360
+    ) -> np.ndarray:
+        """Helper function to find blocks of 30 minutes where SPT window is true.
+
+        Args:
+            below_threshold: the 5-minute rolling median of the anglez difference
+                that is true when below the cutoff threshold.
+            block_length: the length of the long block that defines sleep, default is
+                30 minutes. (360 chunks of 5s)
+
+        Returns:
+            A numpy array with 1s indicating the identified SPT windows.
+        """
         kernel = np.ones(block_length, dtype=int)
         convolved = np.convolve(below_threshold, kernel, mode="same")
         long_blocks_idx = np.where(convolved == block_length)[0]
         sleep_idx_array = np.zeros(len(below_threshold))
         sleep_idx_array[long_blocks_idx] = 1
 
+        return sleep_idx_array
+
+    def _fill_short_blocks(
+        self, sleep_idx_array: np.ndarray, gap_block: int = 720
+    ) -> np.ndarray:
+        """Helper function to fill gaps in SPT window that are less than 60 minutes.
+
+        Args:
+            sleep_idx_array: the array of SPT windows.
+            gap_block: the length of the gap that defines sleep, default is 60 minutes.
+
+        Returns:
+            A numpy array with 1s indicating the identified SPT windows.
+        """
         zeros_idx = np.where(sleep_idx_array == 0)[0]
         n_blocks = np.split(zeros_idx, np.where(np.diff(zeros_idx) != 1)[0] + 1)
         for block_idx in n_blocks:
-            if len(block_idx) < (block_length * 2):
+            if len(block_idx) < (gap_block):
                 sleep_idx_array[block_idx] = 1
 
-        return models.Measurement(
-            measurements=sleep_idx_array, time=anglez_median_long_epoch.time
-        )
+        return sleep_idx_array
 
     def _calculate_sib_periods(
         self, anglez_data: models.Measurement, threshold_degrees: int = 5
     ) -> models.Measurement:
         """Find the sustained inactivity bouts.
 
-        This function finds the absolute dtifference of the anglez data over 5s windows.
+        This function finds the absolute difference of the anglez data over 5s windows.
         We then find the 5-minute windows where all of the differences are below a
         threshold (defaults to 5 degrees).
 
@@ -108,6 +142,7 @@ class SleepDetection:
         anglez_pl_df = pl.DataFrame(
             {"time": anglez_abs_diff.time, "angz_diff": anglez_abs_diff.measurements}
         )
+
         anglez_pl_df = anglez_pl_df.with_columns(pl.col("time").set_sorted())
         anglez_grouped_by_window_length = anglez_pl_df.group_by_dynamic(
             index_column="time", every="5m"
@@ -145,7 +180,7 @@ class SleepDetection:
     ) -> SleepWindow:
         """Find the sleep onset and wake up times.
 
-        This function is implemented as follows.
+        This function is implemented as follows:
         First, we use the spt_window as a guider for potential sleep.
         Then we find overlapping sustained inactivity bouts (sib_periods == 1).
         Sleep onset is defined as the start of the first sib_period that overlaps
