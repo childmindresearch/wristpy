@@ -63,7 +63,7 @@ def test_extract_no_motion_value_error() -> None:
 
 
 def test_extract_no_motion_sphere_error() -> None:
-    """Check extract no motion for not meeting sphere error."""
+    """Check extract no motion."""
     dummy_measure = create_dummy_measurement(
         sampling_rate=1, duration_hours=1, all_same_num=0.29
     )
