@@ -86,7 +86,7 @@ def test_closest_point_fit() -> None:
 
 def test_calibrate_calibration_error() -> None:
     """Test failure due to calibration error."""
-    no_motion_data = np.full((100, 3), (1 / np.sqrt(3))) + 0.3
+    no_motion_data = np.full((3600, 3), (1 / np.sqrt(3))) + 0.3
     dummy_measure = create_dummy_measurement(
         sampling_rate=1, duration_hours=1, all_same_num=(1 / np.sqrt(3)) + 0.3
     )
@@ -103,10 +103,10 @@ def test_calibrate_calibration_error() -> None:
 
 def test_calibration_successful() -> None:
     """Test successful calibration."""
-    no_motion_data = np.full((100, 3), (1 / np.sqrt(3) + 1))
+    no_motion_data = np.full((3600, 3), (1 / np.sqrt(3) + 1))
     linear_transformation = {"scale": 1, "offset": -1}
     dummy_measure = create_dummy_measurement(
-        sampling_rate=2, duration_hours=1, all_same_num=(1 / np.sqrt(3) + 1)
+        sampling_rate=1, duration_hours=1, all_same_num=(1 / np.sqrt(3) + 1)
     )
 
     with mock.patch.object(
