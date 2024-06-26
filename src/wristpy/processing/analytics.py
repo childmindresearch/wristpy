@@ -37,9 +37,13 @@ class SleepDetection:
     def run(self, method: str) -> SleepWindow:
         """Run the sleep detection algorithm."""
         if method == "GGIR":
-            spt_periods = self._spt_window(self.anglez)
+            spt_window = self._spt_window(self.anglez)
             sib_periods = self._calculate_sib_periods(self.anglez)
-            sleep_onset_wakeup = self._find_onset_wakeup_times(spt_periods, sib_periods)
+            spt_window_periods = self._find_periods(spt_window)
+            sib_window_periods = self._find_periods(sib_periods)
+            sleep_onset_wakeup = self._find_onset_wakeup_times(
+                spt_window_periods, sib_window_periods
+            )
 
         return sleep_onset_wakeup
 
@@ -108,15 +112,16 @@ class SleepDetection:
         Args:
             sleep_idx_array: the array of SPT windows.
             gap_block: the length of the gap that defines sleep, default is 60 minutes.
+                The units are chunks of 5s.
 
         Returns:
             A numpy array with 1s indicating the identified SPT windows.
         """
         zeros_idx = np.where(sleep_idx_array == 0)[0]
         n_blocks = np.split(zeros_idx, np.where(np.diff(zeros_idx) != 1)[0] + 1)
-        for block_idx in n_blocks:
-            if len(block_idx) < (gap_block):
-                sleep_idx_array[block_idx] = 1
+        for block_idx, block in enumerate(n_blocks):
+            if block_idx != 0 and len(block) < (gap_block):
+                sleep_idx_array[block] = 1
 
         return sleep_idx_array
 
