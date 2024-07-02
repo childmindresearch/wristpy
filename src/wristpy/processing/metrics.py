@@ -71,8 +71,10 @@ def detect_nonwear(
     It checks if the acceleration data in that long window, for each axis, meets certain
     criteria thresholds to compute a non-wear value.
     And then applies that non-wear value to all the short windows that make up the long
-    window. Additionally, for overlapping windows, the maximum of the non-wear value for
-    the overlaps is kept. Finally, there is a pass to find isolated "1s" in the non-wear
+    window. Additionally, as the majority of the short windows are part of multiple long
+    windows, the value of a short window is updated to the maximum nonwear value from
+    these overlaps.
+    Finally, there is a pass to find isolated "1s" in the non-wear
     value, and set them to 2 if surrounded by > 1 values. The non-wear flag is set to
     1 (true) if the non-wear value is >= 2, and 0 (false) otherwise.
 
@@ -82,14 +84,21 @@ def detect_nonwear(
             data.
         short_epoch_length: The short window size, in seconds, for non-wear detection
         long_epoch_length: The long window size, in seconds, for non-wear detection.
-            Ideally, it should be a multiple of short_epoch_length.
+            It must be an integer multiple of short_epoch_length.
         std_criteria: Threshold criteria for standard deviation
         range_criteria: Threshold criteria for range of acceleration
 
-
     Returns:
         A new Measurment instance with the non-wear flag and corresponding timestamps.
+
+    Raises:
+        ValueError: If long_epoch_length is not a multiple of short_epoch_length.
     """
+    if long_epoch_length % short_epoch_length != 0:
+        raise ValueError(
+            "long_epoch_length must be an integer multiple of short_epoch_length"
+        )
+
     acceleration_grouped_by_short_window = _group_acceleration_data_by_time(
         acceleration, short_epoch_length
     )
@@ -149,12 +158,18 @@ def _compute_nonwear_value_array(
     std_criteria: float,
     range_criteria: float,
 ) -> np.ndarray:
-    """Helper function to calculate the nonwear criteria per axis.
+    """Helper function to calculate the nonwear value array.
+
+    This function calculates the nonwear value array based on the GGIR 2023 methodology.
+    It computes the nonwear value for each axis, based on the acceleration data that
+    makes up one long epoch window. That nonwear value is then applied to all the
+    short windows that make up the long window. It iterates forward by one short_window
+    length and repeats the process. For the overlapping short windows, the maximum
+    nonwear value is kept and is assigned to the nonwear value array.
 
     Args:
-        grouped_acceleration: The acceleration data that makes up one long epoch window,
-            it is grouped by short windows.
-        n_short_epoch_in_long_epoch: Number of short epochs in the long epoch.
+        grouped_acceleration: The acceleration data grouped into short windows.
+        n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.
         std_criteria: Threshold criteria for standard deviation.
         range_criteria: Threshold criteria for range of acceleration.
 
