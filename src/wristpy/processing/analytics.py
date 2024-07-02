@@ -27,7 +27,10 @@ class SleepDetection:
     """Class to detect sleep onset and wake times."""
 
     def __init__(
-        self, anglez: models.Measurement, nonwear: models.Measurement, method: str
+        self,
+        anglez: models.Measurement,
+        nonwear: models.Measurement,
+        method: str = "GGIR",
     ) -> None:
         """Initialize the SleepDetection class."""
         self.anglez = anglez
@@ -174,11 +177,16 @@ class SleepDetection:
 
         Returns:
             A Measurement instance with the absolute difference of the anglez data.
+            Note that the length of the returned Measurement instance will be one
+            less than the input anglez_data, this is because np.diff returns an array
+            that is n shorter than the input, where n is the difference step.
         """
         anglez_epoch1 = computations.moving_mean(anglez_data, window_size_seconds)
         absolute_diff = np.abs(np.diff(anglez_epoch1.measurements))
 
-        return models.Measurement(measurements=absolute_diff, time=anglez_data.time[1:])
+        return models.Measurement(
+            measurements=absolute_diff, time=anglez_epoch1.time[1:]
+        )
 
     def _find_onset_wakeup_times(
         self, spt_periods: models.Measurement, sib_periods: models.Measurement
