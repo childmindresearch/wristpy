@@ -4,7 +4,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from wristpy.core.models import Measurement, WatchData
+from wristpy.core import models
 from wristpy.io.readers import readers
 
 
@@ -13,10 +13,10 @@ def test_watchdata_model_1D_acceleration() -> None:
     sensor_data = np.array([1, 2, 3])
     time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
 
-    acceleration = Measurement(measurements=sensor_data, time=time)
+    acceleration = models.Measurement(measurements=sensor_data, time=time)
 
     with pytest.raises(ValueError):
-        WatchData(acceleration=acceleration)
+        models.WatchData(acceleration=acceleration)
 
 
 def test_watchdata_model_acceleration_three_columns() -> None:
@@ -24,10 +24,10 @@ def test_watchdata_model_acceleration_three_columns() -> None:
     sensor_data = np.array([[1, 2], [3, 4]])
     time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2]), "s")
 
-    acceleration = Measurement(measurements=sensor_data, time=time)
+    acceleration = models.Measurement(measurements=sensor_data, time=time)
 
     with pytest.raises(ValueError):
-        WatchData(acceleration=acceleration)
+        models.WatchData(acceleration=acceleration)
 
 
 def test_watchdata_model() -> None:
@@ -37,11 +37,11 @@ def test_watchdata_model() -> None:
     sensor_data = np.array([1, 2, 3])
     time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
 
-    acceleration = Measurement(measurements=accel_data, time=accel_time)
-    lux = Measurement(measurements=sensor_data, time=time)
-    temp = Measurement(measurements=sensor_data, time=time)
+    acceleration = models.Measurement(measurements=accel_data, time=accel_time)
+    lux = models.Measurement(measurements=sensor_data, time=time)
+    temp = models.Measurement(measurements=sensor_data, time=time)
 
-    watch_data = WatchData(acceleration=acceleration, lux=lux, temperature=temp)
+    watch_data = models.WatchData(acceleration=acceleration, lux=lux, temperature=temp)
 
     assert np.array_equal(watch_data.acceleration.measurements, accel_data)
     assert np.array_equal(watch_data.lux.measurements, sensor_data)
@@ -57,7 +57,7 @@ def test_measurement_model_time_type() -> None:
     """Test the error when time is not a datetime series."""
     time = pl.Series([1, 2, 3])
     with pytest.raises(ValueError):
-        Measurement(measurements=np.array([1, 2, 3]), time=time)
+        models.Measurement(measurements=np.array([1, 2, 3]), time=time)
 
 
 def test_measurement_model_time_sorted() -> None:
@@ -65,7 +65,7 @@ def test_measurement_model_time_sorted() -> None:
     time = readers.unix_epoch_time_to_polars_datetime(np.array([2, 1, 3]), "s")
 
     with pytest.raises(ValueError):
-        Measurement(measurements=np.array([1, 2, 3]), time=time)
+        models.Measurement(measurements=np.array([1, 2, 3]), time=time)
 
 
 def test_measurement_model_time_empty() -> None:
@@ -73,7 +73,7 @@ def test_measurement_model_time_empty() -> None:
     time = readers.unix_epoch_time_to_polars_datetime(np.array([]), "s")
 
     with pytest.raises(ValueError):
-        Measurement(measurements=np.array([1, 2, 3]), time=time)
+        models.Measurement(measurements=np.array([1, 2, 3]), time=time)
 
 
 def test_measurement_model_measurements_empty() -> None:
@@ -81,7 +81,7 @@ def test_measurement_model_measurements_empty() -> None:
     time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
 
     with pytest.raises(ValueError):
-        Measurement(measurements=np.array([]), time=time)
+        models.Measurement(measurements=np.array([]), time=time)
 
 
 def test_measurement_model() -> None:
@@ -92,7 +92,7 @@ def test_measurement_model() -> None:
     """
     time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
 
-    measurement = Measurement(measurements=np.array([1, 2, 3]), time=time)
+    measurement = models.Measurement(measurements=np.array([1, 2, 3]), time=time)
 
     assert np.array_equal(measurement.measurements, np.array([1, 2, 3]))
 
