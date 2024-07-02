@@ -248,3 +248,22 @@ def test_detect_nonwear(
     assert (
         len(test_result.time) == expected_time_length
     ), f"Expected time to be {expected_time_length}, got: {len(test_result.time)}"
+
+
+def test_long_epoch_multiple(create_acceleration: pl.DataFrame) -> None:
+    """Test the long epoch multiple function."""
+    short_epoch_length = 5
+    long_epoch_length = 21
+
+    acceleration_df = create_acceleration
+    acceleration = models.Measurement(
+        measurements=acceleration_df.select(["X", "Y", "Z"]).to_numpy(),
+        time=acceleration_df["time"],
+    )
+
+    with pytest.raises(ValueError):
+        metrics.detect_nonwear(
+            acceleration,
+            short_epoch_length,
+            long_epoch_length,
+        )
