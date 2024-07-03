@@ -15,7 +15,7 @@ def create_dummy_measurement(
     sampling_rate: int, duration_hours: int = 84, all_same_num: float | None = None
 ) -> models.Measurement:
     """Create dummy measurement."""
-    n_samples = sampling_rate * 3600 * duration_hours
+    n_samples = int(sampling_rate * 3600 * duration_hours)
     start_time = datetime.now()
     delta = timedelta(seconds=1 / sampling_rate)
 
@@ -75,15 +75,11 @@ def test_extract_no_motion_sphere_error() -> None:
 
 def test_extract_no_motion() -> None:
     """Check extract no motion."""
-    date = datetime.now()
-    delta = timedelta(seconds=1)
-    dummy_datetime = [date + (i * delta) for i in range(60)]
-    sphere_check_data = np.full((60, 3), 0.31)
-    sphere_check_data[30:] = -sphere_check_data[30:]
-
-    dummy_measure = models.Measurement(
-        measurements=sphere_check_data, time=pl.Series(dummy_datetime).alias("time")
+    dummy_measure = create_dummy_measurement(
+        sampling_rate=1, duration_hours=(1 / 60), all_same_num=0.31
     )
+    dummy_measure.measurements[30:] *= -1
+
     calibrator = calibration.Calibration()
 
     no_motion_data = calibrator._extract_no_motion(dummy_measure)

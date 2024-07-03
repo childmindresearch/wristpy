@@ -35,7 +35,7 @@ class Calibration:
     a scale and offset value is determined and applied to the data which, if
     successful, is returned to the user.
 
-    Attributes.
+    Attributes:
         chunked (bool): Determines if either entire dataset will be used, or if
         calibration will be attempted with a subset of the data. Set to false by
         default, when true will initiate _chunked_calibration from the run() method
@@ -47,13 +47,13 @@ class Calibration:
 
         min_calibration_hours (int): The minimum amount of data in hours needed to
         preform calibration. Default is 72. If chunked calibration is selected this will
-        be the size of the initial subset taken for calibration.If error has not been
-        reduced below the min_error value, an additional 12 hours will be taken until
-        all data is used or calibration is successful.
+        be the size of the initial subset taken for calibration. If error has not been
+        reduced below the min_calibration_error value, an additional 12 hours will be
+        taken until all data is used or calibration is successful.
 
         min_standard_deviation (float): The standard deviation critieria used to select
         portions of the data with no movement. Rolling windows with standard deviations
-        below this value will be determined has "still". This value is likely to be
+        below this value will be determined as "still". This value is likely to be
         different between devices. Default is 0.013g, the value determined for GeneActiv
         devices. If measuring the noise in a bench-top test, this threshold should be
         about `1.2 * noise`.
@@ -65,8 +65,8 @@ class Calibration:
         method arrives at this value or better, the process ends. Default is 1e-10.
         Generally should be left at this value.
 
-        min_error (float): Minimum acceptable error. If calibration can not reach this
-        threshold it will error.
+        min_calibration_error (float): Minimum acceptable error. If calibration can not
+        reach this threshold it will error.
 
 
 
@@ -81,9 +81,9 @@ class Calibration:
         min_standard_deviation: float = 0.013,
         max_iterations: int = 1000,
         error_tolerance: float = 1e-10,
-        min_error: float = 0.01,
+        min_calibration_error: float = 0.01,
     ) -> None:
-        """init.
+        """Initializes class.
 
         Attributes:
             chunked (bool, optional): Whether to use chunked calibration for long
@@ -102,7 +102,7 @@ class Calibration:
 
             error_tolerance (float,optional): Tolerance for optimization convergence.
 
-            min_error (float,optional): Minimum acceptable calibration error.
+            min_calibration_error (float,optional): Threshold for calibration error.
 
         Returns:
             None
@@ -113,22 +113,27 @@ class Calibration:
         self.min_standard_deviation = min_standard_deviation
         self.max_iterations = max_iterations
         self.error_tolerance = error_tolerance
-        self.min_error = min_error
+        self.min_calibration_error = min_calibration_error
         self.current_iteration = 0
 
     def run(self, acceleration: models.Measurement) -> models.Measurement:
-        """Runs acceleration data of the Measurement class based on the settings.
+        """Runs calibration on acceleration data based on settings.
 
-        Chunks the data if chunked = true, otherwise it preforms calibration on the
-        entire dataset. linear transformation is then applied to the data.
+        If the chunked arguement is set to true, it will run calibration on an initial
+        chunk of the data the size of which is set to min_calibration_hours. If it fails
+        to calibrate based on this subset, it will add 12 hour chunks to the subset
+        until calibration succeeds, or fails on the entire dataset. Otherwise if chunked
+        is false (default) calibration will be conducted on the whole of the dataset.
+        Calibration is successful when a scale and offset value, that sufficiently
+        minimizes error when applied to the data, is found. The scale and offset values
+        are then applied to every data point in the dataset.
 
         Args:
             acceleration(Measurement): the accelerometer data containing x,y,z axis
             data and time stamps.
 
         Returns:
-            A Measurement object which the original input data, with a linear
-            transformation applied.
+            A Measurement object that contains the calibrated acceleration data.
         """
         data_range = acceleration.time.max() - acceleration.time.min()
         total_hours = math.ceil(data_range.total_seconds() / 3600)
@@ -144,11 +149,13 @@ class Calibration:
         else:
             linear_trans = self._calibrate(acceleration=acceleration)
 
-        transformed_data = (
+        calibrated_acceleration = (
             acceleration.measurements * linear_trans["scale"]
         ) + linear_trans["offset"]
 
-        return models.Measurement(measurements=transformed_data, time=acceleration.time)
+        return models.Measurement(
+            measurements=calibrated_acceleration, time=acceleration.time
+        )
 
     def _chunked_calibration(
         self, acceleration: models.Measurement
@@ -236,7 +243,9 @@ class Calibration:
             np.mean(abs(np.linalg.norm(no_motion_calibrated, axis=1) - 1)), decimals=5
         )
 
-        if (cal_error_end >= cal_error_initial) or (cal_error_end >= self.min_error):
+        if (cal_error_end >= cal_error_initial) or (
+            cal_error_end >= self.min_calibration_error
+        ):
             raise CalibrationError
 
         return linear_tranformation
