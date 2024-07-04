@@ -162,32 +162,22 @@ def test_compute_nonwear_value_per_axis(
     test_resultx = metrics._compute_nonwear_value_per_axis(
         acceleration_grouped["X"], std_criteria, range_criteria
     )
-    test_resulty = metrics._compute_nonwear_value_per_axis(
-        acceleration_grouped["Y"], std_criteria, range_criteria
-    )
-    test_resultz = metrics._compute_nonwear_value_per_axis(
-        acceleration_grouped["Z"], std_criteria, range_criteria
-    )
 
     assert (
         test_resultx == expected_result
     ), f"Expected {expected_result}, got: {test_resultx}"
-    assert (
-        test_resulty == expected_result
-    ), f"Expected {expected_result}, got: {test_resulty}"
-    assert (
-        test_resultz == expected_result
-    ), f"Expected {expected_result}, got: {test_resultz}"
 
 
 @pytest.mark.parametrize(
     "modifier, expected_result",
     [
         (1, 3),
+        (1, 2),
+        (1, 1),
         (0, 0),
     ],
 )
-def test_compute_nowear_value_array(
+def test_compute_nonwear_value_array(
     create_acceleration: pl.DataFrame, modifier: int, expected_result: int
 ) -> None:
     """Test the compute nonwear value array function."""
@@ -199,10 +189,46 @@ def test_compute_nowear_value_array(
         index_column="time", every="5s"
     ).agg([pl.all().exclude(["time"])])
     expected_time_length = len(acceleration_grouped)
+    random_valuesX = pl.Series("X", 5 * np.random.rand(len(create_acceleration)))
+    random_valuesY = pl.Series("Y", 5 * np.random.rand(len(create_acceleration)))
 
-    test_result = metrics._compute_nonwear_value_array(
-        acceleration_grouped, n_short_epoch_in_long_epoch, std_criteria, range_criteria
-    )
+    if expected_result == 3:
+        test_result = metrics._compute_nonwear_value_array(
+            acceleration_grouped,
+            n_short_epoch_in_long_epoch,
+            std_criteria,
+            range_criteria,
+        )
+    elif expected_result == 2:
+        create_acceleration.replace_column(0, random_valuesX)
+        acceleration_grouped = create_acceleration.group_by_dynamic(
+            index_column="time", every="5s"
+        ).agg([pl.all().exclude(["time"])])
+        test_result = metrics._compute_nonwear_value_array(
+            acceleration_grouped,
+            n_short_epoch_in_long_epoch,
+            std_criteria,
+            range_criteria,
+        )
+    elif expected_result == 1:
+        create_acceleration.replace_column(0, random_valuesX)
+        create_acceleration.replace_column(1, random_valuesY)
+        acceleration_grouped = create_acceleration.group_by_dynamic(
+            index_column="time", every="5s"
+        ).agg([pl.all().exclude(["time"])])
+        test_result = metrics._compute_nonwear_value_array(
+            acceleration_grouped,
+            n_short_epoch_in_long_epoch,
+            std_criteria,
+            range_criteria,
+        )
+    else:
+        test_result = metrics._compute_nonwear_value_array(
+            acceleration_grouped,
+            n_short_epoch_in_long_epoch,
+            std_criteria,
+            range_criteria,
+        )
 
     assert np.all(
         test_result == expected_result
@@ -224,7 +250,7 @@ def test_detect_nonwear(
 ) -> None:
     """Test the detect nonwear function."""
     short_epoch_length = 5
-    long_epoch_length = 20
+    n_short_epoch_in_long_epoch = int(4)
     std_criteria = modifier
     range_criteria = modifier
     acceleration_df = create_acceleration
@@ -237,7 +263,7 @@ def test_detect_nonwear(
     test_result = metrics.detect_nonwear(
         acceleration,
         short_epoch_length,
-        long_epoch_length,
+        n_short_epoch_in_long_epoch,
         std_criteria,
         range_criteria,
     )
@@ -248,22 +274,3 @@ def test_detect_nonwear(
     assert (
         len(test_result.time) == expected_time_length
     ), f"Expected time to be {expected_time_length}, got: {len(test_result.time)}"
-
-
-def test_long_epoch_multiple(create_acceleration: pl.DataFrame) -> None:
-    """Test the long epoch multiple function."""
-    short_epoch_length = 5
-    long_epoch_length = 21
-
-    acceleration_df = create_acceleration
-    acceleration = models.Measurement(
-        measurements=acceleration_df.select(["X", "Y", "Z"]).to_numpy(),
-        time=acceleration_df["time"],
-    )
-
-    with pytest.raises(ValueError):
-        metrics.detect_nonwear(
-            acceleration,
-            short_epoch_length,
-            long_epoch_length,
-        )

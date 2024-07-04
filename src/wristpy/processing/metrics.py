@@ -59,7 +59,7 @@ def angle_relative_to_horizontal(
 def detect_nonwear(
     acceleration: models.Measurement,
     short_epoch_length: int = 900,
-    long_epoch_length: int = 3600,
+    n_short_epoch_in_long_epoch: int = 4,
     std_criteria: float = 0.013,
     range_criteria: float = 0.05,
 ) -> models.Measurement:
@@ -67,10 +67,13 @@ def detect_nonwear(
 
     This implements GGIR "2023" non-wear detection algorithm.
     Briefly, the algorithm, creates a sliding window of long epoch length that steps
-    forward by the short epoch length.
+    forward by the short epoch length. The long epoch length is an integer multiple of
+    the short epoch length, that can be specified by the user.
     It checks if the acceleration data in that long window, for each axis, meets certain
-    criteria thresholds to compute a non-wear value.
-    And then applies that non-wear value to all the short windows that make up the long
+    criteria thresholds for the standard deviation and range of acceleration values to
+    compute a non-wear value. The total non-wear value (0, 1, 2, 3) for the long window
+    is the sum of each axis.
+    The non-wear value is applied to all the short windows that make up the long
     window. Additionally, as the majority of the short windows are part of multiple long
     windows, the value of a short window is updated to the maximum nonwear value from
     these overlaps.
@@ -82,28 +85,18 @@ def detect_nonwear(
     Args:
         acceleration: The Measurment instance that contains the calibrated acceleration
             data.
-        short_epoch_length: The short window size, in seconds, for non-wear detection
-        long_epoch_length: The long window size, in seconds, for non-wear detection.
-            It must be an integer multiple of short_epoch_length.
-        std_criteria: Threshold criteria for standard deviation
-        range_criteria: Threshold criteria for range of acceleration
+        short_epoch_length: The short window size, in seconds.
+        n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.
+        std_criteria: Threshold criteria for standard deviation.
+        range_criteria: Threshold criteria for range of acceleration.
 
     Returns:
         A new Measurment instance with the non-wear flag and corresponding timestamps.
-
-    Raises:
-        ValueError: If long_epoch_length is not a multiple of short_epoch_length.
     """
-    if long_epoch_length % short_epoch_length != 0:
-        raise ValueError(
-            "long_epoch_length must be an integer multiple of short_epoch_length"
-        )
-
     acceleration_grouped_by_short_window = _group_acceleration_data_by_time(
         acceleration, short_epoch_length
     )
 
-    n_short_epoch_in_long_epoch = int(long_epoch_length / short_epoch_length)
     nonwear_value_array = _compute_nonwear_value_array(
         acceleration_grouped_by_short_window,
         n_short_epoch_in_long_epoch,
