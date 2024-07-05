@@ -100,7 +100,7 @@ def test_find_periods(
     dummy_date = datetime(2024, 5, 2)
     dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(10)]
     test_time = pl.Series("time", dummy_datetime_list)
-    window_data = np.array([0, 1, 1, 1, 0, 1, 0, 0, 1])
+    window_data = np.array([0, 1, 1, 1, 0, 1, 0, 0, 0, 1])
     window_measurement = models.Measurement(measurements=window_data, time=test_time)
     expected_result = [
         (dummy_datetime_list[1], dummy_datetime_list[4]),
@@ -113,26 +113,62 @@ def test_find_periods(
     assert result == expected_result, f"Expected {expected_result}, but got {result}"
 
 
-@pytest.mark.parametrize(
-    "modifier",
-    [
-        0,
-        1,
-    ],
-)
-def test_spt_window(sleep_detection: analytics.SleepDetection, modifier: int) -> None:
+def test_spt_window(sleep_detection: analytics.SleepDetection) -> None:
     """Test the _spt_window method."""
-    expected_length = int(len(sleep_detection.anglez.measurements) / 5 - 1)
-    if modifier:
-        sleep_detection.anglez.measurements = np.zeros(
-            len(sleep_detection.anglez.measurements)
-        )
+    sleep_detection.anglez.measurements = np.zeros(
+        len(sleep_detection.anglez.measurements)
+    )
+    half_long_block = 180
+    expected_length = int(len(sleep_detection.anglez.measurements) / 5) - 1
+    expected_result = np.zeros(expected_length)
+    expected_result[half_long_block:] = 1
+
     result = sleep_detection._spt_window(sleep_detection.anglez)
 
-    if modifier == 0:
-        expected_result = np.zeros(expected_length)
-    else:
-        expected_result = np.zeros(expected_length)
-        expected_result[180:] = 1
-    assert np.array_equal(result.measurements, expected_result)
-    assert np.array_equal(len(result.time), expected_length)
+    assert np.array_equal(
+        result.measurements, expected_result
+    ), f"Expected {expected_result}, but got {result.measurements}"
+    assert np.array_equal(
+        len(result.time), expected_length
+    ), f"Expected {expected_length}, but got {len(result.time)}"
+
+
+def test_calculate_sib_periods(sleep_detection: analytics.SleepDetection) -> None:
+    """Test the _calculate_sib_periods method."""
+    expected_length = math.ceil(len(sleep_detection.anglez.measurements) / 300)
+    expected_result = np.zeros(expected_length)
+
+    result = sleep_detection._calculate_sib_periods(sleep_detection.anglez, 10)
+
+    assert np.array_equal(
+        result.measurements, expected_result
+    ), f"Expected {expected_result}, but got {result.measurements}"
+    assert (
+        len(result.measurements) == expected_length
+    ), f"Expected {expected_length}, but got {len(result.measurements)}"
+
+
+def test_find_onset_wakeup_times(sleep_detection: analytics.SleepDetection) -> None:
+    """Test the _find_onset_wakeup_times method."""
+    dummy_date = datetime(2024, 5, 2)
+    spt_periods = [
+        (
+            dummy_date + timedelta(hours=1),
+            dummy_date + timedelta(hours=3),
+        )
+    ]
+    sib_periods = [
+        (
+            dummy_date + timedelta(hours=2),
+            dummy_date + timedelta(hours=4),
+        )
+    ]
+    expected_output = analytics.SleepWindow(
+        onset=[dummy_date + timedelta(hours=2)],
+        wakeup=[dummy_date + timedelta(hours=4)],
+    )
+
+    result = sleep_detection._find_onset_wakeup_times(spt_periods, sib_periods)
+
+    assert result.onset == expected_output.onset
+    assert result.wakeup == expected_output.wakeup

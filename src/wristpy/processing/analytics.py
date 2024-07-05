@@ -147,7 +147,9 @@ class SleepDetection:
         )
 
     def _find_onset_wakeup_times(
-        self, spt_periods: models.Measurement, sib_periods: models.Measurement
+        self,
+        spt_periods: List[Tuple[datetime, datetime]],
+        sib_periods: List[Tuple[datetime, datetime]],
     ) -> SleepWindow:
         """Find the sleep onset and wake up times.
 
@@ -159,8 +161,12 @@ class SleepDetection:
         Sleep wakeup is the end of the last sib that overlaps with a spt window.
 
         Args:
-            spt_periods: the sleep period guider windows.
-            sib_periods: the sustained inactivity bouts.
+            spt_periods: the sleep period guider windows, this is computed from the
+                _find_periods method, it is a list of tuples of start and end times
+                of the periods.
+            sib_periods: the sustained inactivity bouts,  this is computed from the
+                _find_periods method, it is a list of tuples of start and end times
+                of the periods.
 
         Returns:
             A SleepWindow instance with sleep onset and wake up times.
@@ -259,6 +265,9 @@ class SleepDetection:
         This is intended to be a helper function for the _find_onset_wakeup_times to
         find periods where either the spt_window or sib_periods are equal to 1.
 
+        If the final value of the window_measurement is 1, the final period is chosen to
+        be the (time[-2],time[-1]).
+
         Args:
             window_measurement: the Measurement instance, intended to be
                 either the spt_window or sib_period.
@@ -280,6 +289,6 @@ class SleepDetection:
                 start_time = None
 
         if start_time is not None:
-            periods.append((start_time, window_measurement.time[-1]))
+            periods.append((window_measurement.time[-2], start_time))
 
         return periods
