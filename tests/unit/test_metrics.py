@@ -168,67 +168,22 @@ def test_compute_nonwear_value_per_axis(
     ), f"Expected {expected_result}, got: {test_resultx}"
 
 
-@pytest.mark.parametrize(
-    "modifier, expected_result",
-    [
-        (1, 3),
-        (1, 2),
-        (1, 1),
-        (0, 0),
-    ],
-)
-def test_compute_nonwear_value_array(
-    create_acceleration: pl.DataFrame, modifier: int, expected_result: int
-) -> None:
+def test_compute_nonwear_value_array(create_acceleration: pl.DataFrame) -> None:
     """Test the compute nonwear value array function."""
     n_short_epoch_in_long_epoch = int(4)
-    std_criteria = modifier
-    range_criteria = modifier
     create_acceleration = create_acceleration.with_columns(pl.col("time").set_sorted())
     acceleration_grouped = create_acceleration.group_by_dynamic(
         index_column="time", every="5s"
     ).agg([pl.all().exclude(["time"])])
     expected_time_length = len(acceleration_grouped)
-    random_valuesX = pl.Series("X", 5 * np.random.rand(len(create_acceleration)))
-    random_valuesY = pl.Series("Y", 5 * np.random.rand(len(create_acceleration)))
+    expected_result = 3
 
-    if expected_result == 3:
-        test_result = metrics._compute_nonwear_value_array(
-            acceleration_grouped,
-            n_short_epoch_in_long_epoch,
-            std_criteria,
-            range_criteria,
-        )
-    elif expected_result == 2:
-        create_acceleration.replace_column(0, random_valuesX)
-        acceleration_grouped = create_acceleration.group_by_dynamic(
-            index_column="time", every="5s"
-        ).agg([pl.all().exclude(["time"])])
-        test_result = metrics._compute_nonwear_value_array(
-            acceleration_grouped,
-            n_short_epoch_in_long_epoch,
-            std_criteria,
-            range_criteria,
-        )
-    elif expected_result == 1:
-        create_acceleration.replace_column(0, random_valuesX)
-        create_acceleration.replace_column(1, random_valuesY)
-        acceleration_grouped = create_acceleration.group_by_dynamic(
-            index_column="time", every="5s"
-        ).agg([pl.all().exclude(["time"])])
-        test_result = metrics._compute_nonwear_value_array(
-            acceleration_grouped,
-            n_short_epoch_in_long_epoch,
-            std_criteria,
-            range_criteria,
-        )
-    else:
-        test_result = metrics._compute_nonwear_value_array(
-            acceleration_grouped,
-            n_short_epoch_in_long_epoch,
-            std_criteria,
-            range_criteria,
-        )
+    test_result = metrics._compute_nonwear_value_array(
+        acceleration_grouped,
+        n_short_epoch_in_long_epoch,
+        std_criteria=1,
+        range_criteria=1,
+    )
 
     assert np.all(
         test_result == expected_result

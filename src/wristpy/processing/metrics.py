@@ -169,9 +169,10 @@ def _compute_nonwear_value_array(
     Returns:
         Non-wear value array.
     """
-    nonwear_value_array = np.zeros(len(grouped_acceleration))
+    total_n_short_windows = len(grouped_acceleration)
+    nonwear_value_array = np.zeros(total_n_short_windows)
 
-    for window_n in range(len(grouped_acceleration) - n_short_epoch_in_long_epoch + 1):
+    for window_n in range(total_n_short_windows - n_short_epoch_in_long_epoch + 1):
         acceleration_selected_long_window = grouped_acceleration[
             window_n : window_n + n_short_epoch_in_long_epoch
         ]
@@ -197,7 +198,7 @@ def _compute_nonwear_value_array(
 
 def _compute_nonwear_value_per_axis(
     axis_acceleration_data: pl.Series, std_criteria: float, range_criteria: float
-) -> int:
+) -> bool:
     """Helper function to calculate the nonwear criteria per axis.
 
     Args:
@@ -216,7 +217,7 @@ def _compute_nonwear_value_per_axis(
     axis_range = axis_long_window_data.max() - axis_long_window_data.min()
 
     criteria_boolean = (axis_std < std_criteria) & (axis_range < range_criteria)
-    return int(criteria_boolean)
+    return criteria_boolean
 
 
 def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.ndarray:
@@ -232,14 +233,15 @@ def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.
     Returns:
         The modified nonwear value array.
     """
-    nonwear_value_is_one = np.where(nonwear_value_array == 1)[0]
+    nonwear_value_array = nonwear_value_array.astype(int)
 
-    for ones_index in nonwear_value_is_one:
-        if ones_index == 0 or ones_index == len(nonwear_value_array) - 1:
-            continue
-        if (nonwear_value_array[ones_index - 1] > 1) and (
-            nonwear_value_array[ones_index + 1] > 1
-        ):
-            nonwear_value_array[ones_index] = 2
+    left_neighbors = np.roll(nonwear_value_array, 1)
+    right_neighbors = np.roll(nonwear_value_array, -1)
+
+    condition = (left_neighbors > 1) & (right_neighbors > 1) & nonwear_value_array == 1
+    condition[0] = False
+    condition[-1] = False
+
+    nonwear_value_array[condition] = 2
 
     return nonwear_value_array
