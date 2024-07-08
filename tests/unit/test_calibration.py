@@ -89,15 +89,28 @@ def test_extract_no_motion() -> None:
     assert np.all(no_motion_data.max(axis=0) >= calibrator.min_acceleration)
 
 
-def test_closest_point_fit() -> None:
+@pytest.mark.parametrize(
+    "scale, offset, expected_scale, expected_offset",
+    [(1.01, 0.001, 1 / 1.01, -0.001 / 1.01), (1.0, 0.0, 1.0, 0.0)],
+)
+def test_closest_point_fit(
+    scale: float, offset: float, expected_scale: float, expected_offset: float
+) -> None:
     """Test closest point fit."""
-    dummy_no_motion = np.full((100, 3), (1 / np.sqrt(3)))
+    dummy_no_motion = np.random.normal(size=(100, 3))
+
+    norms = np.linalg.norm(dummy_no_motion, axis=1, keepdims=True)
+    unit_sphere = dummy_no_motion / norms
     calibrator = calibration.Calibration()
 
-    linear_transform = calibrator._closest_point_fit(dummy_no_motion)
+    linear_transform = calibrator._closest_point_fit((unit_sphere * scale) + offset)
 
-    assert np.allclose(linear_transform["scale"], 1.0)
-    assert np.allclose(linear_transform["offset"], 0.0)
+    assert np.allclose(
+        np.mean(linear_transform["scale"]), expected_scale, atol=1e-4
+    ), f'Scale is {np.mean(linear_transform["scale"])} expected {expected_scale}'
+    assert np.allclose(
+        np.mean(linear_transform["offset"]), expected_offset, atol=1e-4
+    ), f'Offset is {np.mean(linear_transform["offset"])} expected {expected_offset}'
 
 
 def test_calibrate_calibration_error() -> None:
@@ -106,7 +119,7 @@ def test_calibrate_calibration_error() -> None:
     dummy_measure = create_dummy_measurement(
         sampling_rate=1, duration_hours=1, all_same_num=1.0
     )
-    calibrator = calibration.Calibration(min_error=0.0001, max_iterations=5)
+    calibrator = calibration.Calibration(min_calibration_error=0.0001, max_iterations=5)
 
     with mock.patch.object(
         calibration.Calibration, "_extract_no_motion"
@@ -142,12 +155,15 @@ def test_calibration_successful() -> None:
 
 
 @pytest.mark.parametrize(
-    "chunk_num, expected_len",
-    [(0, (3600 * 72)), ((1), (3600 * 84)), ((2), (3600 * 84))],
+    "chunk_num, duration_hours",
+    [(0, (72)), ((1), (84)), ((2), (90)), ((2), (96))],
 )
-def test_take_chunk(chunk_num: int, expected_len: int) -> None:
+def test_take_chunk(chunk_num: int, duration_hours: int) -> None:
     """Test take chunk."""
-    dummy_measure = create_dummy_measurement(sampling_rate=1, duration_hours=84)
+    expected_len = 3600 * duration_hours
+    dummy_measure = create_dummy_measurement(
+        sampling_rate=1, duration_hours=duration_hours
+    )
     dummy_calibrator = calibration.Calibration()
 
     subset = dummy_calibrator._take_chunk(
@@ -163,7 +179,10 @@ def test_chunked_calibration_fail() -> None:
     dummy_measurement = create_dummy_measurement(sampling_rate=1, duration_hours=84)
 
     calibrator = calibration.Calibration(
-        chunked=True, min_calibration_hours=72, max_iterations=5, min_error=0.00001
+        chunked=True,
+        min_calibration_hours=72,
+        max_iterations=5,
+        min_calibration_error=0.00001,
     )
 
     with pytest.raises(calibration.CalibrationError):

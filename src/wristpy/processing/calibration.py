@@ -1,7 +1,6 @@
 """Calibrate accelerometer data."""
 
 import math
-import typing
 
 import numpy as np
 from sklearn import linear_model
@@ -35,41 +34,25 @@ class Calibration:
     a scale and offset value is determined and applied to the data which, if
     successful, is returned to the user.
 
+
     Attributes:
-        chunked (bool): Determines if either entire dataset will be used, or if
-        calibration will be attempted with a subset of the data. Set to false by
-        default, when true will initiate _chunked_calibration from the run() method
-        instead of standard _calibration.
+            chunked (bool, optional): If true will preform calibration on subsets of
+            data if false will calibrate on entire dataset.
 
-        min_acceleration (float): The value on either side of 0g for each axis.
-        Determines if sphere is sufficiently populated to obtain meaningful calibration
-        result. Default is 0.3g.
+            min_acceleration (float,optional): Minimum acceleration for sphere criteria.
 
-        min_calibration_hours (int): The minimum amount of data in hours needed to
-        preform calibration. Default is 72. If chunked calibration is selected this will
-        be the size of the initial subset taken for calibration. If error has not been
-        reduced below the min_calibration_error value, an additional 12 hours will be
-        taken until all data is used or calibration is successful.
+            min_calibration_hours (int,optional): Minimum hours of data required for
+            calibration.
 
-        min_standard_deviation (float): The standard deviation critieria used to select
-        portions of the data with no movement. Rolling windows with standard deviations
-        below this value will be determined as "still". This value is likely to be
-        different between devices. Default is 0.013g, the value determined for GeneActiv
-        devices. If measuring the noise in a bench-top test, this threshold should be
-        about `1.2 * noise`.
+            min_standard_deviation (float,optional): Minimum standard deviation for
+            no-motion detection.
 
-        max_iterations (int): The maximum amount of iterations for the closest_point_fit
-        method. Default is 1000, generally should be left at this value.
+            max_iterations (int,optional): Maximum number of iterations for
+            optimization.
 
-        error_tolerance (float): Tolerated level of error, when the closest_point_fit
-        method arrives at this value or better, the process ends. Default is 1e-10.
-        Generally should be left at this value.
+            error_tolerance (float,optional): Tolerance for optimization convergence.
 
-        min_calibration_error (float): Minimum acceptable error. If calibration can not
-        reach this threshold it will error.
-
-
-
+            min_calibration_error (float,optional): Threshold for calibration error.
 
     """
 
@@ -86,23 +69,39 @@ class Calibration:
         """Initializes class.
 
         Attributes:
-            chunked (bool, optional): Whether to use chunked calibration for long
-            recordings.
+            chunked (bool): Determines if either entire dataset will be used, or if
+            calibration will be attempted with a subset of the data. Set to false by
+            default, when true will initiate _chunked_calibration from the run() method
+            instead of standard _calibration.
 
-            min_acceleration (float,optional): Minimum acceleration for sphere criteria.
+            min_acceleration (float): The value on either side of 0g for each axis.
+            Determines if sphere is sufficiently populated to obtain meaningful
+            calibration result. Default is 0.3g.
 
-            min_calibration_hours (int,optional): Minimum hours of data required for
-            calibration.
+            min_calibration_hours (int): The minimum amount of data in hours needed to
+            preform calibration. Default is 72. If chunked calibration is selected this
+            will be the size of the initial subset taken for calibration. If error has
+            not been reduced below the min_calibration_error value, an additional 12
+            hours will be taken until all data is used or calibration is successful.
 
-            min_standard_deviation (float,optional): Minimum standard deviation for
-            no-motion detection.
+            min_standard_deviation (float): The standard deviation critieria used to
+            select portions of the data with no movement. Rolling windows with standard
+            deviations below this value will be determined as "still". This value is
+            likely to be different between devices. Default is 0.013g. This value was
+            determined just above the empirically derived  baseline standard deviation
+            due to noise (0.010g)(van Hees et al. 2014). If measuring the noise in a
+            bench-top test, this threshold should be about `1.2 * noise`.
 
-            max_iterations (int,optional): Maximum number of iterations for
-            optimization.
+            max_iterations (int): The maximum amount of iterations for the
+            closest_point_fit method. Default is 1000, generally should be left at this
+            value.
 
-            error_tolerance (float,optional): Tolerance for optimization convergence.
+            error_tolerance (float): Tolerated level of error, when the
+            closest_point_fit method arrives at this value or better, the process ends.
+            Default is 1e-10. Generally should be left at this value.
 
-            min_calibration_error (float,optional): Threshold for calibration error.
+            min_calibration_error (float): Minimum acceptable error. If calibration can
+            not reach this threshold it will error.
 
         Returns:
             None
@@ -124,9 +123,10 @@ class Calibration:
         to calibrate based on this subset, it will add 12 hour chunks to the subset
         until calibration succeeds, or fails on the entire dataset. Otherwise if chunked
         is false (default) calibration will be conducted on the whole of the dataset.
-        Calibration is successful when a scale and offset value, that sufficiently
-        minimizes error when applied to the data, is found. The scale and offset values
-        are then applied to every data point in the dataset.
+        Calibration is successful when scale and offset values, that sufficiently
+        minimize error when applied to the data, are found. The scale and offset values
+        are then applied to every data point in the dataset which is then returned as
+        calibrated models.Measurement object.
 
         Args:
             acceleration(Measurement): the accelerometer data containing x,y,z axis
@@ -134,6 +134,17 @@ class Calibration:
 
         Returns:
             A Measurement object that contains the calibrated acceleration data.
+
+        Raises:
+            ValueError: If the acceleration data does not meet the specified minimum
+            hours of data as given by min_calibration_hours.
+
+            SphereCriteriaError: If the sphere is not sufficiently populated, i.e. every
+            axis does not have at least 1 value both above and below  the + and - value
+            of min_acceleraiton.
+
+            CalibrationError: If the calibration process fails to get below the
+            `min_calibration_error` threshold.
         """
         data_range = acceleration.time.max() - acceleration.time.min()
         total_hours = math.ceil(data_range.total_seconds() / 3600)
@@ -162,6 +173,11 @@ class Calibration:
     ) -> dict[str, np.ndarray]:
         """Chunks the data into subsets, to calibrate on smaller sections of data.
 
+        The first chunk is determined by the min_calibration_hours. Should calibration
+        fail on that subset of data, additional chunks of data are added to attempt
+        calibration on. This continues until all data is tried, or calibration succeeds.
+        Chunks are added in increments of 12 hours.
+
         Args:
             acceleration (Measurement): the accelerometer data containing x,y,z axis
             data and time stamps.
@@ -169,6 +185,10 @@ class Calibration:
         Returns:
             A dictionary with type str: ndarray. Contains two keys labeled `scale` and
             `offset`.
+
+        Raises:
+            CalibrationError: If all possible chunks have been used and the calibration
+            process fails to get below the `min_calibration_error` threshold.
         """
         chunk_num = 0
         finished = False
@@ -197,8 +217,8 @@ class Calibration:
             chunk_num (int): the current 12 hour chunk iteration being taken.
 
         Returns:
-            The next chunk of the accelerometer data, if this is the final chunk, the
-            entire data is returned.
+            The minimum hours of accelerometer data and 12 * chunk_num hours of data.
+
         """
         sampling_rate = self._get_sampling_rate(acceleration=acceleration)
         min_samples = int(self.min_calibration_hours * 3600 * sampling_rate)
@@ -218,8 +238,16 @@ class Calibration:
     def _calibrate(self, acceleration: models.Measurement) -> dict[str, np.ndarray]:
         """Calibrates data and returns scale and offset values.
 
-        If error is low enough, the linear transformation is returned in a dict,
-        errors if not.
+        The acceleration data is processed by the _extract_no_motion function, which
+        returns the portions of the data where the subject was still. This data ideally
+        should all have points with a norm of 1. If we take a unit sphere, all the
+        points in no_motion_data should be found along it's surface. As this is not the
+        case we calibrate by finding offset and scale values that will most closely make
+        the whole of our data lie along this unit sphere. This is done by the
+        _closest_point_fit function. We then transform the data by applying the scale
+        and offset values we have found, and if the error has been sufficiently reduced
+        improved, these values are returned. If not calibration fails and raises a
+        calibration error.
 
         Args:
             acceleration (Measurement): the accelerometer data containing x,y,z axis
@@ -228,6 +256,10 @@ class Calibration:
         Returns:
             A dictionary with type str: ndarray. Contains two keys labeled `scale` and
             `offset`.
+
+        Raises:
+            CalibrationError: If the calibration process fails to converge or the final
+            error exceeds the `min_calibration_error` threshold.
         """
         no_motion_data = self._extract_no_motion(acceleration=acceleration)
         linear_tranformation = self._closest_point_fit(no_motion_data=no_motion_data)
@@ -259,6 +291,14 @@ class Calibration:
 
         Returns:
             an ndarray containing the accelerometer data determined to have no motion.
+
+        Raises"
+            ValueError: If no portions of data meet no motion criteria as defined by
+            no_motion_check.
+
+            SphereCriteriaError: If the sphere is not sufficiently populated, i.e. every
+            axis does not have at least 1 value both above and below  the + and - value
+            of min_acceleraiton.
         """
         moving_sd = computations.moving_std(acceleration, 10)
         moving_mean = computations.moving_mean(acceleration, 10)
@@ -301,29 +341,20 @@ class Calibration:
 
         offset = np.zeros(3)
         scale = np.ones(3)
-        for i in range(self.max_iterations):
+        for iteration in range(self.max_iterations):
             current = (no_motion_data * scale) + offset
             closest_point = current / np.linalg.norm(current, axis=1, keepdims=True)
             offset_change = np.zeros(3)
             scale_change = np.ones(3)
 
-            for k in range(3):
-                x_ = np.vstack(
-                    typing.cast(
-                        typing.Sequence[np.ndarray], (current[:, k].reshape(-1, 1))
-                    )
-                )
-                tmp_y = np.vstack(
-                    typing.cast(
-                        typing.Sequence[np.ndarray],
-                        (closest_point[:, k].reshape(-1, 1)),
-                    )
-                )
+            for axis in range(3):
+                x_ = current[:, axis].reshape(-1, 1)
+                tmp_y = closest_point[:, axis].reshape(-1, 1)
                 linear_regression_model.fit(x_, tmp_y, sample_weight=weights)
 
-                offset_change[k] = linear_regression_model.intercept_[0]
-                scale_change[k] = linear_regression_model.coef_[0, 0]
-                current[:, k] = (x_ @ linear_regression_model.coef_).flatten()
+                offset_change[axis] = linear_regression_model.intercept_[0]
+                scale_change[axis] = linear_regression_model.coef_[0, 0]
+                current[:, axis] = (x_ @ linear_regression_model.coef_).flatten()
 
             scale = np.where(scale_change == 0, 1e-8, scale_change) * scale
             offset = offset_change + (offset / scale)
@@ -338,7 +369,10 @@ class Calibration:
                 1 / np.linalg.norm(current - closest_point, axis=1), 100
             )
 
-            if abs(residual[i] - residual[i - 1]) < self.error_tolerance:
+            if (
+                abs(residual[iteration] - residual[iteration - 1])
+                < self.error_tolerance
+            ):
                 break
 
         return {"scale": scale, "offset": offset}
