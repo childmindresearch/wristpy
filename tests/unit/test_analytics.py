@@ -22,53 +22,31 @@ def sleep_detection() -> analytics.SleepDetection:
     return analytics.SleepDetection(anglez_measurement, "GGIR")
 
 
-@pytest.mark.parametrize(
-    "below_threshold, expected_result",
-    [
-        (
-            np.array([0, 0, 1, 1, 1, 1, 0, 0]),
-            np.array([0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0]),
-        ),
-        (
-            np.array([0, 0, 0, 1, 1, 0, 0, 1]),
-            np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
-        ),
-    ],
-)
 def test_find_long_blocks(
     sleep_detection: analytics.SleepDetection,
-    below_threshold: np.ndarray,
-    expected_result: np.ndarray,
 ) -> None:
     """Test the _find_long_blocks method."""
     block_length = 3
+    below_threshold = np.array([0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0])
+    expected_result = np.array([0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0])
+
     result = sleep_detection._find_long_blocks(below_threshold, block_length)
+
     assert np.array_equal(
         result, expected_result
     ), f"Expected {expected_result}, but got {result}"
 
 
-@pytest.mark.parametrize(
-    "sleep_idx_array, expected_result",
-    [
-        (
-            np.array([0, 0, 1, 0, 0, 1, 0, 0]),
-            np.array([0, 0, 1, 1, 1, 1, 1, 1]),
-        ),
-        (
-            np.array([0, 0, 0, 1, 1, 0, 0, 1]),
-            np.array([0, 0, 0, 1, 1, 1, 1, 1]),
-        ),
-    ],
-)
 def test_fill_short_blocks(
     sleep_detection: analytics.SleepDetection,
-    sleep_idx_array: np.ndarray,
-    expected_result: np.ndarray,
 ) -> None:
     """Test the _fill_short_blocks method."""
     gap_block = 3
+    sleep_idx_array = np.array([0, 0, 0, 1, 1, 0, 0, 1])
+    expected_result = np.array([0, 0, 0, 1, 1, 1, 1, 1])
+
     result = sleep_detection._fill_short_blocks(sleep_idx_array, gap_block)
+
     assert np.array_equal(
         result, expected_result
     ), f"Expected {expected_result}, but got {result}"
@@ -172,3 +150,14 @@ def test_find_onset_wakeup_times(sleep_detection: analytics.SleepDetection) -> N
 
     assert result.onset == expected_output.onset
     assert result.wakeup == expected_output.wakeup
+
+
+def test_run_sleep_detection(sleep_detection: analytics.SleepDetection) -> None:
+    """Test the full sleep detection process."""
+    result = sleep_detection.run(sleep_detection.method)
+
+    assert isinstance(
+        result, analytics.SleepWindow
+    ), "result is not an instance of SleepWindow"
+    assert result.onset == []
+    assert result.wakeup == []

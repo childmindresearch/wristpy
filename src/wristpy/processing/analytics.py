@@ -1,4 +1,4 @@
-"""Calculate sleep onset and wake times."""
+"""Calculate sleep onset and wake up times."""
 
 from dataclasses import dataclass
 from datetime import datetime
@@ -15,8 +15,8 @@ class SleepWindow:
     """Dataclass to store sleep window information.
 
     Attributes:
-        onset: the time the participant fell asleep.
-        wakeup: the time the participant woke up
+        onset: the predicted start time of the sleep window.
+        wakeup: the predicted end time of the sleep window.
     """
 
     onset: List[datetime]
@@ -24,7 +24,7 @@ class SleepWindow:
 
 
 class SleepDetection:
-    """Class to detect sleep onset and wake times.
+    """Class to detect sleep onset and wake up times.
 
     This class implements a user chosen sleep detection algorithm to find sleep onset
     and wakeup times.
@@ -44,7 +44,7 @@ class SleepDetection:
         nonwear: Optional[models.Measurement] = None,
         method: str = "GGIR",
     ) -> None:
-        """Initialize the SleepDetection class."""
+        """Initialize the SleepDetection class with default attributes."""
         self.anglez = anglez
         self.nonwear = nonwear
         self.method = method
@@ -78,7 +78,7 @@ class SleepDetection:
     def _spt_window(
         self, anglez_data: models.Measurement, threshold: float = 0.13
     ) -> models.Measurement:
-        """Implement GGIR Heuristic distribution of z angle for SPT window detection.
+        """Implement Heuristic distribution of z angle (HDCZA) for SPT window detection.
 
         This function finds the absolute difference of the anglez data over 5s windows.
         We find when the 5-minute rolling median of that difference is below a
@@ -158,7 +158,7 @@ class SleepDetection:
         Then we find overlapping sustained inactivity bouts (sib_periods == 1).
         Sleep onset is defined as the start of the first sib_period that overlaps
         with a specific spt_window.
-        Sleep wakeup is the end of the last sib that overlaps with a spt window.
+        Sleep wakeup is the end of the last SIB that overlaps with a spt window.
 
         Args:
             spt_periods: the sleep period guider windows, this is computed from the
@@ -193,7 +193,12 @@ class SleepDetection:
     def _find_long_blocks(
         self, below_threshold: np.ndarray, block_length: int = 360
     ) -> np.ndarray:
-        """Helper function to find blocks of 30 minutes where SPT window is true.
+        """Helper function to find long blocks where SPT window is true.
+
+        This function uses the convolution of a kernel of 1s, of length block_length,
+        to find the continuous long blocks where SPT window is true. Where the
+        convolution value is == long_block_length that implies an overlap between the
+        kernel and the threshold signal of length long_block.
 
         Args:
             below_threshold: the 5-minute rolling median of the anglez difference
@@ -216,6 +221,11 @@ class SleepDetection:
         self, sleep_idx_array: np.ndarray, gap_block: int = 720
     ) -> np.ndarray:
         """Helper function to fill gaps in SPT window that are less than 60 minutes.
+
+        We first find all the zeros in the sleep_idx_array, and then use np.diff to find
+        the gaps between those zeros, if np.diff !=0, that implies there is a gap
+        between 0s. We split slp_idx_array and find, and fill, the blocks that
+        are < gap_block.
 
         Args:
             sleep_idx_array: the array of SPT windows.
@@ -248,7 +258,8 @@ class SleepDetection:
             A Measurement instance with the absolute difference of the anglez data.
             Note that the length of the returned Measurement instance will be one
             less than the input anglez_data, this is because np.diff returns an array
-            that is n shorter than the input, where n is the difference step.
+            that is diff_size shorter than the input, where diff_size is the size of
+            the difference step.
         """
         anglez_epoch1 = computations.moving_mean(anglez_data, window_size_seconds)
         absolute_diff = np.abs(np.diff(anglez_epoch1.measurements))
