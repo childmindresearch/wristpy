@@ -12,7 +12,7 @@ from wristpy.processing import calibration
 
 
 def create_dummy_measurement(
-    sampling_rate: int, duration_hours: int = 84, all_same_num: float | None = None
+    sampling_rate: int, duration_hours: float = 84.0, all_same_num: float | None = None
 ) -> models.Measurement:
     """Create dummy measurement."""
     n_samples = int(sampling_rate * 3600 * duration_hours)
