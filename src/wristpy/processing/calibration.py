@@ -324,7 +324,13 @@ class Calibration:
             return no_motion_data
 
     def _closest_point_fit(self, no_motion_data: np.ndarray) -> dict[str, np.ndarray]:
-        """Applies closest point fit to no motion data.
+        """Applies closest point fit to no motion data to calibrated accelerometer data.
+
+        This method implements an iterative algorithm that finds the optimal scale and
+        offset for calibrating accelerometer data. The ndarray it acts on are the
+        periods of "no motion" identified by the _extract_no_motion method. This data is
+        then fit to a unit sphere, the surface of which represents all the possible
+        values for the X,Y,Z axis under the effects of exactly 1g (earth's gravity).
 
         Args:
             no_motion_data (np.ndarray): The acceleration data during periods of no
