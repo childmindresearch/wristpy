@@ -1,8 +1,9 @@
 """Calculate sleep onset and wake up times."""
 
+import abc
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 import numpy as np
 import polars as pl
@@ -19,59 +20,71 @@ class SleepWindow:
         wakeup: the predicted end time of the sleep window.
     """
 
-    onset: List[datetime]
-    wakeup: List[datetime]
+    onset: datetime
+    wakeup: datetime
 
 
-class SleepDetection:
-    """Class to detect sleep onset and wake up times.
+class AbstractSleepDetector(abc.ABC):
+    """Abstract class defining the interface for sleep detection algorithms."""
 
-    This class implements a user chosen sleep detection algorithm to find sleep onset
-    and wakeup times.
+    @abc.abstractmethod
+    def __init__(self, anglez: models.Measurement) -> None:
+        """Initialization function for the sleep detection algorithm.
+
+        Must contain the anglez data as an input.
+        """
+        pass
+
+    @abc.abstractmethod
+    def run_sleep_detection(self) -> List[SleepWindow]:
+        """Sleep Detector must contain a run_sleep_detection function.
+
+        The function must return a list of SleepWindow objects.
+        """
+        pass
+
+
+class GGIRSleepDetection(AbstractSleepDetector):
+    """Sleep Detection algorithm based on the GGIR method.
+
+    This class implements the GGIR method for sleep detection. The method uses the angle-z
+    data to find periods of sleep. It returns a list of SleepWindow objects.
 
     Attributes:
         anglez (models.Measurement): The angle-z data, calculated from the calibrated
             accelerometer data.
-        nonwear (Optional[models.Measurement]): The non-wear data, which may be used to
-            exclude timepoints from analysis. Default is None.
-        method (str): The method to use for sleep detection. Default is "GGIR".
-
     """
 
     def __init__(
         self,
         anglez: models.Measurement,
-        nonwear: Optional[models.Measurement] = None,
-        method: str = "GGIR",
     ) -> None:
-        """Initialize the SleepDetection class with default attributes."""
-        self.anglez = anglez
-        self.nonwear = nonwear
-        self.method = method
-
-    def run(self, method: str) -> SleepWindow:
-        """Run the sleep detection algorithm defined in the chosen method.
-
-        Current support is only for the GGIR method, which uses the angle-z data to
-        first find potential sleep periods (SPT windows) and then find sustained
-        inactivity bouts (SIB periods). The sleep onset and wake up times are then
-        calculated based on the overlap between the SPT windows and SIB periods.
+        """Initialize the SleepDetection class with default attributes.
 
         Args:
-            method: the method to use for sleep detection. Currently only "GGIR" is
-                supported.
+            anglez: the raw anglez data, calculated from calibrated acceleration.
+        """
+        self.anglez = anglez
+
+    def run_sleep_detection(self) -> List[SleepWindow]:
+        """Run the GGIR sleep detection.
+
+        This algorithm uses the angle-z data to first find potential sleep periods
+        (SPT windows) and then find sustained inactivity bouts (SIB periods). The
+        sleep onset and wake up times are then calculated based on the overlap between
+        the SPT windows and SIB periods.
 
         Returns:
-            A SleepWindow instance with sleep onset and wake up times.
+            A list of SleepWindow instances, each instance contains a sleep onset/wakeup
+            time pair.
         """
-        if method == "GGIR":
-            spt_window = self._spt_window(self.anglez)
-            sib_periods = self._calculate_sib_periods(self.anglez)
-            spt_window_periods = self._find_periods(spt_window)
-            sib_window_periods = self._find_periods(sib_periods)
-            sleep_onset_wakeup = self._find_onset_wakeup_times(
-                spt_window_periods, sib_window_periods
-            )
+        spt_window = self._spt_window(self.anglez)
+        sib_periods = self._calculate_sib_periods(self.anglez)
+        spt_window_periods = self._find_periods(spt_window)
+        sib_window_periods = self._find_periods(sib_periods)
+        sleep_onset_wakeup = self._find_onset_wakeup_times(
+            spt_window_periods, sib_window_periods
+        )
 
         return sleep_onset_wakeup
 
@@ -81,10 +94,10 @@ class SleepDetection:
         """Implement Heuristic distribution of z angle (HDCZA) for SPT window detection.
 
         This function finds the absolute difference of the anglez data over 5s windows.
-        We find when the 5-minute rolling median of that difference is below a
-        threshold (default set to minimum in GGIR range).
-        We then find blocks of 30 minutes (360 blocks of 5s) where the rolling median is
-        below the threshold.
+        We find the 5-minute rolling median of that difference.
+        Next, we find what that 5-minute median is below a specified threshold, taken as
+        the lower limit defined within the GGIR implementation of the HDCZA algorithm.
+        We then find long blocks (30 minutes) when the threshold criteria is met.
         Any gaps in SPT windows that are less than a specified window length
         (default 60 minutes) are filled.
 
@@ -95,12 +108,15 @@ class SleepDetection:
         Returns:
             A Measurement instance with values set to 1 indicating identified
             SPT windows and corresponding time stamps.
+
+        References:
+            van Hees, V.T., Sabia, S., Jones, S.E. et al. Estimating sleep parameters
+              using an accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
+              https://doi.org/10.1038/s41598-018-31266-z
         """
         anglez_abs_diff = self._compute_abs_diff_mean_anglez(anglez_data)
         anglez_median_long_epoch = computations.moving_median(anglez_abs_diff, 300)
-        below_threshold = (
-            (anglez_median_long_epoch.measurements < threshold).astype(int).flatten()
-        )
+        below_threshold = (anglez_median_long_epoch.measurements < threshold).flatten()
 
         sleep_idx_array = self._find_long_blocks(below_threshold)
 
@@ -126,6 +142,11 @@ class SleepDetection:
         Returns:
             A Measurement instance with values set to 1 indicating identified SIB
             windows, and corresponding time stamps.
+
+        References:
+            van Hees, V. T. et al. A Novel, Open Access Method to Assess Sleep
+            Duration Using a Wrist-Worn Accelerometer. PLoS One 10, e0142533 (2015).
+            https://doi.org/10.1371/journal.pone.0142533
         """
         anglez_abs_diff = self._compute_abs_diff_mean_anglez(anglez_data)
 
@@ -138,7 +159,9 @@ class SleepDetection:
             index_column="time", every="5m"
         ).agg([pl.all().exclude(["time"])])
         flag = anglez_grouped_by_window_length["angz_diff"].map_elements(
-            lambda lst: all(x < threshold_degrees for x in lst)
+            lambda grouped_list_data: all(
+                list_data < threshold_degrees for list_data in grouped_list_data
+            )
         )
 
         return models.Measurement(
@@ -150,7 +173,7 @@ class SleepDetection:
         self,
         spt_periods: List[Tuple[datetime, datetime]],
         sib_periods: List[Tuple[datetime, datetime]],
-    ) -> SleepWindow:
+    ) -> List[SleepWindow]:
         """Find the sleep onset and wake up times.
 
         This function is implemented as follows:
@@ -173,22 +196,26 @@ class SleepDetection:
             If there is no overlap between spt_windows and sib_periods,
             the onset and wakeup lists will be empty.
         """
-        onset = []
-        wakeup = []
-        for spt in spt_periods:
+        sleep_windows = []
+        for sleep_guide in spt_periods:
             min_onset = None
             max_wakeup = None
-            for sib in sib_periods:
-                if sib[0] <= spt[1] and sib[1] >= spt[0]:
-                    if min_onset is None or sib[0] < min_onset:
-                        min_onset = sib[0]
-                    if max_wakeup is None or sib[1] > max_wakeup:
-                        max_wakeup = sib[1]
+            for inactivity_bout in sib_periods:
+                if (
+                    inactivity_bout[0] <= sleep_guide[1]
+                    and inactivity_bout[1] >= sleep_guide[0]
+                ):
+                    if min_onset is None or inactivity_bout[0] < min_onset:
+                        min_onset = inactivity_bout[0]
+                    if max_wakeup is None or inactivity_bout[1] > max_wakeup:
+                        max_wakeup = inactivity_bout[1]
             if min_onset is not None and max_wakeup is not None:
-                onset.append(min_onset)
-                wakeup.append(max_wakeup)
+                sleep_windows.append(SleepWindow(onset=min_onset, wakeup=max_wakeup))
 
-        return SleepWindow(onset=onset, wakeup=wakeup)
+        if not sleep_windows:
+            sleep_windows.append(SleepWindow(onset=[], wakeup=[]))
+
+        return sleep_windows
 
     def _find_long_blocks(
         self, below_threshold: np.ndarray, block_length: int = 360
@@ -250,8 +277,6 @@ class SleepDetection:
 
         Args:
             anglez_data: the raw anglez data.
-                ##Note if we have access to the epoch1 anglez data this function will be
-                modified or removed
             window_size_seconds: the window size in seconds to average the anglez data.
 
         Returns:
@@ -273,11 +298,8 @@ class SleepDetection:
     ) -> List[Tuple[datetime, datetime]]:
         """Find periods where window_measurement is equal to 1.
 
-        This is intended to be a helper function for the _find_onset_wakeup_times to
+        This is a helper function for the _find_onset_wakeup_times to
         find periods where either the spt_window or sib_periods are equal to 1.
-
-        If the final value of the window_measurement is 1, the final period is chosen to
-        be the (time[-2],time[-1]).
 
         Args:
             window_measurement: the Measurement instance, intended to be
@@ -285,21 +307,24 @@ class SleepDetection:
 
         Returns:
             A list of tuples, where each tuple contains the start and end times of
-            a period.
+            a period. For isolated ones the function returns the same start
+            and end time. The list is sorted by time.
         """
-        periods = []
-        start_time = None
+        edge_detection = np.convolve([1, 3, 1], window_measurement.measurements, "same")
+        single_one = np.nonzero(edge_detection == 3)[0]
 
-        for time, value in zip(
-            window_measurement.time, window_measurement.measurements
-        ):
-            if value == 1 and start_time is None:
-                start_time = time
-            elif value != 1 and start_time is not None:
-                periods.append((start_time, time))
-                start_time = None
+        single_periods = [
+            (window_measurement.time.item(idx), window_measurement.time.item(idx))
+            for idx in single_one
+        ]
 
-        if start_time is not None:
-            periods.append((window_measurement.time[-2], start_time))
+        blocked_one_edge = np.nonzero(edge_detection == 4)[0]
+        block_pairs = np.reshape(blocked_one_edge, (-1, 2))
+        block_periods = [
+            (window_measurement.time.item(idx[0]), window_measurement.time.item(idx[1]))
+            for idx in block_pairs
+        ]
+        all_periods = single_periods + block_periods
+        all_periods.sort()
 
-        return periods
+        return all_periods
