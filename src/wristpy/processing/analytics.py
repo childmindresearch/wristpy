@@ -3,7 +3,7 @@
 import abc
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 import polars as pl
@@ -20,8 +20,8 @@ class SleepWindow:
         wakeup: the predicted end time of the sleep window.
     """
 
-    onset: datetime
-    wakeup: datetime
+    onset: Union[datetime, List]
+    wakeup: Union[datetime, List]
 
 
 class AbstractSleepDetector(abc.ABC):
@@ -47,8 +47,8 @@ class AbstractSleepDetector(abc.ABC):
 class GGIRSleepDetection(AbstractSleepDetector):
     """Sleep Detection algorithm based on the GGIR method.
 
-    This class implements the GGIR method for sleep detection. The method uses the angle-z
-    data to find periods of sleep. It returns a list of SleepWindow objects.
+    This class implements the GGIR method for sleep detection. The method uses the
+    angle-z data to find periods of sleep. It returns a list of SleepWindow objects.
 
     Attributes:
         anglez (models.Measurement): The angle-z data, calculated from the calibrated
