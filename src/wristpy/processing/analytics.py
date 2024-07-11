@@ -89,21 +89,22 @@ class GGIRSleepDetection(AbstractSleepDetector):
         return sleep_onset_wakeup
 
     def _spt_window(
-        self, anglez_data: models.Measurement, threshold: float = 0.13
+        self, anglez_data: models.Measurement, threshold: float = 0.2
     ) -> models.Measurement:
         """Implement Heuristic distribution of z angle (HDCZA) for SPT window detection.
 
         This function finds the absolute difference of the anglez data over 5s windows.
         We find the 5-minute rolling median of that difference.
         Next, we find what that 5-minute median is below a specified threshold, taken as
-        the lower limit defined within the GGIR implementation of the HDCZA algorithm.
+        new default value from the GGIR implementation of the HDCZA algorithm.
         We then find long blocks (30 minutes) when the threshold criteria is met.
         Any gaps in SPT windows that are less than a specified window length
         (default 60 minutes) are filled.
 
         Args:
             anglez_data: the raw anglez data, calculated from calibrated acceleration.
-            threshold: the threshold for the distribution of z angle.
+            threshold: the threshold for the distribution of z angle, chosen as
+                0.2 based on new GGIR default.
 
         Returns:
             A Measurement instance with values set to 1 indicating identified
@@ -212,9 +213,6 @@ class GGIRSleepDetection(AbstractSleepDetector):
             if min_onset is not None and max_wakeup is not None:
                 sleep_windows.append(SleepWindow(onset=min_onset, wakeup=max_wakeup))
 
-        if not sleep_windows:
-            sleep_windows.append(SleepWindow(onset=[], wakeup=[]))
-
         return sleep_windows
 
     def _find_long_blocks(
@@ -249,10 +247,11 @@ class GGIRSleepDetection(AbstractSleepDetector):
     ) -> np.ndarray:
         """Helper function to fill gaps in SPT window that are less than 60 minutes.
 
-        We first find all the zeros in the sleep_idx_array, and then use np.diff to find
-        the gaps between those zeros, if np.diff !=0, that implies there is a gap
-        between 0s. We split slp_idx_array and find, and fill, the blocks that
-        are < gap_block.
+        We find the first non-zero in the sleep_idx_array, if there are none ,
+        we return the initial array.
+        We then iterate over the array and count every zero between ones
+        (skipping the first 1),
+        if that value is less than the gap_block, we fill in with ones.
 
         Args:
             sleep_idx_array: the array of SPT windows.
@@ -262,11 +261,22 @@ class GGIRSleepDetection(AbstractSleepDetector):
         Returns:
             A numpy array with 1s indicating the identified SPT windows.
         """
-        zeros_idx = np.where(sleep_idx_array == 0)[0]
-        n_blocks = np.split(zeros_idx, np.where(np.diff(zeros_idx) != 1)[0] + 1)
-        for block_idx, block in enumerate(n_blocks):
-            if block_idx != 0 and len(block) < (gap_block):
-                sleep_idx_array[block] = 1
+        n_zeros = 0
+        first_one_idx = next(
+            (index for index, value in enumerate(sleep_idx_array) if value), None
+        )
+        if first_one_idx is None:
+            return sleep_idx_array
+
+        for sleep_array_idx in range(first_one_idx, len(sleep_idx_array)):
+            sleep_value = sleep_idx_array[sleep_array_idx]
+            if not sleep_value:
+                n_zeros += 1
+                continue
+
+            if n_zeros < gap_block:
+                sleep_idx_array[sleep_array_idx - n_zeros : sleep_array_idx] = 1
+                n_zeros = 0
 
         return sleep_idx_array
 

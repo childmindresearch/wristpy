@@ -2,6 +2,7 @@
 
 import math
 from datetime import datetime, timedelta
+from typing import List
 
 import numpy as np
 import polars as pl
@@ -92,23 +93,33 @@ def test_find_periods(
     assert result == expected_result, f"Expected {expected_result}, but got {result}"
 
 
-@pytest.mark.parametrize("modifier", [0, 1])
-def test_spt_window(
-    sleep_detection: analytics.GGIRSleepDetection, modifier: int
-) -> None:
+def test_spt_window(sleep_detection: analytics.GGIRSleepDetection) -> None:
     """Test the _spt_window method."""
     half_long_block = 180
+    sleep_detection.anglez.measurements = np.zeros(
+        len(sleep_detection.anglez.measurements)
+    )
+    expected_length = int(len(sleep_detection.anglez.measurements) / 5) - 1
+    expected_result = np.ones(expected_length)
+    expected_result[0:half_long_block] = 0
+    expected_result[-(half_long_block - 1) :] = 0
+
+    result = sleep_detection._spt_window(sleep_detection.anglez)
+
+    assert np.array_equal(
+        result.measurements, expected_result
+    ), f"Expected {expected_result}, but got {result.measurements}"
+    assert np.array_equal(
+        len(result.time), expected_length
+    ), f"Expected {expected_length}, but got {len(result.time)}"
+
+
+def test_spt_window_null(sleep_detection: analytics.GGIRSleepDetection) -> None:
+    """Test the _spt_window method."""
     expected_length = int(len(sleep_detection.anglez.measurements) / 5) - 1
     expected_result = np.zeros(expected_length)
 
-    if modifier:
-        result = sleep_detection._spt_window(sleep_detection.anglez)
-    else:
-        sleep_detection.anglez.measurements = np.zeros(
-            len(sleep_detection.anglez.measurements)
-        )
-        expected_result[half_long_block:] = 1
-        result = sleep_detection._spt_window(sleep_detection.anglez)
+    result = sleep_detection._spt_window(sleep_detection.anglez)
 
     assert np.array_equal(
         result.measurements, expected_result
@@ -163,8 +174,5 @@ def test_run_sleep_detection(sleep_detection: analytics.GGIRSleepDetection) -> N
     """Test the full sleep detection process."""
     result = sleep_detection.run_sleep_detection()
 
-    assert isinstance(
-        result[0], analytics.SleepWindow
-    ), "result is not an instance of SleepWindow"
-    assert result[0].onset == []
-    assert result[0].wakeup == []
+    assert result == []
+    assert isinstance(result, List)
