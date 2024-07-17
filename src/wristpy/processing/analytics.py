@@ -356,21 +356,22 @@ def compute_physical_activty_categories(
     """Compute the physical activity categories based on the ENMO data.
 
     This function uses the enmo_epoch1 data (5s aggregated data) to compute three
-    physical activity levels, light, moderate, and vigorous.
+    physical activity levels: light, moderate, and vigorous.
 
     Args:
         enmo_epoch1: The enmo epoch1 data, as physical activity data should be computed
             on aggregated data.
         thresholds: The threshold values for the physical activity categories.
             The default values are
-                [light_threshold, moderate_threshold, vigorous_threshold].
+                (light_threshold, moderate_threshold, vigorous_threshold).
 
     Returns:
-        A Measurement instance with the physical activity categories,
-        temporal resolution is the same as enmo_epoch1.
+        A Measurement instance with the physical activity categories;
+        1 for light, 2 for moderate, 3 for vigorous. 0 represents inactivity.
+        The temporal resolution is the same as enmo_epoch1.
 
     Raises:
-        ValueError: If the threshold values are not ascending order.
+        ValueError: If the threshold values are not in ascending order.
     """
     if list(thresholds) != sorted(thresholds):
         raise ValueError("Thresholds must be in ascending order.")
