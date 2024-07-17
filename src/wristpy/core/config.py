@@ -1,8 +1,5 @@
 """Configuration module for wristpy."""
 
-import pathlib
-
-import pydantic
 import pydantic_settings
 
 

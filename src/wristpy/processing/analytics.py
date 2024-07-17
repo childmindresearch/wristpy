@@ -347,11 +347,11 @@ class GGIRSleepDetection(AbstractSleepDetector):
 
 def compute_physical_activty_categories(
     enmo_epoch1: models.Measurement,
-    thresholds: Tuple[float, float, float] = [
+    thresholds: Tuple[float, float, float] = (
         LIGHT_THRESHOLD,
         MODERATE_THRESHOLD,
         VIGOROUS_THRESHOLD,
-    ],
+    ),
 ) -> models.Measurement:
     """Compute the physical activity categories based on the ENMO data.
 
