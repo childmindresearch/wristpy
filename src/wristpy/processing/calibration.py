@@ -1,29 +1,47 @@
 """Calibrate accelerometer data."""
 
 import math
+import pdb
+from collections.abc import Generator
+from dataclasses import dataclass
 
 import numpy as np
-from sklearn import linear_model
+from sklearn import linear_model, metrics
 
 from wristpy.core import computations, models
 
 
 class SphereCriteriaError(Exception):
-    """Raises error when calibration fails due to sphere criteria."""
+    """Data did not meet the sphere criteria."""
 
-    def __init__(self) -> None:
-        """Initalize."""
-        self.message = "Calibration failed, data did not meet sphere criteria."
-        super().__init__(self.message)
+    pass
 
 
 class CalibrationError(Exception):
-    """Raises error when calibration error can not get below error tolerance."""
+    """Was not able to lower calibration below error threshold."""
 
-    def __init__(self) -> None:
-        """Init."""
-        self.message = "Calibration failed, error could not be sufficiently improved"
-        super().__init__(self.message)
+    pass
+
+
+class NoMotionError(Exception):
+    """No epochs with zero movement could be found in the data."""
+
+    pass
+
+
+@dataclass
+class LinearTransformation:
+    """Data class that contains scale and offset values for calibration.
+
+    Attributes:
+        scale: 3-element 1-D array of floats used to scale accelerameter data for
+            calibration. Each element corresponds to the scaling factor for each axis.
+        offset: 3-element 1-D array of floats used to offset accelerameter data for
+            calibration. Each element corresponds to the offset value for each axis.
+    """
+
+    scale: np.ndarray
+    offset: np.ndarray
 
 
 class Calibration:
@@ -36,23 +54,14 @@ class Calibration:
 
 
     Attributes:
-            chunked (bool, optional): If true will preform calibration on subsets of
-            data if false will calibrate on entire dataset.
-
-            min_acceleration (float,optional): Minimum acceleration for sphere criteria.
-
-            min_calibration_hours (int,optional): Minimum hours of data required for
-            calibration.
-
-            min_standard_deviation (float,optional): Minimum standard deviation for
-            no-motion detection.
-
-            max_iterations (int,optional): Maximum number of iterations for
-            optimization.
-
-            error_tolerance (float,optional): Tolerance for optimization convergence.
-
-            min_calibration_error (float,optional): Threshold for calibration error.
+            chunked: If true will preform calibration on subsets of data if false will
+                calibrate on entire dataset.
+            min_acceleration: Minimum acceleration for sphere criteria.
+            min_calibration_hours: Minimum hours of data required for calibration.
+            min_standard_deviation: Minimum standard deviation for no-motion detection.
+            max_iterations: Maximum number of iterations for optimization.
+            error_tolerance: Tolerance for optimization convergence.
+            min_calibration_error: Threshold for calibration error.
 
     """
 
@@ -69,39 +78,33 @@ class Calibration:
         """Initializes class.
 
         Attributes:
-            chunked (bool): Determines if either entire dataset will be used, or if
-            calibration will be attempted with a subset of the data. Set to false by
-            default, when true will initiate _chunked_calibration from the run() method
-            instead of standard _calibration.
-
-            min_acceleration (float): The value on either side of 0g for each axis.
-            Determines if sphere is sufficiently populated to obtain meaningful
-            calibration result. Default is 0.3g.
-
-            min_calibration_hours (int): The minimum amount of data in hours needed to
-            preform calibration. Default is 72. If chunked calibration is selected this
-            will be the size of the initial subset taken for calibration. If error has
-            not been reduced below the min_calibration_error value, an additional 12
-            hours will be taken until all data is used or calibration is successful.
-
-            min_standard_deviation (float): The standard deviation critieria used to
-            select portions of the data with no movement. Rolling windows with standard
-            deviations below this value will be determined as "still". This value is
-            likely to be different between devices. Default is 0.013g. This value was
-            determined just above the empirically derived  baseline standard deviation
-            due to noise (0.010g)(van Hees et al. 2014). If measuring the noise in a
-            bench-top test, this threshold should be about `1.2 * noise`.
-
-            max_iterations (int): The maximum amount of iterations for the
-            closest_point_fit method. Default is 1000, generally should be left at this
-            value.
-
-            error_tolerance (float): Tolerated level of error, when the
-            closest_point_fit method arrives at this value or better, the process ends.
-            Default is 1e-10. Generally should be left at this value.
-
-            min_calibration_error (float): Minimum acceptable error. If calibration can
-            not reach this threshold it will error.
+            chunked: Determines if either entire dataset will be used, or if
+                calibration will be attempted with a subset of the data. Set to false by
+                default, when true will initiate _chunked_calibration from the run()
+                method instead of standard _calibration.
+            min_acceleration: The value on either side of 0g for each axis.
+                Determines if sphere is sufficiently populated to obtain meaningful
+                calibration result. Default is 0.3g.
+            min_calibration_hours: The minimum amount of data in hours needed to
+                preform calibration. Default is 72. If chunked calibration is selected
+                this will be the size of the initial subset taken for calibration. If
+                error has not been reduced below the min_calibration_error value, an
+                additional 12 hours will be taken until all data is used or calibration
+                is successful.
+            min_standard_deviation: The standard deviation critieria used to select
+                portions of the data with no movement. Rolling windows with standard
+                deviations below this value will be determined as "still". This value is
+                likely to be different between devices. Default is 0.013g. This value
+                was determined just above the empirically derived  baseline standard
+                deviation due to noise (0.010g)(van Hees et al. 2014). If measuring the
+                noise in a bench-top test, this threshold should be about `1.2 * noise`.
+            max_iterations: The maximum amount of iterations for the closest_point_fit
+                method. Default is 1000, generally should be left at this value.
+            error_tolerance: Tolerated level of error, when the
+                closest_point_fit method arrives at this value or better, the process
+                ends. Default is 1e-10. Generally should be left at this value.
+            min_calibration_error: Minimum acceptable error. If calibration can
+                not reach this threshold it will error.
 
         Returns:
             None
@@ -113,7 +116,6 @@ class Calibration:
         self.max_iterations = max_iterations
         self.error_tolerance = error_tolerance
         self.min_calibration_error = min_calibration_error
-        self.current_iteration = 0
 
     def run(self, acceleration: models.Measurement) -> models.Measurement:
         """Runs calibration on acceleration data based on settings.
@@ -129,22 +131,20 @@ class Calibration:
         calibrated models.Measurement object.
 
         Args:
-            acceleration(Measurement): the accelerometer data containing x,y,z axis
-            data and time stamps.
+            acceleration: the accelerometer data containing x,y,z axis
+                data and time stamps.
 
         Returns:
             A Measurement object that contains the calibrated acceleration data.
 
         Raises:
             ValueError: If the acceleration data does not meet the specified minimum
-            hours of data as given by min_calibration_hours.
-
+                hours of data as given by min_calibration_hours.
             SphereCriteriaError: If the sphere is not sufficiently populated, i.e. every
-            axis does not have at least 1 value both above and below  the + and - value
-            of min_acceleraiton.
-
+                axis does not have at least 1 value both above and below  the + and
+                - value of min_acceleraiton.
             CalibrationError: If the calibration process fails to get below the
-            `min_calibration_error` threshold.
+                `min_calibration_error` threshold.
         """
         data_range = acceleration.time.max() - acceleration.time.min()
         total_hours = math.ceil(data_range.total_seconds() / 3600)
@@ -156,13 +156,13 @@ class Calibration:
             )
 
         if self.chunked:
-            linear_trans = self._chunked_calibration(acceleration=acceleration)
+            linear_transformation = self._chunked_calibration(acceleration=acceleration)
         else:
-            linear_trans = self._calibrate(acceleration=acceleration)
+            linear_transformation = self._calibrate(acceleration=acceleration)
 
         calibrated_acceleration = (
-            acceleration.measurements * linear_trans["scale"]
-        ) + linear_trans["offset"]
+            acceleration.measurements * linear_transformation.scale
+        ) + linear_transformation.offset
 
         return models.Measurement(
             measurements=calibrated_acceleration, time=acceleration.time
@@ -170,7 +170,7 @@ class Calibration:
 
     def _chunked_calibration(
         self, acceleration: models.Measurement
-    ) -> dict[str, np.ndarray]:
+    ) -> LinearTransformation:
         """Chunks the data into subsets, to calibrate on smaller sections of data.
 
         The first chunk is determined by the min_calibration_hours. Should calibration
@@ -179,63 +179,58 @@ class Calibration:
         Chunks are added in increments of 12 hours.
 
         Args:
-            acceleration (Measurement): the accelerometer data containing x,y,z axis
-            data and time stamps.
+            acceleration: the accelerometer data containing x,y,z axis
+                data and time stamps.
 
         Returns:
-            A dictionary with type str: ndarray. Contains two keys labeled `scale` and
-            `offset`.
+            A LinearTransformation object with scale and offset attributes to be applied
+            to acceleration data for calibration.
 
         Raises:
             CalibrationError: If all possible chunks have been used and the calibration
-            process fails to get below the `min_calibration_error` threshold.
+                process fails to get below the `min_calibration_error` threshold.
         """
-        chunk_num = 0
-        finished = False
-
-        while not finished:
-            subset = self._take_chunk(acceleration=acceleration, chunk_num=chunk_num)
-            if len(acceleration.measurements) == len(subset.measurements):
-                finished = True
-
+        for chunk in self._get_chunk:
             try:
-                return self._calibrate(subset)
-            except (SphereCriteriaError, CalibrationError, ValueError):
-                chunk_num += 1
+                return self._calibrate(chunk)
+            except (SphereCriteriaError, CalibrationError, NoMotionError):
+                pass
+        raise CalibrationError(
+            message="After all chunks of data used calibration has failed."
+        )
 
-        raise CalibrationError
-
-    def _take_chunk(
-        self, acceleration: models.Measurement, chunk_num: int
-    ) -> models.Measurement:
-        """Takes the next chunk based on the chunk number.
+    def _get_chunk(
+        self, acceleration: models.Measurement
+    ) -> Generator[models.Measurement, None, None]:
+        """Takes a subset of acceleration data to be used for calibration.
 
         Args:
-            acceleration (Measurement): the accelerometer data containing x,y,z axis
-            data and time stamps.
-
-            chunk_num (int): the current 12 hour chunk iteration being taken.
+            acceleration: the accelerometer data containing x,y,z axis
+                data and time stamps.
 
         Returns:
-            The minimum hours of accelerometer data and 12 * chunk_num hours of data.
+            The minimum hours of accelerometer data + additional 12 hour chunks of data
+            everytime the generator function is called.
 
         """
         sampling_rate = self._get_sampling_rate(acceleration=acceleration)
         min_samples = int(self.min_calibration_hours * 3600 * sampling_rate)
         chunk_size = int(12 * 3600 * sampling_rate)
-
         total_samples = len(acceleration.measurements)
-        current_sample = min_samples + (chunk_num * chunk_size)
+        if min_samples == total_samples:
+            sample_indices = [total_samples]
+        else:
+            sample_indices = list(range(min_samples, total_samples, chunk_size))
+            if sample_indices[-1] != total_samples:
+                sample_indices += [total_samples]
 
-        if current_sample > total_samples:
-            current_sample = total_samples
+        for idx in sample_indices:
+            yield models.Measurement(
+                measurements=acceleration.measurements[:idx, :],
+                time=acceleration.time[:idx],
+            )
 
-        return models.Measurement(
-            measurements=acceleration.measurements[:current_sample, :],
-            time=acceleration.time[:current_sample],
-        )
-
-    def _calibrate(self, acceleration: models.Measurement) -> dict[str, np.ndarray]:
+    def _calibrate(self, acceleration: models.Measurement) -> LinearTransformation:
         """Calibrates data and returns scale and offset values.
 
         The acceleration data is processed by the _extract_no_motion function, which
@@ -250,23 +245,23 @@ class Calibration:
         calibration error.
 
         Args:
-            acceleration (Measurement): the accelerometer data containing x,y,z axis
-            data and time stamps.
+            acceleration: the accelerometer data containing x,y,z axis
+                data and time stamps.
 
         Returns:
-            A dictionary with type str: ndarray. Contains two keys labeled `scale` and
-            `offset`.
+            A LinearTransformation object with scale and offset attributes to be applied
+            to acceleration data for calibration.
 
         Raises:
             CalibrationError: If the calibration process fails to converge or the final
-            error exceeds the `min_calibration_error` threshold.
+                error exceeds the `min_calibration_error` threshold.
         """
         no_motion_data = self._extract_no_motion(acceleration=acceleration)
-        linear_tranformation = self._closest_point_fit(no_motion_data=no_motion_data)
+        linear_transformation = self._closest_point_fit(no_motion_data=no_motion_data)
 
         no_motion_calibrated = (
-            no_motion_data * linear_tranformation["scale"]
-        ) + linear_tranformation["offset"]
+            no_motion_data * linear_transformation.scale
+        ) + linear_transformation.offset
 
         cal_error_initial = np.round(
             np.mean(abs(np.linalg.norm(no_motion_data, axis=1) - 1)), decimals=5
@@ -275,30 +270,44 @@ class Calibration:
             np.mean(abs(np.linalg.norm(no_motion_calibrated, axis=1) - 1)), decimals=5
         )
 
-        if (cal_error_end >= cal_error_initial) or (
+        if (cal_error_end > cal_error_initial) or (
             cal_error_end >= self.min_calibration_error
         ):
-            raise CalibrationError
+            raise CalibrationError(
+                "Calibration error could not be sufficiently minimized."
+                f"Initial Error: {cal_error_initial}, Final Error: {cal_error_end},"
+                f"Error threshold: {self.min_calibration_error}"
+            )
 
-        return linear_tranformation
+        return linear_transformation
 
     def _extract_no_motion(self, acceleration: models.Measurement) -> np.ndarray:
         """Identifies areas of stillness using standard deviation and mean.
 
+        The function first takes a moving standard deviation and a moving mean of the
+        acceleration data in 10 second epochs. These ndarrays are then used to identify
+        the portions of the data that have a standard deviation below
+        min_standard_deviation and a mean value < 2. These epochs are determined to be
+        the periods where the accelerometer was influenced by no motion beyond the
+        force of gravity. Secondly, we check that each axis has at least 1 value above
+        the +min_acceleration and one value below the -min_acceleration. If this check
+        is passed it gives us confidence that the sphere constituted by these data  is
+        sufficiently populated to later fit to the idealized unit sphere.
+
         Args:
-            acceleration (Measurement): the accelerometer data containing x,y,z axis
-            data and time stamps.
+            acceleration: the accelerometer data containing x,y,z axis
+                data and time stamps.
 
         Returns:
             an ndarray containing the accelerometer data determined to have no motion.
 
         Raises"
-            ValueError: If no portions of data meet no motion criteria as defined by
-            no_motion_check.
+            NoMotionError: If no portions of data meet no motion criteria as defined by
+                no_motion_check.
 
             SphereCriteriaError: If the sphere is not sufficiently populated, i.e. every
-            axis does not have at least 1 value both above and below  the + and - value
-            of min_acceleraiton.
+                axis does not have at least 1 value both above and below  the + and
+                - value of min_acceleraiton.
         """
         moving_sd = computations.moving_std(acceleration, 10)
         moving_mean = computations.moving_mean(acceleration, 10)
@@ -310,20 +319,13 @@ class Calibration:
         no_motion_data = moving_mean.measurements[no_motion_check]
 
         if no_motion_data.shape[0] == 0:
-            raise ValueError(
+            raise NoMotionError(
                 "Zero non-motion epochs found. Data did not meet criteria."
             )
 
-        sphere_criteria_check = np.sum(
-            (no_motion_data.min(axis=0) < -self.min_acceleration)
-            & (no_motion_data.max(axis=0) > self.min_acceleration)
-        )
-        if sphere_criteria_check != 3:
-            raise SphereCriteriaError
-        else:
-            return no_motion_data
+        return no_motion_data
 
-    def _closest_point_fit(self, no_motion_data: np.ndarray) -> dict[str, np.ndarray]:
+    def _closest_point_fit(self, no_motion_data: np.ndarray) -> LinearTransformation:
         """Applies closest point fit to no motion data to calibrated accelerometer data.
 
         This method implements an iterative algorithm that finds the optimal scale and
@@ -333,12 +335,12 @@ class Calibration:
         values for the X,Y,Z axis under the effects of exactly 1g (earth's gravity).
 
         Args:
-            no_motion_data (np.ndarray): The acceleration data during periods of no
-            motion, in order to determine scale and offset.
+            no_motion_data: The acceleration data during periods of no
+                motion, in order to determine scale and offset.
 
         Returns:
-            A dictionary with type str: ndarray. Contains two keys labeled `scale` and
-            `offset`.
+            A LinearTransformation object with scale and offset attributes to be applied
+            to acceleration data for calibration.
         """
         weights = np.ones(no_motion_data.shape[0]) * 100
         residual = [np.Inf]
@@ -381,14 +383,22 @@ class Calibration:
             ):
                 break
 
-        return {"scale": scale, "offset": offset}
+        sphere_criteria_check = np.all(
+            (current.min(axis=0) < -self.min_acceleration)
+            & (current.max(axis=0) > self.min_acceleration)
+        )
+        if sphere_criteria_check:
+            return LinearTransformation(scale=scale, offset=offset)
+        raise SphereCriteriaError(
+            "Did not meet criteria to sufficnetly populate sphere"
+        )
 
     def _get_sampling_rate(self, acceleration: models.Measurement) -> int:
         """Get the sampling rate.
 
         Args:
-            acceleration (Measurement): the accelerometer data containing x,y,z axis
-            data and time stamps.
+            acceleration: the accelerometer data containing x,y,z axis
+                data and time stamps.
 
         Returns:
             sampling rate in Hz.
