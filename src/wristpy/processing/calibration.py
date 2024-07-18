@@ -385,9 +385,6 @@ class Calibration:
         for _ in range(self.max_iterations):
             current = (no_motion_data * scale) + offset
             closest_point = current / np.linalg.norm(current, axis=1, keepdims=True)
-
-            if np.any(np.isinf(current)):
-                raise
             linear_regression_model.fit(current, closest_point, sample_weight=weights)
             offset_change = linear_regression_model.intercept_
             scale_change = np.diag(linear_regression_model.coef_)
