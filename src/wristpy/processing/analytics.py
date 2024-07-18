@@ -8,7 +8,12 @@ from typing import List, Tuple, Union
 import numpy as np
 import polars as pl
 
-from wristpy.core import computations, models
+from wristpy.core import computations, config, models
+
+settings = config.Settings()
+LIGHT_THRESHOLD = settings.LIGHT_THRESHOLD
+MODERATE_THRESHOLD = settings.MODERATE_THRESHOLD
+VIGOROUS_THRESHOLD = settings.VIGOROUS_THRESHOLD
 
 
 @dataclass
@@ -338,3 +343,51 @@ class GGIRSleepDetection(AbstractSleepDetector):
         all_periods.sort()
 
         return all_periods
+
+
+def compute_physical_activty_categories(
+    enmo_epoch1: models.Measurement,
+    thresholds: Tuple[float, float, float] = (
+        LIGHT_THRESHOLD,
+        MODERATE_THRESHOLD,
+        VIGOROUS_THRESHOLD,
+    ),
+) -> models.Measurement:
+    """Compute the physical activity categories based on the ENMO data.
+
+    This function uses the enmo_epoch1 data (5s aggregated data) to compute three
+    physical activity levels: light, moderate, and vigorous.
+
+    Args:
+        enmo_epoch1: The enmo epoch1 data, as physical activity data should be computed
+            on aggregated data.
+        thresholds: The threshold values for the physical activity categories.
+            The default values are
+                (light_threshold, moderate_threshold, vigorous_threshold).
+
+    Returns:
+        A Measurement instance with the physical activity categories;
+        1 for light, 2 for moderate, 3 for vigorous. 0 represents inactivity.
+        The temporal resolution is the same as enmo_epoch1.
+
+    Raises:
+        ValueError: If the threshold values are not in ascending order.
+    """
+    if list(thresholds) != sorted(thresholds):
+        raise ValueError("Thresholds must be in ascending order.")
+
+    activity_levels = (
+        (
+            (thresholds[0] < enmo_epoch1.measurements)
+            & (enmo_epoch1.measurements <= thresholds[1])
+        )
+        * 1
+        + (
+            (thresholds[1] < enmo_epoch1.measurements)
+            & (enmo_epoch1.measurements <= thresholds[2])
+        )
+        * 2
+        + (enmo_epoch1.measurements > thresholds[2]) * 3
+    )
+
+    return models.Measurement(measurements=activity_levels, time=enmo_epoch1.time)
