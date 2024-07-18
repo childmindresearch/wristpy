@@ -28,9 +28,9 @@ The package currently supports the following formats:
 
 - GGIR Calibration: Applies the GGIR calibration procedure to raw accelerometer data.
 - Metrics Calculation: Calculates various metrics on the calibrated data, namely ENMO (euclidean norm , minus one) and angle-Z (angle of acceleration relative to the *x-y* axis).
-- Physical activity levels: 
-- Non-wear detection
-- Sleep Detection
+- Physical activity levels: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. 
+- Non-wear detection: We find periods of non-wear based on the acceleration data. 
+- Sleep Detection: Using the HDCZ and HSPT algorithms to analyze changes in arm angle to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.
 
 
 ## Installation
