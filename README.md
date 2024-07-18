@@ -1,25 +1,36 @@
 [![DOI](https://zenodo.org/badge/657341621.svg)](https://zenodo.org/doi/10.5281/zenodo.10383685)
 
-# Wristpy: Wrist-Worn Accelerometer Data Processing
+# Wristpy: Wrist-Worn Accelerometer Data Processing <img src="logo.png" align="right" width="25%"/>
 
 
 
-[![Build](https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml?query=branch%3Amain)
-[![codecov](https://codecov.io/gh/childmindresearch/wristpy/branch/main/graph/badge.svg?token=22HWWFWPW5)](https://codecov.io/gh/childmindresearch/wristpy)
+
+[![Build](https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml/badge.svg?branch=development)](https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml?query=branch%3Amain)
+[![codecov](https://codecov.io/gh/childmindresearch/wristpy/branch/development/graph/badge.svg?token=22HWWFWPW5)](https://codecov.io/gh/childmindresearch/wristpy)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
 [![LGPL--2.1 License](https://img.shields.io/badge/license-LGPL--2.1-blue.svg)](https://github.com/childmindresearch/wristpy/blob/main/LICENSE)
 [![pages](https://img.shields.io/badge/api-docs-blue)](https://childmindresearch.github.io/wristpy)
 
-Welcome to wristpy, a Python library designed for processing and analyzing wrist-worn accelerometer data. This library provides a set of tools for calibrating raw accelerometer data, calculating physical activity metrics (ENMO derived) and sleep metrics (angle-Z derived), finding non-wear periods, and proividing the additional available metadata (temperature, lux, battery voltage, etc.). 
+Welcome to wristpy, a Python library designed for processing and analyzing wrist-worn accelerometer data. This library provides a set of tools for calibrating raw accelerometer data, calculating physical activity metrics (ENMO derived) and sleep metrics (angle-Z derived), finding non-wear periods, and detecing sleep periods (onset and wakeup times). Additionally, we provide access to other sensor dat that may be recorded by the watch, including; temperature, luminosity, capacitive sensing, battery voltage, and all metadata.
+
+## Supported formats & devices
+
+The package currently supports the following formats:
+
+| Format | Manufacturer | Device | Implementation status |
+| --- | --- | --- | --- |
+| GT3X | Actigraph | wGT3X-BT | ✅ |
+| BIN | GENEActiv | GENEActiv | ✅ |
 
 
 ## Features
 
 - GGIR Calibration: Applies the GGIR calibration procedure to raw accelerometer data.
-- Non-Movement Identification: Identifies periods of non-movement based on a rolling standard deviation threshold.
 - Metrics Calculation: Calculates various metrics on the calibrated data, namely ENMO (euclidean norm , minus one) and angle-Z (angle of acceleration relative to the *x-y* axis).
-- All metrics and raw data are provided in an output class, with the calculated metrics downsampled to a fixed epoch resolution of 5s.
+- Physical activity levels: 
+- Non-wear detection
+- Sleep Detection
 
 
 ## Installation
@@ -44,44 +55,39 @@ Here is an example on how to use wristpy to process .gt3x files collected from A
 
 #loading the prerequisite modules
 import wristpy
-from wristpy.common.data_model import OutputData
-from wristpy.io.loaders import gt3x
-from wristpy.ggir import calibration, metrics_calc
+from wristpy.core import computations
+from wristpy.io.readers import readers
+from wristpy.processing import metrics, analytics
 
 #set the paths to the raw data and the desired output path
-file_name = '/path/to/your/file.gt3x'
+file_path = '/path/to/your/file.gt3x'
 output_path = '/path/to/your/output/file.csv'
-test_config = wristpy.common.data_model.Config(file_name, output_path)
+
 
 #load the acceleration data
-test_data = gt3x.load_fast(test_config.path_input)
+test_data = readers.read_watch_data(file_path)
 
 #calibrate the data
-test_output = calibration.start_ggir_calibration(test_data)
+calibrator = calibration.Calibration()
+calibrated_data = calibrator.run(test_data.acceleration)
 
-#compute some desired metrics
-metrics_calc.calc_base_metrics(test_output)
-metrics_calc.calc_epoch1_metrics(test_output)
-metrics_calc.calc_epoch1_raw(test_output)
-metrics_calc.set_nonwear_flag(test_output, 900)
-metrics_calc.calc_epoch1_light(test_data, test_output)
-metrics_calc.calc_epoch1_battery(test_data, test_output)
-output_data_csv = pl.DataFrame(
-        {
-            "time": test_output.time_epoch1,
-            "X": test_output.accel_epoch1["X_mean"],
-            "Y": test_output.accel_epoch1["Y_mean"],
-            "Z": test_output.accel_epoch1["Z_mean"],
-            "enmo": test_output.enmo_epoch1,
-            "anglez": test_output.anglez_epoch1,
-            "Non-wear Flag": test_output.non_wear_flag_epoch1,
-            "light": test_output.lux_epoch1,
-            "battery voltage": test_output.battery_upsample_epoch1,
-        }
-    )
+#Compute some metrics and get epoch1 data
+enmo = metrics.euclidean_norm_minus_one(calibrated_data)
+anglez = metrics.angle_relative_to_horizontal(test_data_geneactiv.acceleration)
 
-#save the output to .csv
-output_data_csv.write_csv(output_file_path)
+enmo_epoch1 = computations.moving_mean(enmo)
+anglez_epoch1 = computations.moving_mean(anglez)
+
+#Find sleep windows
+sleep_detector_class = analytics.GGIRSleepDetection(anglez)
+sleep_windows = sleep_detector_class.run_sleep_detection()
+
+#Find non-wear periods
+non_wear_array =  metrics.detect_nonwear(calibrated_data, 900,4, 0.1,0.5)
+
+#Get activity levels
+activity_measurement = analytics.compute_physical_activty_categories(enmo_epoch1)
+
 ```
 
 ## Links or References
