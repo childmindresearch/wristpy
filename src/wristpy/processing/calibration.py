@@ -1,11 +1,11 @@
 """Calibrate accelerometer data."""
 
 import math
-import pdb
 from collections.abc import Generator
 from dataclasses import dataclass
 
 import numpy as np
+import polars as pl
 from sklearn import linear_model, metrics
 
 from wristpy.core import computations, models
@@ -25,6 +25,12 @@ class CalibrationError(Exception):
 
 class NoMotionError(Exception):
     """No epochs with zero movement could be found in the data."""
+
+    pass
+
+
+class ZeroScaleError(Exception):
+    """Scale value went to zero."""
 
     pass
 
@@ -147,7 +153,7 @@ class Calibration:
                 `min_calibration_error` threshold.
         """
         data_range = acceleration.time.max() - acceleration.time.min()
-        total_hours = math.ceil(data_range.total_seconds() / 3600)
+        total_hours = math.floor(data_range.total_seconds() / 3600)
 
         if total_hours < self.min_calibration_hours:
             raise ValueError(
@@ -190,14 +196,12 @@ class Calibration:
             CalibrationError: If all possible chunks have been used and the calibration
                 process fails to get below the `min_calibration_error` threshold.
         """
-        for chunk in self._get_chunk:
+        for chunk in self._get_chunk(acceleration):
             try:
                 return self._calibrate(chunk)
             except (SphereCriteriaError, CalibrationError, NoMotionError):
                 pass
-        raise CalibrationError(
-            message="After all chunks of data used calibration has failed."
-        )
+        raise CalibrationError("After all chunks of data used calibration has failed.")
 
     def _get_chunk(
         self, acceleration: models.Measurement
@@ -213,7 +217,7 @@ class Calibration:
             everytime the generator function is called.
 
         """
-        sampling_rate = self._get_sampling_rate(acceleration=acceleration)
+        sampling_rate = Calibration._get_sampling_rate(timestamps=acceleration.time)
         min_samples = int(self.min_calibration_hours * 3600 * sampling_rate)
         chunk_size = int(12 * 3600 * sampling_rate)
         total_samples = len(acceleration.measurements)
@@ -255,6 +259,12 @@ class Calibration:
         Raises:
             CalibrationError: If the calibration process fails to converge or the final
                 error exceeds the `min_calibration_error` threshold.
+
+        References:
+            van Hees VT, Fang Z, Langford J, et al. Autocalibration of accelerometer
+            data for free-living physical activity assessment using local gravity
+            and temperature: an evaluation on four continents. J Appl Physiol (1985)
+            2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
         """
         no_motion_data = self._extract_no_motion(acceleration=acceleration)
         linear_transformation = self._closest_point_fit(no_motion_data=no_motion_data)
@@ -289,10 +299,8 @@ class Calibration:
         the portions of the data that have a standard deviation below
         min_standard_deviation and a mean value < 2. These epochs are determined to be
         the periods where the accelerometer was influenced by no motion beyond the
-        force of gravity. Secondly, we check that each axis has at least 1 value above
-        the +min_acceleration and one value below the -min_acceleration. If this check
-        is passed it gives us confidence that the sphere constituted by these data  is
-        sufficiently populated to later fit to the idealized unit sphere.
+        force of gravity. If periods of no motion are found, the ndarray is returned,
+        to be fit to the idealized unit sphere for the purposes of calibration
 
         Args:
             acceleration: the accelerometer data containing x,y,z axis
@@ -301,24 +309,25 @@ class Calibration:
         Returns:
             an ndarray containing the accelerometer data determined to have no motion.
 
-        Raises"
+        Raises:
             NoMotionError: If no portions of data meet no motion criteria as defined by
                 no_motion_check.
 
-            SphereCriteriaError: If the sphere is not sufficiently populated, i.e. every
-                axis does not have at least 1 value both above and below  the + and
-                - value of min_acceleraiton.
+        References:
+            van Hees VT, Fang Z, Langford J, et al. Autocalibration of accelerometer
+            data for free-living physical activity assessment using local gravity
+            and temperature: an evaluation on four continents. J Appl Physiol (1985)
+            2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
         """
         moving_sd = computations.moving_std(acceleration, 10)
         moving_mean = computations.moving_mean(acceleration, 10)
-
         no_motion_check = np.all(
             moving_sd.measurements < self.min_standard_deviation, axis=1
         ) & np.all(np.abs(moving_mean.measurements) < 2, axis=1)
 
         no_motion_data = moving_mean.measurements[no_motion_check]
 
-        if no_motion_data.shape[0] == 0:
+        if not np.any(no_motion_data):
             raise NoMotionError(
                 "Zero non-motion epochs found. Data did not meet criteria."
             )
@@ -329,10 +338,11 @@ class Calibration:
         """Applies closest point fit to no motion data to calibrated accelerometer data.
 
         This method implements an iterative algorithm that finds the optimal scale and
-        offset for calibrating accelerometer data. The ndarray it acts on are the
+        offset for calibrating accelerometer data. The ndarray it processes contains the
         periods of "no motion" identified by the _extract_no_motion method. This data is
-        then fit to a unit sphere, the surface of which represents all the possible
-        values for the X,Y,Z axis under the effects of exactly 1g (earth's gravity).
+        then fit to an idealized unit sphere which represents the accelerometer data
+        under noiseless conditions. The scale and offset derived from this process are
+        used to calibrate our data along each axis.
 
         Args:
             no_motion_data: The acceleration data during periods of no
@@ -341,69 +351,83 @@ class Calibration:
         Returns:
             A LinearTransformation object with scale and offset attributes to be applied
             to acceleration data for calibration.
+
+        Raises:
+            SphereCriteriaError: If the sphere is not sufficiently populated, i.e. every
+                axis does not have at least 1 value both above and below  the + and
+                - value of min_acceleraiton.
+            ZeroScaleError: Numerical instability inherent to the algorithm may cause
+                values of the scale vector to tend toward zero under certain conditions.
+                This will cause calibration to fail.
+
+        References:
+            van Hees VT, Fang Z, Langford J, et al. Autocalibration of accelerometer
+            data for free-living physical activity assessment using local gravity
+            and temperature: an evaluation on four continents. J Appl Physiol (1985)
+            2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
         """
+        sphere_criteria_check = np.all(
+            (no_motion_data.min(axis=0) < -self.min_acceleration)
+            & (no_motion_data.max(axis=0) > self.min_acceleration)
+        )
+        if not sphere_criteria_check:
+            raise SphereCriteriaError(
+                "Did not meet criteria to sufficnetly populate sphere"
+            )
+
         weights = np.ones(no_motion_data.shape[0]) * 100
-        residual = [np.Inf]
+        previous_residual = np.Inf
 
         linear_regression_model = linear_model.LinearRegression()
 
         offset = np.zeros(3)
         scale = np.ones(3)
-        for iteration in range(self.max_iterations):
+        for _ in range(self.max_iterations):
             current = (no_motion_data * scale) + offset
             closest_point = current / np.linalg.norm(current, axis=1, keepdims=True)
-            offset_change = np.zeros(3)
-            scale_change = np.ones(3)
 
-            for axis in range(3):
-                x_ = current[:, axis].reshape(-1, 1)
-                tmp_y = closest_point[:, axis].reshape(-1, 1)
-                linear_regression_model.fit(x_, tmp_y, sample_weight=weights)
+            if np.any(np.isinf(current)):
+                raise
+            linear_regression_model.fit(current, closest_point, sample_weight=weights)
+            offset_change = linear_regression_model.intercept_
+            scale_change = np.diag(linear_regression_model.coef_)
 
-                offset_change[axis] = linear_regression_model.intercept_[0]
-                scale_change[axis] = linear_regression_model.coef_[0, 0]
-                current[:, axis] = (x_ @ linear_regression_model.coef_).flatten()
-
-            scale = np.where(scale_change == 0, 1e-8, scale_change) * scale
-            offset = offset_change + (offset / scale)
-
-            residual.append(
-                3
-                * np.mean(
-                    weights[:, None] * (current - closest_point) ** 2 / weights.sum()
+            if np.all((scale * scale_change) == 0):
+                raise ZeroScaleError(
+                    """Calibration has failed as a result of zero scale values."""
                 )
+
+            scale *= scale_change
+            offset += offset_change / scale
+
+            residual = 0.03 * metrics.mean_squared_error(
+                current, closest_point, sample_weight=weights
             )
+
             weights = np.minimum(
                 1 / np.linalg.norm(current - closest_point, axis=1), 100
             )
 
-            if (
-                abs(residual[iteration] - residual[iteration - 1])
-                < self.error_tolerance
-            ):
+            if abs(residual - previous_residual) < self.error_tolerance:
                 break
 
-        sphere_criteria_check = np.all(
-            (current.min(axis=0) < -self.min_acceleration)
-            & (current.max(axis=0) > self.min_acceleration)
-        )
-        if sphere_criteria_check:
-            return LinearTransformation(scale=scale, offset=offset)
-        raise SphereCriteriaError(
-            "Did not meet criteria to sufficnetly populate sphere"
-        )
+            previous_residual = residual
 
-    def _get_sampling_rate(self, acceleration: models.Measurement) -> int:
+        return LinearTransformation(scale=scale, offset=offset)
+
+    @staticmethod
+    def _get_sampling_rate(timestamps: pl.Series) -> int:
         """Get the sampling rate.
 
         Args:
-            acceleration: the accelerometer data containing x,y,z axis
-                data and time stamps.
+            timestamps: polars series of datetime objects representing the time points
+            of each sample in the acceleration data.
 
         Returns:
             sampling rate in Hz.
         """
-        sampling_rate = acceleration.time.len() / round(
-            (acceleration.time.max() - acceleration.time.min()).total_seconds()
+        sampling_rate = timestamps.len() / round(
+            (timestamps.max() - timestamps.min()).total_seconds()  # type: ignore
         )
+
         return round(sampling_rate)
