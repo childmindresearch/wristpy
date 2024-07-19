@@ -71,7 +71,7 @@ calibrated_data = calibrator.run(test_data.acceleration)
 
 #Compute some metrics and get epoch1 data
 enmo = metrics.euclidean_norm_minus_one(calibrated_data)
-anglez = metrics.angle_relative_to_horizontal(test_data_geneactiv.acceleration)
+anglez = metrics.angle_relative_to_horizontal(calibrated_data)
 
 enmo_epoch1 = computations.moving_mean(enmo)
 anglez_epoch1 = computations.moving_mean(anglez)
