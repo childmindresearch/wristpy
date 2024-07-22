@@ -244,9 +244,9 @@ class Calibration:
         case we calibrate by finding offset and scale values that will most closely make
         the whole of our data lie along this unit sphere. This is done by the
         _closest_point_fit function. We then transform the data by applying the scale
-        and offset values we have found, and if the error has been sufficiently reduced
-        improved, these values are returned. If not calibration fails and raises a
-        calibration error.
+        and offset values we have found, and if the error has been sufficiently reduced,
+        these values are returned. If not calibration fails and raises a calibration
+        error.
 
         Args:
             acceleration: the accelerometer data containing x,y,z axis
@@ -389,7 +389,7 @@ class Calibration:
             offset_change = linear_regression_model.intercept_
             scale_change = np.diag(linear_regression_model.coef_)
 
-            if np.all((scale * scale_change) == 0):
+            if np.all((scale * scale_change) < 1e-8):
                 raise ZeroScaleError(
                     """Calibration has failed as a result of zero scale values."""
                 )
