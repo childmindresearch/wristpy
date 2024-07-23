@@ -6,7 +6,8 @@ from dataclasses import dataclass
 
 import numpy as np
 import polars as pl
-from sklearn import linear_model, metrics
+from sklearn import linear_model
+from sklearn import metrics as sklearn_metrics
 
 from wristpy.core import computations, models
 
@@ -397,7 +398,7 @@ class Calibration:
             scale *= scale_change
             offset += offset_change / scale
 
-            residual = 0.03 * metrics.mean_squared_error(
+            residual = 0.03 * sklearn_metrics.mean_squared_error(
                 current, closest_point, sample_weight=weights
             )
 
