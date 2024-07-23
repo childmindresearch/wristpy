@@ -373,7 +373,7 @@ class Calibration:
         )
         if not sphere_criteria_check:
             raise SphereCriteriaError(
-                "Did not meet criteria to sufficnetly populate sphere"
+                "Did not meet criteria to sufficiently populate sphere"
             )
 
         weights = np.ones(no_motion_data.shape[0]) * 100
