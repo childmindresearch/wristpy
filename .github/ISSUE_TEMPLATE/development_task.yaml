@@ -1,9 +1,6 @@
 name: Development Task
 description: This is a template for a development task
-# If you want to enable automatic linking to projects,
-# uncomment the following line and replace the project ID
-# with the ID of your project.
-# projects: ["childmindresearch/1"]
+projects: ["childmindresearch/5"]
 title: 'Task: '
 labels: [task]
 body:
