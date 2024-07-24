@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wristpy"
-version = "0.1.0"
+version = "0.0.1a0"
 description = "A beautiful description."
 authors = ["Florian Rupprecht <florian.rupprecht@childmind.org>"]
 license = "LGPL-2.1"

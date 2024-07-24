@@ -1,0 +1,49 @@
+
+name: Publish to PyPi
+
+permissions:
+  actions: write
+
+on:
+  workflow_run:
+    workflows: [Python Tests]
+    types:
+    - completed
+    branches:
+    - main
+
+jobs:
+  pypi-release:
+    name: PyPi Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version-file: pyproject.toml
+
+    - name: Skip if version did not change.
+      run: |
+        version_change=$(git diff -r HEAD^1 pyproject.toml | grep -E "^(\+|-)version =")
+        if [[ -z "$version_change" ]]; then
+          gh run cancel ${{ github.run_id }}
+          gh run watch ${{ github.run_id }}
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build package.
+      run: |
+        pipx install poetry
+        poetry install --only main
+        poetry build
+
+    - name: Publish to PyPi.
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_KEY }}
+        verbose: true
