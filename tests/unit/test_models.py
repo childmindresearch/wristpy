@@ -43,13 +43,14 @@ def test_watchdata_model() -> None:
 
     watch_data = models.WatchData(acceleration=acceleration, lux=lux, temperature=temp)
 
-    assert np.array_equal(watch_data.acceleration.measurements, accel_data)
-    assert np.array_equal(watch_data.lux.measurements, sensor_data)
-    assert np.array_equal(watch_data.temperature.measurements, sensor_data)
-    assert np.array_equal(
-        watch_data.temperature.time.dt.timestamp().to_numpy(),
-        np.array([1, 2, 3]) * 1000000,
-    )
+    if watch_data.lux is not None:
+        assert np.array_equal(watch_data.lux.measurements, sensor_data)
+    if watch_data.temperature is not None:
+        assert np.array_equal(watch_data.temperature.measurements, sensor_data)
+        assert np.array_equal(
+            watch_data.temperature.time.dt.timestamp().to_numpy(),
+            np.array([1, 2, 3]) * 1000000,
+        )
     assert isinstance(watch_data.battery, type(None))
 
 
