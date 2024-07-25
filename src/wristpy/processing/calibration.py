@@ -3,6 +3,8 @@
 import math
 from collections.abc import Generator
 from dataclasses import dataclass
+from datetime import datetime
+from typing import cast
 
 import numpy as np
 import polars as pl
@@ -153,7 +155,9 @@ class Calibration:
             CalibrationError: If the calibration process fails to get below the
                 `min_calibration_error` threshold.
         """
-        data_range = acceleration.time.max() - acceleration.time.min()
+        data_range = cast(datetime, acceleration.time.max()) - cast(
+            datetime, acceleration.time.min()
+        )
         total_hours = math.floor(data_range.total_seconds() / 3600)
 
         if total_hours < self.min_calibration_hours:
@@ -425,7 +429,9 @@ class Calibration:
             sampling rate in Hz.
         """
         sampling_rate = timestamps.len() / round(
-            (timestamps.max() - timestamps.min()).total_seconds()  # type: ignore
+            (
+                cast(datetime, timestamps.max()) - cast(datetime, timestamps.min())
+            ).total_seconds()
         )
 
         return round(sampling_rate)
