@@ -381,7 +381,7 @@ class Calibration:
             )
 
         weights = np.ones(no_motion_data.shape[0]) * 100
-        previous_residual = np.Inf
+        previous_residual = np.inf
 
         linear_regression_model = linear_model.LinearRegression()
 
