@@ -12,7 +12,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python_version: ['3.9', '3.10', '3.11', '3.12']
-        resolution: [lowest-direct, highest]
+        dependency-version: ['lowest', 'current', 'highest']
     steps:
     - uses: actions/checkout@v4
     - name: Install poetry
@@ -23,9 +23,13 @@ jobs:
         cache: poetry
     - name: Install dependencies
       run: |
-        poetry run pip install uv
-        poetry run uv pip install --system --resolution=${{ matrix.resolution }} .
-        poetry install --only dev
+        if [ "${{ matrix.dependency-version }}" = "lowest" ]; then
+          poetry update --no-dev --lock --min
+        elif [ "${{ matrix.dependency-version }}" = "highest" ]; then
+          poetry update --no-dev --lock
+        else
+          poetry install
+        fi
     - name: Run tests
       id: run-tests
       run: >
