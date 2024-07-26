@@ -6,18 +6,26 @@ on:
 
 jobs:
   unit:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+        resolution: [lowest-direct, highest]
     steps:
     - uses: actions/checkout@v4
     - name: Install poetry
       run: pipx install poetry
     - uses: actions/setup-python@v5
       with:
-        python-version-file: pyproject.toml
+        python-version: ${{ matrix.python_version }}
         cache: poetry
     - name: Install dependencies
       run: |
-        poetry install
+        poetry run pip install uv
+        poetry run uv pip install --system --resolution=${{ matrix.resolution }} .
+        poetry install --only dev
     - name: Run tests
       id: run-tests
       run: >
