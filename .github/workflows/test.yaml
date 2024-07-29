@@ -27,6 +27,7 @@ jobs:
         poetry run pip install uv
         poetry run uv pip install --resolution=${{ matrix.resolution }} .
         poetry install --only dev
+      shell: bash
     - name: Run tests
       id: run-tests
       run: >
