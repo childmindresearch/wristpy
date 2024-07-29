@@ -1,6 +1,7 @@
 """test the calibration module."""
 
 from datetime import datetime, timedelta
+from typing import Union
 
 import numpy as np
 import polars as pl
@@ -11,7 +12,9 @@ from wristpy.processing import calibration
 
 
 def create_dummy_measurement(
-    sampling_rate: int, duration_hours: float = 84.0, all_same_num: float | None = None
+    sampling_rate: int,
+    duration_hours: float = 84.0,
+    all_same_num: Union[float, None] = None,
 ) -> models.Measurement:
     """Create dummy measurement for testing.
 
