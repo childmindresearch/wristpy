@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         poetry run pip install uv
-        poetry run uv pip install --system --resolution=${{ matrix.resolution }} .
+        poetry run uv pip install --resolution=${{ matrix.resolution }} .
         poetry install --only dev
     - name: Run tests
       id: run-tests
