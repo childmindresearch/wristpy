@@ -238,7 +238,7 @@ def test_run_calibration() -> None:
     assert np.allclose(
         result.measurements, expected_data.measurements, atol=1e-3
     ), "Measurement data did not match"
-    assert result.time.series_equal(expected_data.time), "Time series are not equal"
+    assert result.time.equals(expected_data.time), "Time series are not equal"
 
 
 def test_run_chunked_calibration() -> None:
@@ -271,4 +271,4 @@ def test_run_chunked_calibration() -> None:
     assert np.allclose(
         result.measurements, expected_data.measurements, atol=1e-3
     ), "Measurement data did not match"
-    assert result.time.series_equal(expected_data.time), "Time series are not equal"
+    assert result.time.equals(expected_data.time), "Time series are not equal"
