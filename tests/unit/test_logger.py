@@ -14,9 +14,9 @@ def test_get_logger(caplog: pytest.LogCaptureFixture) -> None:
 
     logger.debug("Debug message here.")
     logger.info("Info message here.")
-    logger.warning("Warning message here")
+    logger.warning("Warning message here.")
 
     assert logger.getEffectiveLevel() == 20
     assert "Debug message here" not in caplog.text
-    assert "Info message here" in caplog.text
-    assert "Warning message here" in caplog.text
+    assert "Info message here." in caplog.text
+    assert "Warning message here." in caplog.text
