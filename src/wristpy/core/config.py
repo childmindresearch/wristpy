@@ -17,11 +17,11 @@ class Settings(pydantic_settings.BaseSettings):
 
 def get_logger() -> logging.Logger:
     """Gets the wristpy logger."""
-    if logging.getLogger("wristpy").hasHandlers():
-        return logging.getLogger("wristpy")
     logger = logging.getLogger("wristpy")
-    logger.setLevel(Settings().LOGGING_LEVEL)
+    if logger.handlers:
+        return logger
 
+    logger.setLevel(Settings().LOGGING_LEVEL)
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)s - %(funcName)s - %(message)s",  # noqa: E501
     )

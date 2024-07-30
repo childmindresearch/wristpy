@@ -7,7 +7,6 @@ from wristpy.core import config
 
 def test_get_logger(caplog: pytest.LogCaptureFixture) -> None:
     """Test the wristpy logger with level set to 20 (info)."""
-    caplog.set_level(config.Settings().LOGGING_LEVEL)
     logger = config.get_logger()
 
     logger.debug("Debug message here.")
