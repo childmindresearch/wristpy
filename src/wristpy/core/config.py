@@ -12,7 +12,7 @@ class Settings(pydantic_settings.BaseSettings):
     MODERATE_THRESHOLD: float = 0.1
     VIGOROUS_THRESHOLD: float = 0.3
 
-    LOGGING_VERBOSITY: int = 20
+    LOGGING_LEVEL: int = 20
 
 
 def get_logger() -> logging.Logger:
@@ -20,7 +20,7 @@ def get_logger() -> logging.Logger:
     if logging.getLogger("wristpy").hasHandlers():
         return logging.getLogger("wristpy")
     logger = logging.getLogger("wristpy")
-    logger.setLevel(Settings().LOGGING_VERBOSITY)
+    logger.setLevel(Settings().LOGGING_LEVEL)
 
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)s - %(funcName)s - %(message)s",  # noqa: E501
