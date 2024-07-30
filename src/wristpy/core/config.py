@@ -1,5 +1,7 @@
 """Configuration module for wristpy."""
 
+import logging
+
 import pydantic_settings
 
 
@@ -9,3 +11,22 @@ class Settings(pydantic_settings.BaseSettings):
     LIGHT_THRESHOLD: float = 0.03
     MODERATE_THRESHOLD: float = 0.1
     VIGOROUS_THRESHOLD: float = 0.3
+
+    LOGGING_VERBOSITY: int = 20
+
+
+def get_logger() -> logging.Logger:
+    """Gets the wristpy logger."""
+    if logging.getLogger("wristpy").hasHandlers():
+        return logging.getLogger("wristpy")
+    logger = logging.getLogger("wristpy")
+    logger.setLevel(Settings().LOGGING_VERBOSITY)
+
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)s - %(funcName)s - %(message)s",  # noqa: E501
+    )
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
