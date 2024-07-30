@@ -4,8 +4,6 @@ import pytest
 
 from wristpy.core import config
 
-logger = config.get_logger()
-
 
 def test_get_logger(caplog: pytest.LogCaptureFixture) -> None:
     """Test the wristpy logger with level set to 20 (info)."""
