@@ -44,9 +44,12 @@ def test_euclidean_norm_minus_one(
 ) -> None:
     """Tests the euclidean norm function."""
     dummy_date = datetime(2024, 5, 2)
-    dummy_datetime = pl.Series("time", [dummy_date] * TEST_LENGTH)
+    dummy_datetime_list = [
+        dummy_date + timedelta(seconds=i) for i in range(TEST_LENGTH)
+    ]
+    test_time = pl.Series("time", dummy_datetime_list)
     test_acceleration = models.Measurement(
-        measurements=np.column_stack((x, y, z)), time=dummy_datetime
+        measurements=np.column_stack((x, y, z)), time=test_time
     )
 
     enmo_results = metrics.euclidean_norm_minus_one(test_acceleration)
