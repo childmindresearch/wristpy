@@ -85,8 +85,8 @@ class GGIRSleepDetection(AbstractSleepDetector):
         """
         spt_window = self._spt_window(self.anglez)
         sib_periods = self._calculate_sib_periods(self.anglez)
-        spt_window_periods = self._find_periods(spt_window)
-        sib_window_periods = self._find_periods(sib_periods)
+        spt_window_periods = _find_periods(spt_window)
+        sib_window_periods = _find_periods(sib_periods)
         sleep_onset_wakeup = self._find_onset_wakeup_times(
             spt_window_periods, sib_window_periods
         )
@@ -308,41 +308,81 @@ class GGIRSleepDetection(AbstractSleepDetector):
             measurements=absolute_diff, time=anglez_epoch1.time[1:]
         )
 
-    def _find_periods(
-        self, window_measurement: models.Measurement
-    ) -> List[Tuple[datetime, datetime]]:
-        """Find periods where window_measurement is equal to 1.
 
-        This is a helper function for the _find_onset_wakeup_times to
-        find periods where either the spt_window or sib_periods are equal to 1.
+def _find_periods(
+    window_measurement: models.Measurement,
+) -> List[Tuple[datetime, datetime]]:
+    """Find periods where window_measurement is equal to 1.
 
-        Args:
-            window_measurement: the Measurement instance, intended to be
-                either the spt_window or sib_period.
+    This is a helper function for the _find_onset_wakeup_times to
+    find periods where either the spt_window or sib_periods are equal to 1.
 
-        Returns:
-            A list of tuples, where each tuple contains the start and end times of
-            a period. For isolated ones the function returns the same start
-            and end time. The list is sorted by time.
-        """
-        edge_detection = np.convolve([1, 3, 1], window_measurement.measurements, "same")
-        single_one = np.nonzero(edge_detection == 3)[0]
+    Args:
+        window_measurement: the Measurement instance, intended to be
+            either the spt_window or sib_period.
 
-        single_periods = [
-            (window_measurement.time.item(idx), window_measurement.time.item(idx))
-            for idx in single_one
-        ]
+    Returns:
+        A list of tuples, where each tuple contains the start and end times of
+        a period. For isolated ones the function returns the same start
+        and end time. The list is sorted by time.
+    """
+    edge_detection = np.convolve([1, 3, 1], window_measurement.measurements, "same")
+    single_one = np.nonzero(edge_detection == 3)[0]
 
-        blocked_one_edge = np.nonzero(edge_detection == 4)[0]
-        block_pairs = np.reshape(blocked_one_edge, (-1, 2))
-        block_periods = [
-            (window_measurement.time.item(idx[0]), window_measurement.time.item(idx[1]))
-            for idx in block_pairs
-        ]
-        all_periods = single_periods + block_periods
-        all_periods.sort()
+    single_periods = [
+        (window_measurement.time.item(idx), window_measurement.time.item(idx))
+        for idx in single_one
+    ]
 
-        return all_periods
+    blocked_one_edge = np.nonzero(edge_detection == 4)[0]
+    block_pairs = np.reshape(blocked_one_edge, (-1, 2))
+    block_periods = [
+        (window_measurement.time.item(idx[0]), window_measurement.time.item(idx[1]))
+        for idx in block_pairs
+    ]
+    all_periods = single_periods + block_periods
+    all_periods.sort()
+
+    return all_periods
+
+
+def remove_nonwear_from_sleep(
+    non_wear_array: models.Measurement,
+    sleep_windows: List,
+) -> List[SleepWindow]:
+    """Remove non-wear periods from sleep windows.
+
+    This function finds all the non-wear periods and removes any sleep windows that have
+    any overlap with the non-wear periods (including non-wera completely
+    within the sleep window).
+
+    Args:
+        non_wear_array: The non-wear array generated from metrics.detect_nonwear
+        sleep_windows (list): The list of sleep windows, where the entries are
+            instances of the SleepWindow class.
+        anglez (Measurement): The anglez data.
+
+    Returns:
+        A List of the filtered sleep windows.
+    """
+    nonwear_periods = _find_periods(non_wear_array)
+
+    filtered_sleep_windows = []
+    for sleep_window in sleep_windows:
+        if not any(
+            (
+                nonwear_period[0] <= sleep_window.onset <= nonwear_period[1]
+                or nonwear_period[0] <= sleep_window.wakeup <= nonwear_period[1]
+            )
+            or (
+                sleep_window.onset <= nonwear_period[0]
+                and sleep_window.wakeup >= nonwear_period[1]
+            )
+            for nonwear_period in nonwear_periods
+        ):
+            filtered_sleep_windows.append(sleep_window)
+
+    return filtered_sleep_windows
 
 
 def compute_physical_activty_categories(
