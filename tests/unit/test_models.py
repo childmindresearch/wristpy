@@ -61,6 +61,14 @@ def test_measurement_model_time_type() -> None:
         models.Measurement(measurements=np.array([1, 2, 3]), time=time)
 
 
+def test_measurement_model_time_unique() -> None:
+    """Test the error when time is not unique."""
+    time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 1, 3]), "s")
+
+    with pytest.raises(ValueError):
+        models.Measurement(measurements=np.array([1, 2, 3]), time=time)
+
+
 def test_measurement_model_time_sorted() -> None:
     """Test the error when time is not sorted."""
     time = readers.unix_epoch_time_to_polars_datetime(np.array([2, 1, 3]), "s")
