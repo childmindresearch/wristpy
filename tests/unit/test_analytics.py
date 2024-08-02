@@ -100,7 +100,7 @@ def test_find_periods() -> None:
     ],
 )
 def test_remove_nonwear_periods_overlap(
-    non_wear_array: np.array, expected_result: List
+    non_wear_array: np.ndarray, expected_result: List
 ) -> None:
     """Test the _remove_nonwear_from_sleep method.
 
