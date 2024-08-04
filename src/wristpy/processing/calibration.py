@@ -435,3 +435,27 @@ class Calibration:
         )
 
         return round(sampling_rate)
+
+class LuxCalibration:
+    """Implements lux data processing according to the GT3X File Format in https://github.com/actigraph/NHANES-GT3X-File-Format/blob/main/fileformats/lux.bin.md"""
+
+    def __init__(self, lux: models.Measurement, device_type: str):
+        self.lux = lux
+        self.device_type = device_type
+        if self.device_type == 'gt3x': #TODO: Better way to notate device_type?
+            self.scale_factor = 1.25
+            self.zero_threshold = 20
+            self.max_value = 2500
+            self.zero_value = 65535
+        else:
+            raise ValueError(f"Device type {self.device_type} not supported")
+
+    def run(self):
+        # Apply special conditions and scaling
+        scaled_lux_values = np.where(
+            (self.lux.measurements < 20) | (self.lux.measurements == 65535),
+            0,
+            np.minimum(self.lux.measurements * self.scale_factor, self.max_value)
+        )
+        
+        return scaled_lux_values
