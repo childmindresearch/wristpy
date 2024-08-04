@@ -458,4 +458,7 @@ class LuxCalibration:
             np.minimum(self.lux.measurements * self.scale_factor, self.max_value)
         )
         
-        return scaled_lux_values
+        return models.Measurement(
+            measurements=scaled_lux_values,
+            time=self.lux.time
+        )
