@@ -96,7 +96,7 @@ def test_find_periods() -> None:
     [
         (np.array([0, 1, 1, 1, 0]), []),
         (np.array([0, 0, 0, 1, 1]), []),
-        (np.array([0, 0, 1, 0, 0]), []),
+        (np.array([0, 0, 0, 1, 0]), []),
     ],
 )
 def test_remove_nonwear_periods_overlap(
@@ -105,8 +105,8 @@ def test_remove_nonwear_periods_overlap(
     """Test the _remove_nonwear_from_sleep method.
 
     This test is for the following cases:
-        - where the non-wear period is at the beginning of the sleep window.
-        - where the non-wear period is at the end of the sleep window.
+        - where the non-wear period overlaps with sleep onset.
+        - where the non-wear period overlaps with sleep wakeup.
         - where the non-wear period is within the sleep window.
     """
     dummy_date = datetime(2024, 5, 2)

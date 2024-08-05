@@ -353,14 +353,13 @@ def remove_nonwear_from_sleep(
     """Remove non-wear periods from sleep windows.
 
     This function finds all the non-wear periods and removes any sleep windows that have
-    any overlap with the non-wear periods (including non-wera completely
+    any overlap with the non-wear periods (including non-wear completely
     within the sleep window).
 
     Args:
         non_wear_array: The non-wear array generated from metrics.detect_nonwear
-        sleep_windows (list): The list of sleep windows, where the entries are
+        sleep_windows : The list of sleep windows, where the entries are
             instances of the SleepWindow class.
-        anglez (Measurement): The anglez data.
 
     Returns:
         A List of the filtered sleep windows.
