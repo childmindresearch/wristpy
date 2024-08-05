@@ -1,8 +1,8 @@
 """Calculate sleep onset and wake up times."""
 
 import abc
+import datetime
 from dataclasses import dataclass
-from datetime import datetime
 from typing import List, Tuple, Union
 
 import numpy as np
@@ -25,8 +25,8 @@ class SleepWindow:
         wakeup: the predicted end time of the sleep window.
     """
 
-    onset: Union[datetime, List]
-    wakeup: Union[datetime, List]
+    onset: Union[datetime.datetime, List]
+    wakeup: Union[datetime.datetime, List]
 
 
 class AbstractSleepDetector(abc.ABC):
@@ -177,8 +177,8 @@ class GGIRSleepDetection(AbstractSleepDetector):
 
     def _find_onset_wakeup_times(
         self,
-        spt_periods: List[Tuple[datetime, datetime]],
-        sib_periods: List[Tuple[datetime, datetime]],
+        spt_periods: List[Tuple[datetime.datetime, datetime.datetime]],
+        sib_periods: List[Tuple[datetime.datetime, datetime.datetime]],
     ) -> List[SleepWindow]:
         """Find the sleep onset and wake up times.
 
@@ -311,11 +311,12 @@ class GGIRSleepDetection(AbstractSleepDetector):
 
 def _find_periods(
     window_measurement: models.Measurement,
-) -> List[Tuple[datetime, datetime]]:
+) -> List[Tuple[datetime.datetime, datetime.datetime]]:
     """Find periods where window_measurement is equal to 1.
 
-    This is a helper function for the _find_onset_wakeup_times to
-    find periods where either the spt_window or sib_periods are equal to 1.
+    This is a helper function to return the periods in the format of
+    List [start_of_period, end_of_period], it is used in the
+    GGIRSleepDetection class and when removing non-wear periods from sleep windows.
 
     Args:
         window_measurement: the Measurement instance, intended to be
@@ -348,7 +349,7 @@ def _find_periods(
 
 def remove_nonwear_from_sleep(
     non_wear_array: models.Measurement,
-    sleep_windows: List,
+    sleep_windows: List[SleepWindow],
 ) -> List[SleepWindow]:
     """Remove non-wear periods from sleep windows.
 
@@ -368,18 +369,21 @@ def remove_nonwear_from_sleep(
 
     filtered_sleep_windows = []
     for sleep_window in sleep_windows:
-        if not any(
-            (
-                nonwear_period[0] <= sleep_window.onset <= nonwear_period[1]
-                or nonwear_period[0] <= sleep_window.wakeup <= nonwear_period[1]
-            )
-            or (
-                sleep_window.onset <= nonwear_period[0]
-                and sleep_window.wakeup >= nonwear_period[1]
-            )
-            for nonwear_period in nonwear_periods
+        if isinstance(sleep_window.onset, datetime.datetime) and isinstance(
+            sleep_window.wakeup, datetime.datetime
         ):
-            filtered_sleep_windows.append(sleep_window)
+            if not any(
+                (
+                    nonwear_period[0] <= sleep_window.onset <= nonwear_period[1]
+                    or nonwear_period[0] <= sleep_window.wakeup <= nonwear_period[1]
+                )
+                or (
+                    sleep_window.onset <= nonwear_period[0]
+                    and sleep_window.wakeup >= nonwear_period[1]
+                )
+                for nonwear_period in nonwear_periods
+            ):
+                filtered_sleep_windows.append(sleep_window)
 
     return filtered_sleep_windows
 

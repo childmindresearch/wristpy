@@ -110,13 +110,12 @@ def test_remove_nonwear_periods_overlap(
         - where the non-wear period is within the sleep window.
     """
     dummy_date = datetime(2024, 5, 2)
-    sleep_windows = []
-    sleep_windows.append(
+    sleep_windows = [
         analytics.SleepWindow(
             onset=dummy_date + timedelta(hours=2),
             wakeup=dummy_date + timedelta(hours=4),
         )
-    )
+    ]
     non_wear_time = pl.Series(
         "time", [dummy_date + timedelta(hours=i) for i in range(len(non_wear_array))]
     )
@@ -136,13 +135,12 @@ def test_remove_nonwear_periods_no_overlap() -> None:
     with the sleep window.
     """
     dummy_date = datetime(2024, 5, 2)
-    sleep_windows = []
-    sleep_windows.append(
+    sleep_windows = [
         analytics.SleepWindow(
             onset=dummy_date + timedelta(hours=2),
             wakeup=dummy_date + timedelta(hours=4),
         )
-    )
+    ]
 
     non_wear_array = np.array([1, 0, 0, 0, 0])
     non_wear_time = pl.Series(
