@@ -1,7 +1,7 @@
 """Test the functionality of the GGIRSleepDetection class."""
 
+import datetime
 import math
-from datetime import datetime, timedelta
 from typing import List
 
 import numpy as np
@@ -15,8 +15,10 @@ from wristpy.processing import analytics
 @pytest.fixture
 def sleep_detection() -> analytics.GGIRSleepDetection:
     """Return a GGIRSleepDetection instance with dummy data."""
-    dummy_date = datetime(2024, 5, 2)
-    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(3600)]
+    dummy_date = datetime.datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + datetime.timedelta(seconds=i) for i in range(3600)
+    ]
     test_time = pl.Series("time", dummy_datetime_list)
     anglez = np.random.uniform(-90, 90, size=3600)
     anglez_measurement = models.Measurement(measurements=anglez, time=test_time)
@@ -75,8 +77,10 @@ def test_compute_abs_diff_mean_anglez(
 
 def test_find_periods() -> None:
     """Test the _find_periods method."""
-    dummy_date = datetime(2024, 5, 2)
-    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(10)]
+    dummy_date = datetime.datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + datetime.timedelta(seconds=i) for i in range(10)
+    ]
     test_time = pl.Series("time", dummy_datetime_list)
     window_data = np.array([0, 1, 1, 1, 0, 1, 0, 0, 0, 1])
     window_measurement = models.Measurement(measurements=window_data, time=test_time)
@@ -109,15 +113,16 @@ def test_remove_nonwear_periods_overlap(
         - where the non-wear period overlaps with sleep wakeup.
         - where the non-wear period is within the sleep window.
     """
-    dummy_date = datetime(2024, 5, 2)
+    dummy_date = datetime.datetime(2024, 5, 2)
     sleep_windows = [
         analytics.SleepWindow(
-            onset=dummy_date + timedelta(hours=2),
-            wakeup=dummy_date + timedelta(hours=4),
+            onset=dummy_date + datetime.timedelta(hours=2),
+            wakeup=dummy_date + datetime.timedelta(hours=4),
         )
     ]
     non_wear_time = pl.Series(
-        "time", [dummy_date + timedelta(hours=i) for i in range(len(non_wear_array))]
+        "time",
+        [dummy_date + datetime.timedelta(hours=i) for i in range(len(non_wear_array))],
     )
     non_wear_measurement = models.Measurement(
         measurements=non_wear_array, time=non_wear_time
@@ -134,17 +139,18 @@ def test_remove_nonwear_periods_no_overlap() -> None:
     This test is for the case where the non-wear period does not overlap
     with the sleep window.
     """
-    dummy_date = datetime(2024, 5, 2)
+    dummy_date = datetime.datetime(2024, 5, 2)
     sleep_windows = [
         analytics.SleepWindow(
-            onset=dummy_date + timedelta(hours=2),
-            wakeup=dummy_date + timedelta(hours=4),
+            onset=dummy_date + datetime.timedelta(hours=2),
+            wakeup=dummy_date + datetime.timedelta(hours=4),
         )
     ]
 
     non_wear_array = np.array([1, 0, 0, 0, 0])
     non_wear_time = pl.Series(
-        "time", [dummy_date + timedelta(hours=i) for i in range(len(non_wear_array))]
+        "time",
+        [dummy_date + datetime.timedelta(hours=i) for i in range(len(non_wear_array))],
     )
     non_wear_measurement = models.Measurement(
         measurements=non_wear_array, time=non_wear_time
@@ -209,22 +215,22 @@ def test_calculate_sib_periods(sleep_detection: analytics.GGIRSleepDetection) ->
 
 def test_find_onset_wakeup_times(sleep_detection: analytics.GGIRSleepDetection) -> None:
     """Test the _find_onset_wakeup_times method."""
-    dummy_date = datetime(2024, 5, 2)
+    dummy_date = datetime.datetime(2024, 5, 2)
     spt_periods = [
         (
-            dummy_date + timedelta(hours=1),
-            dummy_date + timedelta(hours=3),
+            dummy_date + datetime.timedelta(hours=1),
+            dummy_date + datetime.timedelta(hours=3),
         )
     ]
     sib_periods = [
         (
-            dummy_date + timedelta(hours=2),
-            dummy_date + timedelta(hours=4),
+            dummy_date + datetime.timedelta(hours=2),
+            dummy_date + datetime.timedelta(hours=4),
         )
     ]
     expected_output = analytics.SleepWindow(
-        onset=dummy_date + timedelta(hours=2),
-        wakeup=dummy_date + timedelta(hours=4),
+        onset=dummy_date + datetime.timedelta(hours=2),
+        wakeup=dummy_date + datetime.timedelta(hours=4),
     )
 
     result = sleep_detection._find_onset_wakeup_times(spt_periods, sib_periods)
@@ -244,8 +250,8 @@ def test_run_sleep_detection(sleep_detection: analytics.GGIRSleepDetection) -> N
 def test_physical_activity_thresholds_unsorted() -> None:
     """Test the physical_activity_thresholds method with unsorted thresholds."""
     tmp_data = np.array([1, 2, 3])
-    dummy_date = datetime(2024, 5, 2)
-    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(3)]
+    dummy_date = datetime.datetime(2024, 5, 2)
+    dummy_datetime_list = [dummy_date + datetime.timedelta(seconds=i) for i in range(3)]
     time = pl.Series("time", dummy_datetime_list)
     tmp_measurement = models.Measurement(measurements=tmp_data, time=time)
     thresholds = (3, 2, 1)
@@ -257,8 +263,8 @@ def test_physical_activity_thresholds_unsorted() -> None:
 def test_physical_activity_thresholds() -> None:
     """Test the physical_activity_thresholds method."""
     tmp_data = np.arange(4)
-    dummy_date = datetime(2024, 5, 2)
-    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(4)]
+    dummy_date = datetime.datetime(2024, 5, 2)
+    dummy_datetime_list = [dummy_date + datetime.timedelta(seconds=i) for i in range(4)]
     time = pl.Series("time", dummy_datetime_list)
     tmp_measurement = models.Measurement(measurements=tmp_data, time=time)
     thresholds = (0, 1, 2)
