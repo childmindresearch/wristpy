@@ -8,6 +8,7 @@ from typing import cast
 
 import numpy as np
 import polars as pl
+from scipy import optimize
 from sklearn import linear_model
 from sklearn import metrics as sklearn_metrics
 
@@ -295,6 +296,40 @@ class Calibration:
             )
 
         return linear_transformation
+
+    def _closest_point_fit_gradient_descent(
+        self, no_motion_data: np.ndarray
+    ) -> LinearTransformation:
+        """Normalizes data to a unit sphere via a PCA."""
+        start_offset = np.zeros(3)
+        start_scale = np.ones(3)
+
+        def get_distance_to_unit_sphere(params: list[float]) -> float:
+            scale = params[:3]
+            offset = params[3:]
+            distances = np.linalg.norm((no_motion_data * scale) + offset, axis=1) - 1
+            return np.sum(distances**2)
+
+        initial_guess = np.concatenate([start_scale, start_offset])
+        data_range = no_motion_data.max() - no_motion_data.min()
+        scale_bounds = [(0.1, None)] * 3
+        offset_bounds = [(-0.5 * data_range, 0.5 * data_range)] * 3
+        bounds = scale_bounds + offset_bounds
+
+        result = optimize.minimize(
+            get_distance_to_unit_sphere,
+            initial_guess,
+            options={"maxiter": self.max_iterations},
+            bounds=bounds,
+        )
+
+        if result.success:
+            optimal_scale = result.x[:3]
+            optimal_offset = result.x[3:]
+        else:
+            raise ValueError("Optimization failed")
+
+        return LinearTransformation(scale=optimal_scale, offset=optimal_offset)
 
     def _extract_no_motion(self, acceleration: models.Measurement) -> np.ndarray:
         """Identifies areas of stillness using standard deviation and mean.
