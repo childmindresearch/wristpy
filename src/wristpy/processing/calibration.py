@@ -66,6 +66,9 @@ class Calibration:
     Attributes:
             chunked: If true will preform calibration on subsets of data if false will
                 calibrate on entire dataset.
+            method: Define the method used to find the calibration scaling and offset
+                that minimizes the calibration error. Current options are:
+                    'Gradient', 'GGIR'
             min_acceleration: Minimum acceleration for sphere criteria.
             min_calibration_hours: Minimum hours of data required for calibration.
             min_standard_deviation: Minimum standard deviation for no-motion detection.
@@ -78,6 +81,7 @@ class Calibration:
     def __init__(
         self,
         chunked: bool = False,
+        method: str = "Gradient",
         min_acceleration: float = 0.3,
         min_calibration_hours: int = 72,
         min_standard_deviation: float = 0.013,
@@ -92,6 +96,9 @@ class Calibration:
                 calibration will be attempted with a subset of the data. Set to false by
                 default, when true will initiate _chunked_calibration from the run()
                 method instead of standard _calibration.
+            method: Defines what method will be used to find the scaling and offset
+                variables that defines the linear transformation that minimizes the
+                calibration error.
             min_acceleration: The value on either side of 0g for each axis.
                 Determines if sphere is sufficiently populated to obtain meaningful
                 calibration result. Default is 0.3g.
@@ -120,6 +127,7 @@ class Calibration:
             None
         """
         self.chunked = chunked
+        self.method = method
         self.min_acceleration = min_acceleration
         self.min_calibration_hours = min_calibration_hours
         self.min_standard_deviation = min_standard_deviation
@@ -273,7 +281,14 @@ class Calibration:
             2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
         """
         no_motion_data = self._extract_no_motion(acceleration=acceleration)
-        linear_transformation = self._closest_point_fit(no_motion_data=no_motion_data)
+        if self.method == "GGIR":
+            linear_transformation = self._closest_point_fit(
+                no_motion_data=no_motion_data
+            )
+        else:
+            linear_transformation = self._closest_point_fit_gradient_descent(
+                no_motion_data=no_motion_data
+            )
 
         no_motion_calibrated = (
             no_motion_data * linear_transformation.scale
@@ -296,40 +311,6 @@ class Calibration:
             )
 
         return linear_transformation
-
-    def _closest_point_fit_gradient_descent(
-        self, no_motion_data: np.ndarray
-    ) -> LinearTransformation:
-        """Normalizes data to a unit sphere via a PCA."""
-        start_offset = np.zeros(3)
-        start_scale = np.ones(3)
-
-        def get_distance_to_unit_sphere(params: list[float]) -> float:
-            scale = params[:3]
-            offset = params[3:]
-            distances = np.linalg.norm((no_motion_data * scale) + offset, axis=1) - 1
-            return np.sum(distances**2)
-
-        initial_guess = np.concatenate([start_scale, start_offset])
-        data_range = no_motion_data.max() - no_motion_data.min()
-        scale_bounds = [(0.1, None)] * 3
-        offset_bounds = [(-0.5 * data_range, 0.5 * data_range)] * 3
-        bounds = scale_bounds + offset_bounds
-
-        result = optimize.minimize(
-            get_distance_to_unit_sphere,
-            initial_guess,
-            options={"maxiter": self.max_iterations},
-            bounds=bounds,
-        )
-
-        if result.success:
-            optimal_scale = result.x[:3]
-            optimal_offset = result.x[3:]
-        else:
-            raise ValueError("Optimization failed")
-
-        return LinearTransformation(scale=optimal_scale, offset=optimal_offset)
 
     def _extract_no_motion(self, acceleration: models.Measurement) -> np.ndarray:
         """Identifies areas of stillness using standard deviation and mean.
@@ -451,6 +432,58 @@ class Calibration:
             previous_residual = residual
 
         return LinearTransformation(scale=scale, offset=offset)
+
+    def _closest_point_fit_gradient_descent(
+        self, no_motion_data: np.ndarray
+    ) -> LinearTransformation:
+        """Find linear transformation parameters that minimzes distance to unit sphere.
+
+        This function implements the scipy optimize.minimze function to find the
+        optimial scale and offset parameters that will minimze the error function,
+        which is defined as the distance of the no_motion acceleration data
+        from the unit sphere (where the unit sphere represents the ideal data points
+        under 1g acceleartion due to Earth's gravity).
+
+        Args:
+            no_motion_data: The acceleration data during periods of no
+                motion, in order to determine scale and offset.
+
+        Returns:
+            A LinearTransformation object with scale and offset parameters to be applied
+            to acceleration data for calibration.
+
+        Raises:
+            ValueError if the optimization has failed.
+        """
+        start_offset = np.zeros(3)
+        start_scale = np.ones(3)
+
+        def get_distance_to_unit_sphere(params: list[float]) -> float:
+            scale = params[:3]
+            offset = params[3:]
+            distances = np.linalg.norm((no_motion_data * scale) + offset, axis=1) - 1
+            return np.sum(distances**2)
+
+        initial_guess = np.concatenate([start_scale, start_offset])
+        data_range = no_motion_data.max() - no_motion_data.min()
+        scale_bounds = [(0.1, None)] * 3
+        offset_bounds = [(-0.5 * data_range, 0.5 * data_range)] * 3
+        bounds = scale_bounds + offset_bounds
+
+        result = optimize.minimize(
+            get_distance_to_unit_sphere,
+            initial_guess,
+            options={"maxiter": self.max_iterations},
+            bounds=bounds,
+        )
+
+        if result.success:
+            optimal_scale = result.x[:3]
+            optimal_offset = result.x[3:]
+        else:
+            raise ValueError("Optimization failed")
+
+        return LinearTransformation(scale=optimal_scale, offset=optimal_offset)
 
     @staticmethod
     def _get_sampling_rate(timestamps: pl.Series) -> int:

@@ -130,7 +130,10 @@ def test_calibrate_calibration_error() -> None:
         duration_hours=1,
     )
     calibrator = calibration.Calibration(
-        min_calibration_error=0.0001, max_iterations=5, min_acceleration=0
+        min_calibration_error=0.0001,
+        max_iterations=5,
+        min_acceleration=0,
+        method="GGIR",
     )
 
     with pytest.raises(calibration.CalibrationError):
