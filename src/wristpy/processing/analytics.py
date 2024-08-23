@@ -225,25 +225,42 @@ class GGIRSleepDetection(AbstractSleepDetector):
     ) -> np.ndarray:
         """Helper function to find long blocks where SPT window is true.
 
-        This function uses the convolution of a kernel of 1s, of length block_length,
-        to find the continuous long blocks where SPT window is true. Where the
-        convolution value is == long_block_length that implies an overlap between the
-        kernel and the threshold signal of length long_block.
+        This function finds the first non-zero in below_threshold array, if there are
+        none, we return the initial array.
+        We then iterate over the array and count all the ones between zeros
+        (skipping the first 1), if that value is >= long_block we fill in with ones.
 
         Args:
             below_threshold: the 5-minute rolling median of the anglez difference
-                that is true when below the cutoff threshold.
+                that is true when below the cutoff threshold, 5s temporal resolution.
             block_length: the length of the long block that defines sleep, default is
                 30 minutes. (360 chunks of 5s)
 
         Returns:
             A numpy array with 1s indicating the identified SPT windows.
         """
-        kernel = np.ones(block_length, dtype=int)
-        convolved = np.convolve(below_threshold, kernel, mode="same")
-        long_blocks_idx = np.where(convolved == block_length)[0]
+        n_ones = 0
         sleep_idx_array = np.zeros(len(below_threshold))
-        sleep_idx_array[long_blocks_idx] = 1
+
+        first_one_idx = next(
+            (index for index, value in enumerate(below_threshold) if value), None
+        )
+        if first_one_idx is None:
+            return below_threshold
+
+        for spt_array_idx in range(first_one_idx, len(below_threshold)):
+            spt_value = below_threshold[spt_array_idx]
+            if spt_value:
+                n_ones += 1
+                continue
+            if (not spt_value) & (n_ones >= block_length):
+                sleep_idx_array[spt_array_idx - n_ones : spt_array_idx] = 1
+                n_ones = 0
+            if not spt_value:
+                n_ones = 0
+
+        if n_ones >= block_length:
+            sleep_idx_array[-n_ones:] = 1
 
         return sleep_idx_array
 
