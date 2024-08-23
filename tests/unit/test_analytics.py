@@ -30,8 +30,8 @@ def test_find_long_blocks(
 ) -> None:
     """Test the _find_long_blocks method."""
     block_length = 3
-    below_threshold = np.array([0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0])
-    expected_result = np.array([0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0])
+    below_threshold = np.array([0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0])
+    expected_result = np.array([0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0])
 
     result = sleep_detection._find_long_blocks(below_threshold, block_length)
 

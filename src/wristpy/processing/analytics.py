@@ -253,11 +253,9 @@ class GGIRSleepDetection(AbstractSleepDetector):
             if spt_value:
                 n_ones += 1
                 continue
-            if (not spt_value) & (n_ones >= block_length):
+            elif n_ones >= block_length:
                 sleep_idx_array[spt_array_idx - n_ones : spt_array_idx] = 1
-                n_ones = 0
-            if not spt_value:
-                n_ones = 0
+            n_ones = 0
 
         if n_ones >= block_length:
             sleep_idx_array[-n_ones:] = 1
