@@ -227,8 +227,12 @@ class GGIRSleepDetection(AbstractSleepDetector):
 
         This function finds the first non-zero in below_threshold array, if there are
         none, we return the initial array.
-        We then iterate over the array and count all the ones between zeros
-        (skipping the first 1), if that value is >= long_block we fill in with ones.
+        We then iterate over the array looking for continuous chunks of 1s that
+        are >= _block_length. We set the value of sleep_idx_array to 1 for those
+        blocks that meet the criteria.
+        For blocks that are < block_length, the value  of sleep_idx_array is set to 0.
+        Finally, there is a check to see if the counter ended on a block of 1s, and if
+        that block is > block_length we set those values to 1.
 
         Args:
             below_threshold: the 5-minute rolling median of the anglez difference
