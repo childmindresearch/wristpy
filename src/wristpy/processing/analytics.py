@@ -100,8 +100,9 @@ class GGIRSleepDetection(AbstractSleepDetector):
 
         This function finds the absolute difference of the anglez data over 5s windows.
         We find the 5-minute rolling median of that difference.
-        Next, we find what that 5-minute median is below a specified threshold, taken as
-        new default value from the GGIR implementation of the HDCZA algorithm.
+        Next, we find when that 5-minute median is above a specified threshold, taken as
+        the new default value from the GGIR implementation of the HDCZA algorithm. This
+        represent non-sleep candidates. The logical not of this is the sleep candidate.
         We then find long blocks (30 minutes) when the threshold criteria is met.
         Any gaps in SPT windows that are less than a specified window length
         (default 60 minutes) are filled.
@@ -122,11 +123,15 @@ class GGIRSleepDetection(AbstractSleepDetector):
         """
         anglez_abs_diff = self._compute_abs_diff_mean_anglez(anglez_data)
         anglez_median_long_epoch = computations.moving_median(anglez_abs_diff, 300)
-        below_threshold = (anglez_median_long_epoch.measurements < threshold).flatten()
+        non_sleep_candidates = (
+            anglez_median_long_epoch.measurements >= threshold
+        ).flatten()
 
-        sleep_idx_array = self._find_long_blocks(below_threshold)
+        sleep_candidates = np.logical_not(
+            self._fill_false_short_blocks(non_sleep_candidates, 360)
+        )
 
-        sleep_idx_array_filled = self._fill_short_blocks(sleep_idx_array)
+        sleep_idx_array_filled = self._fill_false_short_blocks(sleep_candidates, 720)
 
         return models.Measurement(
             measurements=sleep_idx_array_filled, time=anglez_median_long_epoch.time
@@ -220,89 +225,43 @@ class GGIRSleepDetection(AbstractSleepDetector):
 
         return sleep_windows
 
-    def _find_long_blocks(
-        self, below_threshold: np.ndarray, block_length: int = 360
+    def _fill_false_short_blocks(
+        self, boolean_array: np.ndarray, gap_block: int
     ) -> np.ndarray:
-        """Helper function to find long blocks where SPT window is true.
-
-        This function finds the first non-zero in below_threshold array, if there are
-        none, we return the initial array.
-        We then iterate over the array looking for continuous chunks of 1s that
-        are >= _block_length. We set the value of sleep_idx_array to 1 for those
-        blocks that meet the criteria.
-        For blocks that are < block_length, the value  of sleep_idx_array is set to 0.
-        Finally, there is a check to see if the counter ended on a block of 1s, and if
-        that block is > block_length we set those values to 1.
-
-        Args:
-            below_threshold: the 5-minute rolling median of the anglez difference
-                that is true when below the cutoff threshold, 5s temporal resolution.
-            block_length: the length of the long block that defines sleep, default is
-                30 minutes. (360 chunks of 5s)
-
-        Returns:
-            A numpy array with 1s indicating the identified SPT windows.
-        """
-        n_ones = 0
-        sleep_idx_array = np.zeros(len(below_threshold))
-
-        first_one_idx = next(
-            (index for index, value in enumerate(below_threshold) if value), None
-        )
-        if first_one_idx is None:
-            return below_threshold
-
-        for spt_array_idx in range(first_one_idx, len(below_threshold)):
-            spt_value = below_threshold[spt_array_idx]
-            if spt_value:
-                n_ones += 1
-                continue
-            elif n_ones >= block_length:
-                sleep_idx_array[spt_array_idx - n_ones : spt_array_idx] = 1
-            n_ones = 0
-
-        if n_ones >= block_length:
-            sleep_idx_array[-n_ones:] = 1
-
-        return sleep_idx_array
-
-    def _fill_short_blocks(
-        self, sleep_idx_array: np.ndarray, gap_block: int = 720
-    ) -> np.ndarray:
-        """Helper function to fill gaps in SPT window that are less than 60 minutes.
+        """Helper function to fill gaps in SPT window that are less than gap_blocks.
 
         We find the first non-zero in the sleep_idx_array, if there are none ,
         we return the initial array.
         We then iterate over the array and count every zero between ones
-        (skipping the first 1),
+        (skipping the leading zeros),
         if that value is less than the gap_block, we fill in with ones.
 
         Args:
-            sleep_idx_array: the array of SPT windows.
-            gap_block: the length of the gap that defines sleep, default is 60 minutes.
-                The units are chunks of 5s.
+            boolean_array: A generic boolean array that the array of SPT windows.
+            gap_block: the length of the gap that needs to be filled, for SPT windows,
+                the defaul block length is assumed to be
 
         Returns:
-            A numpy array with 1s indicating the identified SPT windows.
+            A numpy array with 1s, typically for identified SPT windows.
         """
         n_zeros = 0
         first_one_idx = next(
-            (index for index, value in enumerate(sleep_idx_array) if value), None
+            (index for index, value in enumerate(boolean_array) if value), None
         )
         if first_one_idx is None:
-            return sleep_idx_array
+            return boolean_array
 
-        for sleep_array_idx in range(first_one_idx, len(sleep_idx_array)):
-            sleep_value = sleep_idx_array[sleep_array_idx]
+        for sleep_array_idx in range(first_one_idx, len(boolean_array)):
+            sleep_value = boolean_array[sleep_array_idx]
             if not sleep_value:
                 n_zeros += 1
                 continue
 
             if n_zeros < gap_block:
-                sleep_idx_array[sleep_array_idx - n_zeros : sleep_array_idx] = 1
-                n_zeros = 0
+                boolean_array[sleep_array_idx - n_zeros : sleep_array_idx] = 1
+            n_zeros = 0
 
-        return sleep_idx_array
+        return boolean_array
 
     def _compute_abs_diff_mean_anglez(
         self, anglez_data: models.Measurement, window_size_seconds: int = 5
