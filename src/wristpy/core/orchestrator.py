@@ -168,7 +168,6 @@ def run(
         sleep_windows_epoch1=sleep_array,
         nonwear_epoch1=nonwear_epoch1,
     )
-
     if output is not None:
         try:
             results.save_results(output=pathlib.Path(output))
