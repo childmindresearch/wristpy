@@ -9,7 +9,15 @@ from wristpy.processing import calibration
 
 
 def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
-    """Argument parser for python cli."""
+    """Argument parser for python cli.
+
+    Args:
+        args: Optional argument for when accessed via python script. When default value
+        (None) is given arg parser gets arguments from sys.argv.
+
+    Returns:
+        Namespace object will all of the input arguments. s
+    """
     parser = argparse.ArgumentParser(description="Run the main wristpy pipeline")
 
     parser.add_argument("input", type=pathlib.Path, help="Path to the input data.")
