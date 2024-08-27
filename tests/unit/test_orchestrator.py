@@ -6,9 +6,39 @@ import pathlib
 import numpy as np
 import polars as pl
 import pytest
+from _pytest import capture
 
 from wristpy.core import models, orchestrator
-from wristpy.processing import analytics
+from wristpy.processing import analytics, calibration
+
+
+@pytest.fixture
+def dummy_results() -> orchestrator.Results:
+    """Makes a results object for the purpose of testing."""
+    dummy_date = datetime.datetime(2024, 5, 2)
+    dummy_measure = models.Measurement(
+        measurements=np.random.rand(100),
+        time=pl.Series(
+            [dummy_date + datetime.timedelta(seconds=i) for i in range(100)]
+        ),
+    )
+    dummy_results = orchestrator.Results(
+        enmo=dummy_measure,
+        anglez=dummy_measure,
+        enmo_epoch1=dummy_measure,
+        anglez_epoch1=dummy_measure,
+        nonwear_array=dummy_measure,
+        sleep_windows=[
+            analytics.SleepWindow(
+                onset=dummy_date, wakeup=dummy_date + datetime.timedelta(seconds=1)
+            )
+        ],
+        physical_activity_levels=dummy_measure,
+        nonwear_epoch1=dummy_measure,
+        sleep_windows_epoch1=dummy_measure,
+    )
+
+    return dummy_results
 
 
 def test_format_sleep() -> None:
@@ -60,31 +90,8 @@ def test_format_nonwear() -> None:
     assert np.all(non_wear_epoch1 == np.array([1, 1, 0, 0]))
 
 
-def test_results_to_dataframe_epoch1() -> None:
+def test_results_to_dataframe_epoch1(dummy_results: orchestrator.Results) -> None:
     """Tests converting results object to polars dataframe."""
-    dummy_date = datetime.datetime(2024, 5, 2)
-    dummy_measure = models.Measurement(
-        measurements=np.random.rand(100),
-        time=pl.Series(
-            [dummy_date + datetime.timedelta(seconds=i) for i in range(100)]
-        ),
-    )
-    dummy_results = orchestrator.Results(
-        enmo=dummy_measure,
-        anglez=dummy_measure,
-        enmo_epoch1=dummy_measure,
-        anglez_epoch1=dummy_measure,
-        nonwear_array=dummy_measure,
-        sleep_windows=[
-            analytics.SleepWindow(
-                onset=dummy_date, wakeup=dummy_date + datetime.timedelta(seconds=1)
-            )
-        ],
-        physical_activity_levels=dummy_measure,
-        nonwear_epoch1=dummy_measure,
-        sleep_windows_epoch1=dummy_measure,
-    )
-
     df_epoch1 = dummy_results._results_to_dataframe()
 
     assert isinstance(df_epoch1, pl.DataFrame)
@@ -98,31 +105,8 @@ def test_results_to_dataframe_epoch1() -> None:
     assert "anglez" not in df_epoch1.columns
 
 
-def test_results_to_dataframe_raw() -> None:
+def test_results_to_dataframe_raw(dummy_results: orchestrator.Results) -> None:
     """Tests converting results object to polars dataframe."""
-    dummy_date = datetime.datetime(2024, 5, 2)
-    dummy_measure = models.Measurement(
-        measurements=np.random.rand(100),
-        time=pl.Series(
-            [dummy_date + datetime.timedelta(seconds=i) for i in range(100)]
-        ),
-    )
-    dummy_results = orchestrator.Results(
-        enmo=dummy_measure,
-        anglez=dummy_measure,
-        enmo_epoch1=dummy_measure,
-        anglez_epoch1=dummy_measure,
-        nonwear_array=dummy_measure,
-        sleep_windows=[
-            analytics.SleepWindow(
-                onset=dummy_date, wakeup=dummy_date + datetime.timedelta(seconds=1)
-            )
-        ],
-        physical_activity_levels=dummy_measure,
-        nonwear_epoch1=dummy_measure,
-        sleep_windows_epoch1=dummy_measure,
-    )
-
     df_raw_time = dummy_results._results_to_dataframe(use_epoch1_time=False)
 
     assert isinstance(df_raw_time, pl.DataFrame)
@@ -139,30 +123,10 @@ def test_results_to_dataframe_raw() -> None:
 @pytest.mark.parametrize(
     "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
 )
-def test_save_results(file_name: pathlib.Path, tmp_path: pathlib.Path) -> None:
+def test_save_results(
+    dummy_results: orchestrator.Results, file_name: pathlib.Path, tmp_path: pathlib.Path
+) -> None:
     """Test saving."""
-    dummy_date = datetime.datetime(2024, 5, 2)
-    dummy_measure = models.Measurement(
-        measurements=np.random.rand(100),
-        time=pl.Series(
-            [dummy_date + datetime.timedelta(seconds=i) for i in range(100)]
-        ),
-    )
-    dummy_results = orchestrator.Results(
-        enmo=dummy_measure,
-        anglez=dummy_measure,
-        enmo_epoch1=dummy_measure,
-        anglez_epoch1=dummy_measure,
-        nonwear_array=dummy_measure,
-        sleep_windows=[
-            analytics.SleepWindow(
-                onset=dummy_date, wakeup=dummy_date + datetime.timedelta(seconds=1)
-            )
-        ],
-        physical_activity_levels=dummy_measure,
-        nonwear_epoch1=dummy_measure,
-        sleep_windows_epoch1=dummy_measure,
-    )
     output_path = tmp_path / file_name
     epoch1_file = pathlib.Path("test_output_epoch1" + file_name.suffix)
     raw_file = pathlib.Path("test_output_raw_time" + file_name.suffix)
@@ -172,38 +136,35 @@ def test_save_results(file_name: pathlib.Path, tmp_path: pathlib.Path) -> None:
     assert (tmp_path / epoch1_file).exists()
     assert (tmp_path / raw_file).exists()
 
-    pass
 
-
-def test_save_invalid_file_type(tmp_path: pathlib.Path):
-    """test when a bad extention is given."""
-    dummy_date = datetime.datetime(2024, 5, 2)
-    dummy_measure = models.Measurement(
-        measurements=np.random.rand(100),
-        time=pl.Series(
-            [dummy_date + datetime.timedelta(seconds=i) for i in range(100)]
-        ),
-    )
-    dummy_results = orchestrator.Results(
-        enmo=dummy_measure,
-        anglez=dummy_measure,
-        enmo_epoch1=dummy_measure,
-        anglez_epoch1=dummy_measure,
-        nonwear_array=dummy_measure,
-        sleep_windows=[
-            analytics.SleepWindow(
-                onset=dummy_date, wakeup=dummy_date + datetime.timedelta(seconds=1)
-            )
-        ],
-        physical_activity_levels=dummy_measure,
-        nonwear_epoch1=dummy_measure,
-        sleep_windows_epoch1=dummy_measure,
-    )
-
+def test_save_invalid_file_type(
+    dummy_results: orchestrator.Results, tmp_path: pathlib.Path
+) -> None:
+    """Test when a bad extention is given."""
     with pytest.raises(orchestrator.InvalidFileTypeError):
         dummy_results.save_results(tmp_path / "bad_output.vsc")
 
 
-def test_run() -> None:
-    """Test runner."""
-    pass
+def test_run_without_calibration(capfd: capture.CaptureFixture[str]) -> None:
+    """Test that run still returns results when calibration fails."""
+    calibrator = calibration.Calibration(min_calibration_hours=10000)
+    test_file = pathlib.Path(__file__).parent / "sample_data" / "example_actigraph.gt3x"
+
+    results = orchestrator.run(test_file, calibrator=calibrator)
+    captured = capfd.readouterr()
+
+    assert isinstance(results, orchestrator.Results)
+    assert "Calibration FAILED" in captured.out
+    assert "Proceeding without calibration" in captured.out
+
+
+def test_run_bad_output(capfd: capture.CaptureFixture[str]) -> None:
+    """Test that run still returns results when the save path is bad."""
+    test_file = pathlib.Path(__file__).parent / "sample_data" / "example_actigraph.gt3x"
+
+    results = orchestrator.run(test_file, output="bad_output.vsc")
+    captured = capfd.readouterr()
+
+    assert isinstance(results, orchestrator.Results)
+    assert "The extension: .vsc is not supported." in captured.out
+    assert "Please save the file as .csv or .parquet" in captured.out
