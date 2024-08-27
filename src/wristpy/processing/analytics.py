@@ -102,10 +102,9 @@ class GGIRSleepDetection(AbstractSleepDetector):
         We find the 5-minute rolling median of that difference.
         Next, we find when that 5-minute median is above a specified threshold, taken as
         the new default value from the GGIR implementation of the HDCZA algorithm. This
-        represent non-sleep candidates. The logical not of this is the sleep candidate.
+        represents non-sleep candidates. The logical not of this is the sleep candidate.
         We then find long blocks (30 minutes) when the threshold criteria is met.
-        Any gaps in SPT windows that are less than a specified window length
-        (default 60 minutes) are filled.
+        Any gaps in SPT windows that are less than 60 minutes are filled.
 
         Args:
             anglez_data: the raw anglez data, calculated from calibrated acceleration.
@@ -121,17 +120,25 @@ class GGIRSleepDetection(AbstractSleepDetector):
               using an accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
               https://doi.org/10.1038/s41598-018-31266-z
         """
+        long_epoch_median = 300
+        long_block = 360
+        short_block_gap = 720
+
         anglez_abs_diff = self._compute_abs_diff_mean_anglez(anglez_data)
-        anglez_median_long_epoch = computations.moving_median(anglez_abs_diff, 300)
+        anglez_median_long_epoch = computations.moving_median(
+            anglez_abs_diff, long_epoch_median
+        )
         non_sleep_candidates = (
             anglez_median_long_epoch.measurements >= threshold
         ).flatten()
 
         sleep_candidates = np.logical_not(
-            self._fill_false_short_blocks(non_sleep_candidates, 360)
+            self._fill_false_blocks(non_sleep_candidates, long_block)
         )
 
-        sleep_idx_array_filled = self._fill_false_short_blocks(sleep_candidates, 720)
+        sleep_idx_array_filled = self._fill_false_blocks(
+            sleep_candidates, short_block_gap
+        )
 
         return models.Measurement(
             measurements=sleep_idx_array_filled, time=anglez_median_long_epoch.time
@@ -225,7 +232,7 @@ class GGIRSleepDetection(AbstractSleepDetector):
 
         return sleep_windows
 
-    def _fill_false_short_blocks(
+    def _fill_false_blocks(
         self, boolean_array: np.ndarray, gap_block: int
     ) -> np.ndarray:
         """Helper function to fill gaps in SPT window that are less than gap_blocks.
@@ -237,9 +244,8 @@ class GGIRSleepDetection(AbstractSleepDetector):
         if that value is less than the gap_block, we fill in with ones.
 
         Args:
-            boolean_array: A generic boolean array that the array of SPT windows.
-            gap_block: the length of the gap that needs to be filled, for SPT windows,
-                the defaul block length is assumed to be
+            boolean_array: A generic boolean array, typically the SPT window.
+            gap_block: the length of the gap that needs to be filled.
 
         Returns:
             A numpy array with 1s, typically for identified SPT windows.
@@ -258,7 +264,7 @@ class GGIRSleepDetection(AbstractSleepDetector):
                 continue
 
             if n_zeros < gap_block:
-                boolean_array[sleep_array_idx - n_zeros : sleep_array_idx] = 1
+                boolean_array[sleep_array_idx - n_zeros : sleep_array_idx] = True
             n_zeros = 0
 
         return boolean_array

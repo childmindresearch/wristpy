@@ -25,15 +25,19 @@ def sleep_detection() -> analytics.GGIRSleepDetection:
     return analytics.GGIRSleepDetection(anglez_measurement)
 
 
-def test_fill_false_short_blocks(
+def test_fill_false_blocks(
     sleep_detection: analytics.GGIRSleepDetection,
 ) -> None:
     """Test the _fill_false_short_blocks method."""
     gap_block = 3
-    sleep_idx_array = np.array([1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1])
-    expected_result = np.array([1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1])
+    sleep_idx_array = np.array(
+        [True, False, True, False, False, False, True, True, False, True, False, True]
+    )
+    expected_result = np.array(
+        [True, True, True, False, False, False, True, True, True, True, True, True]
+    )
 
-    result = sleep_detection._fill_false_short_blocks(sleep_idx_array, gap_block)
+    result = sleep_detection._fill_false_blocks(sleep_idx_array, gap_block)
 
     assert np.array_equal(
         result, expected_result
