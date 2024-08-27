@@ -113,8 +113,8 @@ def format_nonwear_data(
 
 
 def run(
-    input: str,
-    output: str | None = None,
+    input: pathlib.Path,
+    output: pathlib.Path | None = None,
     settings: config.Settings = config.Settings(),
     calibrator: calibration.Calibration = calibration.Calibration(),
     detect_nonwear_kwargs: Optional[Dict[str, float]] = None,
@@ -170,7 +170,7 @@ def run(
     )
     if output is not None:
         try:
-            results.save_results(output=pathlib.Path(output))
+            results.save_results(output=output)
         except (InvalidFileTypeError, FileNotFoundError) as e:
             print(e)
 
