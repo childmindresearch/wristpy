@@ -24,8 +24,6 @@ class Results(pydantic.BaseModel):
 
     enmo: Optional[models.Measurement] = None
     anglez: Optional[models.Measurement] = None
-    nonwear_array: Optional[models.Measurement] = None
-    sleep_windows: Optional[List[analytics.SleepWindow]] = None
     physical_activity_levels: Optional[models.Measurement] = None
     nonwear_epoch1: Optional[models.Measurement] = None
     sleep_windows_epoch1: Optional[models.Measurement] = None
@@ -62,14 +60,15 @@ class Results(pydantic.BaseModel):
         results_dataframe = pl.DataFrame({"time": self.enmo.time})
 
         for field_name, field_value in self:
+            print(f"{field_name}: Length: {len(field_value.measurements)}")
             results_dataframe = results_dataframe.with_columns(
                 pl.Series(field_name, field_value.measurements)
             )
 
         if output.suffix == ".csv":
-            results_dataframe.write_csv(results_dataframe, separator=",")
+            results_dataframe.write_csv(output, separator=",")
         elif output.suffix == ".parquet":
-            results_dataframe.write_parquet(results_dataframe)
+            results_dataframe.write_parquet(output)
 
 
 def format_sleep_data(
@@ -171,7 +170,9 @@ def run(
         calibrated_acceleration = watch_data.acceleration
     else:
         try:
-            calibrated_acceleration = calibrator.run(watch_data.acceleration)
+            calibrated_acceleration = calibrator.run_calibration(
+                watch_data.acceleration
+            )
         except (
             calibration.CalibrationError,
             calibration.ZeroScaleError,
@@ -187,11 +188,12 @@ def run(
     if epoch_length is not None:
         enmo = computations.moving_mean(enmo, epoch_length=epoch_length)
         anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
-
-    non_wear_array = metrics.detect_nonwear(
-        calibrated_acceleration,
-        range_criteria=settings.RANGE_CRITERIA,  # change bassed on file extension ?
-    )
+    if input.suffix == ".bin":
+        non_wear_array = metrics.detect_nonwear(
+            calibrated_acceleration, range_criteria=0.5
+        )
+    else:
+        non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
 
     sleep_detector = analytics.GGIRSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
@@ -213,7 +215,7 @@ def run(
         measurements=format_nonwear_data(
             nonwear_data=non_wear_array,
             reference_measure=enmo,
-            nonwear_temporal_resolution=settings.SHORT_EPOCH_LENGTH,
+            nonwear_temporal_resolution=900,
         ),
         time=enmo.time,
     )
