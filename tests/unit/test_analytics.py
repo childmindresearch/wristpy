@@ -20,35 +20,24 @@ def sleep_detection() -> analytics.GGIRSleepDetection:
         dummy_date + datetime.timedelta(seconds=i) for i in range(3600)
     ]
     test_time = pl.Series("time", dummy_datetime_list)
-    anglez = np.random.uniform(-90, 90, size=3600)
+    anglez = np.random.randint(-90, 90, size=3600)
     anglez_measurement = models.Measurement(measurements=anglez, time=test_time)
     return analytics.GGIRSleepDetection(anglez_measurement)
 
 
-def test_find_long_blocks(
+def test_fill_false_blocks(
     sleep_detection: analytics.GGIRSleepDetection,
 ) -> None:
-    """Test the _find_long_blocks method."""
-    block_length = 3
-    below_threshold = np.array([0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0])
-    expected_result = np.array([0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0])
-
-    result = sleep_detection._find_long_blocks(below_threshold, block_length)
-
-    assert np.array_equal(
-        result, expected_result
-    ), f"Expected {expected_result}, but got {result}"
-
-
-def test_fill_short_blocks(
-    sleep_detection: analytics.GGIRSleepDetection,
-) -> None:
-    """Test the _fill_short_blocks method."""
+    """Test the _fill_false_short_blocks method."""
     gap_block = 3
-    sleep_idx_array = np.array([0, 0, 0, 1, 1, 0, 0, 1])
-    expected_result = np.array([0, 0, 0, 1, 1, 1, 1, 1])
+    sleep_idx_array = np.array(
+        [True, False, True, False, False, False, True, True, False, True, False, True]
+    )
+    expected_result = np.array(
+        [True, True, True, False, False, False, True, True, True, True, True, True]
+    )
 
-    result = sleep_detection._fill_short_blocks(sleep_idx_array, gap_block)
+    result = sleep_detection._fill_false_blocks(sleep_idx_array, gap_block)
 
     assert np.array_equal(
         result, expected_result
@@ -164,14 +153,11 @@ def test_remove_nonwear_periods_no_overlap() -> None:
 
 def test_spt_window(sleep_detection: analytics.GGIRSleepDetection) -> None:
     """Test the _spt_window method."""
-    half_long_block = 180
     sleep_detection.anglez.measurements = np.zeros(
         len(sleep_detection.anglez.measurements)
     )
     expected_length = int(len(sleep_detection.anglez.measurements) / 5) - 1
     expected_result = np.ones(expected_length)
-    expected_result[0:half_long_block] = 0
-    expected_result[-(half_long_block - 1) :] = 0
 
     result = sleep_detection._spt_window(sleep_detection.anglez)
 
