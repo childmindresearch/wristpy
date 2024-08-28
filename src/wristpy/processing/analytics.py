@@ -15,6 +15,8 @@ LIGHT_THRESHOLD = settings.LIGHT_THRESHOLD
 MODERATE_THRESHOLD = settings.MODERATE_THRESHOLD
 VIGOROUS_THRESHOLD = settings.VIGOROUS_THRESHOLD
 
+logger = config.get_logger()
+
 
 @dataclass
 class SleepWindow:
@@ -83,6 +85,7 @@ class GGIRSleepDetection(AbstractSleepDetector):
             A list of SleepWindow instances, each instance contains a sleep onset/wakeup
             time pair.
         """
+        logger.debug("Beginning sleep detection.")
         spt_window = self._spt_window(self.anglez)
         sib_periods = self._calculate_sib_periods(self.anglez)
         spt_window_periods = self._find_periods(spt_window)
