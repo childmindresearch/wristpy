@@ -156,15 +156,34 @@ def test_run_without_calibration(capfd: capture.CaptureFixture[str]) -> None:
     assert isinstance(results, orchestrator.Results)
     assert "Calibration FAILED" in captured.out
     assert "Proceeding without calibration" in captured.out
+    assert results.enmo is not None
+    assert results.anglez is not None
+    assert results.enmo_epoch1 is not None
+    assert results.anglez_epoch1 is not None
+    assert results.nonwear_array is not None
+    assert results.sleep_windows is not None
+    assert results.physical_activity_levels is not None
+    assert results.nonwear_epoch1 is not None
+    assert results.sleep_windows_epoch1 is not None
 
 
 def test_run_bad_output(capfd: capture.CaptureFixture[str]) -> None:
     """Test that run still returns results when the save path is bad."""
     test_file = pathlib.Path(__file__).parent / "sample_data" / "example_actigraph.gt3x"
 
-    results = orchestrator.run(test_file, output="bad_output.vsc")
+    results = orchestrator.run(test_file, output=pathlib.Path("bad_output.vsc"))
     captured = capfd.readouterr()
 
     assert isinstance(results, orchestrator.Results)
     assert "The extension: .vsc is not supported." in captured.out
     assert "Please save the file as .csv or .parquet" in captured.out
+    assert results.enmo is not None
+    assert results.anglez is not None
+    assert results.enmo_epoch1 is not None
+    assert results.anglez_epoch1 is not None
+    assert results.nonwear_array is not None
+    assert results.sleep_windows is not None
+    assert results.physical_activity_levels is not None
+    assert results.nonwear_epoch1 is not None
+
+    assert results.sleep_windows_epoch1 is not None

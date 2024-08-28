@@ -19,7 +19,7 @@ class InvalidFileTypeError(Exception):
 
 
 class Results(BaseModel):
-    """dataclass containing results of run."""
+    """dataclass containing results of orchestrator.run()."""
 
     enmo: Optional[models.Measurement] = None
     anglez: Optional[models.Measurement] = None
@@ -32,7 +32,32 @@ class Results(BaseModel):
     sleep_windows_epoch1: Optional[models.Measurement] = None
 
     def save_results(self, output: pathlib.Path) -> None:
-        """Convert to polars and save the dataframe as a csv or parquet file."""
+        """Convert to polars and save the dataframe as a csv or parquet file.
+
+        The data captured by Results can be in one of two temporal resolutions, the
+        unaltered (raw) time stamps taken from the watch data, and the down sampled
+        epoch1 time stamps (5 second intervals). The "raw" time is used in the enmo and
+        anglez data, and the epoch1 time is used for enmo_epoch1, anglez_epoch1,
+        nonwear_epoch1, physical_activity_levels and sleep_windows_epoch1. nonwear_array
+        values are in 15 minute blocks and are upsampled to match epoch1 time for the
+        purposes of saving. Additionally the sleep window data is a list of timestamp
+        pairs, which are used to create a binary array in epoch1 time. Two files will
+        be saved, one of each temporal resolution. This means if output is entered as
+        /path/to/file/file.csv,The file names will be labeled as file_epoch1.csv and
+        file_raw_time.csv in the path/to/file directory.
+
+        Args:
+            self: The object itself.
+            output: The path and file name of the data to be saved. as either a csv or
+                parquet files.
+
+        Returns:
+            None.
+
+        Raises:
+            InvalidFileTypeError: If the output file path ends with any extension other
+                than csv or parquet.
+        """
         if output.suffix not in [".csv", ".parquet"]:
             raise InvalidFileTypeError(
                 f"The extension: {output.suffix} is not supported.",
@@ -53,7 +78,19 @@ class Results(BaseModel):
             results_raw_time.write_parquet(save_path_raw_time)
 
     def _results_to_dataframe(self, use_epoch1_time: bool = True) -> pl.DataFrame:
-        """Format results into a dataframe."""
+        """Format results into a dataframe.
+
+        Args:
+            self: the results object.
+            use_epoch1_time: Determines which temporal resolution and data to use. If
+                True the dataframe will contain enmo_epoch1, anglez_epoch1,
+                nonwear_epoch1, physical_activity_levels and sleep_windows_epoch1. If
+                False the the dataframe will be in "raw" time and contain the enmo and
+                anglez data.
+
+        Returns:
+            The polars dataframe to be saved into csv or parquet format.
+        """
         time_data = self.enmo_epoch1.time if use_epoch1_time else self.enmo.time
 
         results_dataframe = pl.DataFrame({"time": time_data})
@@ -75,7 +112,17 @@ class Results(BaseModel):
 def format_sleep_data(
     sleep_windows: List[analytics.SleepWindow], epoch1_measure: models.Measurement
 ) -> np.ndarray:
-    """Formats sleep windows into an array for saving."""
+    """Formats sleep windows into an array for saving.
+
+    Args:
+        sleep_windows: The list of time stamp pairs indicating periods of sleep.
+        epoch1_measure: The measure from which the temporal resolution will be taken.
+            Any epoch1 measure can be used, but enmo is used for consistency.
+
+    Returns:
+        1-D binary np.ndarray, with 1 indicating sleep. Will be of the same length as
+            the timestamps in the epoch1_measure.
+    """
     sleep_array = np.zeros(len(epoch1_measure.time))
 
     for window in sleep_windows:
@@ -90,7 +137,18 @@ def format_sleep_data(
 def format_nonwear_data(
     nonwear_data: models.Measurement, epoch1_measure: models.Measurement
 ) -> np.ndarray:
-    """Format nonwear data into an array for saving."""
+    """Format nonwear data into an array for saving.
+
+    Args:
+        nonwear_data: The nonwear measurement.
+        epoch1_measure: The measure from which the temporal resolution will be taken.
+            Any epoch1 measure can be used, but enmo is used for consistency.
+
+    Returns:
+        1-D binary np.ndarray, with 1 indicating nonwear. Will be of the same length as
+            the timestamps in the epoch1_measure.
+
+    """
     nonwear_df = pl.DataFrame(
         {
             "nonwear": nonwear_data.measurements,
@@ -119,7 +177,24 @@ def run(
     calibrator: calibration.Calibration = calibration.Calibration(),
     detect_nonwear_kwargs: Optional[Dict[str, float]] = None,
 ) -> Results:
-    """Runs wristpy."""
+    """Runs wristpy.
+
+    Args:
+        input: Path to the input file to be read. Currently supports .bin and .gt3x
+        output: Path to save data to. The path should end in the file name to be given
+            to the save data. Two files will be saved, each with the given file name and
+            the _raw_time or _epoch1 label after. Currently supports saving in .csv and
+            .parquet
+        settings: The settings object from which physical activity levels are taken.
+        calibrator: The calibrator to be used on the input data.
+        detect_nonwear_kwargs: The arguments to the nonwear function delivered as a
+            dictionary. Arguements are short_epoch_length, n_short_epoch_in_long_epoch,
+            std_criteria, range_criteria.
+
+    Returns:
+        All calculated data in a save ready format as a Results object.
+
+    """
     watch_data = readers.read_watch_data(input)
     try:
         calibrated_acceleration = calibrator.run(watch_data.acceleration)
