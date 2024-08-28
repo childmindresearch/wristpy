@@ -90,8 +90,16 @@ class Results(BaseModel):
 
         Returns:
             The polars dataframe to be saved into csv or parquet format.
+
+        Raises:
+            ValueError if the attribute for the time column is None.
         """
-        time_data = self.enmo_epoch1.time if use_epoch1_time else self.enmo.time
+        data_source = self.enmo_epoch1 if use_epoch1_time else self.enmo
+
+        if data_source is None:
+            raise ValueError(f"{data_source} is None, can't construct time column.")
+
+        time_data = data_source.time
 
         results_dataframe = pl.DataFrame({"time": time_data})
 
