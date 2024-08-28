@@ -40,7 +40,8 @@ class Measurement(BaseModel):
     def validate_time(cls, v: pl.Series) -> pl.Series:
         """Validate the time series.
 
-        Check that the time series is a datetime series and sorted.
+        Check that the time series is a datetime series, contains only unque entries,
+        and is sorted.
 
         Args:
             cls: The class.
@@ -55,6 +56,8 @@ class Measurement(BaseModel):
         """
         if not isinstance(v.dtype, pl.datatypes.Datetime):
             raise ValueError("Time must be a datetime series")
+        if not v.is_unique().all():
+            raise ValueError("Time series must contain unique entries")
         if not v.is_sorted():
             raise ValueError("Time series must be sorted")
         if v.is_empty():

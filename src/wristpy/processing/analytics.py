@@ -1,8 +1,8 @@
 """Calculate sleep onset and wake up times."""
 
 import abc
+import datetime
 from dataclasses import dataclass
-from datetime import datetime
 from typing import List, Tuple, Union
 
 import numpy as np
@@ -27,8 +27,8 @@ class SleepWindow:
         wakeup: the predicted end time of the sleep window.
     """
 
-    onset: Union[datetime, List]
-    wakeup: Union[datetime, List]
+    onset: Union[datetime.datetime, List]
+    wakeup: Union[datetime.datetime, List]
 
 
 class AbstractSleepDetector(abc.ABC):
@@ -88,8 +88,8 @@ class GGIRSleepDetection(AbstractSleepDetector):
         logger.debug("Beginning sleep detection.")
         spt_window = self._spt_window(self.anglez)
         sib_periods = self._calculate_sib_periods(self.anglez)
-        spt_window_periods = self._find_periods(spt_window)
-        sib_window_periods = self._find_periods(sib_periods)
+        spt_window_periods = _find_periods(spt_window)
+        sib_window_periods = _find_periods(sib_periods)
         sleep_onset_wakeup = self._find_onset_wakeup_times(
             spt_window_periods, sib_window_periods
         )
@@ -103,11 +103,11 @@ class GGIRSleepDetection(AbstractSleepDetector):
 
         This function finds the absolute difference of the anglez data over 5s windows.
         We find the 5-minute rolling median of that difference.
-        Next, we find what that 5-minute median is below a specified threshold, taken as
-        new default value from the GGIR implementation of the HDCZA algorithm.
+        Next, we find when that 5-minute median is above a specified threshold, taken as
+        the new default value from the GGIR implementation of the HDCZA algorithm. This
+        represents non-sleep candidates. The logical not of this is the sleep candidate.
         We then find long blocks (30 minutes) when the threshold criteria is met.
-        Any gaps in SPT windows that are less than a specified window length
-        (default 60 minutes) are filled.
+        Any gaps in SPT windows that are less than 60 minutes are filled.
 
         Args:
             anglez_data: the raw anglez data, calculated from calibrated acceleration.
@@ -123,13 +123,25 @@ class GGIRSleepDetection(AbstractSleepDetector):
               using an accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
               https://doi.org/10.1038/s41598-018-31266-z
         """
+        long_epoch_median = 300
+        long_block = 360
+        short_block_gap = 720
+
         anglez_abs_diff = self._compute_abs_diff_mean_anglez(anglez_data)
-        anglez_median_long_epoch = computations.moving_median(anglez_abs_diff, 300)
-        below_threshold = (anglez_median_long_epoch.measurements < threshold).flatten()
+        anglez_median_long_epoch = computations.moving_median(
+            anglez_abs_diff, long_epoch_median
+        )
+        non_sleep_candidates = (
+            anglez_median_long_epoch.measurements >= threshold
+        ).flatten()
 
-        sleep_idx_array = self._find_long_blocks(below_threshold)
+        sleep_candidates = np.logical_not(
+            self._fill_false_blocks(non_sleep_candidates, long_block)
+        )
 
-        sleep_idx_array_filled = self._fill_short_blocks(sleep_idx_array)
+        sleep_idx_array_filled = self._fill_false_blocks(
+            sleep_candidates, short_block_gap
+        )
 
         return models.Measurement(
             measurements=sleep_idx_array_filled, time=anglez_median_long_epoch.time
@@ -180,8 +192,8 @@ class GGIRSleepDetection(AbstractSleepDetector):
 
     def _find_onset_wakeup_times(
         self,
-        spt_periods: List[Tuple[datetime, datetime]],
-        sib_periods: List[Tuple[datetime, datetime]],
+        spt_periods: List[Tuple[datetime.datetime, datetime.datetime]],
+        sib_periods: List[Tuple[datetime.datetime, datetime.datetime]],
     ) -> List[SleepWindow]:
         """Find the sleep onset and wake up times.
 
@@ -223,70 +235,42 @@ class GGIRSleepDetection(AbstractSleepDetector):
 
         return sleep_windows
 
-    def _find_long_blocks(
-        self, below_threshold: np.ndarray, block_length: int = 360
+    def _fill_false_blocks(
+        self, boolean_array: np.ndarray, gap_block: int
     ) -> np.ndarray:
-        """Helper function to find long blocks where SPT window is true.
-
-        This function uses the convolution of a kernel of 1s, of length block_length,
-        to find the continuous long blocks where SPT window is true. Where the
-        convolution value is == long_block_length that implies an overlap between the
-        kernel and the threshold signal of length long_block.
-
-        Args:
-            below_threshold: the 5-minute rolling median of the anglez difference
-                that is true when below the cutoff threshold.
-            block_length: the length of the long block that defines sleep, default is
-                30 minutes. (360 chunks of 5s)
-
-        Returns:
-            A numpy array with 1s indicating the identified SPT windows.
-        """
-        kernel = np.ones(block_length, dtype=int)
-        convolved = np.convolve(below_threshold, kernel, mode="same")
-        long_blocks_idx = np.where(convolved == block_length)[0]
-        sleep_idx_array = np.zeros(len(below_threshold))
-        sleep_idx_array[long_blocks_idx] = 1
-
-        return sleep_idx_array
-
-    def _fill_short_blocks(
-        self, sleep_idx_array: np.ndarray, gap_block: int = 720
-    ) -> np.ndarray:
-        """Helper function to fill gaps in SPT window that are less than 60 minutes.
+        """Helper function to fill gaps in SPT window that are less than gap_blocks.
 
         We find the first non-zero in the sleep_idx_array, if there are none ,
         we return the initial array.
         We then iterate over the array and count every zero between ones
-        (skipping the first 1),
+        (skipping the leading zeros),
         if that value is less than the gap_block, we fill in with ones.
 
         Args:
-            sleep_idx_array: the array of SPT windows.
-            gap_block: the length of the gap that defines sleep, default is 60 minutes.
-                The units are chunks of 5s.
+            boolean_array: A generic boolean array, typically the SPT window.
+            gap_block: the length of the gap that needs to be filled.
 
         Returns:
-            A numpy array with 1s indicating the identified SPT windows.
+            A numpy array with 1s, typically for identified SPT windows.
         """
         n_zeros = 0
         first_one_idx = next(
-            (index for index, value in enumerate(sleep_idx_array) if value), None
+            (index for index, value in enumerate(boolean_array) if value), None
         )
         if first_one_idx is None:
-            return sleep_idx_array
+            return boolean_array
 
-        for sleep_array_idx in range(first_one_idx, len(sleep_idx_array)):
-            sleep_value = sleep_idx_array[sleep_array_idx]
+        for sleep_array_idx in range(first_one_idx, len(boolean_array)):
+            sleep_value = boolean_array[sleep_array_idx]
             if not sleep_value:
                 n_zeros += 1
                 continue
 
             if n_zeros < gap_block:
-                sleep_idx_array[sleep_array_idx - n_zeros : sleep_array_idx] = 1
-                n_zeros = 0
+                boolean_array[sleep_array_idx - n_zeros : sleep_array_idx] = True
+            n_zeros = 0
 
-        return sleep_idx_array
+        return boolean_array
 
     def _compute_abs_diff_mean_anglez(
         self, anglez_data: models.Measurement, window_size_seconds: int = 5
@@ -311,41 +295,84 @@ class GGIRSleepDetection(AbstractSleepDetector):
             measurements=absolute_diff, time=anglez_epoch1.time[1:]
         )
 
-    def _find_periods(
-        self, window_measurement: models.Measurement
-    ) -> List[Tuple[datetime, datetime]]:
-        """Find periods where window_measurement is equal to 1.
 
-        This is a helper function for the _find_onset_wakeup_times to
-        find periods where either the spt_window or sib_periods are equal to 1.
+def _find_periods(
+    window_measurement: models.Measurement,
+) -> List[Tuple[datetime.datetime, datetime.datetime]]:
+    """Find periods where window_measurement is equal to 1.
 
-        Args:
-            window_measurement: the Measurement instance, intended to be
-                either the spt_window or sib_period.
+    This is a helper function to return the periods in the format of
+    List [start_of_period, end_of_period], it is used in the
+    GGIRSleepDetection class and when removing non-wear periods from sleep windows.
 
-        Returns:
-            A list of tuples, where each tuple contains the start and end times of
-            a period. For isolated ones the function returns the same start
-            and end time. The list is sorted by time.
-        """
-        edge_detection = np.convolve([1, 3, 1], window_measurement.measurements, "same")
-        single_one = np.nonzero(edge_detection == 3)[0]
+    Args:
+        window_measurement: the Measurement instance, intended to be
+            either the spt_window or sib_period.
 
-        single_periods = [
-            (window_measurement.time.item(idx), window_measurement.time.item(idx))
-            for idx in single_one
-        ]
+    Returns:
+        A list of tuples, where each tuple contains the start and end times of
+        a period. For isolated ones the function returns the same start
+        and end time. The list is sorted by time.
+    """
+    edge_detection = np.convolve([1, 3, 1], window_measurement.measurements, "same")
+    single_one = np.nonzero(edge_detection == 3)[0]
 
-        blocked_one_edge = np.nonzero(edge_detection == 4)[0]
-        block_pairs = np.reshape(blocked_one_edge, (-1, 2))
-        block_periods = [
-            (window_measurement.time.item(idx[0]), window_measurement.time.item(idx[1]))
-            for idx in block_pairs
-        ]
-        all_periods = single_periods + block_periods
-        all_periods.sort()
+    single_periods = [
+        (window_measurement.time.item(idx), window_measurement.time.item(idx))
+        for idx in single_one
+    ]
 
-        return all_periods
+    blocked_one_edge = np.nonzero(edge_detection == 4)[0]
+    block_pairs = np.reshape(blocked_one_edge, (-1, 2))
+    block_periods = [
+        (window_measurement.time.item(idx[0]), window_measurement.time.item(idx[1]))
+        for idx in block_pairs
+    ]
+    all_periods = single_periods + block_periods
+    all_periods.sort()
+
+    return all_periods
+
+
+def remove_nonwear_from_sleep(
+    non_wear_array: models.Measurement,
+    sleep_windows: List[SleepWindow],
+) -> List[SleepWindow]:
+    """Remove non-wear periods from sleep windows.
+
+    This function finds all the non-wear periods and removes any sleep windows that have
+    any overlap with the non-wear periods (including non-wear completely
+    within the sleep window).
+
+    Args:
+        non_wear_array: The non-wear array generated from metrics.detect_nonwear
+        sleep_windows : The list of sleep windows, where the entries are
+            instances of the SleepWindow class.
+
+    Returns:
+        A List of the filtered sleep windows.
+    """
+    nonwear_periods = _find_periods(non_wear_array)
+
+    filtered_sleep_windows = []
+    for sleep_window in sleep_windows:
+        if isinstance(sleep_window.onset, datetime.datetime) and isinstance(
+            sleep_window.wakeup, datetime.datetime
+        ):
+            if not any(
+                (
+                    nonwear_period[0] <= sleep_window.onset <= nonwear_period[1]
+                    or nonwear_period[0] <= sleep_window.wakeup <= nonwear_period[1]
+                )
+                or (
+                    sleep_window.onset <= nonwear_period[0]
+                    and sleep_window.wakeup >= nonwear_period[1]
+                )
+                for nonwear_period in nonwear_periods
+            ):
+                filtered_sleep_windows.append(sleep_window)
+
+    return filtered_sleep_windows
 
 
 def compute_physical_activty_categories(

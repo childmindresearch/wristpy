@@ -2,22 +2,34 @@ name: Python Tests
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 jobs:
   unit:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python_version: ['3.9', '3.10', '3.11', '3.12']
+        resolution: [lowest-direct, highest]
     steps:
     - uses: actions/checkout@v4
     - name: Install poetry
       run: pipx install poetry
     - uses: actions/setup-python@v5
       with:
-        python-version-file: pyproject.toml
-        cache: poetry
+        python-version: ${{ matrix.python_version }}
+        cache: pip
     - name: Install dependencies
       run: |
-        poetry install
+        poetry env use python
+        poetry run pip install uv
+        poetry run uv pip install --resolution=${{ matrix.resolution }} .
+        poetry install --only dev
+      shell: bash
     - name: Run tests
       id: run-tests
       run: >
@@ -28,6 +40,7 @@ jobs:
           --cov=src tests \
           --log-level=DEBUG \
           --verbose
+      shell: bash
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:

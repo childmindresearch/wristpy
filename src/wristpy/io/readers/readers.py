@@ -1,7 +1,7 @@
 """Function to read accelerometer data from a file."""
 
 import pathlib
-from typing import Literal
+from typing import Literal, Union
 
 import actfast
 import numpy as np
@@ -10,7 +10,7 @@ import polars as pl
 from wristpy.core import models
 
 
-def read_watch_data(file_name: pathlib.Path | str) -> models.WatchData:
+def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
     """Read watch data from a file.
 
     Currently supported watch types are Actigraph .gt3x and GeneActiv .bin.
