@@ -11,7 +11,9 @@ import polars as pl
 from sklearn import linear_model
 from sklearn import metrics as sklearn_metrics
 
-from wristpy.core import computations, models
+from wristpy.core import computations, config, models
+
+logger = config.get_logger()
 
 
 class SphereCriteriaError(Exception):
@@ -409,7 +411,8 @@ class Calibration:
             weights = np.minimum(
                 1 / np.linalg.norm(current - closest_point, axis=1), 100
             )
-
+            logger.debug(f"scale: {scale}, offset: {offset}")
+            logger.debug(f"residual: {residual}")
             if abs(residual - previous_residual) < self.error_tolerance:
                 break
 
