@@ -93,7 +93,9 @@ class GGIRSleepDetection(AbstractSleepDetector):
         sleep_onset_wakeup = self._find_onset_wakeup_times(
             spt_window_periods, sib_window_periods
         )
-
+        logger.debug(
+            f"Sleep detection complete. Windows detected: {len(sleep_onset_wakeup)}"
+        )
         return sleep_onset_wakeup
 
     def _spt_window(
@@ -123,6 +125,7 @@ class GGIRSleepDetection(AbstractSleepDetector):
               using an accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
               https://doi.org/10.1038/s41598-018-31266-z
         """
+        logger.debug(f"Finding spt windows, Threshold: {threshold}")
         long_epoch_median = 300
         long_block = 360
         short_block_gap = 720
@@ -142,7 +145,7 @@ class GGIRSleepDetection(AbstractSleepDetector):
         sleep_idx_array_filled = self._fill_false_blocks(
             sleep_candidates, short_block_gap
         )
-
+        logger.debug("Found SPT windows")
         return models.Measurement(
             measurements=sleep_idx_array_filled, time=anglez_median_long_epoch.time
         )
@@ -314,6 +317,7 @@ def _find_periods(
         a period. For isolated ones the function returns the same start
         and end time. The list is sorted by time.
     """
+    logger.debug("Finding periods.")
     edge_detection = np.convolve([1, 3, 1], window_measurement.measurements, "same")
     single_one = np.nonzero(edge_detection == 3)[0]
 
@@ -403,8 +407,11 @@ def compute_physical_activty_categories(
     Raises:
         ValueError: If the threshold values are not in ascending order.
     """
+    logger.debug(f"Computing physical activity levels, thresholds: {thresholds}")
     if list(thresholds) != sorted(thresholds):
-        raise ValueError("Thresholds must be in ascending order.")
+        message = "Thresholds must be in ascending order."
+        logger.error("ValueError, thresholds must be in ascending order.")
+        raise ValueError(message)
 
     activity_levels = (
         (

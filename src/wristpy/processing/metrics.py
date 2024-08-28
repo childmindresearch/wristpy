@@ -112,10 +112,6 @@ def detect_nonwear(
     )
     non_wear_flag = np.where(nonwear_value_array_cleaned >= 2, 1, 0)
 
-    logger.debug(
-        f"Returning non-wear array of length {len(non_wear_flag)},",
-        f"time stamps of length {len(acceleration_grouped_by_short_window["time"])}",
-    )
     return models.Measurement(
         measurements=non_wear_flag, time=acceleration_grouped_by_short_window["time"]
     )
