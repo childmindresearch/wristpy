@@ -170,6 +170,7 @@ class Calibration:
             CalibrationError: If the calibration process fails to get below the
                 `min_calibration_error` threshold.
         """
+        logger.debug("Starting calibration.")
         data_range = cast(datetime, acceleration.time.max()) - cast(
             datetime, acceleration.time.min()
         )
@@ -288,7 +289,7 @@ class Calibration:
             and temperature: an evaluation on four continents. J Appl Physiol (1985)
             2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
         """
-        logger.debug("attempting calibration...")
+        logger.debug("attempting to calibrate...")
         no_motion_data = self._extract_no_motion(acceleration=acceleration)
         linear_transformation = self._closest_point_fit(no_motion_data=no_motion_data)
 
@@ -311,7 +312,11 @@ class Calibration:
                 f"Initial Error: {cal_error_initial}, Final Error: {cal_error_end},"
                 f"Error threshold: {self.min_calibration_error}"
             )
-        logger.debug("Calibration successful, returning scale and offset values.")
+        logger.debug(
+            "Calibration successful.",
+            f"scale: {linear_transformation.scale}.",
+            f"Offset: {linear_transformation.offset}.",
+        )
         return linear_transformation
 
     def _extract_no_motion(self, acceleration: models.Measurement) -> np.ndarray:
@@ -429,9 +434,10 @@ class Calibration:
             weights = np.minimum(
                 1 / np.linalg.norm(current - closest_point, axis=1), 100
             )
-            logger.debug(f"scale: {scale}, offset: {offset}")
-            logger.debug(f"residual: {residual}")
+
+            logger.debug(f"scale: {scale}, offset: {offset}, residual: {residual}")
             if abs(residual - previous_residual) < self.error_tolerance:
+                logger.debug("Change in residual below error tolerance, ending loop.}")
                 break
 
             previous_residual = residual

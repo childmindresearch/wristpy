@@ -145,7 +145,6 @@ class GGIRSleepDetection(AbstractSleepDetector):
         sleep_idx_array_filled = self._fill_false_blocks(
             sleep_candidates, short_block_gap
         )
-        logger.debug("Found SPT windows")
         return models.Measurement(
             measurements=sleep_idx_array_filled, time=anglez_median_long_epoch.time
         )
@@ -172,6 +171,7 @@ class GGIRSleepDetection(AbstractSleepDetector):
             Duration Using a Wrist-Worn Accelerometer. PLoS One 10, e0142533 (2015).
             https://doi.org/10.1371/journal.pone.0142533
         """
+        logger.debug(f"Calculating SIB period threshold: {threshold_degrees} degrees")
         anglez_abs_diff = self._compute_abs_diff_mean_anglez(anglez_data)
 
         anglez_pl_df = pl.DataFrame(
@@ -220,6 +220,11 @@ class GGIRSleepDetection(AbstractSleepDetector):
             If there is no overlap between spt_windows and sib_periods,
             the onset and wakeup lists will be empty.
         """
+        logger.debug(
+            "Searching for SIB periods within SPT windows."
+            f"SPT periods: {len(spt_periods)},"
+            f"SIB periods: {len(sib_periods)}"
+        )
         sleep_windows = []
         for sleep_guide in spt_periods:
             min_onset = None
@@ -235,7 +240,7 @@ class GGIRSleepDetection(AbstractSleepDetector):
                         max_wakeup = inactivity_bout[1]
             if min_onset is not None and max_wakeup is not None:
                 sleep_windows.append(SleepWindow(onset=min_onset, wakeup=max_wakeup))
-
+        logger.debug(f"{sleep_windows} sleep windows found.")
         return sleep_windows
 
     def _fill_false_blocks(
@@ -317,7 +322,7 @@ def _find_periods(
         a period. For isolated ones the function returns the same start
         and end time. The list is sorted by time.
     """
-    logger.debug("Finding periods.")
+    logger.debug("Finding periods in window measurement.")
     edge_detection = np.convolve([1, 3, 1], window_measurement.measurements, "same")
     single_one = np.nonzero(edge_detection == 3)[0]
 
@@ -335,6 +340,7 @@ def _find_periods(
     all_periods = single_periods + block_periods
     all_periods.sort()
 
+    logger.debug(f"Found {len(all_periods)} periods.")
     return all_periods
 
 
@@ -356,6 +362,7 @@ def remove_nonwear_from_sleep(
     Returns:
         A List of the filtered sleep windows.
     """
+    logger.debug(f"Finding non-wear periods within {len(sleep_windows)} sleep windows.")
     nonwear_periods = _find_periods(non_wear_array)
 
     filtered_sleep_windows = []
@@ -376,6 +383,7 @@ def remove_nonwear_from_sleep(
             ):
                 filtered_sleep_windows.append(sleep_window)
 
+    logger.debug(f"Non-wear removed. {len(sleep_windows)} sleep windows remain.")
     return filtered_sleep_windows
 
 
@@ -426,5 +434,4 @@ def compute_physical_activty_categories(
         * 2
         + (enmo_epoch1.measurements > thresholds[2]) * 3
     )
-
     return models.Measurement(measurements=activity_levels, time=enmo_epoch1.time)
