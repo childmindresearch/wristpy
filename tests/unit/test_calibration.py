@@ -123,6 +123,52 @@ def test_closest_point_fit() -> None:
     ), f"Offset is {linear_transform.offset} expected {expected_offset})"
 
 
+def test_closest_point_fit_zscore() -> None:
+    """Test closest point fit."""
+    scale = np.array([1.1, 0.9, 0.6])
+    offset = np.array([0.1, 0.2, 0.1])
+    expected_scale = 1 / scale
+    expected_offset = -offset / scale
+    data = np.random.randn(1000, 3)
+    norms = np.linalg.norm(data, axis=1, keepdims=True)
+    unit_sphere = data / norms
+    calibrator = calibration.Calibration()
+
+    linear_transform = calibrator._closest_point_fit_zscore(
+        (unit_sphere * scale) + offset
+    )
+
+    assert np.allclose(
+        linear_transform.scale, expected_scale, atol=1e-3
+    ), f"Scale is {linear_transform.scale} expected {expected_scale}"
+    assert np.allclose(
+        linear_transform.offset, expected_offset, atol=1e-3
+    ), f"Offset is {linear_transform.offset} expected {expected_offset})"
+
+
+def test_closest_point_fit_gradient() -> None:
+    """Test closest point fit."""
+    scale = np.array([1.1, 0.9, 0.6])
+    offset = np.array([0.1, 0.2, 0.1])
+    expected_scale = 1 / scale
+    expected_offset = -offset / scale
+    data = np.random.randn(1000, 3)
+    norms = np.linalg.norm(data, axis=1, keepdims=True)
+    unit_sphere = data / norms
+    calibrator = calibration.Calibration()
+
+    linear_transform = calibrator._closest_point_fit_gradient_descent(
+        (unit_sphere * scale) + offset
+    )
+
+    assert np.allclose(
+        linear_transform.scale, expected_scale, atol=1e-3
+    ), f"Scale is {linear_transform.scale} expected {expected_scale}"
+    assert np.allclose(
+        linear_transform.offset, expected_offset, atol=1e-3
+    ), f"Offset is {linear_transform.offset} expected {expected_offset})"
+
+
 def test_calibrate_calibration_error() -> None:
     """Test error when calibration was not possible."""
     dummy_measure = create_dummy_measurement(
@@ -146,7 +192,7 @@ def test_calibration_successful() -> None:
     offset = np.array([0.1, 0.2, 0.1])
     expected_scale = 1 / scale
     expected_offset = -offset / scale
-    dummy_no_motion = np.random.randn(1000, 3) - 0.5
+    dummy_no_motion = np.random.randn(1000, 3)
     norms = np.linalg.norm(dummy_no_motion, axis=1, keepdims=True)
     unit_sphere = dummy_no_motion / norms
     test_data = np.repeat(unit_sphere, repeats=10, axis=0)
@@ -215,7 +261,7 @@ def test_run_calibration() -> None:
     """Testing run function when chunked = False."""
     scale = np.array([1.1, 1.01, 0.9])
     offset = np.array([0.1, 0.2, 0.1])
-    dummy_no_motion = np.random.randn(1000, 3) - 0.5
+    dummy_no_motion = np.random.randn(1000, 3) - 0.2
     norms = np.linalg.norm(dummy_no_motion, axis=1, keepdims=True)
     unit_sphere = dummy_no_motion / norms
     test_data = np.repeat(unit_sphere, repeats=10, axis=0)
@@ -263,7 +309,10 @@ def test_run_chunked_calibration() -> None:
         time=pl.Series(time_data).alias("time"),
     )
     calibrator = calibration.Calibration(
-        min_standard_deviation=9999, chunked=True, min_calibration_hours=1
+        min_standard_deviation=9999,
+        chunked=True,
+        min_calibration_hours=1,
+        method="GGIR",
     )
 
     result = calibrator.run(dummy_measure)
