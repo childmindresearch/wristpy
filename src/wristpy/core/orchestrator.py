@@ -47,7 +47,6 @@ class Results(BaseModel):
         file_raw_time.csv in the path/to/file directory.
 
         Args:
-            self: The object itself.
             output: The path and file name of the data to be saved. as either a csv or
                 parquet files.
 
@@ -81,7 +80,6 @@ class Results(BaseModel):
         """Format results into a dataframe.
 
         Args:
-            self: the results object.
             use_epoch1_time: Determines which temporal resolution and data to use. If
                 True the dataframe will contain enmo_epoch1, anglez_epoch1,
                 nonwear_epoch1, physical_activity_levels and sleep_windows_epoch1. If
@@ -118,24 +116,24 @@ class Results(BaseModel):
 
 
 def format_sleep_data(
-    sleep_windows: List[analytics.SleepWindow], epoch1_measure: models.Measurement
+    sleep_windows: List[analytics.SleepWindow], reference_measure: models.Measurement
 ) -> np.ndarray:
     """Formats sleep windows into an array for saving.
 
     Args:
         sleep_windows: The list of time stamp pairs indicating periods of sleep.
-        epoch1_measure: The measure from which the temporal resolution will be taken.
+        reference_measure: The measure from which the temporal resolution will be taken.
             Any epoch1 measure can be used, but enmo is used for consistency.
 
     Returns:
         1-D binary np.ndarray, with 1 indicating sleep. Will be of the same length as
             the timestamps in the epoch1_measure.
     """
-    sleep_array = np.zeros(len(epoch1_measure.time))
+    sleep_array = np.zeros(len(reference_measure.time))
 
     for window in sleep_windows:
-        sleep_mask = (epoch1_measure.time >= window.onset) & (
-            epoch1_measure.time <= window.wakeup
+        sleep_mask = (reference_measure.time >= window.onset) & (
+            reference_measure.time <= window.wakeup
         )
         sleep_array[sleep_mask] = 1
 
@@ -143,18 +141,18 @@ def format_sleep_data(
 
 
 def format_nonwear_data(
-    nonwear_data: models.Measurement, epoch1_measure: models.Measurement
+    nonwear_data: models.Measurement, reference_measure: models.Measurement
 ) -> np.ndarray:
     """Format nonwear data into an array for saving.
 
     Args:
         nonwear_data: The nonwear measurement.
-        epoch1_measure: The measure from which the temporal resolution will be taken.
+        reference_measure: The measure from which the temporal resolution will be taken.
             Any epoch1 measure can be used, but enmo is used for consistency.
 
     Returns:
         1-D binary np.ndarray, with 1 indicating nonwear. Will be of the same length as
-            the timestamps in the epoch1_measure.
+            the timestamps in the reference_measure.
 
     """
     nonwear_df = pl.DataFrame(
@@ -169,7 +167,7 @@ def format_nonwear_data(
 
     end_sequence = pl.repeat(
         nonwear_upsample["nonwear"][-1],
-        n=(len(epoch1_measure.time) - len(nonwear_upsample["time"])),
+        n=(len(reference_measure.time) - len(nonwear_upsample["time"])),
         dtype=pl.Int64,
         eager=True,
     )

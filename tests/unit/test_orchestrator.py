@@ -120,6 +120,26 @@ def test_results_to_dataframe_raw(dummy_results: orchestrator.Results) -> None:
     assert "anglez" in df_raw_time.columns
 
 
+def test_results_to_dataframe_value_error_epoch1(
+    dummy_results: orchestrator.Results,
+) -> None:
+    """Tests that error is raised when time reference is None."""
+    results = orchestrator.Results()
+
+    with pytest.raises(ValueError):
+        results._results_to_dataframe()
+
+
+def test_results_to_dataframe_value_error_raw(
+    dummy_results: orchestrator.Results,
+) -> None:
+    """Tests that error is raised when time reference is None."""
+    results = orchestrator.Results()
+
+    with pytest.raises(ValueError):
+        results._results_to_dataframe(use_epoch1_time=False)
+
+
 @pytest.mark.parametrize(
     "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
 )
@@ -185,5 +205,4 @@ def test_run_bad_output(capfd: capture.CaptureFixture[str]) -> None:
     assert results.sleep_windows is not None
     assert results.physical_activity_levels is not None
     assert results.nonwear_epoch1 is not None
-
     assert results.sleep_windows_epoch1 is not None
