@@ -160,7 +160,8 @@ def format_nonwear_data(
             "nonwear": nonwear_data.measurements,
             "time": nonwear_data.time,
         }
-    )
+    ).set_sorted("time")
+
     nonwear_upsample = nonwear_df.upsample(time_column="time", every="5s").fill_null(
         strategy="forward"
     )
