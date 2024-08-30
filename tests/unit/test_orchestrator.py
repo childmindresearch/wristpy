@@ -57,7 +57,7 @@ def test_format_sleep() -> None:
     )
 
     sleep_array = orchestrator.format_sleep_data(
-        sleep_windows=[sleep_window_1, sleep_window_2], epoch1_measure=dummy_measure
+        sleep_windows=[sleep_window_1, sleep_window_2], reference_measure=dummy_measure
     )
 
     assert (
@@ -81,7 +81,7 @@ def test_format_nonwear() -> None:
     )
 
     non_wear_epoch1 = orchestrator.format_nonwear_data(
-        nonwear_data=nonwear_measurement, epoch1_measure=dummy_epoch1
+        nonwear_data=nonwear_measurement, reference_measure=dummy_epoch1
     )
 
     assert (
