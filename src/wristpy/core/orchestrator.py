@@ -1,7 +1,7 @@
 """Python based runner."""
 
 import pathlib
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import polars as pl
@@ -181,7 +181,7 @@ def run(
     output: pathlib.Path | None = None,
     settings: config.Settings = config.Settings(),
     calibrator: calibration.Calibration = calibration.Calibration(),
-    detect_nonwear_kwargs: Optional[Dict[str, float]] = None,
+    detect_nonwear_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Results:
     """Runs wristpy.
 
@@ -227,13 +227,13 @@ def run(
     )
     sleep_array = models.Measurement(
         measurements=format_sleep_data(
-            sleep_windows=sleep_windows, epoch1_measure=enmo_epoch1
+            sleep_windows=sleep_windows, reference_measure=enmo_epoch1
         ),
         time=enmo_epoch1.time,
     )
     nonwear_epoch1 = models.Measurement(
         measurements=format_nonwear_data(
-            nonwear_data=non_wear_array, epoch1_measure=enmo_epoch1
+            nonwear_data=non_wear_array, reference_measure=enmo_epoch1
         ),
         time=enmo_epoch1.time,
     )
