@@ -178,7 +178,7 @@ def format_nonwear_data(
 
 def run(
     input: pathlib.Path,
-    output: pathlib.Path | None = None,
+    output: Optional[pathlib.Path] = None,
     settings: config.Settings = config.Settings(),
     calibrator: calibration.Calibration = calibration.Calibration(),
     detect_nonwear_kwargs: Optional[Dict[str, Any]] = None,
