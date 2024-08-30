@@ -157,7 +157,7 @@ def format_nonwear_data(
     """
     nonwear_df = pl.DataFrame(
         {
-            "nonwear": nonwear_data.measurements.astype(np.int64s),
+            "nonwear": nonwear_data.measurements.astype(np.int64),
             "time": nonwear_data.time,
         }
     ).set_sorted("time")
