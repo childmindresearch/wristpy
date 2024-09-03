@@ -363,7 +363,8 @@ def remove_nonwear_from_sleep(
         A List of the filtered sleep windows.
     """
     logger.debug(
-        "Finding non-wear periods within %s sleep windows.", len(sleep_windows)
+        "Finding non-wear periods that overlap with any of the %s sleep windows.",
+        len(sleep_windows),
     )
     nonwear_periods = _find_periods(non_wear_array)
 
