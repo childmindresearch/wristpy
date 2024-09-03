@@ -12,7 +12,7 @@ class Settings(pydantic_settings.BaseSettings):
     MODERATE_THRESHOLD: float = 0.1
     VIGOROUS_THRESHOLD: float = 0.3
 
-    LOGGING_LEVEL = logging.INFO
+    LOGGING_LEVEL: int = logging.INFO
 
 
 def get_logger() -> logging.Logger:
