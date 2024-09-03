@@ -123,29 +123,6 @@ def test_closest_point_fit() -> None:
     ), f"Offset is {linear_transform.offset} expected {expected_offset})"
 
 
-def test_closest_point_fit_zscore() -> None:
-    """Test closest point fit."""
-    scale = np.array([1.1, 0.9, 0.6])
-    offset = np.array([0.1, 0.2, 0.1])
-    expected_scale = 1 / scale
-    expected_offset = -offset / scale
-    data = np.random.randn(1000, 3)
-    norms = np.linalg.norm(data, axis=1, keepdims=True)
-    unit_sphere = data / norms
-    calibrator = calibration.Calibration()
-
-    linear_transform = calibrator._closest_point_fit_zscore(
-        (unit_sphere * scale) + offset
-    )
-
-    assert np.allclose(
-        linear_transform.scale, expected_scale, atol=1e-3
-    ), f"Scale is {linear_transform.scale} expected {expected_scale}"
-    assert np.allclose(
-        linear_transform.offset, expected_offset, atol=1e-3
-    ), f"Offset is {linear_transform.offset} expected {expected_offset})"
-
-
 def test_closest_point_fit_gradient() -> None:
     """Test closest point fit."""
     scale = np.array([1.1, 0.9, 0.6])

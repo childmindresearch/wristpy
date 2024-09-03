@@ -68,7 +68,7 @@ class Calibration:
                 calibrate on entire dataset.
             method: Define the method used to find the calibration scaling and offset
                 that minimizes the calibration error. Current options are:
-                    'Zscore', 'GGIR', default is 'Gradient'.
+                    'GGIR', or the default 'Gradient'.
             min_acceleration: Minimum acceleration for sphere criteria.
             min_calibration_hours: Minimum hours of data required for calibration.
             min_standard_deviation: Minimum standard deviation for no-motion detection.
@@ -285,10 +285,6 @@ class Calibration:
             linear_transformation = self._closest_point_fit(
                 no_motion_data=no_motion_data
             )
-        elif self.method == "ZScore":
-            linear_transformation = self._closest_point_fit_zscore(
-                no_motion_data=no_motion_data
-            )
         else:
             linear_transformation = self._closest_point_fit_gradient_descent(
                 no_motion_data=no_motion_data
@@ -437,26 +433,6 @@ class Calibration:
 
         return LinearTransformation(scale=scale, offset=offset)
 
-    def _closest_point_fit_zscore(
-        self, no_motion_data: np.ndarray
-    ) -> LinearTransformation:
-        """Find linear transformation parameters that minimzes distance to unit sphere.
-
-        This function finds the linear transformation scale and offset parameters based
-        on the normalized z-score of the no motion data.
-
-        Args:
-            no_motion_data: The acceleration data during periods of no
-                motion, in order to determine scale and offset.
-
-        Returns:
-            A LinearTransformation object with scale and offset parameters to be applied
-            to acceleration data for calibration.
-        """
-        scale = 1 / (np.sqrt(3) * np.std(no_motion_data, axis=0))
-        offset = -np.mean(no_motion_data, axis=0) * scale
-        return LinearTransformation(scale=scale, offset=offset)
-
     def _closest_point_fit_gradient_descent(
         self, no_motion_data: np.ndarray
     ) -> LinearTransformation:
@@ -466,7 +442,9 @@ class Calibration:
         optimial scale and offset parameters that will minimze the error function,
         which is defined as the distance of the no_motion acceleration data
         from the unit sphere (where the unit sphere represents the ideal data points
-        under 1g acceleartion due to Earth's gravity).
+        under 1g acceleartion due to Earth's gravity). The initial guess for the
+        scale and offset are chosen by the equivalent transformation that would z-score
+        the no_motion_data.
 
         Args:
             no_motion_data: The acceleration data during periods of no motion.
@@ -478,8 +456,8 @@ class Calibration:
         Raises:
             ValueError if the optimization has failed.
         """
-        start_offset = np.zeros(3)
-        start_scale = np.ones(3)
+        start_scale = 1 / (np.sqrt(3) * np.std(no_motion_data, axis=0))
+        start_offset = -np.mean(no_motion_data, axis=0) * start_scale
 
         def get_distance_to_unit_sphere(params: list[float]) -> float:
             scale = params[:3]
