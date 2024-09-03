@@ -146,6 +146,15 @@ def test_closest_point_fit_gradient() -> None:
     ), f"Offset is {linear_transform.offset} expected {expected_offset})"
 
 
+def test_closest_point_fit_gradient_value_error() -> None:
+    """Test closest point fit gradient raises ValueError."""
+    data = np.random.randn(1000, 3)
+    calibrator = calibration.Calibration(max_iterations=0)
+
+    with pytest.raises(ValueError):
+        calibrator._closest_point_fit_gradient_descent(data)
+
+
 def test_calibrate_calibration_error() -> None:
     """Test error when calibration was not possible."""
     dummy_measure = create_dummy_measurement(
