@@ -217,7 +217,7 @@ class Calibration:
             CalibrationError: If all possible chunks have been used and the calibration
                 process fails to get below the `min_calibration_error` threshold.
         """
-        logger.debug("running chunked calibration.")
+        logger.debug("Running chunked calibration.")
         for chunk in self._get_chunk(acceleration):
             try:
                 return self._calibrate(chunk)
@@ -289,7 +289,7 @@ class Calibration:
             and temperature: an evaluation on four continents. J Appl Physiol (1985)
             2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
         """
-        logger.debug("attempting to calibrate...")
+        logger.debug("Attempting to calibrate...")
         no_motion_data = self._extract_no_motion(acceleration=acceleration)
         linear_transformation = self._closest_point_fit(no_motion_data=no_motion_data)
 
@@ -308,14 +308,14 @@ class Calibration:
             cal_error_end >= self.min_calibration_error
         ):
             raise CalibrationError(
-                "Calibration error could not be sufficiently minimized."
-                f"Initial Error: {cal_error_initial}, Final Error: {cal_error_end},"
+                "Calibration error could not be sufficiently minimized. "
+                f"Initial Error: {cal_error_initial}, Final Error: {cal_error_end}, "
                 f"Error threshold: {self.min_calibration_error}"
             )
         logger.debug(
-            "Calibration successful.",
-            f"scale: {linear_transformation.scale}.",
-            f"Offset: {linear_transformation.offset}.",
+            "Calibration successful. Scale: %s, Offset: %s",
+            linear_transformation.scale,
+            linear_transformation.offset,
         )
         return linear_transformation
 
@@ -347,7 +347,7 @@ class Calibration:
             and temperature: an evaluation on four continents. J Appl Physiol (1985)
             2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
         """
-        logger.debug("extracting no motion.")
+        logger.debug("Extracting no motion.")
         moving_sd = computations.moving_std(acceleration, 10)
         moving_mean = computations.moving_mean(acceleration, 10)
         no_motion_check = np.all(
@@ -435,7 +435,7 @@ class Calibration:
                 1 / np.linalg.norm(current - closest_point, axis=1), 100
             )
 
-            logger.debug(f"scale: {scale}, offset: {offset}, residual: {residual}")
+            logger.debug("Scale: %s, Offset: %s, Residual: %s", scale, offset, residual)
             if abs(residual - previous_residual) < self.error_tolerance:
                 logger.debug("Change in residual below error tolerance, ending loop.}")
                 break
