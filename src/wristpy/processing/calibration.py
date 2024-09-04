@@ -12,28 +12,43 @@ from scipy import optimize
 from sklearn import linear_model
 from sklearn import metrics as sklearn_metrics
 
-from wristpy.core import computations, models
+from wristpy.core import computations, config, models
+
+logger = config.get_logger()
 
 
-class SphereCriteriaError(Exception):
+class LoggedException(Exception):
+    """Base class that automatically logs messages."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize a new instance of the LoggedException class.
+
+        Args:
+            message: The message to display.
+        """
+        logger.exception(message)
+        super().__init__(message)
+
+
+class SphereCriteriaError(LoggedException):
     """Data did not meet the sphere criteria."""
 
     pass
 
 
-class CalibrationError(Exception):
+class CalibrationError(LoggedException):
     """Was not able to lower calibration below error threshold."""
 
     pass
 
 
-class NoMotionError(Exception):
+class NoMotionError(LoggedException):
     """No epochs with zero movement could be found in the data."""
 
     pass
 
 
-class ZeroScaleError(Exception):
+class ZeroScaleError(LoggedException):
     """Scale value went to zero."""
 
     pass
@@ -164,6 +179,7 @@ class Calibration:
             CalibrationError: If the calibration process fails to get below the
                 `min_calibration_error` threshold.
         """
+        logger.debug("Starting calibration.")
         data_range = cast(datetime, acceleration.time.max()) - cast(
             datetime, acceleration.time.min()
         )
@@ -210,6 +226,7 @@ class Calibration:
             CalibrationError: If all possible chunks have been used and the calibration
                 process fails to get below the `min_calibration_error` threshold.
         """
+        logger.debug("Running chunked calibration.")
         for chunk in self._get_chunk(acceleration):
             try:
                 return self._calibrate(chunk)
@@ -231,6 +248,7 @@ class Calibration:
             everytime the generator function is called.
 
         """
+        logger.debug("Getting chunk.")
         sampling_rate = Calibration._get_sampling_rate(timestamps=acceleration.time)
         min_samples = int(self.min_calibration_hours * 3600 * sampling_rate)
         chunk_size = int(12 * 3600 * sampling_rate)
@@ -280,6 +298,7 @@ class Calibration:
             and temperature: an evaluation on four continents. J Appl Physiol (1985)
             2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
         """
+        logger.debug("Attempting to calibrate...")
         no_motion_data = self._extract_no_motion(acceleration=acceleration)
         if self.method == "GGIR":
             linear_transformation = self._closest_point_fit(
@@ -305,11 +324,15 @@ class Calibration:
             cal_error_end >= self.min_calibration_error
         ):
             raise CalibrationError(
-                "Calibration error could not be sufficiently minimized."
-                f"Initial Error: {cal_error_initial}, Final Error: {cal_error_end},"
+                "Calibration error could not be sufficiently minimized. "
+                f"Initial Error: {cal_error_initial}, Final Error: {cal_error_end}, "
                 f"Error threshold: {self.min_calibration_error}"
             )
-
+        logger.debug(
+            "Calibration successful. Scale: %s, Offset: %s",
+            linear_transformation.scale,
+            linear_transformation.offset,
+        )
         return linear_transformation
 
     def _extract_no_motion(self, acceleration: models.Measurement) -> np.ndarray:
@@ -340,6 +363,7 @@ class Calibration:
             and temperature: an evaluation on four continents. J Appl Physiol (1985)
             2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
         """
+        logger.debug("Extracting no motion.")
         moving_sd = computations.moving_std(acceleration, 10)
         moving_mean = computations.moving_mean(acceleration, 10)
         no_motion_check = np.all(
@@ -387,6 +411,7 @@ class Calibration:
             and temperature: an evaluation on four continents. J Appl Physiol (1985)
             2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
         """
+        logger.debug("Beginning closest point fit.")
         sphere_criteria_check = np.all(
             (no_motion_data.min(axis=0) < -self.min_acceleration)
             & (no_motion_data.max(axis=0) > self.min_acceleration)
@@ -426,7 +451,9 @@ class Calibration:
                 1 / np.linalg.norm(current - closest_point, axis=1), 100
             )
 
+            logger.debug("Scale: %s, Offset: %s, Residual: %s", scale, offset, residual)
             if abs(residual - previous_residual) < self.error_tolerance:
+                logger.debug("Change in residual below error tolerance, ending loop.}")
                 break
 
             previous_residual = residual
