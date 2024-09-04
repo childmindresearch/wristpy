@@ -15,6 +15,8 @@ LIGHT_THRESHOLD = settings.LIGHT_THRESHOLD
 MODERATE_THRESHOLD = settings.MODERATE_THRESHOLD
 VIGOROUS_THRESHOLD = settings.VIGOROUS_THRESHOLD
 
+logger = config.get_logger()
+
 
 @dataclass
 class SleepWindow:
@@ -83,6 +85,7 @@ class GGIRSleepDetection(AbstractSleepDetector):
             A list of SleepWindow instances, each instance contains a sleep onset/wakeup
             time pair.
         """
+        logger.debug("Beginning sleep detection.")
         spt_window = self._spt_window(self.anglez)
         sib_periods = self._calculate_sib_periods(self.anglez)
         spt_window_periods = _find_periods(spt_window)
@@ -90,7 +93,9 @@ class GGIRSleepDetection(AbstractSleepDetector):
         sleep_onset_wakeup = self._find_onset_wakeup_times(
             spt_window_periods, sib_window_periods
         )
-
+        logger.debug(
+            "Sleep detection complete. Windows detected: %s", len(sleep_onset_wakeup)
+        )
         return sleep_onset_wakeup
 
     def _spt_window(
@@ -120,6 +125,7 @@ class GGIRSleepDetection(AbstractSleepDetector):
               using an accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
               https://doi.org/10.1038/s41598-018-31266-z
         """
+        logger.debug("Finding spt windows, Threshold: %s", threshold)
         long_epoch_median = 300
         long_block = 360
         short_block_gap = 720
@@ -139,7 +145,6 @@ class GGIRSleepDetection(AbstractSleepDetector):
         sleep_idx_array_filled = self._fill_false_blocks(
             sleep_candidates, short_block_gap
         )
-
         return models.Measurement(
             measurements=sleep_idx_array_filled, time=anglez_median_long_epoch.time
         )
@@ -166,6 +171,7 @@ class GGIRSleepDetection(AbstractSleepDetector):
             Duration Using a Wrist-Worn Accelerometer. PLoS One 10, e0142533 (2015).
             https://doi.org/10.1371/journal.pone.0142533
         """
+        logger.debug("Calculating SIB period threshold: %s degrees", threshold_degrees)
         anglez_abs_diff = self._compute_abs_diff_mean_anglez(anglez_data)
 
         anglez_pl_df = pl.DataFrame(
@@ -214,6 +220,11 @@ class GGIRSleepDetection(AbstractSleepDetector):
             If there is no overlap between spt_windows and sib_periods,
             the onset and wakeup lists will be empty.
         """
+        logger.debug(
+            "Finding SIB periods within SPT windows. SPT periods:%s, SIB periods: %s",
+            spt_periods,
+            sib_periods,
+        )
         sleep_windows = []
         for sleep_guide in spt_periods:
             min_onset = None
@@ -229,7 +240,7 @@ class GGIRSleepDetection(AbstractSleepDetector):
                         max_wakeup = inactivity_bout[1]
             if min_onset is not None and max_wakeup is not None:
                 sleep_windows.append(SleepWindow(onset=min_onset, wakeup=max_wakeup))
-
+        logger.debug("Sleep windows found: %s", len(sleep_windows))
         return sleep_windows
 
     def _fill_false_blocks(
@@ -311,6 +322,7 @@ def _find_periods(
         a period. For isolated ones the function returns the same start
         and end time. The list is sorted by time.
     """
+    logger.debug("Finding periods in window measurement.")
     edge_detection = np.convolve([1, 3, 1], window_measurement.measurements, "same")
     single_one = np.nonzero(edge_detection == 3)[0]
 
@@ -328,6 +340,7 @@ def _find_periods(
     all_periods = single_periods + block_periods
     all_periods.sort()
 
+    logger.debug("Found %s periods.", len(all_periods))
     return all_periods
 
 
@@ -349,6 +362,10 @@ def remove_nonwear_from_sleep(
     Returns:
         A List of the filtered sleep windows.
     """
+    logger.debug(
+        "Finding non-wear periods that overlap with any of the %s sleep windows.",
+        len(sleep_windows),
+    )
     nonwear_periods = _find_periods(non_wear_array)
 
     filtered_sleep_windows = []
@@ -369,6 +386,7 @@ def remove_nonwear_from_sleep(
             ):
                 filtered_sleep_windows.append(sleep_window)
 
+    logger.debug("Non-wear removed. %s sleep windows remain.", len(sleep_windows))
     return filtered_sleep_windows
 
 
@@ -400,7 +418,9 @@ def compute_physical_activty_categories(
     Raises:
         ValueError: If the threshold values are not in ascending order.
     """
+    logger.debug("Computing physical activity levels, thresholds: %s", thresholds)
     if list(thresholds) != sorted(thresholds):
+        logger.error("ValueError, thresholds must be in ascending order.")
         raise ValueError("Thresholds must be in ascending order.")
 
     activity_levels = (
@@ -416,5 +436,4 @@ def compute_physical_activty_categories(
         * 2
         + (enmo_epoch1.measurements > thresholds[2]) * 3
     )
-
     return models.Measurement(measurements=activity_levels, time=enmo_epoch1.time)
