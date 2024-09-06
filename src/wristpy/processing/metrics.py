@@ -3,7 +3,9 @@
 import numpy as np
 import polars as pl
 
-from wristpy.core import models
+from wristpy.core import config, models
+
+logger = config.get_logger()
 
 
 def euclidean_norm_minus_one(acceleration: models.Measurement) -> models.Measurement:
@@ -93,6 +95,7 @@ def detect_nonwear(
     Returns:
         A new Measurment instance with the non-wear flag and corresponding timestamps.
     """
+    logger.debug("Detecting non-wear data.")
     acceleration_grouped_by_short_window = _group_acceleration_data_by_time(
         acceleration, short_epoch_length
     )
