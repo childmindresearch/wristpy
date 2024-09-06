@@ -14,6 +14,11 @@ class Settings(pydantic_settings.BaseSettings):
 
     LOGGING_LEVEL: int = logging.INFO
 
+    SHORT_EPOCH_LENGTH: int = 900
+    N_SHORT_EPOCH_IN_LONG_EPOCH: int = 4
+    STD_CRITERIA: float = 0.013
+    RANGE_CRITERIA: float = 0.05
+
 
 def get_logger() -> logging.Logger:
     """Gets the wristpy logger."""
