@@ -515,7 +515,8 @@ class ConstraintedMinimizationCalibration(AbstractCalibrator):
                 f"Error threshold: {self.min_calibration_error}"
             )
         logger.debug(
-            "Calibration successful. Scale: %s, Offset: %s . Initial error %s, Final error %s",
+            "Calibration successful. Scale: %s, Offset: %s. "
+            "Initial error %s, Final error %s",
             linear_transformation.scale,
             linear_transformation.offset,
             cal_error_initial,
