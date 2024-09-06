@@ -7,6 +7,8 @@ from typing import List, Optional
 from wristpy.core import config
 from wristpy.processing import calibration
 
+settings = config.Settings()
+
 
 def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     """Argument parser for python cli.
@@ -33,22 +35,47 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         "-l",
         "--light-threshold",
         type=float,
-        default=config.Settings().LIGHT_THRESHOLD,
+        default=settings.LIGHT_THRESHOLD,
         help="Threshold for light physical activity",
     )
     parser.add_argument(
         "-m",
         "--moderate-threshold",
         type=float,
-        default=config.Settings().MODERATE_THRESHOLD,
+        default=settings.MODERATE_THRESHOLD,
         help="Threshold for moderate physical activity",
     )
     parser.add_argument(
         "-v",
         "--vigorous-threshold",
         type=float,
-        default=config.Settings().VIGOROUS_THRESHOLD,
+        default=settings.VIGOROUS_THRESHOLD,
         help="Threshold for vigorous physical activity",
+    )
+
+    parser.add_argument(
+        "--short-length",
+        type=int,
+        default=settings.SHORT_EPOCH_LENGTH,
+        help="Short window size for non-wear detection, in seconds",
+    )
+    parser.add_argument(
+        "--short-in-long",
+        type=int,
+        default=settings.N_SHORT_EPOCH_IN_LONG_EPOCH,
+        help="Number of short epochs that make up one long epoch",
+    )
+    parser.add_argument(
+        "--std",
+        type=float,
+        default=settings.STD_CRITERIA,
+        help="Threshold criteria for standard deviation in non-wear detection",
+    )
+    parser.add_argument(
+        "--range",
+        type=float,
+        default=settings.RANGE_CRITERIA,
+        help="Threshold criteria for range of acceleration in non-wear detection",
     )
 
     parser.add_argument(
@@ -89,31 +116,6 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         type=float,
         default=calibration.Calibration().min_calibration_error,
         help="Threshold for calibration error",
-    )
-
-    parser.add_argument(
-        "--short-length",
-        type=int,
-        default=900,
-        help="Short window size for non-wear detection, in seconds",
-    )
-    parser.add_argument(
-        "--short-in-long",
-        type=int,
-        default=4,
-        help="Number of short epochs that make up one long epoch",
-    )
-    parser.add_argument(
-        "--std",
-        type=float,
-        default=0.013,
-        help="Threshold criteria for standard deviation in non-wear detection",
-    )
-    parser.add_argument(
-        "--range",
-        type=float,
-        default=0.05,
-        help="Threshold criteria for range of acceleration in non-wear detection",
     )
 
     return parser.parse_args(args)
