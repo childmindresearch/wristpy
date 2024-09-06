@@ -1,5 +1,6 @@
 """Calibrate accelerometer data."""
 
+import abc
 import math
 from collections.abc import Generator
 from dataclasses import dataclass
@@ -69,8 +70,26 @@ class LinearTransformation:
     offset: np.ndarray
 
 
-class Calibration:
-    """Implements calibration on accelerometer data, based off of GGIR's implementation.
+class AbstractCalibrator(abc.ABC):
+    """Abstract class defining the interface for the different calibration methods."""
+
+    @abc.abstractmethod
+    def __init__(self) -> None:
+        """Initialization function for the calibrator."""
+        pass
+
+    @abc.abstractmethod
+    def run_calibration(self, acceleration: models.Measurement) -> models.Measurement:
+        """The calibration method must contain a run_calibration function.
+
+        The function must take the acceleration measurement object as input and return
+        a measurement object that contains the calibrated acceleration data.
+        """
+        pass
+
+
+class GgirCalibration(AbstractCalibrator):
+    """Implements the GGIR calibration on accelerometer data..
 
     This class implements methods for autocalibrating accelerometer data using either
     entire dataset or subsets, as determined by the settings. Depending on the settings
@@ -79,24 +98,20 @@ class Calibration:
 
 
     Attributes:
-            chunked: If true will preform calibration on subsets of data if false will
-                calibrate on entire dataset.
-            method: Define the method used to find the calibration scaling and offset
-                that minimizes the calibration error. Current options are:
-                    'GGIR', or the default 'Gradient'.
-            min_acceleration: Minimum acceleration for sphere criteria.
-            min_calibration_hours: Minimum hours of data required for calibration.
-            min_standard_deviation: Minimum standard deviation for no-motion detection.
-            max_iterations: Maximum number of iterations for optimization.
-            error_tolerance: Tolerance for optimization convergence.
-            min_calibration_error: Threshold for calibration error.
+        chunked: If true will preform calibration on subsets of data if false will
+            calibrate on entire dataset.
+        min_acceleration: Minimum acceleration for sphere criteria.
+        min_calibration_hours: Minimum hours of data required for calibration.
+        min_standard_deviation: Minimum standard deviation for no-motion detection.
+        max_iterations: Maximum number of iterations for optimization.
+        error_tolerance: Tolerance for optimization convergence.
+        min_calibration_error: Threshold for calibration error.
 
     """
 
     def __init__(
         self,
         chunked: bool = False,
-        method: str = "Gradient",
         min_acceleration: float = 0.3,
         min_calibration_hours: int = 72,
         min_standard_deviation: float = 0.013,
@@ -111,9 +126,6 @@ class Calibration:
                 calibration will be attempted with a subset of the data. Set to false by
                 default, when true will initiate _chunked_calibration from the run()
                 method instead of standard _calibration.
-            method: Defines what method will be used to find the scaling and offset
-                variables that defines the linear transformation that minimizes the
-                calibration error.
             min_acceleration: The value on either side of 0g for each axis.
                 Determines if sphere is sufficiently populated to obtain meaningful
                 calibration result. Default is 0.3g.
@@ -142,7 +154,6 @@ class Calibration:
             None
         """
         self.chunked = chunked
-        self.method = method
         self.min_acceleration = min_acceleration
         self.min_calibration_hours = min_calibration_hours
         self.min_standard_deviation = min_standard_deviation
@@ -150,7 +161,7 @@ class Calibration:
         self.error_tolerance = error_tolerance
         self.min_calibration_error = min_calibration_error
 
-    def run(self, acceleration: models.Measurement) -> models.Measurement:
+    def run_calibration(self, acceleration: models.Measurement) -> models.Measurement:
         """Runs calibration on acceleration data based on settings.
 
         If the chunked arguement is set to true, it will run calibration on an initial
@@ -249,7 +260,7 @@ class Calibration:
 
         """
         logger.debug("Getting chunk.")
-        sampling_rate = Calibration._get_sampling_rate(timestamps=acceleration.time)
+        sampling_rate = GgirCalibration._get_sampling_rate(timestamps=acceleration.time)
         min_samples = int(self.min_calibration_hours * 3600 * sampling_rate)
         chunk_size = int(12 * 3600 * sampling_rate)
         total_samples = len(acceleration.measurements)
@@ -299,15 +310,9 @@ class Calibration:
             2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
         """
         logger.debug("Attempting to calibrate...")
-        no_motion_data = self._extract_no_motion(acceleration=acceleration)
-        if self.method == "GGIR":
-            linear_transformation = self._closest_point_fit(
-                no_motion_data=no_motion_data
-            )
-        else:
-            linear_transformation = self._closest_point_fit_gradient_descent(
-                no_motion_data=no_motion_data
-            )
+        no_motion_data = _extract_no_motion(acceleration=acceleration)
+
+        linear_transformation = self._closest_point_fit(no_motion_data=no_motion_data)
 
         no_motion_calibrated = (
             no_motion_data * linear_transformation.scale
@@ -334,50 +339,6 @@ class Calibration:
             linear_transformation.offset,
         )
         return linear_transformation
-
-    def _extract_no_motion(self, acceleration: models.Measurement) -> np.ndarray:
-        """Identifies areas of stillness using standard deviation and mean.
-
-        The function first takes a moving standard deviation and a moving mean of the
-        acceleration data in 10 second epochs. These ndarrays are then used to identify
-        the portions of the data that have a standard deviation below
-        min_standard_deviation and a mean value < 2. These epochs are determined to be
-        the periods where the accelerometer was influenced by no motion beyond the
-        force of gravity. If periods of no motion are found, the ndarray is returned,
-        to be fit to the idealized unit sphere for the purposes of calibration
-
-        Args:
-            acceleration: the accelerometer data containing x,y,z axis
-                data and time stamps.
-
-        Returns:
-            an ndarray containing the accelerometer data determined to have no motion.
-
-        Raises:
-            NoMotionError: If no portions of data meet no motion criteria as defined by
-                no_motion_check.
-
-        References:
-            van Hees VT, Fang Z, Langford J, et al. Autocalibration of accelerometer
-            data for free-living physical activity assessment using local gravity
-            and temperature: an evaluation on four continents. J Appl Physiol (1985)
-            2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
-        """
-        logger.debug("Extracting no motion.")
-        moving_sd = computations.moving_std(acceleration, 10)
-        moving_mean = computations.moving_mean(acceleration, 10)
-        no_motion_check = np.all(
-            moving_sd.measurements < self.min_standard_deviation, axis=1
-        ) & np.all(np.abs(moving_mean.measurements) < 2, axis=1)
-
-        no_motion_data = moving_mean.measurements[no_motion_check]
-
-        if not np.any(no_motion_data):
-            raise NoMotionError(
-                "Zero non-motion epochs found. Data did not meet criteria."
-            )
-
-        return no_motion_data
 
     def _closest_point_fit(self, no_motion_data: np.ndarray) -> LinearTransformation:
         """Applies closest point fit to no motion data to calibrated accelerometer data.
@@ -460,9 +421,114 @@ class Calibration:
 
         return LinearTransformation(scale=scale, offset=offset)
 
-    def _closest_point_fit_gradient_descent(
-        self, no_motion_data: np.ndarray
-    ) -> LinearTransformation:
+    @staticmethod
+    def _get_sampling_rate(timestamps: pl.Series) -> int:
+        """Get the sampling rate.
+
+        Args:
+            timestamps: polars series of datetime objects representing the time points
+            of each sample in the acceleration data.
+
+        Returns:
+            sampling rate in Hz.
+        """
+        sampling_rate = timestamps.len() / round(
+            (
+                cast(datetime, timestamps.max()) - cast(datetime, timestamps.min())
+            ).total_seconds()
+        )
+
+        return round(sampling_rate)
+
+
+class ConstraintedMinimizationCalibration(AbstractCalibrator):
+    """Calibrates accelerometer data using the default wristpy method.
+
+    This is a modification of the method proposed by Van Hees et al. (2014), in which we
+    use all available data, make use of the scipy optimize minimize function for the
+    closest_point_fit.
+
+    Attributes:
+        acceleration: The accelerometer data that we want to calibrate.
+        min_standard_deviation: Minimum standard deviation for no-motion detection.
+    """
+
+    def __init__(
+        self,
+        min_standard_deviation: float = 0.013,
+        max_iterations: int = 1000,
+        min_calibration_error: float = 0.01,
+    ) -> None:
+        """Initializes class.
+
+        Args:
+            min_standard_deviation: The standard deviation critieria used to find
+                periods of no motion. Default is 0.013g.
+            max_iterations: The maximum amount of iterations for the
+                closest_point_fit function.
+            min_calibration_error: Minimum acceptable error. If calibration can
+                not reach this threshold it will error.
+
+        Returns:
+            None
+        """
+        self.min_standard_deviation = min_standard_deviation
+        self.max_iterations = max_iterations
+        self.min_calibration_error = min_calibration_error
+
+    def run_calibration(self, acceleration: models.Measurement) -> models.Measurement:
+        """Runs calibration on acceleration data.
+
+        Args:
+            acceleration: the accelerometer data containing x,y,z axis
+                data and time stamps.
+
+        Returns:
+            A Measurement object that contains the calibrated acceleration data.
+
+        Raises:
+            CalibrationError: If the calibration process fails to converge or the final
+                error exceeds the `min_calibration_error` threshold.
+        """
+        logger.debug("Starting calibration.")
+        no_motion_data = _extract_no_motion(
+            acceleration=acceleration,
+            min_standard_deviation=self.min_standard_deviation,
+        )
+        linear_transformation = self._closest_point_fit(no_motion_data=no_motion_data)
+
+        no_motion_calibrated = (
+            no_motion_data * linear_transformation.scale
+        ) + linear_transformation.offset
+
+        cal_error_initial = np.round(
+            np.mean(abs(np.linalg.norm(no_motion_data, axis=1) - 1)), decimals=5
+        )
+        cal_error_end = np.around(
+            np.mean(abs(np.linalg.norm(no_motion_calibrated, axis=1) - 1)), decimals=5
+        )
+
+        if cal_error_end >= self.min_calibration_error:
+            raise CalibrationError(
+                "Calibration error could not be sufficiently minimized. "
+                f"Initial Error: {cal_error_initial}, Final Error: {cal_error_end}, "
+                f"Error threshold: {self.min_calibration_error}"
+            )
+        logger.debug(
+            "Calibration successful. Scale: %s, Offset: %s",
+            linear_transformation.scale,
+            linear_transformation.offset,
+        )
+
+        calibrated_acceleration = (
+            acceleration.measurements * linear_transformation.scale
+        ) + linear_transformation.offset
+
+        return models.Measurement(
+            measurements=calibrated_acceleration, time=acceleration.time
+        )
+
+    def _closest_point_fit(self, no_motion_data: np.ndarray) -> LinearTransformation:
         """Find linear transformation parameters that minimzes distance to unit sphere.
 
         This function implements the scipy optimize.minimze function to find the
@@ -481,10 +547,10 @@ class Calibration:
             to acceleration data for calibration.
 
         Raises:
-            ValueError if the optimization has failed.
+            Calibration Error: If the optimization process fails to converge.
         """
-        start_scale = 1 / (np.sqrt(3) * np.std(no_motion_data, axis=0))
-        start_offset = -np.mean(no_motion_data, axis=0) * start_scale
+        start_scale = np.ones(3)
+        start_offset = np.zeros(3)
 
         def get_distance_to_unit_sphere(params: list[float]) -> float:
             scale = params[:3]
@@ -509,25 +575,53 @@ class Calibration:
             optimal_scale = result.x[:3]
             optimal_offset = result.x[3:]
         else:
-            raise ValueError("Optimization failed")
+            raise CalibrationError("Optimization failed")
 
         return LinearTransformation(scale=optimal_scale, offset=optimal_offset)
 
-    @staticmethod
-    def _get_sampling_rate(timestamps: pl.Series) -> int:
-        """Get the sampling rate.
 
-        Args:
-            timestamps: polars series of datetime objects representing the time points
-            of each sample in the acceleration data.
+def _extract_no_motion(
+    acceleration: models.Measurement, min_standard_deviation: float = 0.013
+) -> np.ndarray:
+    """Identifies areas of stillness using standard deviation and mean.
 
-        Returns:
-            sampling rate in Hz.
-        """
-        sampling_rate = timestamps.len() / round(
-            (
-                cast(datetime, timestamps.max()) - cast(datetime, timestamps.min())
-            ).total_seconds()
-        )
+    The function first takes a moving standard deviation and a moving mean of the
+    acceleration data in 10 second epochs. These ndarrays are then used to identify
+    the portions of the data that have a standard deviation below
+    min_standard_deviation and a mean value < 2. These epochs are determined to be
+    the periods where the accelerometer was influenced by no motion beyond the
+    force of gravity. If periods of no motion are found, the ndarray is returned,
+    to be fit to the idealized unit sphere for the purposes of calibration
 
-        return round(sampling_rate)
+    Args:
+        acceleration: the accelerometer data containing x,y,z axis
+            data and time stamps.
+        min_standard_deviation: The standard deviation critieria used to find periods of
+            no motion.
+
+    Returns:
+        an ndarray containing the accelerometer data determined to have no motion.
+
+    Raises:
+        NoMotionError: If no portions of data meet no motion criteria as defined by
+            no_motion_check.
+
+    References:
+        van Hees VT, Fang Z, Langford J, et al. Autocalibration of accelerometer
+        data for free-living physical activity assessment using local gravity
+        and temperature: an evaluation on four continents. J Appl Physiol (1985)
+        2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.
+    """
+    logger.debug("Extracting no motion.")
+    moving_sd = computations.moving_std(acceleration, 10)
+    moving_mean = computations.moving_mean(acceleration, 10)
+    no_motion_check = np.all(
+        moving_sd.measurements < min_standard_deviation, axis=1
+    ) & np.all(np.abs(moving_mean.measurements) < 2, axis=1)
+
+    no_motion_data = moving_mean.measurements[no_motion_check]
+
+    if not np.any(no_motion_data):
+        raise NoMotionError("Zero non-motion epochs found. Data did not meet criteria.")
+
+    return no_motion_data
