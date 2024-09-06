@@ -160,7 +160,7 @@ def test_constrainmin_Calibration_Error() -> None:
         duration_hours=1,
     )
     calibrator = calibration.ConstraintedMinimizationCalibration(
-        min_calibration_error=0, max_iterations=1
+        min_calibration_error=-1, max_iterations=1
     )
 
     with pytest.raises(calibration.CalibrationError):
@@ -169,21 +169,12 @@ def test_constrainmin_Calibration_Error() -> None:
 
 def test_calibrate_calibration_error() -> None:
     """Test error when calibration was not possible."""
-    scale = np.array([1.1, 1.01, 0.9])
-    offset = np.array([0.1, 0.2, 0.1])
-    dummy_no_motion = np.random.randn(1000, 3)
-    norms = np.linalg.norm(dummy_no_motion, axis=1, keepdims=True)
-    unit_sphere = dummy_no_motion / norms
-    test_data = np.repeat(unit_sphere, repeats=10, axis=0)
-    start_time = datetime(2024, 5, 4, 12, 0, 0)
-    delta = timedelta(seconds=1)
-    time_data = [start_time + i * delta for i in range(10000)]
-    dummy_measure = models.Measurement(
-        measurements=(test_data * scale) + offset,
-        time=pl.Series(time_data).alias("time"),
+    dummy_measure = create_dummy_measurement(
+        sampling_rate=1,
+        duration_hours=1,
     )
     calibrator = calibration.GgirCalibration(
-        min_calibration_error=0.0001, max_iterations=1, min_acceleration=0
+        min_calibration_error=0.0001, max_iterations=5, min_acceleration=0
     )
 
     with pytest.raises(calibration.CalibrationError):
