@@ -144,13 +144,27 @@ def test_closest_point_fit_constrainedmin() -> None:
     ), f"Offset is {linear_transform.offset} expected {expected_offset})"
 
 
-def test_closest_point_fit_gradient_value_error() -> None:
-    """Test closest point fit gradient raises ValueError."""
+def test_closest_point_fit_constrainmin_Calibration_Error() -> None:
+    """Test closest point fit raises Calibration Error for constrained min."""
     data = np.random.randn(1000, 3)
     calibrator = calibration.ConstraintedMinimizationCalibration(max_iterations=0)
 
     with pytest.raises(calibration.CalibrationError):
         calibrator._closest_point_fit(data)
+
+
+def test_constrainmin_Calibration_Error() -> None:
+    """Test ConstrainedMnimization Calibration raises Calibration Error."""
+    dummy_measure = create_dummy_measurement(
+        sampling_rate=1,
+        duration_hours=1,
+    )
+    calibrator = calibration.ConstraintedMinimizationCalibration(
+        min_calibration_error=0, max_iterations=0
+    )
+
+    with pytest.raises(calibration.CalibrationError):
+        calibrator.run_calibration(dummy_measure)
 
 
 def test_calibrate_calibration_error() -> None:
