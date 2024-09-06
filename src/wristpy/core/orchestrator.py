@@ -1,24 +1,37 @@
 """Python based runner."""
 
 import pathlib
-from typing import Any, Dict, List, Optional
+from typing import List, Literal, Optional, Protocol, Union
 
 import numpy as np
 import polars as pl
-from pydantic import BaseModel
+import pydantic
 
 from wristpy.core import computations, config, models
 from wristpy.io.readers import readers
 from wristpy.processing import analytics, calibration, metrics
 
 
-class InvalidFileTypeError(Exception):
+# should there be an exceptions module ?
+class InvalidFileTypeError(calibration.LoggedException):
     """Wristpy cannot save in the given file type."""
 
     pass
 
 
-class Results(BaseModel):
+class CalibratorProtocol(Protocol):
+    """Protocol for providing a calibrator."""
+
+    def __init__(
+        self, *args: Union[int, float, bool], **kwargs: Union[int, float, bool]
+    ) -> None:
+        """Initializes the class."""
+
+    def run(self, acceleration: models.Measurement) -> models.Measurement:
+        """Runs calibration on acceleration data based on settings."""
+
+
+class Results(pydantic.BaseModel):
     """dataclass containing results of orchestrator.run()."""
 
     enmo: Optional[models.Measurement] = None
@@ -50,9 +63,6 @@ class Results(BaseModel):
             output: The path and file name of the data to be saved. as either a csv or
                 parquet files.
 
-        Returns:
-            None.
-
         Raises:
             InvalidFileTypeError: If the output file path ends with any extension other
                 than csv or parquet.
@@ -76,7 +86,7 @@ class Results(BaseModel):
             results_epoch1_time.write_parquet(save_path_epoch1)
             results_raw_time.write_parquet(save_path_raw_time)
 
-    def _results_to_dataframe(self, use_epoch1_time: bool = True) -> pl.DataFrame:
+    def _results_to_dataframe(self, *, use_epoch1_time: bool = True) -> pl.DataFrame:
         """Format results into a dataframe.
 
         Args:
@@ -123,11 +133,10 @@ def format_sleep_data(
     Args:
         sleep_windows: The list of time stamp pairs indicating periods of sleep.
         reference_measure: The measure from which the temporal resolution will be taken.
-            Any epoch1 measure can be used, but enmo is used for consistency.
 
     Returns:
-        1-D binary np.ndarray, with 1 indicating sleep. Will be of the same length as
-            the timestamps in the epoch1_measure.
+        1-D np.ndarray, with 1 indicating sleep. Will be of the same length as
+            the timestamps in the reference_measure.
     """
     sleep_array = np.zeros(len(reference_measure.time))
 
@@ -148,10 +157,9 @@ def format_nonwear_data(
     Args:
         nonwear_data: The nonwear measurement.
         reference_measure: The measure from which the temporal resolution will be taken.
-            Any epoch1 measure can be used, but enmo is used for consistency.
 
     Returns:
-        1-D binary np.ndarray, with 1 indicating nonwear. Will be of the same length as
+        1-D np.ndarray, with 1 indicating nonwear. Will be of the same length as
             the timestamps in the reference_measure.
 
     """
@@ -181,8 +189,12 @@ def run(
     input: pathlib.Path,
     output: Optional[pathlib.Path] = None,
     settings: config.Settings = config.Settings(),
-    calibrator: calibration.Calibration = calibration.Calibration(),
-    detect_nonwear_kwargs: Optional[Dict[str, Any]] = None,
+    calibrator: Union[
+        None,
+        Literal["ggir", "gradient"],
+        CalibratorProtocol,
+    ] = "gradient",
+    epoch: int = 5,
 ) -> Results:
     """Runs wristpy.
 
@@ -194,18 +206,22 @@ def run(
             .parquet
         settings: The settings object from which physical activity levels are taken.
         calibrator: The calibrator to be used on the input data.
-        detect_nonwear_kwargs: The arguments to the nonwear function delivered as a
-            dictionary. Arguements are short_epoch_length, n_short_epoch_in_long_epoch,
-            std_criteria, range_criteria.
+        epoch: The temporal resolution in seconds, the data will be down sampled to.
 
     Returns:
         All calculated data in a save ready format as a Results object.
 
     """
+    if output is not None and output.suffix not in [".csv", ".parquet"]:
+        raise InvalidFileTypeError(
+            f"The extension: {output.suffix} is not supported.",
+            "Please save the file as .csv or .parquet",
+        )
     watch_data = readers.read_watch_data(input)
+    # do a data points check, and then give a warning here.
     try:
         calibrated_acceleration = calibrator.run(watch_data.acceleration)
-    except Exception as e:
+    except calibration.LoggedException as e:
         print("Calibration FAILED:", str(e))
         print("Proceeding without calibration.")
         calibrated_acceleration = watch_data.acceleration
@@ -214,8 +230,13 @@ def run(
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
     anglez_epoch1 = computations.moving_mean(anglez)
     non_wear_array = metrics.detect_nonwear(
-        calibrated_acceleration, **(detect_nonwear_kwargs or {})
+        calibrated_acceleration,
+        short_epoch_length=settings.SHORT_EPOCH_LENGTH,
+        n_short_epoch_in_long_epoch=settings.N_SHORT_EPOCH_IN_LONG_EPOCH,
+        std_criteria=settings.STD_CRITERIA,
+        range_criteria=settings.RANGE_CRITERIA,
     )
+
     sleep_detector = analytics.GGIRSleepDetection(anglez_epoch1)
     sleep_windows = sleep_detector.run_sleep_detection()
     physical_activity_levels = analytics.compute_physical_activty_categories(
