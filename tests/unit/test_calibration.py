@@ -253,7 +253,7 @@ def test_run_ggircalibration() -> None:
     """Testing run function when chunked = False."""
     scale = np.array([1.1, 1.01, 0.9])
     offset = np.array([0.1, 0.2, 0.1])
-    dummy_no_motion = np.random.randn(1000, 3) - 0.2
+    dummy_no_motion = np.random.randn(1000, 3) - 0.5
     norms = np.linalg.norm(dummy_no_motion, axis=1, keepdims=True)
     unit_sphere = dummy_no_motion / norms
     test_data = np.repeat(unit_sphere, repeats=10, axis=0)

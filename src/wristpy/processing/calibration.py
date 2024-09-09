@@ -468,8 +468,8 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
                 periods of no motion. Default is 0.013g.
             max_iterations: The maximum amount of iterations for the
                 closest_point_fit function.
-            max_calibration_error: Maximum acceptable calibration error. If calibration can
-                not reach this threshold it will error.
+            max_calibration_error: Maximum acceptable calibration error. If calibration
+                cannot reach this threshold it will error.
 
         Returns:
             None
