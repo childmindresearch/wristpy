@@ -157,9 +157,7 @@ def test_closest_point_fit_constrainmin_calibration_error_minimum() -> None:
     """Test closest point fit raises CalibrationError for constrained min."""
     data = np.random.randn(1000, 3)
     scale = np.array([1.1, 0.9, 0.6])
-    calibrator = calibration.ConstrainedMinimizationCalibration(
-        max_calibration_error=1e-15, max_iterations=15
-    )
+    calibrator = calibration.ConstrainedMinimizationCalibration(max_calibration_error=0)
 
     with pytest.raises(calibration.CalibrationError):
         calibrator._closest_point_fit(data * scale)

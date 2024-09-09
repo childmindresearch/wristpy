@@ -565,14 +565,10 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
             raise CalibrationError("Optimization failed")
 
         no_motion_calibrated = (no_motion_data * result.x[:3]) + result.x[3:]
-        cal_error_end = np.around(
-            np.mean(abs(np.linalg.norm(no_motion_calibrated, axis=1) - 1)),
-            decimals=5,
-        )
+        cal_error_end = np.mean(abs(np.linalg.norm(no_motion_calibrated, axis=1) - 1))
+
         if cal_error_end >= self.max_calibration_error:
-            cal_error_initial = np.round(
-                np.mean(abs(np.linalg.norm(no_motion_data, axis=1) - 1)), decimals=5
-            )
+            cal_error_initial = np.mean(abs(np.linalg.norm(no_motion_data, axis=1) - 1))
             logger.debug(
                 "Calibration error could not be sufficiently minimized. "
                 f"Initial Error: {cal_error_initial}, Final Error: {cal_error_end}, "
