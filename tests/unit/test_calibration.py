@@ -67,7 +67,7 @@ def test_no_motion_error() -> None:
 
     with pytest.raises(calibration.NoMotionError):
         calibration._extract_no_motion(
-            acceleration=dummy_measure, min_standard_deviation=0.001
+            acceleration=dummy_measure, no_motion_threshold=0.001
         )
 
 
@@ -132,7 +132,7 @@ def test_closest_point_fit_constrainedmin() -> None:
     data = np.random.randn(1000, 3)
     norms = np.linalg.norm(data, axis=1, keepdims=True)
     unit_sphere = data / norms
-    calibrator = calibration.ConstraintedMinimizationCalibration()
+    calibrator = calibration.ConstrainedMinimizationCalibration()
 
     linear_transform = calibrator._closest_point_fit((unit_sphere * scale) + offset)
 
@@ -144,27 +144,24 @@ def test_closest_point_fit_constrainedmin() -> None:
     ), f"Offset is {linear_transform.offset} expected {expected_offset})"
 
 
-def test_closest_point_fit_constrainmin_Calibration_Error() -> None:
-    """Test closest point fit raises Calibration Error for constrained min."""
+def test_closest_point_fit_constrainmin_calibration_error() -> None:
+    """Test closest point fit raises CalibrationError for constrained min."""
     data = np.random.randn(1000, 3)
-    calibrator = calibration.ConstraintedMinimizationCalibration(max_iterations=0)
+    calibrator = calibration.ConstrainedMinimizationCalibration(max_iterations=0)
 
     with pytest.raises(calibration.CalibrationError):
         calibrator._closest_point_fit(data)
 
 
-def test_constrainmin_Calibration_Error() -> None:
-    """Test ConstrainedMnimization Calibration raises Calibration Error."""
-    dummy_measure = create_dummy_measurement(
-        sampling_rate=1,
-        duration_hours=1,
-    )
-    calibrator = calibration.ConstraintedMinimizationCalibration(
-        min_calibration_error=-1, max_iterations=1
+def test_closest_point_fit_constrainmin_calibration_error_minimum() -> None:
+    """Test closest point fit raises CalibrationError for constrained min."""
+    data = np.random.randn(1000, 3)
+    calibrator = calibration.ConstrainedMinimizationCalibration(
+        max_calibration_error=1e-8, max_iterations=1
     )
 
     with pytest.raises(calibration.CalibrationError):
-        calibrator.run_calibration(dummy_measure)
+        calibrator._closest_point_fit(data)
 
 
 def test_calibrate_calibration_error() -> None:
@@ -174,7 +171,7 @@ def test_calibrate_calibration_error() -> None:
         duration_hours=1,
     )
     calibrator = calibration.GgirCalibration(
-        min_calibration_error=0.0001, max_iterations=5, min_acceleration=0
+        max_calibration_error=0.0001, max_iterations=5, min_acceleration=0
     )
 
     with pytest.raises(calibration.CalibrationError):
@@ -198,7 +195,7 @@ def test_ggir_calibration_successful() -> None:
         measurements=(test_data * scale) + offset,
         time=pl.Series(time_data).alias("time"),
     )
-    calibrator = calibration.GgirCalibration(min_standard_deviation=9999)
+    calibrator = calibration.GgirCalibration(no_motion_threshold=9999)
 
     linear_transform = calibrator._calibrate(dummy_measure)
 
@@ -233,7 +230,7 @@ def test_chunked_calibration_error() -> None:
     """Testing chunked calibration failing after using all chunks."""
     dummy_measure = create_dummy_measurement(sampling_rate=1, duration_hours=84)
     calibrator = calibration.GgirCalibration(
-        min_standard_deviation=9999, min_calibration_error=0, chunked=True
+        no_motion_threshold=9999, max_calibration_error=0, chunked=True
     )
 
     with pytest.raises(
@@ -271,7 +268,7 @@ def test_run_ggircalibration() -> None:
         time=pl.Series(time_data).alias("time"),
     )
     calibrator = calibration.GgirCalibration(
-        min_standard_deviation=9999, min_calibration_hours=1
+        no_motion_threshold=9999, min_calibration_hours=1
     )
 
     result = calibrator.run_calibration(dummy_measure)
@@ -286,7 +283,7 @@ def test_run_ggircalibration() -> None:
 
 
 def test_run_constrainedmincalibration() -> None:
-    """Testing run fcalibration fuinction for the constrained minimization."""
+    """Testing run calibration function for the constrained minimization."""
     scale = np.array([1.1, 1.01, 0.9])
     offset = np.array([0.1, 0.2, 0.1])
     dummy_no_motion = np.random.randn(1000, 3) - 0.2
@@ -303,8 +300,8 @@ def test_run_constrainedmincalibration() -> None:
         measurements=(test_data * scale) + offset,
         time=pl.Series(time_data).alias("time"),
     )
-    calibrator = calibration.ConstraintedMinimizationCalibration(
-        min_standard_deviation=9999
+    calibrator = calibration.ConstrainedMinimizationCalibration(
+        no_motion_threshold=9999
     )
 
     result = calibrator.run_calibration(dummy_measure)
@@ -337,7 +334,7 @@ def test_run_chunked_calibration() -> None:
         time=pl.Series(time_data).alias("time"),
     )
     calibrator = calibration.GgirCalibration(
-        min_standard_deviation=9999, chunked=True, min_calibration_hours=1
+        no_motion_threshold=9999, chunked=True, min_calibration_hours=1
     )
 
     result = calibrator.run_calibration(dummy_measure)
