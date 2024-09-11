@@ -1,5 +1,6 @@
 """Python based runner."""
 
+import datetime
 import pathlib
 from typing import List, Literal, Optional, Protocol, Union
 
@@ -12,7 +13,6 @@ from wristpy.io.readers import readers
 from wristpy.processing import analytics, calibration, metrics
 
 
-# should there be an exceptions module ?
 class InvalidFileTypeError(calibration.LoggedException):
     """Wristpy cannot save in the given file type."""
 
@@ -36,8 +36,6 @@ class Results(pydantic.BaseModel):
 
     enmo: Optional[models.Measurement] = None
     anglez: Optional[models.Measurement] = None
-    enmo_epoch1: Optional[models.Measurement] = None
-    anglez_epoch1: Optional[models.Measurement] = None
     nonwear_array: Optional[models.Measurement] = None
     sleep_windows: Optional[List[analytics.SleepWindow]] = None
     physical_activity_levels: Optional[models.Measurement] = None
@@ -73,56 +71,17 @@ class Results(pydantic.BaseModel):
                 "Please save the file as .csv or .parquet",
             )
 
-        results_epoch1_time = self._results_to_dataframe()
-        results_raw_time = self._results_to_dataframe(use_epoch1_time=False)
-
-        save_path_epoch1 = output.with_name(output.stem + "_epoch1" + output.suffix)
-        save_path_raw_time = output.with_name(output.stem + "_raw_time" + output.suffix)
-
-        if output.suffix == ".csv":
-            results_epoch1_time.write_csv(save_path_epoch1, separator=",")
-            results_raw_time.write_csv(save_path_raw_time, separator=",")
-        elif output.suffix == ".parquet":
-            results_epoch1_time.write_parquet(save_path_epoch1)
-            results_raw_time.write_parquet(save_path_raw_time)
-
-    def _results_to_dataframe(self, *, use_epoch1_time: bool = True) -> pl.DataFrame:
-        """Format results into a dataframe.
-
-        Args:
-            use_epoch1_time: Determines which temporal resolution and data to use. If
-                True the dataframe will contain enmo_epoch1, anglez_epoch1,
-                nonwear_epoch1, physical_activity_levels and sleep_windows_epoch1. If
-                False the the dataframe will be in "raw" time and contain the enmo and
-                anglez data.
-
-        Returns:
-            The polars dataframe to be saved into csv or parquet format.
-
-        Raises:
-            ValueError if the attribute for the time column is None.
-        """
-        data_source = self.enmo_epoch1 if use_epoch1_time else self.enmo
-
-        if data_source is None:
-            raise ValueError(f"{data_source} is None, can't construct time column.")
-
-        time_data = data_source.time
-
-        results_dataframe = pl.DataFrame({"time": time_data})
+        results_dataframe = pl.DataFrame({"time": self.enmo.time})
 
         for field_name, field_value in self:
-            if field_value is not None:
-                if (
-                    use_epoch1_time
-                    and field_name
-                    not in ["enmo", "anglez", "sleep_windows", "nonwear_array"]
-                ) or (not use_epoch1_time and field_name in ["enmo", "anglez"]):
-                    results_dataframe = results_dataframe.with_columns(
-                        pl.Series(field_name, field_value.measurements)
-                    )
+            results_dataframe = results_dataframe.with_columns(
+                pl.Series(field_name, field_value.measurements)
+            )
 
-        return results_dataframe
+        if output.suffix == ".csv":
+            results_dataframe.write_csv(results_dataframe, separator=",")
+        elif output.suffix == ".parquet":
+            results_dataframe.write_parquet(results_dataframe)
 
 
 def format_sleep_data(
@@ -150,19 +109,11 @@ def format_sleep_data(
 
 
 def format_nonwear_data(
-    nonwear_data: models.Measurement, reference_measure: models.Measurement
+    nonwear_data: models.Measurement,
+    reference_measure: models.Measurement,
+    nonwear_temporal_resolution: float,
 ) -> np.ndarray:
-    """Format nonwear data into an array for saving.
-
-    Args:
-        nonwear_data: The nonwear measurement.
-        reference_measure: The measure from which the temporal resolution will be taken.
-
-    Returns:
-        1-D np.ndarray, with 1 indicating nonwear. Will be of the same length as
-            the timestamps in the reference_measure.
-
-    """
+    """Here."""
     nonwear_df = pl.DataFrame(
         {
             "nonwear": nonwear_data.measurements.astype(np.int64),
@@ -170,19 +121,18 @@ def format_nonwear_data(
         }
     ).set_sorted("time")
 
-    nonwear_upsample = nonwear_df.upsample(time_column="time", every="5s").fill_null(
-        strategy="forward"
-    )
+    nonwear_array = np.zeros(len(reference_measure.time))
 
-    end_sequence = pl.repeat(
-        nonwear_upsample["nonwear"][-1],
-        n=(len(reference_measure.time) - len(nonwear_upsample["time"])),
-        dtype=pl.Int64,
-        eager=True,
-    )
-    full_nonwear_array = pl.concat([nonwear_upsample["nonwear"], end_sequence])
+    for row in nonwear_df.iter_rows(named=True):
+        nonwear_value = row["nonwear"]
+        time = row["time"]
+        nonwear_mask = (reference_measure.time >= time) & (
+            reference_measure.time
+            <= time + datetime.timedelta(seconds=nonwear_temporal_resolution)
+        )
+        nonwear_array[nonwear_mask] = nonwear_value
 
-    return full_nonwear_array.to_numpy()
+    return nonwear_array
 
 
 def run(
@@ -194,7 +144,7 @@ def run(
         Literal["ggir", "gradient"],
         CalibratorProtocol,
     ] = "gradient",
-    epoch: int = 5,
+    epoch_length: Union[int, None] = 5,
 ) -> Results:
     """Runs wristpy.
 
@@ -206,7 +156,7 @@ def run(
             .parquet
         settings: The settings object from which physical activity levels are taken.
         calibrator: The calibrator to be used on the input data.
-        epoch: The temporal resolution in seconds, the data will be down sampled to.
+        epoch_length: The temporal resolution in seconds, the data will be down sampled to.
 
     Returns:
         All calculated data in a save ready format as a Results object.
@@ -218,17 +168,19 @@ def run(
             "Please save the file as .csv or .parquet",
         )
     watch_data = readers.read_watch_data(input)
-    # do a data points check, and then give a warning here.
     try:
         calibrated_acceleration = calibrator.run(watch_data.acceleration)
     except calibration.LoggedException as e:
         print("Calibration FAILED:", str(e))
         print("Proceeding without calibration.")
         calibrated_acceleration = watch_data.acceleration
+
     enmo = metrics.euclidean_norm_minus_one(calibrated_acceleration)
-    enmo_epoch1 = computations.moving_mean(enmo)
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
-    anglez_epoch1 = computations.moving_mean(anglez)
+    if epoch_length is not None:
+        enmo = computations.moving_mean(enmo, epoch_length=epoch_length)
+        anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
+
     non_wear_array = metrics.detect_nonwear(
         calibrated_acceleration,
         short_epoch_length=settings.SHORT_EPOCH_LENGTH,
@@ -237,10 +189,10 @@ def run(
         range_criteria=settings.RANGE_CRITERIA,
     )
 
-    sleep_detector = analytics.GGIRSleepDetection(anglez_epoch1)
+    sleep_detector = analytics.GGIRSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
     physical_activity_levels = analytics.compute_physical_activty_categories(
-        enmo_epoch1,
+        enmo,
         (
             settings.LIGHT_THRESHOLD,
             settings.MODERATE_THRESHOLD,
@@ -249,22 +201,22 @@ def run(
     )
     sleep_array = models.Measurement(
         measurements=format_sleep_data(
-            sleep_windows=sleep_windows, reference_measure=enmo_epoch1
+            sleep_windows=sleep_windows, reference_measure=enmo
         ),
-        time=enmo_epoch1.time,
+        time=enmo.time,
     )
     nonwear_epoch1 = models.Measurement(
         measurements=format_nonwear_data(
-            nonwear_data=non_wear_array, reference_measure=enmo_epoch1
+            nonwear_data=non_wear_array,
+            reference_measure=enmo,
+            nonwear_temporal_resolution=settings.SHORT_EPOCH_LENGTH,
         ),
-        time=enmo_epoch1.time,
+        time=enmo.time,
     )
 
     results = Results(
         enmo=enmo,
         anglez=anglez,
-        enmo_epoch1=enmo_epoch1,
-        anglez_epoch1=anglez_epoch1,
         nonwear_array=non_wear_array,
         sleep_windows=sleep_windows,
         physical_activity_levels=physical_activity_levels,

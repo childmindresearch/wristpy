@@ -80,8 +80,10 @@ def test_format_nonwear() -> None:
         time=pl.Series([dummy_date, dummy_date + datetime.timedelta(seconds=10)]),
     )
 
-    non_wear_epoch1 = orchestrator.format_nonwear_data(
-        nonwear_data=nonwear_measurement, reference_measure=dummy_epoch1
+    non_wear_epoch1 = orchestrator.format_nonwear_data2(
+        nonwear_data=nonwear_measurement,
+        reference_measure=dummy_epoch1,
+        nonwear_temporal_resolution=5,
     )
 
     assert (
