@@ -12,6 +12,8 @@ from wristpy.core import computations, config, models
 from wristpy.io.readers import readers
 from wristpy.processing import analytics, calibration, metrics
 
+logger = config.get_logger()
+
 
 class InvalidFileTypeError(calibration.LoggedException):
     """Wristpy cannot save in the given file type."""
@@ -60,7 +62,6 @@ class Results(pydantic.BaseModel):
         results_dataframe = pl.DataFrame({"time": self.enmo.time})
 
         for field_name, field_value in self:
-            print(f"{field_name}: Length: {len(field_value.measurements)}")
             results_dataframe = results_dataframe.with_columns(
                 pl.Series(field_name, field_value.measurements)
             )
@@ -125,7 +126,7 @@ def format_nonwear_data(
 def run(
     input: pathlib.Path,
     output: Optional[pathlib.Path] = None,
-    settings: config.Settings = config.Settings(),
+    settings: config.Settings = config.Settings(LOGGING_LEVEL=10),
     calibrator: Union[
         None,
         Literal["ggir", "gradient"],
@@ -153,23 +154,24 @@ def run(
             f"The extension: {output.suffix} is not supported.",
             "Please save the file as .csv or .parquet",
         )
-    watch_data = readers.read_watch_data(input)
-
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
         raise ValueError(
             f"Invalid calibrator:{calibrator}. Choose: 'ggir', gradient'.",
             "Enter None if no calibration is desired.",
         )
 
+    watch_data = readers.read_watch_data(input)
     if calibrator == "ggir":
         calibrator = calibration.GgirCalibration()
     elif calibrator == "gradient":
         calibrator = calibration.ConstrainedMinimizationCalibration()
 
     if calibrator is None:
+        logger.debug("Running without calibration.")
         calibrated_acceleration = watch_data.acceleration
     else:
         try:
+            logger.debug("Running calibration with calibrator: %s", calibrator)
             calibrated_acceleration = calibrator.run_calibration(
                 watch_data.acceleration
             )
@@ -223,8 +225,6 @@ def run(
     results = Results(
         enmo=enmo,
         anglez=anglez,
-        nonwear_array=non_wear_array,
-        sleep_windows=sleep_windows,
         physical_activity_levels=physical_activity_levels,
         sleep_windows_epoch1=sleep_array,
         nonwear_epoch1=nonwear_epoch1,
