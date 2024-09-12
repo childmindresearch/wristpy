@@ -565,7 +565,9 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
             raise CalibrationError("Optimization failed.")
 
         if cal_error_end >= self.max_calibration_error:
-            cal_error_initial = np.mean(abs(np.linalg.norm(no_motion_data, axis=1) - 1))
+            cal_error_initial = np.mean(
+                (np.linalg.norm(no_motion_data, axis=1) - 1) ** 2
+            )
             logger.debug(
                 "Calibration error could not be sufficiently minimized."
                 "Initial Error: %s,  Final Error: %s, Error threshold: %s.",
