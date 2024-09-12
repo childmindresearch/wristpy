@@ -55,7 +55,7 @@ class Results(pydantic.BaseModel):
         """
         if output.suffix not in [".csv", ".parquet"]:
             raise InvalidFileTypeError(
-                f"The extension: {output.suffix} is not supported.",
+                f"The extension: {output.suffix} is not supported."
                 "Please save the file as .csv or .parquet",
             )
 
