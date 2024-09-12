@@ -550,13 +550,13 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
         scale_bounds = [(0.1, None)] * 3
         offset_bounds = [(-0.5 * data_range, 0.5 * data_range)] * 3
         bounds = scale_bounds + offset_bounds
-
         result = optimize.minimize(
             get_distance_to_unit_sphere,
             initial_guess,
             options={"maxiter": self.max_iterations},
             bounds=bounds,
         )
+        cal_error_end = np.sqrt(result.fun / len(no_motion_data))
 
         if result.success:
             optimal_scale = result.x[:3]
@@ -564,13 +564,13 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
         else:
             raise CalibrationError("Optimization failed.")
 
-        if result.fun >= self.max_calibration_error:
+        if cal_error_end >= self.max_calibration_error:
             cal_error_initial = np.mean(abs(np.linalg.norm(no_motion_data, axis=1) - 1))
             logger.debug(
                 "Calibration error could not be sufficiently minimized."
                 "Initial Error: %s,  Final Error: %s, Error threshold: %s.",
                 cal_error_initial,
-                result.fun,
+                cal_error_end,
                 self.max_calibration_error,
             )
             raise CalibrationError(
