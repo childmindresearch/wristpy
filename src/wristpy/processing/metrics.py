@@ -3,6 +3,7 @@
 import numpy as np
 import polars as pl
 
+from typing import Literal
 from wristpy.core import config, models
 
 logger = config.get_logger()
@@ -64,6 +65,7 @@ def detect_nonwear(
     n_short_epoch_in_long_epoch: int = 4,
     std_criteria: float = 0.013,
     range_criteria: float = 0.05,
+    method: Literal["full", "std"] = "full",
 ) -> models.Measurement:
     """Set non_wear_flag based on accelerometer data.
 
@@ -91,6 +93,9 @@ def detect_nonwear(
         n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.
         std_criteria: Threshold criteria for standard deviation.
         range_criteria: Threshold criteria for range of acceleration.
+        method: The criteria method to use:
+            "full": Both standard deviation and range criteria are used.
+            "std": Only standard deviation criteria is used.
 
     Returns:
         A new Measurment instance with the non-wear flag and corresponding timestamps.
@@ -105,6 +110,7 @@ def detect_nonwear(
         n_short_epoch_in_long_epoch,
         std_criteria,
         range_criteria,
+        method,
     )
 
     nonwear_value_array_cleaned = _cleanup_isolated_ones_nonwear_value(
@@ -153,6 +159,7 @@ def _compute_nonwear_value_array(
     n_short_epoch_in_long_epoch: int,
     std_criteria: float,
     range_criteria: float,
+    method: Literal["full", "std"] = "full",
 ) -> np.ndarray:
     """Helper function to calculate the nonwear value array.
 
@@ -168,6 +175,9 @@ def _compute_nonwear_value_array(
         n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.
         std_criteria: Threshold criteria for standard deviation.
         range_criteria: Threshold criteria for range of acceleration.
+        method: The criteria method to use:
+            "full": Both standard deviation and range criteria are used.
+            "std": Only standard deviation criteria is used.
 
     Returns:
         Non-wear value array.
@@ -183,7 +193,7 @@ def _compute_nonwear_value_array(
         calculated_nonwear_value = acceleration_selected_long_window.select(
             pl.col("X", "Y", "Z").map_batches(
                 lambda df: _compute_nonwear_value_per_axis(
-                    df, std_criteria, range_criteria
+                    df, std_criteria, range_criteria, method=method
                 )
             )
         ).sum_horizontal()
@@ -200,7 +210,10 @@ def _compute_nonwear_value_array(
 
 
 def _compute_nonwear_value_per_axis(
-    axis_acceleration_data: pl.Series, std_criteria: float, range_criteria: float
+    axis_acceleration_data: pl.Series,
+    std_criteria: float,
+    range_criteria: float,
+    method: Literal["full", "std"] = "full",
 ) -> bool:
     """Helper function to calculate the nonwear criteria per axis.
 
@@ -211,15 +224,21 @@ def _compute_nonwear_value_per_axis(
             that make up short_epoch_length in seconds).
         std_criteria: Threshold criteria for standard deviation
         range_criteria: Threshold criteria for range of acceleration
+        method: The criteria method to use:
+            "full": Both standard deviation and range criteria are used.
+            "std": Only standard deviation criteria is used.
 
     Returns:
         Non-wear value for the axis.
     """
     axis_long_window_data = pl.concat(axis_acceleration_data, how="vertical")
     axis_std = axis_long_window_data.std()
-    axis_range = axis_long_window_data.max() - axis_long_window_data.min()
+    if method == "full":
+        axis_range = axis_long_window_data.max() - axis_long_window_data.min()
+        criteria_boolean = (axis_std < std_criteria) & (axis_range < range_criteria)
+    elif method == "std":
+        criteria_boolean = axis_std < std_criteria
 
-    criteria_boolean = (axis_std < std_criteria) & (axis_range < range_criteria)
     return criteria_boolean
 
 
