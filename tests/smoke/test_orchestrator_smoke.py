@@ -55,7 +55,7 @@ def test_bad_calibrator(test_file: pathlib.Path) -> None:
         match="Invalid calibrator: Ggir. Choose: 'ggir', 'gradient'. "
         "Enter None if no calibration is desired.",
     ):
-        orchestrator.run(input=test_file, calibrator="Ggir")
+        orchestrator.run(input=test_file, calibrator="Ggir")  # type: ignore[arg-type]
 
 
 def test_bad_save_file(test_file: pathlib.Path) -> None:
