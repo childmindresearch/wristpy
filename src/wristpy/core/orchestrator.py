@@ -30,11 +30,11 @@ class DirectoryNotFoundError(calibration.LoggedException):
 class Results(pydantic.BaseModel):
     """dataclass containing results of orchestrator.run()."""
 
-    enmo: Optional[models.Measurement] = None
-    anglez: Optional[models.Measurement] = None
-    physical_activity_levels: Optional[models.Measurement] = None
-    nonwear_epoch: Optional[models.Measurement] = None
-    sleep_windows_epoch: Optional[models.Measurement] = None
+    enmo: models.Measurement
+    anglez: models.Measurement
+    physical_activity_levels: models.Measurement
+    nonwear_epoch: models.Measurement
+    sleep_windows_epoch: models.Measurement
 
     def save_results(self, output: pathlib.Path) -> None:
         """Convert to polars and save the dataframe as a csv or parquet file.
@@ -184,18 +184,22 @@ def run(
         )
 
     watch_data = readers.read_watch_data(input)
-    if calibrator == "ggir":
-        calibrator = calibration.GgirCalibration()
-    elif calibrator == "gradient":
-        calibrator = calibration.ConstrainedMinimizationCalibration()
 
     if calibrator is None:
-        logger.debug("Running without calibration.")
+        logger.debug("Running without calibration")
         calibrated_acceleration = watch_data.acceleration
     else:
+        if calibrator == "ggir":
+            calibrator_object: calibration.AbstractCalibrator = (
+                calibration.GgirCalibration()
+            )
+        else:
+            calibrator_object: calibration.AbstractCalibrator = (
+                calibration.ConstrainedMinimizationCalibration()
+            )
         try:
             logger.debug("Running calibration with calibrator: %s", calibrator)
-            calibrated_acceleration = calibrator.run_calibration(
+            calibrated_acceleration = calibrator_object.run_calibration(
                 watch_data.acceleration
             )
         except (
