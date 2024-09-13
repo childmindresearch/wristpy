@@ -21,6 +21,12 @@ class InvalidFileTypeError(calibration.LoggedException):
     pass
 
 
+class DirectoryNotFoundError(calibration.LoggedException):
+    """Output save path not found."""
+
+    pass
+
+
 class Results(pydantic.BaseModel):
     """dataclass containing results of orchestrator.run()."""
 
@@ -49,15 +55,8 @@ class Results(pydantic.BaseModel):
             output: The path and file name of the data to be saved. as either a csv or
                 parquet files.
 
-        Raises:
-            InvalidFileTypeError: If the output file path ends with any extension other
-                than csv or parquet.
         """
-        if output.suffix not in [".csv", ".parquet"]:
-            raise InvalidFileTypeError(
-                f"The extension: {output.suffix} is not supported."
-                "Please save the file as .csv or .parquet",
-            )
+        validate_output(output=output)
 
         results_dataframe = pl.DataFrame({"time": self.enmo.time})
 
@@ -70,6 +69,28 @@ class Results(pydantic.BaseModel):
             results_dataframe.write_csv(output, separator=",")
         elif output.suffix == ".parquet":
             results_dataframe.write_parquet(output)
+
+
+def validate_output(output: pathlib.Path) -> None:
+    """Validates that the output path exists and is a valid format.
+
+    Args:
+        output: the name of the file to be saved, and the directory it will be saved in.
+            must be a .csv or .parquet file.
+
+    Raises:
+        InvalidFileTypeError:If the output file path ends with any extension other
+                than csv or parquet.
+        DirectoryNotFoundError: If the directory for the file to be saved in does not
+            exist.
+    """
+    if not output.parent.exists():
+        raise DirectoryNotFoundError(f"The directory:{output.parent} does not exist.")
+    if output.suffix not in [".csv", ".parquet"]:
+        raise InvalidFileTypeError(
+            f"The extension: {output.suffix} is not supported."
+            "Please save the file as .csv or .parquet",
+        )
 
 
 def format_sleep_data(
@@ -149,14 +170,12 @@ def run(
         All calculated data in a save ready format as a Results object.
 
     """
-    if output is not None and output.suffix not in [".csv", ".parquet"]:
-        raise InvalidFileTypeError(
-            f"The extension: {output.suffix} is not supported.",
-            "Please save the file as .csv or .parquet",
-        )
+    if output is not None:
+        validate_output(output=output)
+
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
         raise ValueError(
-            f"Invalid calibrator:{calibrator}. Choose: 'ggir', gradient'.",
+            f"Invalid calibrator: {calibrator}. Choose: 'ggir', 'gradient'. "
             "Enter None if no calibration is desired.",
         )
 
@@ -176,6 +195,7 @@ def run(
                 watch_data.acceleration
             )
         except (
+            ValueError,
             calibration.CalibrationError,
             calibration.ZeroScaleError,
             calibration.SphereCriteriaError,
@@ -232,7 +252,7 @@ def run(
     if output is not None:
         try:
             results.save_results(output=output)
-        except (InvalidFileTypeError, FileNotFoundError) as e:
+        except (InvalidFileTypeError, DirectoryNotFoundError) as e:
             print(e)
 
     return results
