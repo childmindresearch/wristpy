@@ -33,29 +33,18 @@ class Results(pydantic.BaseModel):
     enmo: Optional[models.Measurement] = None
     anglez: Optional[models.Measurement] = None
     physical_activity_levels: Optional[models.Measurement] = None
-    nonwear_epoch1: Optional[models.Measurement] = None
-    sleep_windows_epoch1: Optional[models.Measurement] = None
+    nonwear_epoch: Optional[models.Measurement] = None
+    sleep_windows_epoch: Optional[models.Measurement] = None
 
     def save_results(self, output: pathlib.Path) -> None:
         """Convert to polars and save the dataframe as a csv or parquet file.
-
-        The data captured by Results can be in one of two temporal resolutions, the
-        unaltered (raw) time stamps taken from the watch data, and the down sampled
-        epoch1 time stamps (5 second intervals). The "raw" time is used in the enmo and
-        anglez data, and the epoch1 time is used for enmo_epoch1, anglez_epoch1,
-        nonwear_epoch1, physical_activity_levels and sleep_windows_epoch1. nonwear_array
-        values are in 15 minute blocks and are upsampled to match epoch1 time for the
-        purposes of saving. Additionally the sleep window data is a list of timestamp
-        pairs, which are used to create a binary array in epoch1 time. Two files will
-        be saved, one of each temporal resolution. This means if output is entered as
-        /path/to/file/file.csv,The file names will be labeled as file_epoch1.csv and
-        file_raw_time.csv in the path/to/file directory.
 
         Args:
             output: The path and file name of the data to be saved. as either a csv or
                 parquet files.
 
         """
+        logger.debug("Saving results.")
         validate_output(output=output)
 
         results_dataframe = pl.DataFrame({"time": self.enmo.time})
@@ -67,8 +56,10 @@ class Results(pydantic.BaseModel):
 
         if output.suffix == ".csv":
             results_dataframe.write_csv(output, separator=",")
+            logger.debug("results saved in: %s", output)
         elif output.suffix == ".parquet":
             results_dataframe.write_parquet(output)
+            logger.debug("results saved in: %s", output)
 
 
 def validate_output(output: pathlib.Path) -> None:
@@ -106,6 +97,7 @@ def format_sleep_data(
         1-D np.ndarray, with 1 indicating sleep. Will be of the same length as
             the timestamps in the reference_measure.
     """
+    logger.debug("Formatting sleep array from sleep windows.")
     sleep_array = np.zeros(len(reference_measure.time))
 
     for window in sleep_windows:
@@ -120,9 +112,22 @@ def format_sleep_data(
 def format_nonwear_data(
     nonwear_data: models.Measurement,
     reference_measure: models.Measurement,
-    nonwear_temporal_resolution: float,
+    original_temporal_resolution: float,
 ) -> np.ndarray:
-    """Here."""
+    """Formats nonwear data to match the temporal resolution of the other measures.
+
+    Args:
+        nonwear_data: The nonwear array to be upsampled.
+        reference_measure: The measurement we match the non_wear data's temporal
+            resolution to.
+        original_temporal_resolution: The original temporal resolution of the
+            nonwear_data.
+
+    Returns:
+        1-D np.ndarray with 1 indicating a nonwear timepoint. Will match the
+            length of the reference measure.
+    """
+    logger.debug("Upsampling nonwear data.")
     nonwear_df = pl.DataFrame(
         {
             "nonwear": nonwear_data.measurements.astype(np.int64),
@@ -137,7 +142,7 @@ def format_nonwear_data(
         time = row["time"]
         nonwear_mask = (reference_measure.time >= time) & (
             reference_measure.time
-            <= time + datetime.timedelta(seconds=nonwear_temporal_resolution)
+            <= time + datetime.timedelta(seconds=original_temporal_resolution)
         )
         nonwear_array[nonwear_mask] = nonwear_value
 
@@ -147,7 +152,7 @@ def format_nonwear_data(
 def run(
     input: pathlib.Path,
     output: Optional[pathlib.Path] = None,
-    settings: config.Settings = config.Settings(LOGGING_LEVEL=10),
+    settings: config.Settings = config.Settings(),
     calibrator: Union[
         None,
         Literal["ggir", "gradient"],
@@ -158,13 +163,12 @@ def run(
 
     Args:
         input: Path to the input file to be read. Currently supports .bin and .gt3x
-        output: Path to save data to. The path should end in the file name to be given
-            to the save data. Two files will be saved, each with the given file name and
-            the _raw_time or _epoch1 label after. Currently supports saving in .csv and
-            .parquet
+        output: Path to save data to. The path should end in the save file name in
+            either .csv or .parquet formats.
         settings: The settings object from which physical activity levels are taken.
         calibrator: The calibrator to be used on the input data.
-        epoch_length: The temporal resolution in seconds, the data will be down sampled to.
+        epoch_length: The temporal resolution in seconds, the data will be down sampled
+            to. If None is given no down sampling is preformed.
 
     Returns:
         All calculated data in a save ready format as a Results object.
@@ -233,11 +237,11 @@ def run(
         ),
         time=enmo.time,
     )
-    nonwear_epoch1 = models.Measurement(
+    nonwear_epoch = models.Measurement(
         measurements=format_nonwear_data(
             nonwear_data=non_wear_array,
             reference_measure=enmo,
-            nonwear_temporal_resolution=900,
+            original_temporal_resolution=900,
         ),
         time=enmo.time,
     )
@@ -246,8 +250,8 @@ def run(
         enmo=enmo,
         anglez=anglez,
         physical_activity_levels=physical_activity_levels,
-        sleep_windows_epoch1=sleep_array,
-        nonwear_epoch1=nonwear_epoch1,
+        sleep_windows_epoch=sleep_array,
+        nonwear_epoch=nonwear_epoch,
     )
     if output is not None:
         try:

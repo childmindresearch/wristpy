@@ -25,8 +25,8 @@ def dummy_results() -> orchestrator.Results:
         enmo=dummy_measure,
         anglez=dummy_measure,
         physical_activity_levels=dummy_measure,
-        nonwear_epoch1=dummy_measure,
-        sleep_windows_epoch1=dummy_measure,
+        nonwear_epoch=dummy_measure,
+        sleep_windows_epoch=dummy_measure,
     )
 
     return dummy_results
@@ -63,7 +63,7 @@ def test_format_nonwear() -> None:
     dummy_datetime_list = [
         dummy_date + datetime.timedelta(seconds=i * 5) for i in range(4)
     ]
-    dummy_epoch1 = models.Measurement(
+    dummy_epoch = models.Measurement(
         measurements=np.ones(4), time=pl.Series(dummy_datetime_list)
     )
     nonwear_measurement = models.Measurement(
@@ -71,16 +71,14 @@ def test_format_nonwear() -> None:
         time=pl.Series([dummy_date, dummy_date + datetime.timedelta(seconds=10)]),
     )
 
-    non_wear_epoch1 = orchestrator.format_nonwear_data(
+    nonwear_epoch = orchestrator.format_nonwear_data(
         nonwear_data=nonwear_measurement,
-        reference_measure=dummy_epoch1,
-        nonwear_temporal_resolution=5,
+        reference_measure=dummy_epoch,
+        original_temporal_resolution=5,
     )
 
-    assert (
-        len(non_wear_epoch1) == len(dummy_epoch1.measurements) == len(dummy_epoch1.time)
-    )
-    assert np.all(non_wear_epoch1 == np.array([1, 1, 0, 0]))
+    assert len(nonwear_epoch) == len(dummy_epoch.measurements) == len(dummy_epoch.time)
+    assert np.all(nonwear_epoch == np.array([1, 1, 0, 0]))
 
 
 @pytest.mark.parametrize(

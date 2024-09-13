@@ -28,8 +28,8 @@ def test_happy_path(
     assert isinstance(results, orchestrator.Results)
     assert results.enmo is not None
     assert results.anglez is not None
-    assert results.nonwear_epoch1 is not None
-    assert results.sleep_windows_epoch1 is not None
+    assert results.nonwear_epoch is not None
+    assert results.sleep_windows_epoch is not None
     assert results.physical_activity_levels is not None
 
 
@@ -43,8 +43,8 @@ def test_different_epoch(tmp_path: pathlib.Path, test_file: pathlib.Path) -> Non
     assert isinstance(results, orchestrator.Results)
     assert results.enmo is not None
     assert results.anglez is not None
-    assert results.nonwear_epoch1 is not None
-    assert results.sleep_windows_epoch1 is not None
+    assert results.nonwear_epoch is not None
+    assert results.sleep_windows_epoch is not None
     assert results.physical_activity_levels is not None
 
 
