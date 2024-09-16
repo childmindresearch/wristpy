@@ -1,9 +1,10 @@
 """Calculate base metrics, anglez and enmo."""
 
+from typing import Literal, Optional
+
 import numpy as np
 import polars as pl
 
-from typing import Literal
 from wristpy.core import config, models
 
 logger = config.get_logger()
@@ -158,7 +159,7 @@ def _compute_nonwear_value_array(
     grouped_acceleration: pl.DataFrame,
     n_short_epoch_in_long_epoch: int,
     std_criteria: float,
-    range_criteria: float,
+    range_criteria: Optional[float] = 0.05,
     method: Literal["full", "std"] = "full",
 ) -> np.ndarray:
     """Helper function to calculate the nonwear value array.
@@ -212,7 +213,7 @@ def _compute_nonwear_value_array(
 def _compute_nonwear_value_per_axis(
     axis_acceleration_data: pl.Series,
     std_criteria: float,
-    range_criteria: float,
+    range_criteria: Optional[float] = 0.05,
     method: Literal["full", "std"] = "full",
 ) -> bool:
     """Helper function to calculate the nonwear criteria per axis.
