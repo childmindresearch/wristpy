@@ -5,7 +5,6 @@ import pathlib
 from typing import List, Optional
 
 from wristpy.core import config
-from wristpy.processing import calibration
 
 settings = config.Settings()
 
@@ -18,7 +17,7 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         (None) is given arg parser gets arguments from sys.argv.
 
     Returns:
-        Namespace object will all of the input arguments. s
+        Namespace object with all of the input arguments.
     """
     parser = argparse.ArgumentParser(description="Run the main wristpy pipeline")
 
@@ -32,90 +31,27 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "-l",
-        "--light-threshold",
-        type=float,
-        default=settings.LIGHT_THRESHOLD,
-        help="Threshold for light physical activity",
-    )
-    parser.add_argument(
-        "-m",
-        "--moderate-threshold",
-        type=float,
-        default=settings.MODERATE_THRESHOLD,
-        help="Threshold for moderate physical activity",
-    )
-    parser.add_argument(
-        "-v",
-        "--vigorous-threshold",
-        type=float,
-        default=settings.VIGOROUS_THRESHOLD,
-        help="Threshold for vigorous physical activity",
+        "-c",
+        "--calibrator",
+        type=str,
+        choices=["ggir", "gradient"],
+        default=None,
+        help="Pick which calibrator to use. Can be 'ggir' or 'gradient."
+        "None by default.",
     )
 
     parser.add_argument(
-        "--short-length",
-        type=int,
-        default=settings.SHORT_EPOCH_LENGTH,
-        help="Short window size for non-wear detection, in seconds",
-    )
-    parser.add_argument(
-        "--short-in-long",
-        type=int,
-        default=settings.N_SHORT_EPOCH_IN_LONG_EPOCH,
-        help="Number of short epochs that make up one long epoch",
-    )
-    parser.add_argument(
-        "--std",
+        "-t",
+        "--thresholds",
         type=float,
-        default=settings.STD_CRITERIA,
-        help="Threshold criteria for standard deviation in non-wear detection",
-    )
-    parser.add_argument(
-        "--range",
-        type=float,
-        default=settings.RANGE_CRITERIA,
-        help="Threshold criteria for range of acceleration in non-wear detection",
-    )
-
-    parser.add_argument(
-        "--chunked", action="store_false", help="Use chunked calibration"
-    )
-    parser.add_argument(
-        "--min-acceleration",
-        type=float,
-        default=calibration.Calibration().min_acceleration,
-        help="Minimum acceleration for sphere criteria",
-    )
-    parser.add_argument(
-        "--min-hours",
-        type=int,
-        default=calibration.Calibration().min_calibration_hours,
-        help="Minimum hours of data required for calibration",
-    )
-    parser.add_argument(
-        "--min-std",
-        type=float,
-        default=calibration.Calibration().min_standard_deviation,
-        help="Minimum standard deviation for no-motion detection",
-    )
-    parser.add_argument(
-        "--max-iterations",
-        type=int,
-        default=calibration.Calibration().max_iterations,
-        help="Maximum number of iterations for optimization",
-    )
-    parser.add_argument(
-        "--error-tolerance",
-        type=float,
-        default=calibration.Calibration().error_tolerance,
-        help="Tolerance for optimization convergence",
-    )
-    parser.add_argument(
-        "--min-calibration-error",
-        type=float,
-        default=calibration.Calibration().min_calibration_error,
-        help="Threshold for calibration error",
+        nargs=3,
+        default=[
+            settings.LIGHT_THRESHOLD,
+            settings.MODERATE_THRESHOLD,
+            settings.VIGOROUS_THRESHOLD,
+        ],
+        help="Provide three thresholds for light, moderate, and vigorous activity."
+        "In that order. Defaults to config values.",
     )
 
     return parser.parse_args(args)
