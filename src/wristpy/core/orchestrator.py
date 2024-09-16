@@ -159,7 +159,12 @@ def run(
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
 ) -> Results:
-    """Runs wristpy.
+    """Runs main processing steps for wristpy and returns data for analysis.
+
+    The run() function will provide the user with enmo, anglez, physical activity levels
+    sleep detection and nonwear data. All measures will be in the same temporal
+    resolution. Users may choose from 'ggir' and 'gradient' calibration methods, or
+    enter None to proceed without calibration.
 
     Args:
         input: Path to the input file to be read. Currently supports .bin and .gt3x
