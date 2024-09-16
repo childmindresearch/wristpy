@@ -556,11 +556,11 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
             options={"maxiter": self.max_iterations},
             bounds=bounds,
         )
-        cal_error_end = np.sqrt(result.fun / len(no_motion_data))
 
         if result.success:
             optimal_scale = result.x[:3]
             optimal_offset = result.x[3:]
+            cal_error_end = np.sqrt(result.fun / len(no_motion_data))
         else:
             raise CalibrationError("Optimization failed.")
 
