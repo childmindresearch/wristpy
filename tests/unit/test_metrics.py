@@ -171,6 +171,32 @@ def test_compute_nonwear_value_per_axis(
     ), f"Expected {expected_result}, got: {test_resultx}"
 
 
+@pytest.mark.parametrize(
+    "modifier, expected_result",
+    [
+        (1, 1),
+        (0, 0),
+    ],
+)
+def test_compute_nonwear_value_per_axis_std(
+    create_acceleration: pl.DataFrame, modifier: int, expected_result: int
+) -> None:
+    """Test the nonwear value per axis function."""
+    std_criteria = modifier
+    acceleration = create_acceleration.with_columns(pl.col("time").set_sorted())
+    acceleration_grouped = acceleration.group_by_dynamic(
+        index_column="time", every="5s"
+    ).agg([pl.all().exclude(["time"])])
+
+    test_resultx = metrics._compute_nonwear_value_per_axis(
+        acceleration_grouped["X"], std_criteria, method="std"
+    )
+
+    assert (
+        test_resultx == expected_result
+    ), f"Expected {expected_result}, got: {test_resultx}"
+
+
 def test_compute_nonwear_value_array(create_acceleration: pl.DataFrame) -> None:
     """Test the compute nonwear value array function."""
     n_short_epoch_in_long_epoch = int(4)
@@ -186,6 +212,31 @@ def test_compute_nonwear_value_array(create_acceleration: pl.DataFrame) -> None:
         n_short_epoch_in_long_epoch,
         std_criteria=1,
         range_criteria=1,
+    )
+
+    assert np.all(
+        test_result == expected_result
+    ), f"Expected {expected_result}, got: {test_result}"
+    assert (
+        len(test_result) == expected_time_length
+    ), f"Expected time to be {expected_time_length}, got: {len(test_result)}"
+
+
+def test_compute_nonwear_value_array_std(create_acceleration: pl.DataFrame) -> None:
+    """Test the compute nonwear value array function."""
+    n_short_epoch_in_long_epoch = int(4)
+    create_acceleration = create_acceleration.with_columns(pl.col("time").set_sorted())
+    acceleration_grouped = create_acceleration.group_by_dynamic(
+        index_column="time", every="5s"
+    ).agg([pl.all().exclude(["time"])])
+    expected_time_length = len(acceleration_grouped)
+    expected_result = 3
+
+    test_result = metrics._compute_nonwear_value_array(
+        acceleration_grouped,
+        n_short_epoch_in_long_epoch,
+        std_criteria=1,
+        method="std",
     )
 
     assert np.all(
@@ -224,6 +275,43 @@ def test_detect_nonwear(
         n_short_epoch_in_long_epoch,
         std_criteria,
         range_criteria,
+    )
+
+    assert np.all(
+        test_result.measurements == modifier
+    ), f"Expected non-wear flag value to be {expected_result}, got: {test_result}"
+    assert (
+        len(test_result.time) == expected_time_length
+    ), f"Expected time to be {expected_time_length}, got: {len(test_result.time)}"
+
+
+@pytest.mark.parametrize(
+    "modifier, expected_result",
+    [
+        (1, 1),
+        (0, 0),
+    ],
+)
+def test_detect_nonwear_std(
+    create_acceleration: pl.DataFrame, modifier: int, expected_result: int
+) -> None:
+    """Test the detect nonwear function."""
+    short_epoch_length = 5
+    n_short_epoch_in_long_epoch = int(4)
+    std_criteria = modifier
+    acceleration_df = create_acceleration
+    acceleration = models.Measurement(
+        measurements=acceleration_df.select(["X", "Y", "Z"]).to_numpy(),
+        time=acceleration_df["time"],
+    )
+    expected_time_length = math.ceil(len(acceleration.time) / short_epoch_length)
+
+    test_result = metrics.detect_nonwear(
+        acceleration,
+        short_epoch_length,
+        n_short_epoch_in_long_epoch,
+        std_criteria,
+        method="std",
     )
 
     assert np.all(
