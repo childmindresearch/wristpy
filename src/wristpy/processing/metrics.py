@@ -65,8 +65,7 @@ def detect_nonwear(
     short_epoch_length: int = 900,
     n_short_epoch_in_long_epoch: int = 4,
     std_criteria: float = 0.013,
-    range_criteria: float = 0.05,
-    method: Literal["full", "std"] = "full",
+    range_criteria: Optional[float] = None,
 ) -> models.Measurement:
     """Set non_wear_flag based on accelerometer data.
 
@@ -93,10 +92,8 @@ def detect_nonwear(
         short_epoch_length: The short window size, in seconds.
         n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.
         std_criteria: Threshold criteria for standard deviation.
-        range_criteria: Threshold criteria for range of acceleration.
-        method: The criteria method to use:
-            "full": Both standard deviation and range criteria are used.
-            "std": Only standard deviation criteria is used.
+        range_criteria: Optional threshold criteria for range of acceleration.
+            Default value is None to use solely the standard deviation criteria.
 
     Returns:
         A new Measurment instance with the non-wear flag and corresponding timestamps.
@@ -111,7 +108,6 @@ def detect_nonwear(
         n_short_epoch_in_long_epoch,
         std_criteria,
         range_criteria,
-        method,
     )
 
     nonwear_value_array_cleaned = _cleanup_isolated_ones_nonwear_value(
@@ -159,8 +155,7 @@ def _compute_nonwear_value_array(
     grouped_acceleration: pl.DataFrame,
     n_short_epoch_in_long_epoch: int,
     std_criteria: float,
-    range_criteria: Optional[float] = 0.05,
-    method: Literal["full", "std"] = "full",
+    range_criteria: Optional[float] = None,
 ) -> np.ndarray:
     """Helper function to calculate the nonwear value array.
 
@@ -176,9 +171,6 @@ def _compute_nonwear_value_array(
         n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.
         std_criteria: Threshold criteria for standard deviation.
         range_criteria: Threshold criteria for range of acceleration.
-        method: The criteria method to use:
-            "full": Both standard deviation and range criteria are used.
-            "std": Only standard deviation criteria is used.
 
     Returns:
         Non-wear value array.
@@ -194,7 +186,9 @@ def _compute_nonwear_value_array(
         calculated_nonwear_value = acceleration_selected_long_window.select(
             pl.col("X", "Y", "Z").map_batches(
                 lambda df: _compute_nonwear_value_per_axis(
-                    df, std_criteria, range_criteria, method=method
+                    df,
+                    std_criteria,
+                    range_criteria,
                 )
             )
         ).sum_horizontal()
@@ -213,8 +207,7 @@ def _compute_nonwear_value_array(
 def _compute_nonwear_value_per_axis(
     axis_acceleration_data: pl.Series,
     std_criteria: float,
-    range_criteria: Optional[float] = 0.05,
-    method: Literal["full", "std"] = "full",
+    range_criteria: Optional[float] = None,
 ) -> bool:
     """Helper function to calculate the nonwear criteria per axis.
 
@@ -224,20 +217,18 @@ def _compute_nonwear_value_per_axis(
             acceleration data of one axis (length of each list is the number of samples
             that make up short_epoch_length in seconds).
         std_criteria: Threshold criteria for standard deviation
-        range_criteria: Threshold criteria for range of acceleration
-        method: The criteria method to use:
-            "full": Both standard deviation and range criteria are used.
-            "std": Only standard deviation criteria is used.
+        range_criteria: Threshold criteria for range of acceleration. If None, only
+            standard deviation criteria is used.
 
     Returns:
         Non-wear value for the axis.
     """
     axis_long_window_data = pl.concat(axis_acceleration_data, how="vertical")
     axis_std = axis_long_window_data.std()
-    if method == "full":
+    if range_criteria is not None:
         axis_range = axis_long_window_data.max() - axis_long_window_data.min()
         criteria_boolean = (axis_std < std_criteria) & (axis_range < range_criteria)
-    elif method == "std":
+    else:
         criteria_boolean = axis_std < std_criteria
 
     return criteria_boolean
