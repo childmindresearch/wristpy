@@ -7,7 +7,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from wristpy.core import models
+from wristpy.core import exceptions, models
 from wristpy.processing import calibration
 
 
@@ -54,7 +54,7 @@ def test_get_sampling_rate() -> None:
     dummy_measure = create_dummy_measurement(
         sampling_rate=60, duration_hours=1, all_same_num=0.0
     )
-    calibrator = calibration.Calibration()
+    calibrator = calibration.GgirCalibration()
 
     sampling_rate = calibrator._get_sampling_rate(dummy_measure.time)
 
@@ -64,10 +64,11 @@ def test_get_sampling_rate() -> None:
 def test_no_motion_error() -> None:
     """Test error where no "no motion" epochs found."""
     dummy_measure = create_dummy_measurement(sampling_rate=1, duration_hours=1)
-    calibrator = calibration.Calibration(min_standard_deviation=0.001)
 
-    with pytest.raises(calibration.NoMotionError):
-        calibrator._extract_no_motion(acceleration=dummy_measure)
+    with pytest.raises(exceptions.NoMotionError):
+        calibration._extract_no_motion(
+            acceleration=dummy_measure, no_motion_threshold=0.001
+        )
 
 
 def test_extract_no_motion() -> None:
@@ -75,9 +76,8 @@ def test_extract_no_motion() -> None:
     dummy_measure = create_dummy_measurement(
         sampling_rate=1, duration_hours=1, all_same_num=0.32
     )
-    calibrator = calibration.Calibration()
 
-    no_motion_data = calibrator._extract_no_motion(dummy_measure)
+    no_motion_data = calibration._extract_no_motion(dummy_measure)
 
     assert np.any(no_motion_data), "No non-motion epochs found"
 
@@ -86,9 +86,9 @@ def test_sphere_error() -> None:
     """Test sphere criteria check in closest point fit."""
     dummy_data = np.full((100, 3), 100)
 
-    calibrator = calibration.Calibration(min_acceleration=0)
+    calibrator = calibration.GgirCalibration(min_acceleration=0)
 
-    with pytest.raises(calibration.SphereCriteriaError):
+    with pytest.raises(exceptions.SphereCriteriaError):
         calibrator._closest_point_fit(dummy_data)
 
 
@@ -96,9 +96,9 @@ def test_zero_scale_error() -> None:
     """Test error due to scale becomeing zero values."""
     data = np.array([[2.0, 2.0, 2.0], [2.0, 2.0, 2.0], [-0.001, -0.001, -0.001]])
 
-    calibrator = calibration.Calibration(min_acceleration=0)
+    calibrator = calibration.GgirCalibration(min_acceleration=0)
 
-    with pytest.raises(calibration.ZeroScaleError):
+    with pytest.raises(exceptions.ZeroScaleError):
         calibrator._closest_point_fit(data)
 
 
@@ -111,7 +111,7 @@ def test_closest_point_fit() -> None:
     data = np.random.randn(1000, 3) - 0.5
     norms = np.linalg.norm(data, axis=1, keepdims=True)
     unit_sphere = data / norms
-    calibrator = calibration.Calibration()
+    calibrator = calibration.GgirCalibration()
 
     linear_transform = calibrator._closest_point_fit((unit_sphere * scale) + offset)
 
@@ -123,27 +123,70 @@ def test_closest_point_fit() -> None:
     ), f"Offset is {linear_transform.offset} expected {expected_offset})"
 
 
+def test_closest_point_fit_constrainedmin() -> None:
+    """Test closest point fit."""
+    scale = np.array([1.1, 0.9, 0.6])
+    offset = np.array([0.1, 0.2, 0.1])
+    expected_scale = 1 / scale
+    expected_offset = -offset / scale
+    data = np.random.randn(1000, 3)
+    norms = np.linalg.norm(data, axis=1, keepdims=True)
+    unit_sphere = data / norms
+    calibrator = calibration.ConstrainedMinimizationCalibration()
+
+    linear_transform = calibrator._closest_point_fit((unit_sphere * scale) + offset)
+
+    assert np.allclose(
+        linear_transform.scale, expected_scale, atol=1e-3
+    ), f"Scale is {linear_transform.scale} expected {expected_scale}"
+    assert np.allclose(
+        linear_transform.offset, expected_offset, atol=1e-3
+    ), f"Offset is {linear_transform.offset} expected {expected_offset})"
+
+
+def test_closest_point_fit_constrainmin_calibration_error() -> None:
+    """Test closest point fit raises CalibrationError for constrained min."""
+    data = np.random.randn(1000, 3)
+    calibrator = calibration.ConstrainedMinimizationCalibration(max_iterations=0)
+
+    with pytest.raises(exceptions.CalibrationError, match="Optimization failed."):
+        calibrator._closest_point_fit(data)
+
+
+def test_closest_point_fit_constrainmin_calibration_error_minimum() -> None:
+    """Test closest point fit raises CalibrationError for constrained min."""
+    data = np.random.randn(1000, 3)
+    scale = np.array([1.1, 0.9, 0.6])
+    calibrator = calibration.ConstrainedMinimizationCalibration(max_calibration_error=0)
+
+    with pytest.raises(
+        exceptions.CalibrationError,
+        match="Calibration error could not be sufficiently minimized.",
+    ):
+        calibrator._closest_point_fit(data * scale)
+
+
 def test_calibrate_calibration_error() -> None:
     """Test error when calibration was not possible."""
     dummy_measure = create_dummy_measurement(
         sampling_rate=1,
         duration_hours=1,
     )
-    calibrator = calibration.Calibration(
-        min_calibration_error=0.0001, max_iterations=5, min_acceleration=0
+    calibrator = calibration.GgirCalibration(
+        max_calibration_error=0.0001, max_iterations=5, min_acceleration=0
     )
 
-    with pytest.raises(calibration.CalibrationError):
+    with pytest.raises(exceptions.CalibrationError):
         calibrator._calibrate(dummy_measure)
 
 
-def test_calibration_successful() -> None:
-    """Test successful calibration."""
+def test_ggir_calibration_successful() -> None:
+    """Test successful ggir calibration."""
     scale = np.array([1.1, 1.01, 0.9])
     offset = np.array([0.1, 0.2, 0.1])
     expected_scale = 1 / scale
     expected_offset = -offset / scale
-    dummy_no_motion = np.random.randn(1000, 3) - 0.5
+    dummy_no_motion = np.random.randn(1000, 3)
     norms = np.linalg.norm(dummy_no_motion, axis=1, keepdims=True)
     unit_sphere = dummy_no_motion / norms
     test_data = np.repeat(unit_sphere, repeats=10, axis=0)
@@ -154,7 +197,7 @@ def test_calibration_successful() -> None:
         measurements=(test_data * scale) + offset,
         time=pl.Series(time_data).alias("time"),
     )
-    calibrator = calibration.Calibration(min_standard_deviation=9999)
+    calibrator = calibration.GgirCalibration(no_motion_threshold=9999)
 
     linear_transform = calibrator._calibrate(dummy_measure)
 
@@ -176,7 +219,7 @@ def test_get_chunk(duration_hours: int, expected_hours: np.ndarray) -> None:
         sampling_rate=1, duration_hours=duration_hours
     )
     expected_lengths = expected_hours * 3600
-    dummy_calibrator = calibration.Calibration()
+    dummy_calibrator = calibration.GgirCalibration()
 
     generator_chunks = dummy_calibrator._get_chunk(acceleration=dummy_measure)
 
@@ -188,12 +231,12 @@ def test_get_chunk(duration_hours: int, expected_hours: np.ndarray) -> None:
 def test_chunked_calibration_error() -> None:
     """Testing chunked calibration failing after using all chunks."""
     dummy_measure = create_dummy_measurement(sampling_rate=1, duration_hours=84)
-    calibrator = calibration.Calibration(
-        min_standard_deviation=9999, min_calibration_error=0, chunked=True
+    calibrator = calibration.GgirCalibration(
+        no_motion_threshold=9999, max_calibration_error=0, chunked=True
     )
 
     with pytest.raises(
-        calibration.CalibrationError,
+        exceptions.CalibrationError,
         match="After all chunks of data used calibration has failed.",
     ):
         calibrator._chunked_calibration(dummy_measure)
@@ -202,13 +245,13 @@ def test_chunked_calibration_error() -> None:
 def test_run_hours_value_error() -> None:
     """Test error when not enough hours of data."""
     dummy_measure = create_dummy_measurement(sampling_rate=60, duration_hours=10)
-    calibrator = calibration.Calibration(min_calibration_hours=72)
+    calibrator = calibration.GgirCalibration(min_calibration_hours=72)
 
     with pytest.raises(ValueError):
-        calibrator.run(dummy_measure)
+        calibrator.run_calibration(dummy_measure)
 
 
-def test_run_calibration() -> None:
+def test_run_ggircalibration() -> None:
     """Testing run function when chunked = False."""
     scale = np.array([1.1, 1.01, 0.9])
     offset = np.array([0.1, 0.2, 0.1])
@@ -226,11 +269,44 @@ def test_run_calibration() -> None:
         measurements=(test_data * scale) + offset,
         time=pl.Series(time_data).alias("time"),
     )
-    calibrator = calibration.Calibration(
-        min_standard_deviation=9999, min_calibration_hours=1
+    calibrator = calibration.GgirCalibration(
+        no_motion_threshold=9999, min_calibration_hours=1
     )
 
-    result = calibrator.run(dummy_measure)
+    result = calibrator.run_calibration(dummy_measure)
+
+    assert isinstance(
+        result, models.Measurement
+    ), f"was expecting type models.Measurement, object is of type {type(result)}"
+    assert np.allclose(
+        result.measurements, expected_data.measurements, atol=1e-3
+    ), "Measurement data did not match"
+    assert result.time.equals(expected_data.time), "Time series are not equal"
+
+
+def test_run_constrainedmincalibration() -> None:
+    """Testing run calibration function for the constrained minimization."""
+    scale = np.array([1.1, 1.01, 0.9])
+    offset = np.array([0.1, 0.2, 0.1])
+    dummy_no_motion = np.random.randn(1000, 3) - 0.2
+    norms = np.linalg.norm(dummy_no_motion, axis=1, keepdims=True)
+    unit_sphere = dummy_no_motion / norms
+    test_data = np.repeat(unit_sphere, repeats=10, axis=0)
+    start_time = datetime(2024, 5, 4, 12, 0, 0)
+    delta = timedelta(seconds=1)
+    time_data = [start_time + i * delta for i in range(10000)]
+    expected_data = models.Measurement(
+        measurements=test_data, time=pl.Series(time_data).alias("time")
+    )
+    dummy_measure = models.Measurement(
+        measurements=(test_data * scale) + offset,
+        time=pl.Series(time_data).alias("time"),
+    )
+    calibrator = calibration.ConstrainedMinimizationCalibration(
+        no_motion_threshold=9999
+    )
+
+    result = calibrator.run_calibration(dummy_measure)
 
     assert isinstance(
         result, models.Measurement
@@ -259,11 +335,11 @@ def test_run_chunked_calibration() -> None:
         measurements=(test_data * scale) + offset,
         time=pl.Series(time_data).alias("time"),
     )
-    calibrator = calibration.Calibration(
-        min_standard_deviation=9999, chunked=True, min_calibration_hours=1
+    calibrator = calibration.GgirCalibration(
+        no_motion_threshold=9999, chunked=True, min_calibration_hours=1
     )
 
-    result = calibrator.run(dummy_measure)
+    result = calibrator.run_calibration(dummy_measure)
 
     assert isinstance(
         result, models.Measurement
