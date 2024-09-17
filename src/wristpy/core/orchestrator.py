@@ -47,19 +47,17 @@ class Results(pydantic.BaseModel):
         logger.debug("Saving results.")
         validate_output(output=output)
 
-        results_dataframe = pl.DataFrame({"time": self.enmo.time})
-
-        for field_name, field_value in self:
-            results_dataframe = results_dataframe.with_columns(
-                pl.Series(field_name, field_value.measurements)
-            )
+        results_dataframe = pl.DataFrame(
+            {"time": self.enmo.time}
+            | {name: value.measurements for name, value in self}
+        )
 
         if output.suffix == ".csv":
             results_dataframe.write_csv(output, separator=",")
-            logger.debug("results saved in: %s", output)
         elif output.suffix == ".parquet":
             results_dataframe.write_parquet(output)
-            logger.debug("results saved in: %s", output)
+
+        logger.debug("results saved in: %s", output)
 
 
 def validate_output(output: pathlib.Path) -> None:
@@ -150,8 +148,8 @@ def format_nonwear_data(
 
 
 def run(
-    input: pathlib.Path,
-    output: Optional[pathlib.Path] = None,
+    input: Optional[Union[pathlib.Path, str]],
+    output: Optional[Union[pathlib.Path, str]] = None,
     settings: config.Settings = config.Settings(),
     calibrator: Union[
         None,
@@ -179,6 +177,7 @@ def run(
         All calculated data in a save ready format as a Results object.
 
     """
+    output = pathlib.Path(output)
     if output is not None:
         validate_output(output=output)
 
@@ -214,8 +213,7 @@ def run(
             calibration.SphereCriteriaError,
             calibration.NoMotionError,
         ) as e:
-            print(f"Calibration FAILED:{e}")
-            print("Proceeding without calibration.")
+            logger.error("Calibration FAILED: %s. Proceeding without calibration.", e)
             calibrated_acceleration = watch_data.acceleration
 
     enmo = metrics.euclidean_norm_minus_one(calibrated_acceleration)
