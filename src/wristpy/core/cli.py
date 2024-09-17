@@ -33,10 +33,9 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         "-c",
         "--calibrator",
         type=str,
-        choices=["ggir", "gradient"],
-        default=None,
-        help="Pick which calibrator to use. Can be 'ggir' or 'gradient."
-        "None by default.",
+        choices=["ggir", "gradient", "none"],
+        help="Pick which calibrator to use. Can be 'ggir' or 'gradient'."
+        "Leave empty or enter 'none' to proceed without calibration.",
     )
 
     parser.add_argument(
