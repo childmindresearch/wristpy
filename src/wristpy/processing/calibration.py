@@ -38,7 +38,7 @@ class SphereCriteriaError(LoggedException):
 
 
 class CalibrationError(LoggedException):
-    """Was not able to lower calibration below error threshold."""
+    """Calibration failed to converge or is not below the error threshold."""
 
     pass
 
@@ -550,7 +550,6 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
         scale_bounds = [(0.1, None)] * 3
         offset_bounds = [(-0.5 * data_range, 0.5 * data_range)] * 3
         bounds = scale_bounds + offset_bounds
-
         result = optimize.minimize(
             get_distance_to_unit_sphere,
             initial_guess,
@@ -561,18 +560,20 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
         if result.success:
             optimal_scale = result.x[:3]
             optimal_offset = result.x[3:]
+            cal_error_end = np.sqrt(result.fun / len(no_motion_data))
         else:
-            raise CalibrationError("Optimization failed")
-
-        no_motion_calibrated = (no_motion_data * result.x[:3]) + result.x[3:]
-        cal_error_end = np.mean(abs(np.linalg.norm(no_motion_calibrated, axis=1) - 1))
+            raise CalibrationError("Optimization failed.")
 
         if cal_error_end >= self.max_calibration_error:
-            cal_error_initial = np.mean(abs(np.linalg.norm(no_motion_data, axis=1) - 1))
+            cal_error_initial = np.mean(
+                (np.linalg.norm(no_motion_data, axis=1) - 1) ** 2
+            )
             logger.debug(
-                "Calibration error could not be sufficiently minimized. "
-                f"Initial Error: {cal_error_initial}, Final Error: {cal_error_end}, "
-                f"Error threshold: {self.max_calibration_error}"
+                "Calibration error could not be sufficiently minimized."
+                "Initial Error: %s,  Final Error: %s, Error threshold: %s.",
+                cal_error_initial,
+                cal_error_end,
+                self.max_calibration_error,
             )
             raise CalibrationError(
                 "Calibration error could not be sufficiently minimized."
@@ -592,7 +593,7 @@ def _extract_no_motion(
     no_motion_threshold and a mean value < 2. These epochs are determined to be
     the periods where the accelerometer was influenced by no motion beyond the
     force of gravity. If periods of no motion are found, the ndarray is returned,
-    to be fit to the idealized unit sphere for the purposes of calibration
+    to be fit to the idealized unit sphere for the purposes of calibration.
 
     Args:
         acceleration: the accelerometer data containing x,y,z axis
