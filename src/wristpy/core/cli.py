@@ -13,8 +13,7 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     """Argument parser for python cli.
 
     Args:
-        args: Optional argument for when accessed via python script. When default value
-        (None) is given arg parser gets arguments from sys.argv.
+        args: Optional argument for when accessed via python script.
 
     Returns:
         Namespace object with all of the input arguments.
@@ -54,4 +53,9 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         "In that order. Defaults to config values.",
     )
 
-    return parser.parse_args(args)
+    args = parser.parse_args(args)
+
+    if list(args.thresholds) != sorted(list(args.thresholds)):
+        raise ValueError("Physical activity thresholds must be in ascending order")
+
+    return args
