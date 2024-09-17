@@ -1,10 +1,9 @@
 """Configuration module for wristpy."""
 
 import logging
-from typing import List
 
 import pydantic_settings
-from pydantic import field_validator
+from pydantic import model_validator
 
 
 class Settings(pydantic_settings.BaseSettings):
@@ -16,17 +15,23 @@ class Settings(pydantic_settings.BaseSettings):
 
     LOGGING_LEVEL: int = logging.INFO
 
-    @field_validator("LIGHT_THRESHOLD", "MODERATE_THRESHOLD", "VIGOROUS_THRESHOLD")
-    def validate_threshold_order(cls, v: List[float]) -> List[float]:
+    @model_validator(mode="after")
+    def validate_threshold_order(self) -> "Settings":
         """Validate that the thresholds are in ascending order.
 
-        Args:
-            cls: The class.
-            v: the three thresholds we will evalute.
-
         Returns:
-            The thresholds where light < moderate < vigorous.
+            The settings with thresholds in ascending order.
+
+        Raises:
+            ValueError if the thresholds are not in ascending order.
         """
+        if not (
+            self.LIGHT_THRESHOLD < self.MODERATE_THRESHOLD < self.VIGOROUS_THRESHOLD
+        ):
+            raise ValueError(
+                "light, moderate and vigorous thresholds must be in ascending order."
+            )
+        return self
 
 
 def get_logger() -> logging.Logger:
