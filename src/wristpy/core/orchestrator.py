@@ -167,6 +167,7 @@ def run(
         All calculated data in a save ready format as a Results object.
 
     """
+    input = pathlib.Path(input)
     if output is not None:
         output = pathlib.Path(output)
         validate_output(output=output)
