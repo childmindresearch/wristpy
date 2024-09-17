@@ -40,33 +40,3 @@ def test_different_epoch(
     assert results.nonwear_epoch is not None
     assert results.sleep_windows_epoch is not None
     assert results.physical_activity_levels is not None
-
-
-def test_bad_calibrator(sample_data_gt3x: pathlib.Path) -> None:
-    """Test run when invalid calibrator given."""
-    with pytest.raises(
-        ValueError,
-        match="Invalid calibrator: Ggir. Choose: 'ggir', 'gradient'. "
-        "Enter None if no calibration is desired.",
-    ):
-        orchestrator.run(input=sample_data_gt3x, calibrator="Ggir")  # type: ignore[arg-type]
-
-
-def test_bad_save_file(sample_data_gt3x: pathlib.Path) -> None:
-    """Tests run when incorrect save file format given."""
-    with pytest.raises(
-        exceptions.InvalidFileTypeError,
-        match="The extension: .marquet is not supported."
-        "Please save the file as .csv or .parquet",
-    ):
-        orchestrator.run(
-            input=sample_data_gt3x, output=pathlib.Path("test_output.marquet")
-        )
-
-
-def test_bad_path(sample_data_gt3x: pathlib.Path) -> None:
-    """Tests run when bad path is given."""
-    with pytest.raises(exceptions.DirectoryNotFoundError):
-        orchestrator.run(
-            input=sample_data_gt3x, output=pathlib.Path("this/path/isnt/real.csv")
-        )

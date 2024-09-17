@@ -81,6 +81,16 @@ def test_format_nonwear() -> None:
     assert np.all(nonwear_epoch == np.array([1, 1, 0, 0]))
 
 
+def test_bad_calibrator(sample_data_gt3x: pathlib.Path) -> None:
+    """Test run when invalid calibrator given."""
+    with pytest.raises(
+        ValueError,
+        match="Invalid calibrator: Ggir. Choose: 'ggir', 'gradient'. "
+        "Enter None if no calibration is desired.",
+    ):
+        orchestrator.run(input=sample_data_gt3x, calibrator="Ggir")  # type: ignore[arg-type]
+
+
 @pytest.mark.parametrize(
     "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
 )
