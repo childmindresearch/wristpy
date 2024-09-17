@@ -1,6 +1,6 @@
 """Calculate base metrics, anglez and enmo."""
 
-from typing import Literal, Optional
+from typing import Optional
 
 import numpy as np
 import polars as pl
