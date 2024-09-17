@@ -138,7 +138,7 @@ def format_nonwear_data(
 
 
 def run(
-    input: Optional[Union[pathlib.Path, str]],
+    input: Union[pathlib.Path, str],
     output: Optional[Union[pathlib.Path, str]] = None,
     settings: config.Settings = config.Settings(),
     calibrator: Union[
@@ -167,8 +167,8 @@ def run(
         All calculated data in a save ready format as a Results object.
 
     """
-    output = pathlib.Path(output)
     if output is not None:
+        output = pathlib.Path(output)
         validate_output(output=output)
 
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
