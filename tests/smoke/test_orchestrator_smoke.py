@@ -4,7 +4,7 @@ import pathlib
 
 import pytest
 
-from wristpy.core import exceptions, orchestrator
+from wristpy.core import orchestrator
 
 
 @pytest.mark.parametrize(
