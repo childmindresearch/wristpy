@@ -13,46 +13,9 @@ from scipy import optimize
 from sklearn import linear_model
 from sklearn import metrics as sklearn_metrics
 
-from wristpy.core import computations, config, models
+from wristpy.core import computations, config, exceptions, models
 
 logger = config.get_logger()
-
-
-class LoggedException(Exception):
-    """Base class that automatically logs messages."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize a new instance of the LoggedException class.
-
-        Args:
-            message: The message to display.
-        """
-        logger.exception(message)
-        super().__init__(message)
-
-
-class SphereCriteriaError(LoggedException):
-    """Data did not meet the sphere criteria."""
-
-    pass
-
-
-class CalibrationError(LoggedException):
-    """Calibration failed to converge or is not below the error threshold."""
-
-    pass
-
-
-class NoMotionError(LoggedException):
-    """No epochs with zero movement could be found in the data."""
-
-    pass
-
-
-class ZeroScaleError(LoggedException):
-    """Scale value went to zero."""
-
-    pass
 
 
 @dataclass
@@ -241,9 +204,15 @@ class GgirCalibration(AbstractCalibrator):
         for chunk in self._get_chunk(acceleration):
             try:
                 return self._calibrate(chunk)
-            except (SphereCriteriaError, CalibrationError, NoMotionError):
+            except (
+                exceptions.SphereCriteriaError,
+                exceptions.CalibrationError,
+                exceptions.NoMotionError,
+            ):
                 pass
-        raise CalibrationError("After all chunks of data used calibration has failed.")
+        raise exceptions.CalibrationError(
+            "After all chunks of data used calibration has failed."
+        )
 
     def _get_chunk(
         self, acceleration: models.Measurement
@@ -328,7 +297,7 @@ class GgirCalibration(AbstractCalibrator):
         if (cal_error_end > cal_error_initial) or (
             cal_error_end >= self.max_calibration_error
         ):
-            raise CalibrationError(
+            raise exceptions.CalibrationError(
                 "Calibration error could not be sufficiently minimized. "
                 f"Initial Error: {cal_error_initial}, Final Error: {cal_error_end}, "
                 f"Error threshold: {self.max_calibration_error}"
@@ -378,7 +347,7 @@ class GgirCalibration(AbstractCalibrator):
             & (no_motion_data.max(axis=0) > self.min_acceleration)
         )
         if not sphere_criteria_check:
-            raise SphereCriteriaError(
+            raise exceptions.SphereCriteriaError(
                 "Did not meet criteria to sufficiently populate sphere"
             )
 
@@ -397,7 +366,7 @@ class GgirCalibration(AbstractCalibrator):
             scale_change = np.diag(linear_regression_model.coef_)
 
             if np.all((scale * scale_change) < 1e-8):
-                raise ZeroScaleError(
+                raise exceptions.ZeroScaleError(
                     """Calibration has failed as a result of zero scale values."""
                 )
 
@@ -562,7 +531,7 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
             optimal_offset = result.x[3:]
             cal_error_end = np.sqrt(result.fun / len(no_motion_data))
         else:
-            raise CalibrationError("Optimization failed.")
+            raise exceptions.CalibrationError("Optimization failed.")
 
         if cal_error_end >= self.max_calibration_error:
             cal_error_initial = np.mean(
@@ -575,7 +544,7 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
                 cal_error_end,
                 self.max_calibration_error,
             )
-            raise CalibrationError(
+            raise exceptions.CalibrationError(
                 "Calibration error could not be sufficiently minimized."
             )
 
@@ -624,6 +593,8 @@ def _extract_no_motion(
     no_motion_data = moving_mean.measurements[no_motion_check]
 
     if not np.any(no_motion_data):
-        raise NoMotionError("Zero non-motion epochs found. Data did not meet criteria.")
+        raise exceptions.NoMotionError(
+            "Zero non-motion epochs found. Data did not meet criteria."
+        )
 
     return no_motion_data

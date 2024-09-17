@@ -7,7 +7,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from wristpy.core import models, orchestrator
+from wristpy.core import exceptions, models, orchestrator
 from wristpy.processing import analytics
 
 
@@ -95,11 +95,11 @@ def test_save_results(
 
 def test_validate_output_invalid_file_type(tmp_path: pathlib.Path) -> None:
     """Test when a bad extention is given."""
-    with pytest.raises(orchestrator.InvalidFileTypeError):
+    with pytest.raises(exceptions.InvalidFileTypeError):
         orchestrator.validate_output(tmp_path / "bad_file.oops")
 
 
 def test_validate_output_invalid_directory() -> None:
     """Test when a bad extention is given."""
-    with pytest.raises(orchestrator.DirectoryNotFoundError):
+    with pytest.raises(exceptions.DirectoryNotFoundError):
         orchestrator.validate_output(pathlib.Path("road/to/nowhere/good_file.csv"))

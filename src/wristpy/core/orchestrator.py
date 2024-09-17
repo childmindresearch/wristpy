@@ -8,23 +8,11 @@ import numpy as np
 import polars as pl
 import pydantic
 
-from wristpy.core import computations, config, models
+from wristpy.core import computations, config, exceptions, models
 from wristpy.io.readers import readers
 from wristpy.processing import analytics, calibration, metrics
 
 logger = config.get_logger()
-
-
-class InvalidFileTypeError(calibration.LoggedException):
-    """Wristpy cannot save in the given file type."""
-
-    pass
-
-
-class DirectoryNotFoundError(calibration.LoggedException):
-    """Output save path not found."""
-
-    pass
 
 
 class Results(pydantic.BaseModel):
@@ -74,9 +62,11 @@ def validate_output(output: pathlib.Path) -> None:
             exist.
     """
     if not output.parent.exists():
-        raise DirectoryNotFoundError(f"The directory:{output.parent} does not exist.")
+        raise exceptions.DirectoryNotFoundError(
+            f"The directory:{output.parent} does not exist."
+        )
     if output.suffix not in [".csv", ".parquet"]:
-        raise InvalidFileTypeError(
+        raise exceptions.InvalidFileTypeError(
             f"The extension: {output.suffix} is not supported."
             "Please save the file as .csv or .parquet",
         )
@@ -208,10 +198,10 @@ def run(
             )
         except (
             ValueError,
-            calibration.CalibrationError,
-            calibration.ZeroScaleError,
-            calibration.SphereCriteriaError,
-            calibration.NoMotionError,
+            exceptions.CalibrationError,
+            exceptions.ZeroScaleError,
+            exceptions.SphereCriteriaError,
+            exceptions.NoMotionError,
         ) as e:
             logger.error("Calibration FAILED: %s. Proceeding without calibration.", e)
             calibrated_acceleration = watch_data.acceleration
@@ -263,7 +253,10 @@ def run(
     if output is not None:
         try:
             results.save_results(output=output)
-        except (InvalidFileTypeError, DirectoryNotFoundError) as e:
+        except (
+            exceptions.InvalidFileTypeError,
+            exceptions.DirectoryNotFoundError,
+        ) as e:
             print(e)
 
     return results

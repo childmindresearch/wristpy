@@ -2,7 +2,7 @@
 
 from wristpy.core import config
 
-logger = config.get_logger
+logger = config.get_logger()
 
 
 class LoggedException(Exception):
