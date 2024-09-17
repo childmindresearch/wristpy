@@ -16,6 +16,7 @@ actfast = "^1.0.0"
 numpy = ">=1.26.0, <3.0.0"
 pydantic = "^2.7.1"
 pydantic-settings = "^2.3.4"
+torch = {version = "^2.4.0", extras = ["machine_learning"]}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

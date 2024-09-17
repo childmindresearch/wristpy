@@ -1,8 +1,11 @@
 """Configuration module for wristpy."""
 
 import logging
+import pathlib
 
 import pydantic_settings
+
+DATA_DIR = pathlib.Path(__file__).parent.parent / "data"
 
 
 class Settings(pydantic_settings.BaseSettings):

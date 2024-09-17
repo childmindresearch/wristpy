@@ -1,3 +1,4 @@
+src/wristpy/data
 .ruff_cache
 .DS_Store
 /local

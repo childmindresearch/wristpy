@@ -2,7 +2,9 @@
 
 import polars as pl
 
-from wristpy.core import models
+from wristpy.core import config, models
+
+logger = config.get_logger()
 
 
 def moving_mean(array: models.Measurement, epoch_length: int = 5) -> models.Measurement:
@@ -18,35 +20,7 @@ def moving_mean(array: models.Measurement, epoch_length: int = 5) -> models.Meas
     Raises:
         ValueError: If the epoch length is not an integer or is less than 1.
     """
-    if epoch_length < 1:
-        raise ValueError("Epoch length must be greater than 0")
-
-    window_size_seconds = str(epoch_length) + "s"
-
-    measurement_polars_df = pl.concat(
-        [pl.DataFrame(array.measurements), pl.DataFrame(array.time)], how="horizontal"
-    )
-
-    measurement_polars_df = measurement_polars_df.with_columns(
-        pl.col("time").set_sorted()
-    )
-
-    take_mean_expression = [
-        pl.all().exclude(["time"]).drop_nans().mean(),
-    ]
-
-    measurement_df_mean = measurement_polars_df.group_by_dynamic(
-        index_column="time", every=window_size_seconds
-    ).agg(take_mean_expression)
-
-    measurements_mean_array = measurement_df_mean.drop("time").to_numpy()
-    if array.measurements.ndim == 1:
-        measurements_mean_array = measurements_mean_array.flatten()
-
-    return models.Measurement(
-        measurements=measurements_mean_array,
-        time=measurement_df_mean["time"],
-    )
+    return resample(array, epoch_length)
 
 
 def moving_std(array: models.Measurement, epoch_length: int = 5) -> models.Measurement:
@@ -133,4 +107,75 @@ def moving_median(
     return models.Measurement(
         measurements=moving_median_df.drop("time").to_numpy(),
         time=measurements_polars_df["time"],
+    )
+
+
+def resample(measurement: models.Measurement, delta_t: float) -> models.Measurement:
+    """Resamples a measurement to a different timescale.
+
+    Args:
+        measurement: The measurement to resample.
+        delta_t: The new time step, in seconds. This will be rounded to the nearest
+            nanosecond.
+
+    Returns:
+        The resampled measurement.
+
+    Raises:
+        NotImplementedError: Raised for measurements with non-monotonically increasing
+            time.
+    """
+    if delta_t <= 0:
+        msg = "delta_t must be positive."
+        raise ValueError(msg)
+
+    all_delta_t = (measurement.time[1:] - measurement.time[:-1]).unique()
+    if len(all_delta_t) != 1:
+        msg = " ".join(
+            [
+                "Resampling function only accepts measurements with monotonically"
+                "increasing time."
+            ]
+        )
+        raise NotImplementedError(msg)
+
+    n_nanoseconds_in_second = 1_000_000_000
+    current_delta_t = all_delta_t[0].seconds * n_nanoseconds_in_second
+    requested_delta_t = round(delta_t * n_nanoseconds_in_second)
+
+    if current_delta_t == requested_delta_t:
+        return measurement
+
+    measurement_df = (
+        pl.from_numpy(measurement.measurements)
+        .with_columns(time=measurement.time)
+        .set_sorted("time")
+    )
+
+    if current_delta_t > requested_delta_t:
+        resampled_df = (
+            measurement_df.upsample(
+                time_column="time", every=f"{requested_delta_t}ns", maintain_order=True
+            )
+            .interpolate()
+            .fill_null("forward")
+        )
+    else:
+        resampled_df = measurement_df.group_by_dynamic(
+            "time", every=f"{requested_delta_t}ns"
+        ).agg(pl.exclude("time").mean())
+
+    new_measurement = (
+        resampled_df.drop("time").to_numpy().reshape((len(resampled_df), -1)).squeeze()
+    )
+    return models.Measurement(
+        measurements=new_measurement,
+        time=resampled_df["time"],
+    )
+
+
+def _measurement_to_dataframe(measurement: models.Measurement) -> pl.DataFrame:
+    return pl.concat(
+        [pl.DataFrame(measurement.measurements), pl.DataFrame(measurement.time)],
+        how="horizontal",
     )
