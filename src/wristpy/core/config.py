@@ -1,10 +1,10 @@
 """Configuration module for wristpy."""
 
 import logging
+from importlib import metadata
 
 import pydantic_settings
 from pydantic import model_validator
-from importlib import metadata
 
 
 class Settings(pydantic_settings.BaseSettings):

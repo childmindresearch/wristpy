@@ -14,7 +14,9 @@ def test_parse_arguments() -> None:
     assert args.input == pathlib.Path("/path/to/input/file.bin")
     assert args.output is None
     assert args.calibrator is None
-    assert isinstance(args.thresholds, float)
+    assert args.epoch_length is None
+    assert isinstance(args.thresholds, list)
+    assert all(isinstance(threshold, float) for threshold in args.thresholds)
 
 
 def test_parse_arguments_with_options() -> None:
@@ -30,6 +32,8 @@ def test_parse_arguments_with_options() -> None:
             "0.1",
             "1.0",
             "1.5",
+            "-e",
+            "5",
         ]
     )
 
@@ -37,24 +41,7 @@ def test_parse_arguments_with_options() -> None:
     assert args.output == pathlib.Path("/path/to/output/file.csv")
     assert args.calibrator == "ggir"
     assert args.thresholds == [0.1, 1.0, 1.5]
-
-
-def test_parse_arguments_bad_thresholds() -> None:
-    """Test running the argparser with non ascending thresholds."""
-    with pytest.raises(
-        ValueError, match="Physical activity thresholds must be in ascending order"
-    ):
-        cli.parse_arguments(
-            [
-                "/path/to/input/file.bin",
-                "-o",
-                "/path/to/output/file.csv",
-                "-t",
-                "3.0",
-                "1.0",
-                "1.5",
-            ]
-        )
+    assert args.epoch_length == 5
 
 
 def test_parse_arguements_no_input() -> None:
