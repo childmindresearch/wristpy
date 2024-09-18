@@ -18,7 +18,10 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     Returns:
         Namespace object with all of the input arguments.
     """
-    parser = argparse.ArgumentParser(description="Run the main wristpy pipeline")
+    parser = argparse.ArgumentParser(
+        description="Run the main wristpy pipeline",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
 
     parser.add_argument("input", type=pathlib.Path, help="Path to the input data.")
 
