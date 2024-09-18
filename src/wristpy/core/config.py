@@ -4,6 +4,7 @@ import logging
 
 import pydantic_settings
 from pydantic import model_validator
+from importlib import metadata
 
 
 class Settings(pydantic_settings.BaseSettings):
@@ -32,6 +33,14 @@ class Settings(pydantic_settings.BaseSettings):
                 "light, moderate and vigorous thresholds must be in ascending order."
             )
         return self
+
+
+def get_version() -> str:
+    """Return wristpy version."""
+    try:
+        return metadata.version("wristpy")
+    except metadata.PackageNotFoundError:
+        return "Version unknown"
 
 
 def get_logger() -> logging.Logger:

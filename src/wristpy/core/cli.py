@@ -1,10 +1,10 @@
-"""CLI argument parser for wristpy."""
+"""CLI for wristpy."""
 
 import argparse
 import pathlib
 from typing import List, Optional
 
-from wristpy.core import config
+from wristpy.core import config, orchestrator
 
 settings = config.Settings()
 
@@ -49,12 +49,33 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
             settings.VIGOROUS_THRESHOLD,
         ],
         help="Provide three thresholds for light, moderate, and vigorous activity."
-        "In that order. Defaults to config values.",
+        "values must be given in ascending order. Defaults to config values.",
     )
 
-    args = parser.parse_args(args)
+    parser.add_argument(
+        "-e",
+        "--epoch_length",
+        type=int,
+        help="Desired sampling rate in seconds. Leave empty to skip downsampling.",
+    )
 
-    if list(args.thresholds) != sorted(list(args.thresholds)):
-        raise ValueError("Physical activity thresholds must be in ascending order")
+    parser.add_argument(
+        "-v", "--version", action="version", version=config.get_version()
+    )
 
-    return args
+    return parser.parse_args(args)
+
+
+if __name__ == "__main__":
+    arguments = parse_arguments()
+    light, moderate, vigorous = arguments.thresholds
+    settings = config.Settings(
+        LIGHT_THRESHOLD=light, MODERATE_THRESHOLD=moderate, VIGOROUS_THRESHOLD=vigorous
+    )
+    orchestrator.run(
+        input=arguments.input,
+        output=arguments.output,
+        settings=settings,
+        calibrator=arguments.calibrator,
+        epoch_length=arguments.epoch_length,
+    )
