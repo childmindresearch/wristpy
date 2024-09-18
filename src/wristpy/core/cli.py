@@ -6,6 +6,7 @@ from typing import List, Optional
 
 from wristpy.core import config, orchestrator
 
+logger = config.get_logger()
 settings = config.Settings()
 
 
@@ -71,6 +72,7 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
 
 if __name__ == "__main__":
     arguments = parse_arguments()
+    logger.debug("Running wristpy. arguments given: %s", arguments)
     light, moderate, vigorous = arguments.thresholds
     settings = config.Settings(
         LIGHT_THRESHOLD=light, MODERATE_THRESHOLD=moderate, VIGOROUS_THRESHOLD=vigorous
