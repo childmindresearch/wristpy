@@ -23,7 +23,7 @@ def test_main_options(sample_data_gt3x: pathlib.Path, tmp_path: pathlib.Path) ->
     """Test cli with options."""
     options_list = [
         str(sample_data_gt3x),
-        "-o",
+        "--output",
         str(tmp_path / "test.csv"),
         "-c",
         "gradient",
@@ -35,7 +35,7 @@ def test_main_options(sample_data_gt3x: pathlib.Path, tmp_path: pathlib.Path) ->
         "5",
     ]
 
-    results = cli.main([options_list])
+    results = cli.main(options_list)
 
     assert isinstance(results, orchestrator.Results)
     assert results.enmo is not None
