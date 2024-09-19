@@ -70,17 +70,23 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     return parser.parse_args(args)
 
 
-if __name__ == "__main__":
-    arguments = parse_arguments()
+def main(args: Optional[List[str]] = None) -> orchestrator.Results:
+    """Runs wristpy orchestrator with command line arguments."""
+    arguments = parse_arguments(args)
     logger.debug("Running wristpy. arguments given: %s", arguments)
+
     light, moderate, vigorous = arguments.thresholds
     settings = config.Settings(
         LIGHT_THRESHOLD=light, MODERATE_THRESHOLD=moderate, VIGOROUS_THRESHOLD=vigorous
     )
-    orchestrator.run(
+    return orchestrator.run(
         input=arguments.input,
         output=arguments.output,
         settings=settings,
         calibrator=arguments.calibrator,
         epoch_length=arguments.epoch_length,
     )
+
+
+if __name__ == "__main__":
+    main()
