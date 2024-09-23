@@ -14,6 +14,8 @@ from wristpy.processing import analytics, calibration, metrics
 
 logger = config.get_logger()
 
+VALID_FILE_TYPES = (".csv", ".parquet")
+
 
 class Results(pydantic.BaseModel):
     """dataclass containing results of orchestrator.run()."""
@@ -23,8 +25,6 @@ class Results(pydantic.BaseModel):
     physical_activity_levels: models.Measurement
     nonwear_epoch: models.Measurement
     sleep_windows_epoch: models.Measurement
-
-    _valid_file_types = (".csv", ".parquet")
 
     def save_results(self, output: pathlib.Path) -> None:
         """Convert to polars and save the dataframe as a csv or parquet file.
@@ -48,7 +48,7 @@ class Results(pydantic.BaseModel):
             results_dataframe.write_parquet(output)
         else:
             raise exceptions.InvalidFileTypeError(
-                f"File type must be one of {self._valid_file_types}"
+                f"File type must be one of {VALID_FILE_TYPES}"
             )
 
         logger.debug("results saved in: %s", output)
@@ -71,7 +71,7 @@ class Results(pydantic.BaseModel):
             raise exceptions.DirectoryNotFoundError(
                 f"The directory:{output.parent} does not exist."
             )
-        if output.suffix not in cls._valid_file_types:
+        if output.suffix not in VALID_FILE_TYPES:
             raise exceptions.InvalidFileTypeError(
                 f"The extension: {output.suffix} is not supported."
                 "Please save the file as .csv or .parquet",
