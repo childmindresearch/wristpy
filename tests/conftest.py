@@ -19,5 +19,5 @@ def sample_data_bin() -> pathlib.Path:
 
 @pytest.fixture
 def sample_data_txt() -> pathlib.Path:
-    """#TODO: define what data. --> Test data to run."""
+    """Text data to test invalid file types."""
     return pathlib.Path(__file__).parent / "sample_data" / "example_text.txt"

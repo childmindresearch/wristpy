@@ -110,7 +110,12 @@ def format_nonwear_data(
 ) -> np.ndarray:
     """Formats nonwear data to match the temporal resolution of the other measures.
 
-    #TODO: Add the reason why polars.upsample isnt valid here.
+    The detect_nonweaer algorithm outputs non-wear values in 15-minute windows, where
+    each timestamp represents the beginning of the window. This structure does not align
+    well with the polars upsample function, which treats the last timestamp as the end
+    of the time series. As a result, using the upsample function would cut off the
+    final window. To avoid this, we manually map the non-wear data to the reference
+    measure's resolution.
 
     Args:
         nonwear_data: The nonwear array to be upsampled.
