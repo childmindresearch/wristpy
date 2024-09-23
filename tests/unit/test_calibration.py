@@ -242,12 +242,12 @@ def test_chunked_calibration_error() -> None:
         calibrator._chunked_calibration(dummy_measure)
 
 
-def test_run_hours_value_error() -> None:
+def test_run_hours_calibration_error() -> None:
     """Test error when not enough hours of data."""
     dummy_measure = create_dummy_measurement(sampling_rate=60, duration_hours=10)
     calibrator = calibration.GgirCalibration(min_calibration_hours=72)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(exceptions.CalibrationError):
         calibrator.run_calibration(dummy_measure)
 
 
