@@ -4,13 +4,13 @@ import pathlib
 
 import pytest
 
-from wristpy.core import config, exceptions, orchestrator
+from wristpy.core import config, orchestrator, exceptions
 
 
 @pytest.mark.parametrize(
     "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
 )
-def test_happy_path(
+def test_orchestrator_happy_path(
     file_name: pathlib.Path, tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path
 ) -> None:
     """Happy path for orchestrator."""
@@ -25,7 +25,7 @@ def test_happy_path(
     assert results.physical_activity_levels is not None
 
 
-def test_different_epoch(
+def test_orchestrator_different_epoch(
     tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path
 ) -> None:
     """Test using none default epoch."""

@@ -25,7 +25,7 @@ class SphereCriteriaError(LoggedException):
 
 
 class CalibrationError(LoggedException):
-    """Was not able to lower calibration below error threshold."""
+    """Custom exception for failures in calibration."""
 
     pass
 
@@ -36,14 +36,8 @@ class NoMotionError(LoggedException):
     pass
 
 
-class ZeroScaleError(LoggedException):
-    """Scale value went to zero."""
-
-    pass
-
-
 class InvalidFileTypeError(LoggedException):
-    """Wristpy cannot save in the given file type."""
+    """Wristpy did not expect this file extension."""
 
     pass
 

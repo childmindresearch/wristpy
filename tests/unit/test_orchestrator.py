@@ -81,6 +81,16 @@ def test_format_nonwear() -> None:
     assert np.all(nonwear_epoch == np.array([1, 1, 0, 0]))
 
 
+def test_bad_calibrator(sample_data_gt3x: pathlib.Path) -> None:
+    """Test run when invalid calibrator given."""
+    with pytest.raises(
+        ValueError,
+        match="Invalid calibrator: Ggir. Choose: 'ggir', 'gradient'. "
+        "Enter None if no calibration is desired.",
+    ):
+        orchestrator.run(input=sample_data_gt3x, calibrator="Ggir")  # type: ignore[arg-type]
+
+
 @pytest.mark.parametrize(
     "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
 )
@@ -96,10 +106,12 @@ def test_save_results(
 def test_validate_output_invalid_file_type(tmp_path: pathlib.Path) -> None:
     """Test when a bad extention is given."""
     with pytest.raises(exceptions.InvalidFileTypeError):
-        orchestrator.validate_output(tmp_path / "bad_file.oops")
+        orchestrator.Results.validate_output(tmp_path / "bad_file.oops")
 
 
 def test_validate_output_invalid_directory() -> None:
     """Test when a bad extention is given."""
     with pytest.raises(exceptions.DirectoryNotFoundError):
-        orchestrator.validate_output(pathlib.Path("road/to/nowhere/good_file.csv"))
+        orchestrator.Results.validate_output(
+            pathlib.Path("road/to/nowhere/good_file.csv")
+        )
