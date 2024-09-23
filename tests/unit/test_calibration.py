@@ -98,7 +98,7 @@ def test_zero_scale_error() -> None:
 
     calibrator = calibration.GgirCalibration(min_acceleration=0)
 
-    with pytest.raises(exceptions.ZeroScaleError):
+    with pytest.raises(exceptions.CalibrationError):
         calibrator._closest_point_fit(data)
 
 

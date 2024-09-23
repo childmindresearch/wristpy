@@ -106,10 +106,12 @@ def test_save_results(
 def test_validate_output_invalid_file_type(tmp_path: pathlib.Path) -> None:
     """Test when a bad extention is given."""
     with pytest.raises(exceptions.InvalidFileTypeError):
-        orchestrator.validate_output(tmp_path / "bad_file.oops")
+        orchestrator.Results.validate_output(tmp_path / "bad_file.oops")
 
 
 def test_validate_output_invalid_directory() -> None:
     """Test when a bad extention is given."""
     with pytest.raises(exceptions.DirectoryNotFoundError):
-        orchestrator.validate_output(pathlib.Path("road/to/nowhere/good_file.csv"))
+        orchestrator.Results.validate_output(
+            pathlib.Path("road/to/nowhere/good_file.csv")
+        )
