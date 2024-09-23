@@ -160,9 +160,11 @@ class GgirCalibration(AbstractCalibrator):
         total_hours = math.floor(data_range.total_seconds() / 3600)
 
         if total_hours < self.min_calibration_hours:
-            raise ValueError(
-                f"Calibration requires {self.min_calibration_hours} hours",
-                f"but only {total_hours} hours of data were given.",
+            raise exceptions.CalibrationError(
+                (
+                    f"Calibration requires {self.min_calibration_hours} hours"
+                    f"but only {total_hours} hours of data were given."
+                ),
             )
 
         if self.chunked:
@@ -366,7 +368,7 @@ class GgirCalibration(AbstractCalibrator):
             scale_change = np.diag(linear_regression_model.coef_)
 
             if np.all((scale * scale_change) < 1e-8):
-                raise exceptions.ZeroScaleError(
+                raise exceptions.CalibrationError(
                     """Calibration has failed as a result of zero scale values."""
                 )
 
