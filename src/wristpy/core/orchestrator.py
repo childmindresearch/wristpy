@@ -232,11 +232,7 @@ def run(
             calibrated_acceleration, range_criteria=settings.RANGE_CRITERIA
         )
     else:
-        raise exceptions.InvalidFileTypeError("Unknown input file type.")
-
-    non_wear_array = metrics.detect_nonwear(
-        calibrated_acceleration, range_criteria=range_criterion
-    )
+        non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
 
     sleep_detector = analytics.GGIRSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
