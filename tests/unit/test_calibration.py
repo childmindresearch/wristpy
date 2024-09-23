@@ -7,7 +7,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from wristpy.core import models
+from wristpy.core import exceptions, models
 from wristpy.processing import calibration
 
 
@@ -65,7 +65,7 @@ def test_no_motion_error() -> None:
     """Test error where no "no motion" epochs found."""
     dummy_measure = create_dummy_measurement(sampling_rate=1, duration_hours=1)
 
-    with pytest.raises(calibration.NoMotionError):
+    with pytest.raises(exceptions.NoMotionError):
         calibration._extract_no_motion(
             acceleration=dummy_measure, no_motion_threshold=0.001
         )
@@ -88,7 +88,7 @@ def test_sphere_error() -> None:
 
     calibrator = calibration.GgirCalibration(min_acceleration=0)
 
-    with pytest.raises(calibration.SphereCriteriaError):
+    with pytest.raises(exceptions.SphereCriteriaError):
         calibrator._closest_point_fit(dummy_data)
 
 
@@ -98,7 +98,7 @@ def test_zero_scale_error() -> None:
 
     calibrator = calibration.GgirCalibration(min_acceleration=0)
 
-    with pytest.raises(calibration.ZeroScaleError):
+    with pytest.raises(exceptions.CalibrationError):
         calibrator._closest_point_fit(data)
 
 
@@ -149,7 +149,7 @@ def test_closest_point_fit_constrainmin_calibration_error() -> None:
     data = np.random.randn(1000, 3)
     calibrator = calibration.ConstrainedMinimizationCalibration(max_iterations=0)
 
-    with pytest.raises(calibration.CalibrationError, match="Optimization failed."):
+    with pytest.raises(exceptions.CalibrationError, match="Optimization failed."):
         calibrator._closest_point_fit(data)
 
 
@@ -160,7 +160,7 @@ def test_closest_point_fit_constrainmin_calibration_error_minimum() -> None:
     calibrator = calibration.ConstrainedMinimizationCalibration(max_calibration_error=0)
 
     with pytest.raises(
-        calibration.CalibrationError,
+        exceptions.CalibrationError,
         match="Calibration error could not be sufficiently minimized.",
     ):
         calibrator._closest_point_fit(data * scale)
@@ -176,7 +176,7 @@ def test_calibrate_calibration_error() -> None:
         max_calibration_error=0.0001, max_iterations=5, min_acceleration=0
     )
 
-    with pytest.raises(calibration.CalibrationError):
+    with pytest.raises(exceptions.CalibrationError):
         calibrator._calibrate(dummy_measure)
 
 
@@ -236,18 +236,18 @@ def test_chunked_calibration_error() -> None:
     )
 
     with pytest.raises(
-        calibration.CalibrationError,
+        exceptions.CalibrationError,
         match="After all chunks of data used calibration has failed.",
     ):
         calibrator._chunked_calibration(dummy_measure)
 
 
-def test_run_hours_value_error() -> None:
+def test_run_hours_calibration_error() -> None:
     """Test error when not enough hours of data."""
     dummy_measure = create_dummy_measurement(sampling_rate=60, duration_hours=10)
     calibrator = calibration.GgirCalibration(min_calibration_hours=72)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(exceptions.CalibrationError):
         calibrator.run_calibration(dummy_measure)
 
 

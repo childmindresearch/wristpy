@@ -8,17 +8,15 @@ from wristpy.core import models
 from wristpy.io.readers import readers
 
 
-def test_read_invalid_extenstion() -> None:
+def test_read_invalid_extenstion(sample_data_txt: pathlib.Path) -> None:
     """Test the read_watch_data function with an invalid file extension."""
-    path_name = pathlib.Path(__file__).parent / "sample_data" / "example_.txt"
     with pytest.raises(IOError):
-        readers.read_watch_data(path_name)
+        readers.read_watch_data(sample_data_txt)
 
 
-def test_gt3x_loader() -> None:
+def test_gt3x_loader(sample_data_gt3x: pathlib.Path) -> None:
     """Test the gt3x loader."""
-    test_file = pathlib.Path(__file__).parent / "sample_data" / "example_actigraph.gt3x"
-    watch_data = readers.read_watch_data(test_file)
+    watch_data = readers.read_watch_data(sample_data_gt3x)
     assert isinstance(watch_data, models.WatchData)
     assert isinstance(watch_data.acceleration, models.Measurement)
     assert isinstance(watch_data.lux, models.Measurement)
@@ -27,10 +25,9 @@ def test_gt3x_loader() -> None:
     assert watch_data.temperature is None
 
 
-def test_geneactiv_bin_loader() -> None:
+def test_geneactiv_bin_loader(sample_data_bin: pathlib.Path) -> None:
     """Test the geneActiv bin loader."""
-    test_file = pathlib.Path(__file__).parent / "sample_data" / "example_geneactiv.bin"
-    watch_data = readers.read_watch_data(test_file)
+    watch_data = readers.read_watch_data(sample_data_bin)
     assert isinstance(watch_data, models.WatchData)
     assert isinstance(watch_data.acceleration, models.Measurement)
     assert isinstance(watch_data.lux, models.Measurement)
