@@ -14,6 +14,8 @@ from wristpy.processing import analytics, calibration, metrics
 
 logger = config.get_logger()
 
+VALID_FILE_TYPES = (".csv", ".parquet")
+
 
 class Results(pydantic.BaseModel):
     """dataclass containing results of orchestrator.run()."""
@@ -33,7 +35,7 @@ class Results(pydantic.BaseModel):
 
         """
         logger.debug("Saving results.")
-        validate_output(output=output)
+        self.validate_output(output=output)
 
         results_dataframe = pl.DataFrame(
             {"time": self.enmo.time}
@@ -44,32 +46,36 @@ class Results(pydantic.BaseModel):
             results_dataframe.write_csv(output, separator=",")
         elif output.suffix == ".parquet":
             results_dataframe.write_parquet(output)
+        else:
+            raise exceptions.InvalidFileTypeError(
+                f"File type must be one of {VALID_FILE_TYPES}"
+            )
 
         logger.debug("results saved in: %s", output)
 
+    @classmethod
+    def validate_output(cls, output: pathlib.Path) -> None:
+        """Validates that the output path exists and is a valid format.
 
-def validate_output(output: pathlib.Path) -> None:
-    """Validates that the output path exists and is a valid format.
+        Args:
+            output: the name of the file to be saved, and the directory it will
+            be saved in. Must be a .csv or .parquet file.
 
-    Args:
-        output: the name of the file to be saved, and the directory it will be saved in.
-            must be a .csv or .parquet file.
-
-    Raises:
-        InvalidFileTypeError:If the output file path ends with any extension other
-                than csv or parquet.
-        DirectoryNotFoundError: If the directory for the file to be saved in does not
-            exist.
-    """
-    if not output.parent.exists():
-        raise exceptions.DirectoryNotFoundError(
-            f"The directory:{output.parent} does not exist."
-        )
-    if output.suffix not in [".csv", ".parquet"]:
-        raise exceptions.InvalidFileTypeError(
-            f"The extension: {output.suffix} is not supported."
-            "Please save the file as .csv or .parquet",
-        )
+        Raises:
+            InvalidFileTypeError:If the output file path ends with any extension other
+                    than csv or parquet.
+            DirectoryNotFoundError: If the directory for the file to be saved in does
+                not exist.
+        """
+        if not output.parent.exists():
+            raise exceptions.DirectoryNotFoundError(
+                f"The directory:{output.parent} does not exist."
+            )
+        if output.suffix not in VALID_FILE_TYPES:
+            raise exceptions.InvalidFileTypeError(
+                f"The extension: {output.suffix} is not supported."
+                "Please save the file as .csv or .parquet",
+            )
 
 
 def format_sleep_data(
@@ -86,7 +92,7 @@ def format_sleep_data(
             the timestamps in the reference_measure.
     """
     logger.debug("Formatting sleep array from sleep windows.")
-    sleep_array = np.zeros(len(reference_measure.time))
+    sleep_array = np.zeros(len(reference_measure.time), dtype=bool)
 
     for window in sleep_windows:
         sleep_mask = (reference_measure.time >= window.onset) & (
@@ -103,6 +109,13 @@ def format_nonwear_data(
     original_temporal_resolution: float,
 ) -> np.ndarray:
     """Formats nonwear data to match the temporal resolution of the other measures.
+
+    The detect_nonweaer algorithm outputs non-wear values in 15-minute windows, where
+    each timestamp represents the beginning of the window. This structure does not align
+    well with the polars upsample function, which treats the last timestamp as the end
+    of the time series. As a result, using the upsample function would cut off the
+    final window. To avoid this, we manually map the non-wear data to the reference
+    measure's resolution.
 
     Args:
         nonwear_data: The nonwear array to be upsampled.
@@ -123,7 +136,7 @@ def format_nonwear_data(
         }
     ).set_sorted("time")
 
-    nonwear_array = np.zeros(len(reference_measure.time))
+    nonwear_array = np.zeros(len(reference_measure.time), dtype=bool)
 
     for row in nonwear_df.iter_rows(named=True):
         nonwear_value = row["nonwear"]
@@ -170,13 +183,15 @@ def run(
     input = pathlib.Path(input)
     if output is not None:
         output = pathlib.Path(output)
-        validate_output(output=output)
+        Results.validate_output(output=output)
 
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
-        raise ValueError(
+        msg = (
             f"Invalid calibrator: {calibrator}. Choose: 'ggir', 'gradient'. "
-            "Enter None if no calibration is desired.",
+            "Enter None if no calibration is desired."
         )
+        logger.error(msg)
+        raise ValueError(msg)
 
     watch_data = readers.read_watch_data(input)
 
@@ -192,19 +207,19 @@ def run(
         else:
             calibrator_object = calibration.ConstrainedMinimizationCalibration()
 
-        try:
             logger.debug("Running calibration with calibrator: %s", calibrator)
+        try:
             calibrated_acceleration = calibrator_object.run_calibration(
                 watch_data.acceleration
             )
         except (
-            ValueError,
             exceptions.CalibrationError,
-            exceptions.ZeroScaleError,
             exceptions.SphereCriteriaError,
             exceptions.NoMotionError,
-        ) as e:
-            logger.error("Calibration FAILED: %s. Proceeding without calibration.", e)
+        ) as exc_info:
+            logger.error(
+                "Calibration FAILED: %s. Proceeding without calibration.", exc_info
+            )
             calibrated_acceleration = watch_data.acceleration
 
     enmo = metrics.euclidean_norm_minus_one(calibrated_acceleration)
@@ -212,12 +227,20 @@ def run(
     if epoch_length is not None:
         enmo = computations.moving_mean(enmo, epoch_length=epoch_length)
         anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
+
+    # Watches require different criteria due to differences in the sensor values on the
+    # lower end of the distribution.
+
     if input.suffix == ".bin":
-        non_wear_array = metrics.detect_nonwear(
-            calibrated_acceleration, range_criteria=0.5
-        )
+        range_criterion = 0.5
+    elif input.suffix == ".gt3x":
+        range_criterion = 0.05
     else:
-        non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
+        raise exceptions.InvalidFileTypeError("Unknown input file type.")
+
+    non_wear_array = metrics.detect_nonwear(
+        calibrated_acceleration, range_criteria=range_criterion
+    )
 
     sleep_detector = analytics.GGIRSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
@@ -257,7 +280,14 @@ def run(
         except (
             exceptions.InvalidFileTypeError,
             exceptions.DirectoryNotFoundError,
-        ) as e:
-            print(e)
+        ) as exc_info:
+            # Allowed to pass to recover in Jupyter Notebook scenarios.
+            logger.error(
+                (
+                    f"Could not save output due to: {exc_info}. Call save_results "
+                    " on the output object with a correct filename to save these "
+                    "results."
+                )
+            )
 
     return results
