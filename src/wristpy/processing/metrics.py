@@ -66,12 +66,12 @@ def detect_nonwear(
 ) -> models.Measurement:
     """Set non_wear_flag based on accelerometer data.
 
-    This implements GGIR "2023" non-wear detection algorithm.
+    This implements a modified version of the GGIR "2023" non-wear detection algorithm.
     Briefly, the algorithm, creates a sliding window of long epoch length that steps
     forward by the short epoch length. The long epoch length is an integer multiple of
     the short epoch length, that can be specified by the user.
-    It checks if the acceleration data in that long window, for each axis, meets certain
-    criteria thresholds for the standard deviation and range of acceleration values to
+    It checks if the acceleration data in that long window, for each axis, meets the
+    criteria threshold for the standard deviation of acceleration values to
     compute a non-wear value. The total non-wear value (0, 1, 2, 3) for the long window
     is the sum of each axis.
     The non-wear value is applied to all the short windows that make up the long
