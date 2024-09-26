@@ -4,7 +4,7 @@ import pathlib
 
 import pytest
 
-from wristpy.core import config, orchestrator
+from wristpy.core import models, orchestrator
 
 
 @pytest.mark.parametrize(
@@ -18,11 +18,11 @@ def test_orchestrator_happy_path(
 
     assert (tmp_path / file_name).exists()
     assert isinstance(results, orchestrator.Results)
-    assert results.enmo is not None
-    assert results.anglez is not None
-    assert results.nonwear_epoch is not None
-    assert results.sleep_windows_epoch is not None
-    assert results.physical_activity_levels is not None
+    assert isinstance(results.enmo, models.Measurement)
+    assert isinstance(results.anglez, models.Measurement)
+    assert isinstance(results.nonwear_epoch, models.Measurement)
+    assert isinstance(results.sleep_windows_epoch, models.Measurement)
+    assert isinstance(results.physical_activity_levels, models.Measurement)
 
 
 def test_orchestrator_different_epoch(
@@ -35,31 +35,8 @@ def test_orchestrator_different_epoch(
 
     assert (tmp_path / "good_file.csv").exists()
     assert isinstance(results, orchestrator.Results)
-    assert results.enmo is not None
-    assert results.anglez is not None
-    assert results.nonwear_epoch is not None
-    assert results.sleep_windows_epoch is not None
-    assert results.physical_activity_levels is not None
-
-
-@pytest.mark.parametrize(
-    "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
-)
-def test_happy_path_range_criteria(
-    file_name: pathlib.Path, tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path
-) -> None:
-    """Happy path for orchestrator."""
-    settings_range_criteria = config.Settings(RANGE_CRITERIA=0.1)
-    results = orchestrator.run(
-        input=sample_data_gt3x,
-        output=tmp_path / file_name,
-        settings=settings_range_criteria,
-    )
-
-    assert (tmp_path / file_name).exists()
-    assert isinstance(results, orchestrator.Results)
-    assert results.enmo is not None
-    assert results.anglez is not None
-    assert results.nonwear_epoch is not None
-    assert results.sleep_windows_epoch is not None
-    assert results.physical_activity_levels is not None
+    assert isinstance(results.enmo, models.Measurement)
+    assert isinstance(results.anglez, models.Measurement)
+    assert isinstance(results.nonwear_epoch, models.Measurement)
+    assert isinstance(results.sleep_windows_epoch, models.Measurement)
+    assert isinstance(results.physical_activity_levels, models.Measurement)

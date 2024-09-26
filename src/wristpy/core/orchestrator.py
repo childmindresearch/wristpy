@@ -227,12 +227,8 @@ def run(
     if epoch_length is not None:
         enmo = computations.moving_mean(enmo, epoch_length=epoch_length)
         anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
-    if settings.RANGE_CRITERIA is not None:
-        non_wear_array = metrics.detect_nonwear(
-            calibrated_acceleration, range_criteria=settings.RANGE_CRITERIA
-        )
-    else:
-        non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
+
+    non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
 
     sleep_detector = analytics.GGIRSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
