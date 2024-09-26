@@ -27,10 +27,11 @@ class Settings(pydantic_settings.BaseSettings):
             ValueError if the thresholds are not in ascending order.
         """
         if not (
-            self.LIGHT_THRESHOLD < self.MODERATE_THRESHOLD < self.VIGOROUS_THRESHOLD
+            0 < self.LIGHT_THRESHOLD < self.MODERATE_THRESHOLD < self.VIGOROUS_THRESHOLD
         ):
             raise ValueError(
-                "light, moderate and vigorous thresholds must be in ascending order."
+                "Light, moderate, and vigorous thresholds must be positive, "
+                "unique, and provided in ascending order."
             )
         return self
 

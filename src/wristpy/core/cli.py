@@ -7,18 +7,18 @@ from typing import List, Optional
 from wristpy.core import config, orchestrator
 
 logger = config.get_logger()
-settings = config.Settings()
 
 
 def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
-    """Argument parser for python cli.
+    """Argument parser for Wristpy's cli.
 
     Args:
         args: Optional argument for when accessed via python script.
 
     Returns:
-        Namespace object with all of the input arguments.
+        Namespace object with all of the input arguments and default values.
     """
+    default_settings = config.Settings()
     parser = argparse.ArgumentParser(
         description="Run the main wristpy pipeline",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -30,16 +30,15 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         "-o",
         "--output",
         type=pathlib.Path,
-        help="Optional path where data will be saved.",
+        help="Path where data will be saved. Supports .csv and .parquet formats.",
     )
 
     parser.add_argument(
         "-c",
         "--calibrator",
         type=str,
-        choices=["ggir", "gradient", "none"],
-        help="Pick which calibrator to use. Can be 'ggir' or 'gradient'."
-        "Leave empty or enter 'none' to proceed without calibration.",
+        choices=["ggir", "gradient"],
+        help="Pick which calibrator to use. Can be 'ggir' or 'gradient'.",
     )
 
     parser.add_argument(
@@ -48,12 +47,12 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         type=float,
         nargs=3,
         default=[
-            settings.LIGHT_THRESHOLD,
-            settings.MODERATE_THRESHOLD,
-            settings.VIGOROUS_THRESHOLD,
+            default_settings.LIGHT_THRESHOLD,
+            default_settings.MODERATE_THRESHOLD,
+            default_settings.VIGOROUS_THRESHOLD,
         ],
         help="Provide three thresholds for light, moderate, and vigorous activity."
-        "values must be given in ascending order. Defaults to config values.",
+        "Values must be given in ascending order.",
     )
 
     parser.add_argument(
@@ -86,7 +85,3 @@ def main(args: Optional[List[str]] = None) -> orchestrator.Results:
         calibrator=arguments.calibrator,
         epoch_length=arguments.epoch_length,
     )
-
-
-if __name__ == "__main__":
-    main()
