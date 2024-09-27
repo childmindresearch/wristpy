@@ -51,7 +51,7 @@ pip install git+https://github.com/childmindresearch/wristpy
 
 ### Using Wristpy through the command-line:
 ```sh
-python wristpy /input/file/path.gt3x -o /save/path/file_name.csv -c gradient
+wristpy /input/file/path.gt3x -o /save/path/file_name.csv -c gradient
 ```
 
 ### Using Wristpy through a python script or notebook:

@@ -21,9 +21,9 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     """
     default_settings = config.Settings()
     parser = argparse.ArgumentParser(
-        description="Run the main wristpy pipeline",
+        description="Run the main Wristpy pipeline.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        epilog="Please report issues at https://github.com/childmindresearch/wristpy",
+        epilog="Please report issues at https://github.com/childmindresearch/wristpy.",
     )
 
     parser.add_argument("input", type=pathlib.Path, help="Path to the input data.")
@@ -43,6 +43,7 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         default="none",
         help="Pick which calibrator to use. Can be 'ggir' or 'gradient'.",
     )
+
     parser.add_argument(
         "-t",
         "--thresholds",
@@ -53,7 +54,7 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
             default_settings.MODERATE_THRESHOLD,
             default_settings.VIGOROUS_THRESHOLD,
         ],
-        help="Provide three thresholds for light, moderate, and vigorous activity."
+        help="Provide three thresholds for light, moderate, and vigorous activity. "
         "Values must be given in ascending order.",
     )
 
@@ -62,8 +63,8 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         "--epoch_length",
         default=5,
         type=int,
-        help="Specify the sampling rate in seconds for all metrics. Set to 0 to"
-        "skip downsampling.",
+        help="Specify the sampling rate in seconds for all metrics. To skip resampling,"
+        " enter 0.",
     )
 
     parser.add_argument(
