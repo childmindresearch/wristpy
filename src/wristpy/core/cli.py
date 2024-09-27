@@ -13,7 +13,8 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     """Argument parser for Wristpy's cli.
 
     Args:
-        args: Optional argument for when accessed via python script.
+        args: A list of command line arguments given as strings. If None, the parser
+            will take the args from `sys.argv`.
 
     Returns:
         Namespace object with all of the input arguments and default values.
@@ -22,6 +23,7 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run the main wristpy pipeline",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        epilog="Please report issues at https://github.com/childmindresearch/wristpy",
     )
 
     parser.add_argument("input", type=pathlib.Path, help="Path to the input data.")
@@ -37,10 +39,10 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         "-c",
         "--calibrator",
         type=str,
-        choices=["ggir", "gradient"],
+        choices=["ggir", "gradient", "none"],
+        default="none",
         help="Pick which calibrator to use. Can be 'ggir' or 'gradient'.",
     )
-
     parser.add_argument(
         "-t",
         "--thresholds",
@@ -58,8 +60,10 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "-e",
         "--epoch_length",
+        default=5,
         type=int,
-        help="Desired sampling rate in seconds. Leave empty to skip downsampling.",
+        help="Specify the sampling rate in seconds for all metrics. Set to 0 to"
+        "skip downsampling.",
     )
 
     parser.add_argument(
@@ -70,7 +74,16 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
 
 
 def main(args: Optional[List[str]] = None) -> orchestrator.Results:
-    """Runs wristpy orchestrator with command line arguments."""
+    """Runs wristpy orchestrator with command line arguments.
+
+    Args:
+         args: A list of command line arguments given as strings. If None, the parser
+            will take the args from `sys.argv`.
+
+    Returns:
+        A Results object containing enmo, anglez, physical activity levels, nonwear
+        detection, and sleep detection.
+    """
     arguments = parse_arguments(args)
     logger.debug("Running wristpy. arguments given: %s", arguments)
 
@@ -82,6 +95,6 @@ def main(args: Optional[List[str]] = None) -> orchestrator.Results:
         input=arguments.input,
         output=arguments.output,
         settings=settings,
-        calibrator=arguments.calibrator,
-        epoch_length=arguments.epoch_length,
+        calibrator=None if arguments.calibrator == "none" else arguments.calibrator,
+        epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
     )

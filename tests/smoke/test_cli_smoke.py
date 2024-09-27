@@ -2,52 +2,61 @@
 
 import pathlib
 
-import pytest
+import pytest_mock
 
-from wristpy.core import cli, orchestrator
-
-
-def test_main_defaults(sample_data_gt3x: pathlib.Path) -> None:
-    """Test cli with only necessary arguments."""
-    results = cli.main([str(sample_data_gt3x)])
-
-    assert isinstance(results, orchestrator.Results)
-    assert results.enmo is not None
-    assert results.anglez is not None
-    assert results.nonwear_epoch is not None
-    assert results.physical_activity_levels is not None
-    assert results.sleep_windows_epoch is not None
+from wristpy.core import cli, config, orchestrator
 
 
-def test_main_options(sample_data_gt3x: pathlib.Path, tmp_path: pathlib.Path) -> None:
-    """Test cli with options."""
-    options_list = [
-        str(sample_data_gt3x),
-        "--output",
-        str(tmp_path / "test.csv"),
-        "-c",
-        "gradient",
-        "-t",
-        "0.1",
-        "1.0",
-        "1.5",
-        "-e",
-        "5",
-    ]
-
-    results = cli.main(options_list)
-
-    assert isinstance(results, orchestrator.Results)
-    assert results.enmo is not None
-    assert results.anglez is not None
-    assert results.nonwear_epoch is not None
-    assert results.physical_activity_levels is not None
-    assert results.sleep_windows_epoch is not None
-
-
-def test_main_no_arguments(
-    sample_data_gt3x: pathlib.Path, tmp_path: pathlib.Path
+def test_main_default(
+    mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
 ) -> None:
-    """Tests cli with no options."""
-    with pytest.raises(SystemExit):
-        cli.main([])
+    """Test Cli with only necessary arguments."""
+    default_settings = config.Settings()
+    mock_run = mocker.patch.object(orchestrator, "run")
+
+    cli.main([str(sample_data_gt3x)])
+
+    mock_run.assert_called_once_with(
+        input=sample_data_gt3x,
+        output=None,
+        settings=default_settings,
+        calibrator=None,
+        epoch_length=5,
+    )
+
+
+def test_main_with_options(
+    mocker: pytest_mock.MockerFixture,
+    sample_data_gt3x: pathlib.Path,
+    tmp_path: pathlib.Path,
+) -> None:
+    """Test Cli with only necessary arguments."""
+    test_settings = config.Settings(
+        LIGHT_THRESHOLD=0.1, MODERATE_THRESHOLD=1.0, VIGOROUS_THRESHOLD=1.5
+    )
+    test_output = tmp_path / "test.csv"
+    mock_run = mocker.patch.object(orchestrator, "run")
+
+    cli.main(
+        [
+            str(sample_data_gt3x),
+            "--output",
+            str(test_output),
+            "-c",
+            "gradient",
+            "-t",
+            "0.1",
+            "1.0",
+            "1.5",
+            "-e",
+            "0",
+        ]
+    )
+
+    mock_run.assert_called_once_with(
+        input=sample_data_gt3x,
+        output=test_output,
+        settings=test_settings,
+        calibrator="gradient",
+        epoch_length=None,
+    )

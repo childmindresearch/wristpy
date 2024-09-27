@@ -1,13 +1,12 @@
 """Main function for wristpy."""
 
-from wristpy.core import cli
+from wristpy.core import cli, orchestrator
 
 
-def run_main() -> None:
+def run_main() -> orchestrator.Results:
     """Main entry point to wristpy."""
     cli.main()
 
 
-# TODO get rid of if statement ?
 if __name__ == "__main__":
     cli.main()
