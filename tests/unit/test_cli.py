@@ -13,8 +13,8 @@ def test_parse_arguments() -> None:
 
     assert args.input == pathlib.Path("/path/to/input/file.bin")
     assert args.output is None
-    assert args.calibrator is None
-    assert args.epoch_length is None
+    assert args.calibrator == "none"
+    assert args.epoch_length == 5
     assert isinstance(args.thresholds, list)
     assert all(isinstance(threshold, float) for threshold in args.thresholds)
 
@@ -33,7 +33,7 @@ def test_parse_arguments_with_options() -> None:
             "1.0",
             "1.5",
             "-e",
-            "5",
+            "0",
         ]
     )
 
@@ -41,7 +41,7 @@ def test_parse_arguments_with_options() -> None:
     assert args.output == pathlib.Path("/path/to/output/file.csv")
     assert args.calibrator == "ggir"
     assert args.thresholds == [0.1, 1.0, 1.5]
-    assert args.epoch_length == 5
+    assert args.epoch_length == 0
 
 
 def test_parse_arguements_no_input() -> None:
