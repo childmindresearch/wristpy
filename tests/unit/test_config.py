@@ -33,7 +33,8 @@ def test_thresholds_value_error() -> None:
     """Testing error when threshold values are not in ascending order."""
     with pytest.raises(
         ValueError,
-        match="light, moderate and vigorous thresholds must be in ascending order.",
+        match="Light, moderate, and vigorous thresholds must be positive, "
+        "unique, and provided in ascending order.",
     ):
         config.Settings(
             LIGHT_THRESHOLD=10.0, MODERATE_THRESHOLD=1.0, VIGOROUS_THRESHOLD=2.0
