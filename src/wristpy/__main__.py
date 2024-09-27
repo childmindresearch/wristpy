@@ -10,7 +10,7 @@ def run_main() -> orchestrator.Results:
         A Results object containing enmo, anglez, physical activity levels, nonwear
         detection, and sleep detection.
     """
-    cli.main()
+    return cli.main()
 
 
 if __name__ == "__main__":
