@@ -1,14 +1,17 @@
 """Calculate sleep onset and wake up times with a CNN UNET classifier.
 
-This CNN U-NET classifier is a re-implementation of the classifier proposed in
+This CNN U-NET classifier is a reproduction of the classifier proposed in
 a Kaggle competition (c.f. https://www.kaggle.com/competitions/child-mind-institute-detect-sleep-states/discussion/460274).
 """
 
 from __future__ import annotations
 
 import datetime
+import pathlib
+import shutil
 from collections.abc import Generator
 from typing import Sequence
+from urllib import request
 
 import numpy as np
 import polars as pl
@@ -17,6 +20,7 @@ from scipy import signal
 from wristpy.core import config, models
 
 logger = config.get_logger()
+DATA_DIR = config.DATA_DIR
 
 try:
     import torch
@@ -34,7 +38,19 @@ except ImportError:
 MODEL_DIR = config.DATA_DIR / "CNN_UNET"
 
 
-class _ConvBNReLU(nn.Module):
+class _TorchCallAnnotated(nn.Module):
+    """Base class for Torch modules.
+
+    This class is required to ensure that __call__ is type hinted correctly for our
+    models.
+    """
+
+    def __call__(self, x: torch.Tensor) -> torch.Tensor:
+        """Parent's __call__ method, required for type hinting the call output."""
+        return super().__call__(x)
+
+
+class _ConvBNReLU(_TorchCallAnnotated):
     """A 1D convolution, batch normalization, and ReLU activation."""
 
     def __init__(
@@ -83,12 +99,8 @@ class _ConvBNReLU(nn.Module):
         """
         return self.layers(x)
 
-    def __call__(self, x: torch.Tensor) -> torch.Tensor:
-        """Parent's __call__ method, required for type hinting the call output."""
-        return super().__call__(x)
 
-
-class _SEBlock(nn.Module):
+class _SEBlock(_TorchCallAnnotated):
     """Implements a Squeeze-and-Excitation (SE) mechanism."""
 
     def __init__(self, n_channels: int, se_ratio: int) -> None:
@@ -119,12 +131,8 @@ class _SEBlock(nn.Module):
         """
         return torch.mul(x, self.layers(x))
 
-    def __call__(self, x: torch.Tensor) -> torch.Tensor:
-        """Parent's __call__ method, required for type hinting the call output."""
-        return super().__call__(x)
 
-
-class _ResBlock(nn.Module):
+class _ResBlock(_TorchCallAnnotated):
     def __init__(self, n_channels: int, kernel_size: int, se_ratio: int) -> None:
         super().__init__()
 
@@ -145,27 +153,22 @@ class _ResBlock(nn.Module):
         """
         return x + self.layers(x)
 
-    def __call__(self, x: torch.Tensor) -> torch.Tensor:
-        """Parent's __call__ method, required for type hinting the call output."""
-        return super().__call__(x)
-
 
 class _Dataset(data.Dataset):
     def __init__(self, X: np.ndarray, Y: np.ndarray | None, flag: np.ndarray) -> None:
         self.X = torch.FloatTensor(X)
-        self.Y = torch.FloatTensor(Y) if Y else None
+        self.Y = torch.FloatTensor(Y) or None
         self.flag = torch.FloatTensor(flag)
 
     def __len__(self) -> int:
         return self.X.shape[0]
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        if self.Y:
-            return (self.X[idx], self.Y[idx], self.flag[idx])
-        return (self.X[idx], torch.Tensor(), self.flag[idx])
+        y_idx = self.Y[idx] if self.Y else torch.Tensor()
+        return (self.X[idx], y_idx, self.flag[idx])
 
 
-class _UNet1d(nn.Module):
+class _UNet1d(_TorchCallAnnotated):
     def __init__(
         self,
         input_channels: int,
@@ -252,10 +255,6 @@ class _UNet1d(nn.Module):
             x = self.up_layers[index](x)
 
         return self.out_layers(x)[:, 0, 180:-180]
-
-    def __call__(self, x: torch.Tensor) -> torch.Tensor:
-        """Parent's __call__ method, required for type hinting the call output."""
-        return super().__call__(x)
 
 
 class CnnUnet:
@@ -452,10 +451,27 @@ class CnnUnet:
         model.eval()
         return model
 
-    @staticmethod
-    def _download_model() -> None:
-        # TODO: Host the files somewhere
-        raise NotImplementedError
+    def _download_model(self, data_dir: pathlib.Path = DATA_DIR) -> None:
+        # TODO: Self-host the model files on Git LFS.
+        n_splits = 10
+
+        base_url = (
+            "https://www.kaggleusercontent.com/kf/154116255/eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"
+            ".._oQvRa5sjSsFHfxOPngl0Q.QyRPnJxVOFu4IMsY7uvB5iJx_Ksuv0WEwy7oYqfqfr6vrt_WeDucAxO7931kTe2Lx85dW"
+            "sdABfM03AoAOzoxIaORgfqNPsPFnGWqhetyACc1LzZWjTKi9gHgB0zjztFWHZtmw3gW7FezZhAPuhSqivaN2KFexuP_aV4"
+            "7EmWDV6mDIAYjgMma7PkYKzQDy204S0FOUd-iHRky2I2TamxgqgMqFjxssBWJCODgj3ip2yKPTEPdP3wCFyqUkY7SFy9fk"
+            "tbYpLIABgBy6JVfZ7hW4HTZhUtjX8wzY6Bw63UL1i-6kMF0sWItEU9qYsDu9VnY-nHO3AErrSOicCXGGLphPDiRYt09-wI"
+            "u18-kdO610UPs56NUFBermVTru0stpquedm_k0Bdk2tokQHG_ClnT0JVNmEWEGiMeZGorFhBGxg2Kzf1SCzre5vEy1vZJ4"
+            "9Nz0Ft9RjI3aLYzO27QPJt7xVwimU4TurMZk2mk-rCyOkzOnSqM8_ryoK94d_0vOTrXczwfy3HU8oEomGxLx1dNahiFEKu"
+            "N2RcfxVVIkDFsqenIHV6dO1hkExni5jy-9QqOlP7jUaNyt8T8zCCu-xrYS7vu0LXfcca3sa4Ymlz1oKWAdGMFosqpWrOhV"
+            "5YDQCbxKh6zCdZ2x41LfIviOkpfug.6LuGMzksPzir2cn7ZPYvQg/model_"
+        )
+
+        for split in range(n_splits):
+            filename = data_dir / f"model_{split}.pth"
+            url = base_url + f"{split}.pth"
+            with request.urlopen(url) as response, filename.open("wb") as file:
+                shutil.copyfileobj(response, file)
 
 
 def _time_interval_strings(interval: float, *, format: str = "%H:%M:%S") -> list[str]:
