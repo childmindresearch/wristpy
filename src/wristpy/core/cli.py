@@ -86,6 +86,11 @@ def main(args: Optional[List[str]] = None) -> orchestrator.Results:
         detection, and sleep detection.
     """
     arguments = parse_arguments(args)
+    if arguments.epoch_length < 0:
+        raise ValueError(
+            f"Value for epoch_length is:{arguments.epoch_length}."
+            "Please enter an integer >= 0."
+        )
     logger.debug("Running wristpy. arguments given: %s", arguments)
 
     light, moderate, vigorous = arguments.thresholds
