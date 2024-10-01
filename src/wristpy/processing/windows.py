@@ -1,5 +1,7 @@
 """Generate and filter sleep windows from predicted onsets and offsets."""
 
+from typing import Literal
+
 import numpy as np
 import polars as pl
 
@@ -22,11 +24,11 @@ def generate_sleep_windows(
         A dataframe with columns 'onset', 'wakeup', and 'score', which is the geometric
         mean of onset and wakeup scores.
     """
-    onset_times = onset_scores.time.to_numpy().astype("datetime64[s]")
-    offset_times = offset_scores.time.to_numpy().astype("datetime64[s]")
+    onset_times = onset_scores.time.to_numpy()
+    offset_times = offset_scores.time.to_numpy()
 
     durations = offset_times[:, None] - onset_times[None, :]
-    duration_mask = durations > min_duration
+    duration_mask = durations > np.timedelta64(min_duration, "s")
     offset_ind, onset_ind = duration_mask.nonzero()
     scores = np.sqrt(
         onset_scores.measurements[onset_ind] * offset_scores.measurements[offset_ind]
@@ -64,10 +66,12 @@ def filter_non_sleep_windows(
             sleep_scores_df.filter(pl.col("time").is_between(window[0], window[1]))
             .select("score")
             .min()
+            .item()
         )
         return window_score > threshold
 
-    filtered = windows.filter(windows.map_rows(test_window))
+    mask = windows.map_rows(test_window)
+    filtered = windows.filter(mask[:, 0])
     return filtered
 
 
@@ -75,7 +79,7 @@ def nms_windows(windows: pl.DataFrame, iou_threshold: float = 0.75) -> pl.DataFr
     """De-duplicate sleep windows by non-max suppression with given IoU threshold."""
     windows = windows.sort("score", descending=True)
 
-    bounds = windows.select("onset", "offset").to_numpy()
+    bounds = windows_to_bounds(windows)
     mask = np.zeros(len(bounds), dtype="bool")
     mask[0] = True
 
@@ -88,8 +92,24 @@ def nms_windows(windows: pl.DataFrame, iou_threshold: float = 0.75) -> pl.DataFr
     return filtered
 
 
+def windows_to_bounds(
+    windows: pl.DataFrame,
+    unit: Literal["s", "ms", "us", "ns"] = "ms",
+) -> np.ndarray:
+    """Extract interval bounds from windows dataframe."""
+    bounds = windows.select("onset", "offset").to_numpy()
+
+    # convert from datetime to float
+    bounds = (bounds - bounds.min()).astype(f"timedelta64[{unit}]")
+    bounds = bounds.astype("float64")
+    return bounds
+
+
 def pairwise_iou(bounds1: np.ndarray, bounds2: np.ndarray) -> np.ndarray:
     """Compute the IoU between all pairs of 1d bounding boxes."""
+    bounds1 = np.atleast_2d(bounds1)
+    bounds2 = np.atleast_2d(bounds2)
+
     l1, r1 = bounds1.T
     l2, r2 = bounds2.T
     durs1 = np.maximum(r1 - l1, 0.0)
@@ -104,6 +124,8 @@ def pairwise_intersection(bounds1: np.ndarray, bounds2: np.ndarray) -> np.ndarra
     """Compute the intersection between all pairs of 1d bounding boxes."""
     l1, r1 = bounds1.T
     l2, r2 = bounds2.T
-    durs = np.minimum(r1[:, None], r2[None, :]) - np.maximum(l1[:, None], l2[None, :])
-    durs = np.maximum(durs, 0)
-    return durs
+    lint = np.maximum(l1[:, None], l2[None, :])
+    rint = np.minimum(r1[:, None], r2[None, :])
+    intersection = rint - lint
+    intersection = np.maximum(intersection, 0)
+    return intersection
