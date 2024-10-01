@@ -1,7 +1,6 @@
 """Configuration module for wristpy."""
 
 import logging
-from typing import Optional
 
 import pydantic_settings
 
