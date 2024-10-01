@@ -12,7 +12,6 @@ class Settings(pydantic_settings.BaseSettings):
     LIGHT_THRESHOLD: float = 0.03
     MODERATE_THRESHOLD: float = 0.1
     VIGOROUS_THRESHOLD: float = 0.3
-    RANGE_CRITERIA: Optional[float] = None
 
     LOGGING_LEVEL: int = logging.INFO
 
