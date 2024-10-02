@@ -1,5 +1,6 @@
 """Generate and filter sleep windows from predicted onsets and offsets."""
 
+from datetime import datetime
 from typing import Literal
 
 import numpy as np
@@ -11,7 +12,7 @@ from wristpy.core import models
 def generate_sleep_windows(
     onset_scores: models.Measurement,
     offset_scores: models.Measurement,
-    min_duration: float = 900.0,
+    min_duration: int = 900,
 ) -> pl.DataFrame:
     """Generate sleep windows from predicted onsets and wakeups.
 
@@ -61,7 +62,7 @@ def filter_non_sleep_windows(
         {"time": sleep_scores.time, "score": sleep_scores.measurements}
     )
 
-    def test_window(window: tuple[pl.Datetime, pl.Datetime, float]) -> bool:
+    def test_window(window: tuple[datetime, datetime, float]) -> bool:
         window_score = (
             sleep_scores_df.filter(pl.col("time").is_between(window[0], window[1]))
             .select("score")
