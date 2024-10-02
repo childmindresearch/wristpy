@@ -27,3 +27,15 @@ def test_get_logger_second_call() -> None:
     assert len(logger.handlers) == len(second_logger.handlers) == 1
     assert logger.handlers[0] is second_logger.handlers[0]
     assert logger is second_logger
+
+
+def test_thresholds_value_error() -> None:
+    """Testing error when threshold values are not in ascending order."""
+    with pytest.raises(
+        ValueError,
+        match="Light, moderate, and vigorous thresholds must be positive, "
+        "unique, and provided in ascending order.",
+    ):
+        config.Settings(
+            LIGHT_THRESHOLD=10.0, MODERATE_THRESHOLD=1.0, VIGOROUS_THRESHOLD=2.0
+        )
