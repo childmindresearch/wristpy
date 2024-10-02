@@ -24,29 +24,23 @@ The package currently supports the following formats:
 | BIN | GENEActiv | GENEActiv | ✅ |
 
 **Special Note**   
-    The `idle_sleep_mode` for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this [here](https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained)). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, the authors of this pacakge do not take any steps to impute data during these time gaps and would caution to not use data collected with this mode enabled. Of course users can make use of the readers within wristpy for their own analysis with this type of data.
+    The `idle_sleep_mode` for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this [here](https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained)). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, the authors of this pacakge do not take any steps to impute data during these time gaps and would caution to not use data collected with this mode enabled. Of course, users can make use of the readers within wristpy for their own analysis with this type of data.
 
 ## Features
 
 - Data Calibration: Three options: ... #TODO Applies the GGIR calibration procedure to raw accelerometer data.
 - Metrics Calculation: Calculates various metrics on the calibrated data, namely ENMO (euclidean norm , minus one) and angle-Z (angle of acceleration relative to the *x-y* axis).
-- Physical activity levels: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. 
-- Non-wear detection: We find periods of non-wear based on the acceleration data. 
+- Non-wear detection: We find periods of non-wear based on the acceleration data. #TODO
 - Sleep Detection: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.
-- Filtering of detected sleep windows: removal of non-wear overlap.
+- Physical activity levels: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 stduy <sup>3</sup>
+- Filtering of detected sleep windows: removal of non-wear overlap. #TODO
 
 ## Installation
 
-Install this package via :
+Install this package from PyPI via :
 
 ```sh
 pip install wristpy
-```
-
-Or get the newest development version via:
-
-```sh
-pip install git+https://github.com/childmindresearch/wristpy
 ```
 
 ## Quick start
@@ -86,7 +80,11 @@ sleep_windows = results.sleep_windows_epoch
 1. van Hees, V.T., Sabia, S., Jones, S.E. et al. Estimating sleep parameters
               using an accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
               https://doi.org/10.1038/s41598-018-31266-z
-2. van Hees, V. T. et al. A Novel, Open Access Method to Assess Sleep
+2. van Hees, V. T., et al. A Novel, Open Access Method to Assess Sleep
             Duration Using a Wrist-Worn Accelerometer. PLoS One 10, e0142533 (2015).
             https://doi.org/10.1371/journal.pone.0142533
+3. Hildebrand, M., et al. Age group comparability of raw accelerometer output
+            from wrist- and hip-worn monitors. Medicine and Science in
+            Sports and Exercise, 46(9), 1816-1824 (2014).
+            https://doi.org/10.1249/mss.0000000000000289
 
