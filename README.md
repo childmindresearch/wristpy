@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/657341621.svg)](https://zenodo.org/doi/10.5281/zenodo.10383685)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13883191.svg)](https://doi.org/10.5281/zenodo.13883191)
 
 # Wristpy: Wrist-Worn Accelerometer Data Processing <img src="logo.png" align="right" width="25%"/>
 
