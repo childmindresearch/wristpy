@@ -419,9 +419,6 @@ def compute_physical_activty_categories(
         ValueError: If the threshold values are not in ascending order.
     """
     logger.debug("Computing physical activity levels, thresholds: %s", thresholds)
-    if list(thresholds) != sorted(thresholds):
-        logger.error("ValueError, thresholds must be in ascending order.")
-        raise ValueError("Thresholds must be in ascending order.")
 
     activity_levels = (
         (

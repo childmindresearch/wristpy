@@ -233,19 +233,6 @@ def test_run_sleep_detection(sleep_detection: analytics.GGIRSleepDetection) -> N
     assert isinstance(result, List)
 
 
-def test_physical_activity_thresholds_unsorted() -> None:
-    """Test the physical_activity_thresholds method with unsorted thresholds."""
-    tmp_data = np.array([1, 2, 3])
-    dummy_date = datetime.datetime(2024, 5, 2)
-    dummy_datetime_list = [dummy_date + datetime.timedelta(seconds=i) for i in range(3)]
-    time = pl.Series("time", dummy_datetime_list)
-    tmp_measurement = models.Measurement(measurements=tmp_data, time=time)
-    thresholds = (3, 2, 1)
-
-    with pytest.raises(ValueError):
-        analytics.compute_physical_activty_categories(tmp_measurement, thresholds)
-
-
 def test_physical_activity_thresholds() -> None:
     """Test the physical_activity_thresholds method."""
     tmp_data = np.arange(4)
