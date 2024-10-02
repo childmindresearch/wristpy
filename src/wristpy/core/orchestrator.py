@@ -230,19 +230,7 @@ def run(
         enmo = computations.moving_mean(enmo, epoch_length=epoch_length)
         anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
 
-    # Watches require different criteria due to differences in the sensor values on the
-    # lower end of the distribution.
-
-    if input.suffix == ".bin":
-        range_criterion = 0.5
-    elif input.suffix == ".gt3x":
-        range_criterion = 0.05
-    else:
-        raise exceptions.InvalidFileTypeError("Unknown input file type.")
-
-    non_wear_array = metrics.detect_nonwear(
-        calibrated_acceleration, range_criteria=range_criterion
-    )
+    non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
 
     sleep_detector = analytics.GGIRSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()

@@ -63,16 +63,15 @@ def detect_nonwear(
     short_epoch_length: int = 900,
     n_short_epoch_in_long_epoch: int = 4,
     std_criteria: float = 0.013,
-    range_criteria: float = 0.05,
 ) -> models.Measurement:
     """Set non_wear_flag based on accelerometer data.
 
-    This implements GGIR "2023" non-wear detection algorithm.
+    This implements a modified version of the GGIR "2023" non-wear detection algorithm.
     Briefly, the algorithm, creates a sliding window of long epoch length that steps
     forward by the short epoch length. The long epoch length is an integer multiple of
     the short epoch length, that can be specified by the user.
-    It checks if the acceleration data in that long window, for each axis, meets certain
-    criteria thresholds for the standard deviation and range of acceleration values to
+    It checks if the acceleration data in that long window, for each axis, meets the
+    criteria threshold for the standard deviation of acceleration values to
     compute a non-wear value. The total non-wear value (0, 1, 2, 3) for the long window
     is the sum of each axis.
     The non-wear value is applied to all the short windows that make up the long
@@ -90,7 +89,7 @@ def detect_nonwear(
         short_epoch_length: The short window size, in seconds.
         n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.
         std_criteria: Threshold criteria for standard deviation.
-        range_criteria: Threshold criteria for range of acceleration.
+
 
     Returns:
         A new Measurment instance with the non-wear flag and corresponding timestamps.
@@ -104,7 +103,6 @@ def detect_nonwear(
         acceleration_grouped_by_short_window,
         n_short_epoch_in_long_epoch,
         std_criteria,
-        range_criteria,
     )
 
     nonwear_value_array_cleaned = _cleanup_isolated_ones_nonwear_value(
@@ -152,7 +150,6 @@ def _compute_nonwear_value_array(
     grouped_acceleration: pl.DataFrame,
     n_short_epoch_in_long_epoch: int,
     std_criteria: float,
-    range_criteria: float,
 ) -> np.ndarray:
     """Helper function to calculate the nonwear value array.
 
@@ -167,7 +164,6 @@ def _compute_nonwear_value_array(
         grouped_acceleration: The acceleration data grouped into short windows.
         n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.
         std_criteria: Threshold criteria for standard deviation.
-        range_criteria: Threshold criteria for range of acceleration.
 
     Returns:
         Non-wear value array.
@@ -183,7 +179,8 @@ def _compute_nonwear_value_array(
         calculated_nonwear_value = acceleration_selected_long_window.select(
             pl.col("X", "Y", "Z").map_batches(
                 lambda df: _compute_nonwear_value_per_axis(
-                    df, std_criteria, range_criteria
+                    df,
+                    std_criteria,
                 )
             )
         ).sum_horizontal()
@@ -200,7 +197,8 @@ def _compute_nonwear_value_array(
 
 
 def _compute_nonwear_value_per_axis(
-    axis_acceleration_data: pl.Series, std_criteria: float, range_criteria: float
+    axis_acceleration_data: pl.Series,
+    std_criteria: float,
 ) -> bool:
     """Helper function to calculate the nonwear criteria per axis.
 
@@ -210,16 +208,15 @@ def _compute_nonwear_value_per_axis(
             acceleration data of one axis (length of each list is the number of samples
             that make up short_epoch_length in seconds).
         std_criteria: Threshold criteria for standard deviation
-        range_criteria: Threshold criteria for range of acceleration
+
 
     Returns:
         Non-wear value for the axis.
     """
     axis_long_window_data = pl.concat(axis_acceleration_data, how="vertical")
     axis_std = axis_long_window_data.std()
-    axis_range = axis_long_window_data.max() - axis_long_window_data.min()
+    criteria_boolean = axis_std < std_criteria
 
-    criteria_boolean = (axis_std < std_criteria) & (axis_range < range_criteria)
     return criteria_boolean
 
 
