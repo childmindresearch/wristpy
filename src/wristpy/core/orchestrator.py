@@ -204,10 +204,12 @@ def run(
     else:
         if calibrator == "ggir":
             calibrator_object = calibration.GgirCalibration()
-        else:
+        elif calibrator == "gradient":
             calibrator_object = calibration.ConstrainedMinimizationCalibration()
+        else:
+            raise ValueError(f"Invalid calibrator given:{calibrator}")
 
-            logger.debug("Running calibration with calibrator: %s", calibrator)
+        logger.debug("Running calibration with calibrator: %s", calibrator)
         try:
             calibrated_acceleration = calibrator_object.run_calibration(
                 watch_data.acceleration

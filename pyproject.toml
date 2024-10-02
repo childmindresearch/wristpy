@@ -24,9 +24,13 @@ mypy = "^1.7.1"
 pre-commit = "^3.5.0"
 pytest-cov = "^4.1.0"
 ruff = "^0.4.8"
+pytest-mock = "^3.14.0"
 
 [tool.poetry.group.docs.dependencies]
 pdoc = "^14.4.0"
+
+[tool.poetry.scripts]
+wristpy = "wristpy.__main__:run_main"
 
 [tool.pytest.ini_options]
 pythonpath = [

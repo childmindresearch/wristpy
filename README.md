@@ -49,43 +49,35 @@ pip install git+https://github.com/childmindresearch/wristpy
 
 ## Quick start
 
-Here is a sample script that goes through the various functions that are built into wristpy. 
+### Using Wristpy through the command-line:
+```sh
+wristpy /input/file/path.gt3x -o /save/path/file_name.csv -c gradient
+```
+
+### Using Wristpy through a python script or notebook:
 
 ```Python
 
-#loading the prerequisite modules
-import wristpy
-from wristpy.core import computations
-from wristpy.io.readers import readers
-from wristpy.processing import metrics, analytics
+from wristpy.core import orchestrator
 
-#set the paths to the raw data and the desired output path
-file_path = '/path/to/your/file.gt3x'
+# Define input file path and output location
+# Support for saving as .csv and .parquet
+input_path = '/path/to/your/file.gt3x'
+output_path = '/path/to/save/file_name.csv'
 
-#load the acceleration data
-test_data = readers.read_watch_data(file_path)
+# Run the orchestrator
+results = orchestrator.run(
+    input=input_path,
+    output=output_path,
+    calibrator='gradient',  # Choose between 'ggir', 'gradient', or 'none'
+)
 
-#calibrate the data
-calibrator = calibration.Calibration()
-calibrated_data = calibrator.run(test_data.acceleration)
-
-#Compute some metrics and get epoch1 data
-enmo = metrics.euclidean_norm_minus_one(calibrated_data)
-anglez = metrics.angle_relative_to_horizontal(calibrated_data)
-
-enmo_epoch1 = computations.moving_mean(enmo)
-anglez_epoch1 = computations.moving_mean(anglez)
-
-#Find sleep windows
-sleep_detector_class = analytics.GGIRSleepDetection(anglez)
-sleep_windows = sleep_detector_class.run_sleep_detection()
-
-#Find non-wear periods
-non_wear_array =  metrics.detect_nonwear(calibrated_data, 900,4, 0.1,0.5)
-
-#Get activity levels
-activity_measurement = analytics.compute_physical_activty_categories(enmo_epoch1)
-
+#Data availble in results object
+enmo = results.enmo
+anglez = results.anglez
+physical_activity_levels = results.physical_activity_levels
+nonwear_array = results.nonwear_epoch
+sleep_windows = results.sleep_windows_epoch
 ```
 
 ## References
