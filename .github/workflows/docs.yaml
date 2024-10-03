@@ -4,9 +4,12 @@ permissions:
   contents: write
 
 on:
-  push:
+  workflow_run:
+    workflows: [Python Tests]
+    types:
+    - completed
     branches:
-      - '**'
+    - main
 
 jobs:
   build-and-publish-docs:
