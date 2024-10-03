@@ -26,7 +26,8 @@ jobs:
         poetry install --with docs
     - name: Build docs
       run: |
-        poetry run pdoc src/wristpy -o docs_build -t docs/pdoc-theme --docformat google --pages .
+        poetry run pdoc src/wristpy -o docs_build -t docs/pdoc-theme --docformat google
+        poetry run pdoc docs/ -o docs_build -t docs/pdoc-theme --docformat google --pages
         touch docs_build/.nojekyll
     - uses: JamesIves/github-pages-deploy-action@v4
       with:
