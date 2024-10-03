@@ -1,1 +1,1 @@
-""".. include:: ../../README.md"""  # noqa: D415
+"""This submodule contains the unit tests."""

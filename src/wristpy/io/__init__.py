@@ -1,1 +1,1 @@
-""".. include:: ../../README.md"""  # noqa: D415
+"""This is the io submodule."""
