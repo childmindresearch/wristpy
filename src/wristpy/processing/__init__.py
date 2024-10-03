@@ -1,4 +1,4 @@
-"""Testing"""  # noqa: D415
+"""Testing this style of init."""
 
-from .analytics import *  # noqa: F401, F403
-from .calibration import *  # noqa: F401, F403
+from .analytics import *
+from .calibration import *  # noqa: F403
