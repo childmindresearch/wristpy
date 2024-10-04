@@ -2,7 +2,7 @@
 
 import datetime
 import pathlib
-from typing import List, Literal, Optional, Union
+from typing import List, Literal, Optional, Tuple, Union
 
 import numpy as np
 import polars as pl
@@ -153,12 +153,13 @@ def format_nonwear_data(
 def run(
     input: Union[pathlib.Path, str],
     output: Optional[Union[pathlib.Path, str]] = None,
-    settings: config.Settings = config.Settings(),
+    thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
     calibrator: Union[
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
+    verbosity: int = 30,
 ) -> Results:
     """Runs main processing steps for wristpy and returns data for analysis.
 
@@ -171,15 +172,23 @@ def run(
         input: Path to the input file to be read. Currently supports .bin and .gt3x
         output: Path to save data to. The path should end in the save file name in
             either .csv or .parquet formats.
-        settings: The settings object from which physical activity levels are taken.
+        thresholds: The cut points for the light, moderate, and vigorous thresholds,
+            given in that order. Values must be asscending, unique, and greater than 0.
+            Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. If None is given no down sampling is preformed.
+        verbosity: The logging level for the logger.
 
     Returns:
         All calculated data in a save ready format as a Results object.
 
+    References:
+        [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
+        output from wrist- and hip-worn monitors. Medicine and Science in Sports and
+        Exercise, 46(9), 1816-1824.
     """
+    logger.setLevel(verbosity)
     input = pathlib.Path(input)
     if output is not None:
         output = pathlib.Path(output)
@@ -248,11 +257,7 @@ def run(
     sleep_windows = sleep_detector.run_sleep_detection()
     physical_activity_levels = analytics.compute_physical_activty_categories(
         enmo,
-        (
-            settings.LIGHT_THRESHOLD,
-            settings.MODERATE_THRESHOLD,
-            settings.VIGOROUS_THRESHOLD,
-        ),
+        thresholds,
     )
     sleep_array = models.Measurement(
         measurements=format_sleep_data(

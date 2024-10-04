@@ -10,11 +10,6 @@ import polars as pl
 
 from wristpy.core import computations, config, models
 
-settings = config.Settings()
-LIGHT_THRESHOLD = settings.LIGHT_THRESHOLD
-MODERATE_THRESHOLD = settings.MODERATE_THRESHOLD
-VIGOROUS_THRESHOLD = settings.VIGOROUS_THRESHOLD
-
 logger = config.get_logger()
 
 
@@ -392,11 +387,7 @@ def remove_nonwear_from_sleep(
 
 def compute_physical_activty_categories(
     enmo_epoch1: models.Measurement,
-    thresholds: Tuple[float, float, float] = (
-        LIGHT_THRESHOLD,
-        MODERATE_THRESHOLD,
-        VIGOROUS_THRESHOLD,
-    ),
+    thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
 ) -> models.Measurement:
     """Compute the physical activity categories based on the ENMO data.
 

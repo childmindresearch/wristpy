@@ -1,6 +1,7 @@
 """CLI for wristpy."""
 
 import argparse
+import logging
 import pathlib
 from typing import List, Optional
 
@@ -19,7 +20,6 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     Returns:
         Namespace object with all of the input arguments and default values.
     """
-    default_settings = config.Settings()
     parser = argparse.ArgumentParser(
         description="Run the main Wristpy pipeline.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -50,9 +50,9 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         type=float,
         nargs=3,
         default=[
-            default_settings.LIGHT_THRESHOLD,
-            default_settings.MODERATE_THRESHOLD,
-            default_settings.VIGOROUS_THRESHOLD,
+            0.0563,
+            0.1916,
+            0.6958,
         ],
         help="Provide three thresholds for light, moderate, and vigorous activity. "
         "Values must be given in ascending order.",
@@ -68,7 +68,16 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "-v", "--version", action="version", version=config.get_version()
+        "-V", "--version", action="version", version=config.get_version()
+    )
+
+    parser.add_argument(
+        "-v",
+        "--verbosity",
+        action="count",
+        default=0,
+        help="Determines the level of verbosity. Use -v for info, -vv for debug."
+        "Default for warning.",
     )
 
     return parser.parse_args(args)
@@ -86,6 +95,16 @@ def main(args: Optional[List[str]] = None) -> orchestrator.Results:
         detection, and sleep detection.
     """
     arguments = parse_arguments(args)
+
+    if arguments.verbosity == 0:
+        log_level = logging.WARNING
+    elif arguments.verbosity == 1:
+        log_level = logging.INFO
+    else:
+        log_level = logging.DEBUG
+
+    logger.setLevel(log_level)
+
     if arguments.epoch_length < 0:
         raise ValueError(
             f"Value for epoch_length is:{arguments.epoch_length}."
@@ -93,14 +112,10 @@ def main(args: Optional[List[str]] = None) -> orchestrator.Results:
         )
     logger.debug("Running wristpy. arguments given: %s", arguments)
 
-    light, moderate, vigorous = arguments.thresholds
-    settings = config.Settings(
-        LIGHT_THRESHOLD=light, MODERATE_THRESHOLD=moderate, VIGOROUS_THRESHOLD=vigorous
-    )
     return orchestrator.run(
         input=arguments.input,
         output=arguments.output,
-        settings=settings,
+        thresholds=tuple(arguments.thresholds),
         calibrator=None if arguments.calibrator == "none" else arguments.calibrator,
         epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
     )
