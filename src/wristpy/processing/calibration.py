@@ -51,7 +51,7 @@ class AbstractCalibrator(abc.ABC):
         pass
 
 
-class GgirCalibration(AbstractCalibrator):
+class GGIRCalibration(AbstractCalibrator):
     """Implements the GGIR calibration on accelerometer data.
 
     This class implements methods for autocalibrating accelerometer data using either
@@ -231,7 +231,7 @@ class GgirCalibration(AbstractCalibrator):
 
         """
         logger.debug("Getting chunk.")
-        sampling_rate = GgirCalibration._get_sampling_rate(timestamps=acceleration.time)
+        sampling_rate = GGIRCalibration._get_sampling_rate(timestamps=acceleration.time)
         min_samples = int(self.min_calibration_hours * 3600 * sampling_rate)
         chunk_size = int(12 * 3600 * sampling_rate)
         total_samples = len(acceleration.measurements)
