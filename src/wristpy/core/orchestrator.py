@@ -196,14 +196,14 @@ def run(
     watch_data = readers.read_watch_data(input)
 
     calibrator_object: Union[
-        calibration.GgirCalibration, calibration.ConstrainedMinimizationCalibration
+        calibration.GGIRCalibration, calibration.ConstrainedMinimizationCalibration
     ]
     if calibrator is None:
         logger.debug("Running without calibration")
         calibrated_acceleration = watch_data.acceleration
     else:
         if calibrator == "ggir":
-            calibrator_object = calibration.GgirCalibration()
+            calibrator_object = calibration.GGIRCalibration()
         elif calibrator == "gradient":
             calibrator_object = calibration.ConstrainedMinimizationCalibration()
         else:

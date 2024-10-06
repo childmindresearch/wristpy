@@ -54,7 +54,7 @@ def test_get_sampling_rate() -> None:
     dummy_measure = create_dummy_measurement(
         sampling_rate=60, duration_hours=1, all_same_num=0.0
     )
-    calibrator = calibration.GgirCalibration()
+    calibrator = calibration.GGIRCalibration()
 
     sampling_rate = calibrator._get_sampling_rate(dummy_measure.time)
 
@@ -86,7 +86,7 @@ def test_sphere_error() -> None:
     """Test sphere criteria check in closest point fit."""
     dummy_data = np.full((100, 3), 100)
 
-    calibrator = calibration.GgirCalibration(min_acceleration=0)
+    calibrator = calibration.GGIRCalibration(min_acceleration=0)
 
     with pytest.raises(exceptions.SphereCriteriaError):
         calibrator._closest_point_fit(dummy_data)
@@ -96,7 +96,7 @@ def test_zero_scale_error() -> None:
     """Test error due to scale becomeing zero values."""
     data = np.array([[2.0, 2.0, 2.0], [2.0, 2.0, 2.0], [-0.001, -0.001, -0.001]])
 
-    calibrator = calibration.GgirCalibration(min_acceleration=0)
+    calibrator = calibration.GGIRCalibration(min_acceleration=0)
 
     with pytest.raises(exceptions.CalibrationError):
         calibrator._closest_point_fit(data)
@@ -111,7 +111,7 @@ def test_closest_point_fit() -> None:
     data = np.random.randn(1000, 3) - 0.5
     norms = np.linalg.norm(data, axis=1, keepdims=True)
     unit_sphere = data / norms
-    calibrator = calibration.GgirCalibration()
+    calibrator = calibration.GGIRCalibration()
 
     linear_transform = calibrator._closest_point_fit((unit_sphere * scale) + offset)
 
@@ -172,7 +172,7 @@ def test_calibrate_calibration_error() -> None:
         sampling_rate=1,
         duration_hours=1,
     )
-    calibrator = calibration.GgirCalibration(
+    calibrator = calibration.GGIRCalibration(
         max_calibration_error=0.0001, max_iterations=5, min_acceleration=0
     )
 
@@ -197,7 +197,7 @@ def test_ggir_calibration_successful() -> None:
         measurements=(test_data * scale) + offset,
         time=pl.Series(time_data).alias("time"),
     )
-    calibrator = calibration.GgirCalibration(no_motion_threshold=9999)
+    calibrator = calibration.GGIRCalibration(no_motion_threshold=9999)
 
     linear_transform = calibrator._calibrate(dummy_measure)
 
@@ -219,7 +219,7 @@ def test_get_chunk(duration_hours: int, expected_hours: np.ndarray) -> None:
         sampling_rate=1, duration_hours=duration_hours
     )
     expected_lengths = expected_hours * 3600
-    dummy_calibrator = calibration.GgirCalibration()
+    dummy_calibrator = calibration.GGIRCalibration()
 
     generator_chunks = dummy_calibrator._get_chunk(acceleration=dummy_measure)
 
@@ -231,7 +231,7 @@ def test_get_chunk(duration_hours: int, expected_hours: np.ndarray) -> None:
 def test_chunked_calibration_error() -> None:
     """Testing chunked calibration failing after using all chunks."""
     dummy_measure = create_dummy_measurement(sampling_rate=1, duration_hours=84)
-    calibrator = calibration.GgirCalibration(
+    calibrator = calibration.GGIRCalibration(
         no_motion_threshold=9999, max_calibration_error=0, chunked=True
     )
 
@@ -245,7 +245,7 @@ def test_chunked_calibration_error() -> None:
 def test_run_hours_calibration_error() -> None:
     """Test error when not enough hours of data."""
     dummy_measure = create_dummy_measurement(sampling_rate=60, duration_hours=10)
-    calibrator = calibration.GgirCalibration(min_calibration_hours=72)
+    calibrator = calibration.GGIRCalibration(min_calibration_hours=72)
 
     with pytest.raises(exceptions.CalibrationError):
         calibrator.run_calibration(dummy_measure)
@@ -269,7 +269,7 @@ def test_run_ggircalibration() -> None:
         measurements=(test_data * scale) + offset,
         time=pl.Series(time_data).alias("time"),
     )
-    calibrator = calibration.GgirCalibration(
+    calibrator = calibration.GGIRCalibration(
         no_motion_threshold=9999, min_calibration_hours=1
     )
 
@@ -335,7 +335,7 @@ def test_run_chunked_calibration() -> None:
         measurements=(test_data * scale) + offset,
         time=pl.Series(time_data).alias("time"),
     )
-    calibrator = calibration.GgirCalibration(
+    calibrator = calibration.GGIRCalibration(
         no_motion_threshold=9999, chunked=True, min_calibration_hours=1
     )
 
