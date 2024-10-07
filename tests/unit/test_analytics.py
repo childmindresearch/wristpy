@@ -254,3 +254,20 @@ def test_physical_activity_thresholds() -> None:
 
     assert np.array_equal(result.measurements, expected_result)
     assert np.array_equal(result.time, time)
+
+
+def test_bad_physical_activity_thresholds() -> None:
+    """Test bad values being passed to physical_activity_thresholds."""
+    tmp_data = np.arange(4)
+    dummy_date = datetime.datetime(2024, 5, 2)
+    dummy_datetime_list = [dummy_date + datetime.timedelta(seconds=i) for i in range(4)]
+    time = pl.Series("time", dummy_datetime_list)
+    tmp_measurement = models.Measurement(measurements=tmp_data, time=time)
+
+    with pytest.raises(
+        ValueError,
+        match="Thresholds must be positive, unique, and given in ascending order.",
+    ):
+        analytics.compute_physical_activty_categories(
+            tmp_measurement, thresholds=(10, 5, 1)
+        )

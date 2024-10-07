@@ -407,9 +407,14 @@ def compute_physical_activty_categories(
         The temporal resolution is the same as enmo_epoch1.
 
     Raises:
-        ValueError: If the threshold values are not in ascending order.
+        ValueError: If the threshold values are not poisitive, unique and  in ascending
+        order.
     """
     logger.debug("Computing physical activity levels, thresholds: %s", thresholds)
+    if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):
+        message = "Thresholds must be positive, unique, and given in ascending order."
+        logger.error(message)
+        raise ValueError(message)
 
     activity_levels = (
         (

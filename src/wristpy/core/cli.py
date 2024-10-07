@@ -110,6 +110,13 @@ def main(args: Optional[List[str]] = None) -> orchestrator.Results:
             f"Value for epoch_length is:{arguments.epoch_length}."
             "Please enter an integer >= 0."
         )
+    if not (
+        0 < arguments.thresholds[0] < arguments.thresholds[1] < arguments.thresholds[2]
+    ):
+        message = "Thresholds must be positive, unique, and given in ascending order."
+        logger.error(message)
+        raise ValueError(message)
+
     logger.debug("Running wristpy. arguments given: %s", arguments)
 
     return orchestrator.run(
