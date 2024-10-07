@@ -106,7 +106,7 @@ def test_main_with_options(
 def test_main_with_bad_thresholds(
     sample_data_gt3x: pathlib.Path,
 ) -> None:
-    """Test cli with optional arguments."""
+    """Test cli with bad thresholds."""
     with pytest.raises(
         ValueError,
         match="Threshold values must be >=0, unique, and in ascending order.",
@@ -125,7 +125,7 @@ def test_main_with_bad_thresholds(
 def test_main_with_bad_epoch(
     sample_data_gt3x: pathlib.Path,
 ) -> None:
-    """Test cli with optional arguments."""
+    """Test cli with invalid epoch length."""
     with pytest.raises(
         ValueError,
         match="Value for epoch_length is:-5." "Please enter an integer >= 0.",
