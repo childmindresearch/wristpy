@@ -101,3 +101,33 @@ def test_main_with_options(
         calibrator="gradient",
         epoch_length=None,
     )
+
+
+def test_main_with_bad_thresholds(
+    sample_data_gt3x: pathlib.Path,
+) -> None:
+    """Test cli with optional arguments."""
+    with pytest.raises(
+        ValueError,
+        match="Threshold values must be >=0, unique, and in ascending order.",
+    ):
+        cli.main(
+            [
+                str(sample_data_gt3x),
+                "-t",
+                "10.0",
+                "1.0",
+                "1.5",
+            ]
+        )
+
+
+def test_main_with_bad_epoch(
+    sample_data_gt3x: pathlib.Path,
+) -> None:
+    """Test cli with optional arguments."""
+    with pytest.raises(
+        ValueError,
+        match="Value for epoch_length is:-5." "Please enter an integer >= 0.",
+    ):
+        cli.main([str(sample_data_gt3x), "-e", "-5"])
