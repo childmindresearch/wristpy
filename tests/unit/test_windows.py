@@ -2,6 +2,7 @@
 
 import datetime
 import math
+from typing import Literal
 
 import numpy as np
 import polars as pl
@@ -115,17 +116,23 @@ def test_filter_non_sleep_windows(
     assert math.isclose(len(filtered) / len(windows), 2 / 3, rel_tol=0.1, abs_tol=0.1)
 
 
-def test_nms_windows(windows: pl.DataFrame) -> None:
+@pytest.mark.parametrize("metric", ["overlap", "iou"])
+def test_nms_windows(metric: Literal["overlap", "iou"], windows: pl.DataFrame) -> None:
     """Test non-max suppression of overlapping windows."""
-    filtered = win.nms_windows(windows, iou_threshold=0.75)
+    filtered = win.nms_windows(windows, metric=metric, threshold=0.75)
 
-    assert len(filtered) == 88
+    expected_lens = {"overlap": 33, "iou": 88}
+    assert len(filtered) == expected_lens[metric]
 
     # check that all pairwise IoUs are below threshold
     bounds = win.windows_to_bounds(filtered)
-    iou = win.pairwise_iou(bounds, bounds)
+
+    if metric == "iou":
+        score = win.pairwise_iou(bounds, bounds)
+    else:
+        score = win.pairwise_overlap(bounds, bounds)
     rind, cind = np.triu_indices(len(bounds), 1)
-    assert np.max(iou[rind, cind]) < 0.75
+    assert np.max(score[rind, cind]) < 0.75
 
 
 def test_pairwise_iou(bounds_pair: tuple[np.ndarray, np.ndarray]) -> None:
@@ -137,6 +144,15 @@ def test_pairwise_iou(bounds_pair: tuple[np.ndarray, np.ndarray]) -> None:
     assert np.all(iou <= 1)
 
 
+def test_pairwise_overlap(bounds_pair: tuple[np.ndarray, np.ndarray]) -> None:
+    """Test pairwise overlap."""
+    bounds1, bounds2 = bounds_pair
+    overlap = win.pairwise_overlap(bounds1, bounds2)
+    assert overlap.shape == (len(bounds1), len(bounds2))
+    assert np.all(overlap >= 0)
+    assert np.all(overlap <= 1)
+
+
 def test_pairwise_intersection(bounds_pair: tuple[np.ndarray, np.ndarray]) -> None:
     """Test pairwise intersection."""
     bounds1, bounds2 = bounds_pair
@@ -144,3 +160,15 @@ def test_pairwise_intersection(bounds_pair: tuple[np.ndarray, np.ndarray]) -> No
     assert intersection.shape == (len(bounds1), len(bounds2))
     assert np.all(intersection >= 0)
     assert np.all(intersection <= 1)
+
+
+def test_find_segments(sleep_scores: models.Measurement) -> None:
+    """Test find segments."""
+    cuts = win.find_segments(
+        sleep_scores, duration=np.timedelta64(15, "m"), threshold=0.1
+    )
+    assert len(cuts) == 4
+
+    indices = np.searchsorted(sleep_scores.time, cuts)
+    cut_scores = sleep_scores.measurements[indices]
+    assert np.all(cut_scores < 0.1)

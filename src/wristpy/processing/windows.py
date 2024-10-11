@@ -1,6 +1,6 @@
 """Generate and filter sleep windows from predicted onsets and offsets."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Literal
 
 import numpy as np
@@ -76,8 +76,12 @@ def filter_non_sleep_windows(
     return filtered
 
 
-def nms_windows(windows: pl.DataFrame, iou_threshold: float = 0.75) -> pl.DataFrame:
-    """De-duplicate sleep windows by non-max suppression with given IoU threshold."""
+def nms_windows(
+    windows: pl.DataFrame,
+    metric: Literal["iou", "overlap"] = "overlap",
+    threshold: float = 0.5,
+) -> pl.DataFrame:
+    """De-duplicate sleep windows by non-max suppression with given threshold."""
     windows = windows.sort("score", descending=True)
 
     bounds = windows_to_bounds(windows)
@@ -85,8 +89,12 @@ def nms_windows(windows: pl.DataFrame, iou_threshold: float = 0.75) -> pl.DataFr
     mask[0] = True
 
     for ii in range(1, len(bounds)):
-        iou = pairwise_iou(bounds[mask], bounds[ii : ii + 1])
-        if iou.max() < iou_threshold:
+        if metric == "iou":
+            score = pairwise_iou(bounds[mask], bounds[ii : ii + 1])
+        else:
+            score = pairwise_overlap(bounds[mask], bounds[ii : ii + 1])
+
+        if score.max() < threshold:
             mask[ii] = True
 
     filtered = windows.filter(mask)
@@ -104,6 +112,21 @@ def windows_to_bounds(
     bounds = (bounds - bounds.min()).astype(f"timedelta64[{unit}]")
     bounds = bounds.astype("float64")
     return bounds
+
+
+def pairwise_overlap(bounds1: np.ndarray, bounds2: np.ndarray) -> np.ndarray:
+    """Compute the overlap between all pairs of 1d bounding boxes."""
+    bounds1 = np.atleast_2d(bounds1)
+    bounds2 = np.atleast_2d(bounds2)
+
+    l1, r1 = bounds1.T
+    l2, r2 = bounds2.T
+    durs1 = np.maximum(r1 - l1, 0.0)
+    durs2 = np.maximum(r2 - l2, 0.0)
+    intersection = pairwise_intersection(bounds1, bounds2)
+    min_durs = np.minimum(durs1[:, None], durs2[None, :])
+    overlap = np.where(min_durs > 0, intersection / min_durs, 0.0)
+    return overlap
 
 
 def pairwise_iou(bounds1: np.ndarray, bounds2: np.ndarray) -> np.ndarray:
@@ -130,3 +153,44 @@ def pairwise_intersection(bounds1: np.ndarray, bounds2: np.ndarray) -> np.ndarra
     intersection = rint - lint
     intersection = np.maximum(intersection, 0)
     return intersection
+
+
+def find_segments(
+    sleep_scores: models.Measurement,
+    duration: timedelta = timedelta(days=1.0),
+    threshold: float = 0.1,
+) -> np.ndarray:
+    """Find non-sleep time points where the long timeseries can be split into segments.
+
+    Args:
+        sleep_scores: instantaneous sleep score measurement
+        duration: approximate length of the segment
+        threshold: score threshold for non-sleep time points
+
+    Returns:
+        array of timestamps indicating the segment cut points.
+    """
+    times = sleep_scores.time.to_numpy()
+    score_values = sleep_scores.measurements
+    duration = np.timedelta64(duration)
+    assert np.all(np.diff(times) > np.timedelta64(0, "s")), "timeseries is not sorted"
+
+    cuts = []
+    start = times[0]
+
+    while start + duration < times[-1]:
+        # search for a non-sleep point where we can cut the timeseries
+        # find open and close points of the search window
+        open_idx = np.searchsorted(times, start + duration, side="right")
+        close_idx = np.searchsorted(times, times[open_idx] + duration, side="left")
+
+        # find the first non-sleep point in the search window
+        search_scores = score_values[open_idx:close_idx]
+        offset = np.argmax(search_scores < threshold)
+        start = times[open_idx + offset]
+
+        if search_scores[offset] < threshold:
+            cuts.append(start)
+
+    cuts = np.array(cuts)
+    return cuts
