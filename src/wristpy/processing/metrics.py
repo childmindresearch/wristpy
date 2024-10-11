@@ -51,7 +51,7 @@ def angle_relative_to_horizontal(
     """
     xy_projection_magnitute = np.linalg.norm(acceleration.measurements[:, 0:2], axis=1)
 
-    angle_radians = np.arctan(acceleration.measurements[:, 2] / xy_projection_magnitute)
+    angle_radians = np.arcsin(acceleration.measurements[:, 2] / xy_projection_magnitute)
 
     angle_degrees = np.degrees(angle_radians)
 
