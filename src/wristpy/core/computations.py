@@ -116,7 +116,10 @@ def moving_median(
         unaltered.
     """
     measurements_polars_df = pl.concat(
-        [pl.DataFrame(acceleration.measurements), pl.DataFrame(acceleration.time)],
+        [
+            pl.DataFrame(acceleration.measurements),
+            pl.DataFrame({"time": acceleration.time}),
+        ],
         how="horizontal",
     )
     measurements_polars_df = measurements_polars_df.set_sorted("time")

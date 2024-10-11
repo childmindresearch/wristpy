@@ -162,7 +162,7 @@ def test_moving_median(window_size: int, expected_output: np.ndarray) -> None:
     """Testing proper function of moving median function."""
     dummy_date = datetime(2024, 5, 2)
     dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(3)]
-    dummy_datetime_pl = pl.Series("time", dummy_datetime_list)
+    dummy_datetime_pl = pl.Series(dummy_datetime_list)
     test_matrix = np.array(
         [
             [1.0, 2.0, 3.0],
