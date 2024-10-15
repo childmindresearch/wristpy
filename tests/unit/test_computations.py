@@ -175,7 +175,7 @@ def test_moving_median(window_size: int, expected_output: np.ndarray) -> None:
         measurements=test_matrix, time=dummy_datetime_pl
     )
 
-    test_result = computations.moving_median(test_measurement, window_size=window_size)
+    test_result = computations.moving_median(test_measurement, epoch_length=window_size)
 
     assert test_result.measurements.shape == expected_output.shape, (
         f"measurements array are not the same shape. Expected {expected_output.shape}, "
