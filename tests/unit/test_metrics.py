@@ -155,15 +155,13 @@ def test_compute_nonwear_value_per_axis(
     create_acceleration: pl.DataFrame, modifier: int, expected_result: int
 ) -> None:
     """Test the nonwear value per axis function."""
-    std_criteria = modifier
-    range_criteria = modifier
     acceleration = create_acceleration.with_columns(pl.col("time").set_sorted())
     acceleration_grouped = acceleration.group_by_dynamic(
         index_column="time", every="5s"
     ).agg([pl.all().exclude(["time"])])
 
     test_resultx = metrics._compute_nonwear_value_per_axis(
-        acceleration_grouped["X"], std_criteria, range_criteria
+        acceleration_grouped["X"], std_criteria=modifier
     )
 
     assert (
@@ -185,7 +183,6 @@ def test_compute_nonwear_value_array(create_acceleration: pl.DataFrame) -> None:
         acceleration_grouped,
         n_short_epoch_in_long_epoch,
         std_criteria=1,
-        range_criteria=1,
     )
 
     assert np.all(
@@ -209,8 +206,6 @@ def test_detect_nonwear(
     """Test the detect nonwear function."""
     short_epoch_length = 5
     n_short_epoch_in_long_epoch = int(4)
-    std_criteria = modifier
-    range_criteria = modifier
     acceleration_df = create_acceleration
     acceleration = models.Measurement(
         measurements=acceleration_df.select(["X", "Y", "Z"]).to_numpy(),
@@ -222,8 +217,7 @@ def test_detect_nonwear(
         acceleration,
         short_epoch_length,
         n_short_epoch_in_long_epoch,
-        std_criteria,
-        range_criteria,
+        std_criteria=modifier,
     )
 
     assert np.all(
