@@ -34,7 +34,10 @@ class Measurement(BaseModel):
                 'time'. Other column names should not be relied upon.
         """
         return pl.concat(
-            [pl.LazyFrame(self.measurements), pl.LazyFrame({"time": self.time})],
+            [
+                pl.LazyFrame(self.measurements),
+                pl.LazyFrame({"time": self.time}).set_sorted("time"),
+            ],
             how="horizontal",
         )
 
