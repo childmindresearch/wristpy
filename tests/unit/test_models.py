@@ -3,6 +3,7 @@
 import numpy as np
 import polars as pl
 import pytest
+from polars import testing
 
 from wristpy.core import models
 from wristpy.io.readers import readers
@@ -109,3 +110,25 @@ def test_measurement_model() -> None:
         measurement.time.dt.timestamp().to_numpy(),
         np.array([1, 2, 3]) * 1000000,
     )
+
+
+def test_measurement_from_data_frame() -> None:
+    """Tests conversion of a DataFrame to a Measurement."""
+    time = readers.unix_epoch_time_to_polars_datetime(np.array([1]), "s")
+    df = pl.DataFrame({"time": time, "x": np.array([1])})
+
+    actual = models.Measurement.from_data_frame(df)
+
+    assert np.all(actual.measurements == df["x"].to_numpy())
+    testing.assert_series_equal(actual.time, df["time"])
+
+
+def test_measurement_lazy_frame() -> None:
+    """Tests conversion of a Measurement to a LazyFrame."""
+    time = readers.unix_epoch_time_to_polars_datetime(np.array([1, 2, 3]), "s")
+    measurement = models.Measurement(measurements=np.array([1, 2, 3]), time=time)
+
+    actual = measurement.lazy_frame().collect()
+
+    assert np.all(actual.drop("time").to_numpy().squeeze() == measurement.measurements)
+    testing.assert_series_equal(actual["time"], measurement.time)
