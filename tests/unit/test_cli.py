@@ -5,7 +5,7 @@ import pathlib
 import pytest
 import pytest_mock
 
-from wristpy.core import cli, config, orchestrator
+from wristpy.core import cli, orchestrator
 
 
 def test_parse_arguments() -> None:
@@ -55,7 +55,7 @@ def test_main_default(
     mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
 ) -> None:
     """Test cli with only necessary arguments."""
-    default_settings = config.Settings()
+    default_thresholds = (0.0563, 0.1916, 0.6958)
     mock_run = mocker.patch.object(orchestrator, "run")
 
     cli.main([str(sample_data_gt3x)])
@@ -63,7 +63,7 @@ def test_main_default(
     mock_run.assert_called_once_with(
         input=sample_data_gt3x,
         output=None,
-        settings=default_settings,
+        thresholds=default_thresholds,
         calibrator=None,
         epoch_length=5,
     )
@@ -75,9 +75,6 @@ def test_main_with_options(
     tmp_path: pathlib.Path,
 ) -> None:
     """Test cli with optional arguments."""
-    test_settings = config.Settings(
-        LIGHT_THRESHOLD=0.1, MODERATE_THRESHOLD=1.0, VIGOROUS_THRESHOLD=1.5
-    )
     test_output = tmp_path / "test.csv"
     mock_run = mocker.patch.object(orchestrator, "run")
 
@@ -100,7 +97,37 @@ def test_main_with_options(
     mock_run.assert_called_once_with(
         input=sample_data_gt3x,
         output=test_output,
-        settings=test_settings,
+        thresholds=(0.1, 1.0, 1.5),
         calibrator="gradient",
         epoch_length=None,
     )
+
+
+def test_main_with_bad_thresholds(
+    sample_data_gt3x: pathlib.Path,
+) -> None:
+    """Test cli with bad thresholds."""
+    with pytest.raises(
+        ValueError,
+        match="Threshold values must be >=0, unique, and in ascending order.",
+    ):
+        cli.main(
+            [
+                str(sample_data_gt3x),
+                "-t",
+                "10.0",
+                "1.0",
+                "1.5",
+            ]
+        )
+
+
+def test_main_with_bad_epoch(
+    sample_data_gt3x: pathlib.Path,
+) -> None:
+    """Test cli with invalid epoch length."""
+    with pytest.raises(
+        ValueError,
+        match="Value for epoch_length is:-5." "Please enter an integer >= 0.",
+    ):
+        cli.main([str(sample_data_gt3x), "-e", "-5"])
