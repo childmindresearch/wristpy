@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 14.7.0"/>
+    <meta name="generator" content="pdoc 14.6.1"/>
     <title>wristpy API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -18,12 +18,10 @@
         <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
         <div>
 
-            <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
-                   pattern=".+" required>
 
             <h2>Contents</h2>
             <ul>
-  <li><a href="#wristpy-wrist-worn-accelerometer-data-processing-img-srchttpsrawgithubusercontentcomchildmindresearchwristpymainlogopng-alignright-width25">Wristpy: Wrist-Worn Accelerometer Data Processing <img src="https://raw.githubusercontent.com/childmindresearch/wristpy/main/logo.png" align="right" width="25%"/></a>
+  <li><a href="#wristpy-wrist-worn-accelerometer-data-processing-img-srclogopng-alignright-width25">Wristpy: Wrist-Worn Accelerometer Data Processing <img src="logo.png" align="right" width="25%"/></a>
   <ul>
     <li><a href="#supported-formats-devices">Supported formats &amp; devices</a></li>
     <li><a href="#features">Features</a></li>
@@ -34,12 +32,6 @@
 </ul>
 
 
-            <h2>Submodules</h2>
-            <ul>
-                    <li><a href="wristpy/core.html">core</a></li>
-                    <li><a href="wristpy/io.html">io</a></li>
-                    <li><a href="wristpy/processing.html">processing</a></li>
-            </ul>
 
 
 
@@ -55,9 +47,9 @@
                     <h1 class="modulename">
 wristpy    </h1>
 
-                        <div class="docstring"><p><a href="https://doi.org/10.5281/zenodo.13883191"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.13883191.svg" alt="DOI" /></a></p>
+                        <div class="docstring"><p><a href="https://zenodo.org/doi/10.5281/zenodo.10383685"><img src="https://zenodo.org/badge/657341621.svg" alt="DOI" /></a></p>
 
-<h1 id="wristpy-wrist-worn-accelerometer-data-processing-img-srchttpsrawgithubusercontentcomchildmindresearchwristpymainlogopng-alignright-width25">Wristpy: Wrist-Worn Accelerometer Data Processing <img src="https://raw.githubusercontent.com/childmindresearch/wristpy/main/logo.png" align="right" width="25%"/></h1>
+<h1 id="wristpy-wrist-worn-accelerometer-data-processing-img-srclogopng-alignright-width25">Wristpy: Wrist-Worn Accelerometer Data Processing <img src="logo.png" align="right" width="25%"/></h1>
 
 <p><a href="https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml?query=branch%3Amain"><img src="https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml/badge.svg?branch=main" alt="Build" /></a>
 <a href="https://codecov.io/gh/childmindresearch/wristpy"><img src="https://codecov.io/gh/childmindresearch/wristpy/branch/main/graph/badge.svg?token=22HWWFWPW5" alt="codecov" /></a>
@@ -66,7 +58,7 @@ wristpy    </h1>
 <a href="https://github.com/childmindresearch/wristpy/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-LGPL--2.1-blue.svg" alt="LGPL--2.1 License" /></a>
 <a href="https://childmindresearch.github.io/wristpy"><img src="https://img.shields.io/badge/api-docs-blue" alt="pages" /></a></p>
 
-<p>Welcome to wristpy, a Python library designed for processing and analyzing wrist-worn accelerometer data. This library provides a set of tools for calibrating raw accelerometer data, calculating physical activity metrics (ENMO derived) and sleep metrics (angle-Z derived), finding non-wear periods, and detecing sleep periods (onset and wakeup times). Additionally, we provide access to other sensor data that may be recorded by the watch, including; temperature, luminosity, capacitive sensing, battery voltage, and all metadata.</p>
+<p>Welcome to wristpy, a Python library designed for processing and analyzing wrist-worn accelerometer data. This library provides a set of tools for calibrating raw accelerometer data, calculating physical activity metrics (ENMO derived) and sleep metrics (angle-Z derived), finding non-wear periods, and detecing sleep periods (onset and wakeup times). Additionally, we provide access to other sensor dat that may be recorded by the watch, including; temperature, luminosity, capacitive sensing, battery voltage, and all metadata.</p>
 
 <h2 id="supported-formats-devices">Supported formats &amp; devices</h2>
 
@@ -97,26 +89,29 @@ wristpy    </h1>
 </tbody>
 </table>
 
-<p><strong>Special Note</strong><br />
-    The <code>idle_sleep_mode</code> for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this <a href="https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained">here</a>). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, the authors of this pacakge do not take any steps to impute data during these time gaps and would caution to not use data collected with this mode enabled. Of course, users can make use of the readers within wristpy for their own analysis with this type of data.</p>
-
 <h2 id="features">Features</h2>
 
 <ul>
-<li>Data Calibration: Three options: ... #TODO Applies the GGIR calibration procedure to raw accelerometer data.</li>
+<li>GGIR Calibration: Applies the GGIR calibration procedure to raw accelerometer data.</li>
 <li>Metrics Calculation: Calculates various metrics on the calibrated data, namely ENMO (euclidean norm , minus one) and angle-Z (angle of acceleration relative to the <em>x-y</em> axis).</li>
-<li>Non-wear detection: We find periods of non-wear based on the acceleration data. #TODO</li>
+<li>Physical activity levels: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. </li>
+<li>Non-wear detection: We find periods of non-wear based on the acceleration data. </li>
 <li>Sleep Detection: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.</li>
-<li>Physical activity levels: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 stduy <sup>3</sup></li>
-<li>Filtering of detected sleep windows: removal of non-wear overlap. #TODO</li>
 </ul>
 
 <h2 id="installation">Installation</h2>
 
-<p>Install this package from PyPI via :</p>
+<p>Install this package via :</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>wristpy
+</code></pre>
+</div>
+
+<p>Or get the newest development version via:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/childmindresearch/wristpy
 </code></pre>
 </div>
 
@@ -132,7 +127,7 @@ wristpy    </h1>
 <h3 id="using-wristpy-through-a-python-script-or-notebook">Using Wristpy through a python script or notebook:</h3>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">orchestrator</span>
+<pre><span></span><code><span class="kn">from</span> <span class="nn">wristpy.core</span> <span class="kn">import</span> <span class="n">orchestrator</span>
 
 <span class="c1"># Define input file path and output location</span>
 <span class="c1"># Support for saving as .csv and .parquet</span>
@@ -161,13 +156,9 @@ wristpy    </h1>
 <li>van Hees, V.T., Sabia, S., Jones, S.E. et al. Estimating sleep parameters
 using an accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
 <a href="https://doi.org/10.1038/s41598-018-31266-z">https://doi.org/10.1038/s41598-018-31266-z</a></li>
-<li>van Hees, V. T., et al. A Novel, Open Access Method to Assess Sleep
+<li>van Hees, V. T. et al. A Novel, Open Access Method to Assess Sleep
 Duration Using a Wrist-Worn Accelerometer. PLoS One 10, e0142533 (2015).
 <a href="https://doi.org/10.1371/journal.pone.0142533">https://doi.org/10.1371/journal.pone.0142533</a></li>
-<li>Hildebrand, M., et al. Age group comparability of raw accelerometer output
-from wrist- and hip-worn monitors. Medicine and Science in
-Sports and Exercise, 46(9), 1816-1824 (2014).
-<a href="https://doi.org/10.1249/mss.0000000000000289">https://doi.org/10.1249/mss.0000000000000289</a></li>
 </ol>
 </div>
 
@@ -181,186 +172,5 @@ Sports and Exercise, 46(9), 1816-1824 (2014).
 
             </section>
     </main>
-<script>
-    function escapeHTML(html) {
-        return document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
-    }
-
-    const originalContent = document.querySelector("main.pdoc");
-    let currentContent = originalContent;
-
-    function setContent(innerHTML) {
-        let elem;
-        if (innerHTML) {
-            elem = document.createElement("main");
-            elem.classList.add("pdoc");
-            elem.innerHTML = innerHTML;
-        } else {
-            elem = originalContent;
-        }
-        if (currentContent !== elem) {
-            currentContent.replaceWith(elem);
-            currentContent = elem;
-        }
-    }
-
-    function getSearchTerm() {
-        return (new URL(window.location)).searchParams.get("search");
-    }
-
-    const searchBox = document.querySelector(".pdoc input[type=search]");
-    searchBox.addEventListener("input", function () {
-        let url = new URL(window.location);
-        if (searchBox.value.trim()) {
-            url.hash = "";
-            url.searchParams.set("search", searchBox.value);
-        } else {
-            url.searchParams.delete("search");
-        }
-        history.replaceState("", "", url.toString());
-        onInput();
-    });
-    window.addEventListener("popstate", onInput);
-
-
-    let search, searchErr;
-
-    async function initialize() {
-        try {
-            search = await new Promise((resolve, reject) => {
-                const script = document.createElement("script");
-                script.type = "text/javascript";
-                script.async = true;
-                script.onload = () => resolve(window.pdocSearch);
-                script.onerror = (e) => reject(e);
-                script.src = "search.js";
-                document.getElementsByTagName("head")[0].appendChild(script);
-            });
-        } catch (e) {
-            console.error("Cannot fetch pdoc search index");
-            searchErr = "Cannot fetch search index.";
-        }
-        onInput();
-
-        document.querySelector("nav.pdoc").addEventListener("click", e => {
-            if (e.target.hash) {
-                searchBox.value = "";
-                searchBox.dispatchEvent(new Event("input"));
-            }
-        });
-    }
-
-    function onInput() {
-        setContent((() => {
-            const term = getSearchTerm();
-            if (!term) {
-                return null
-            }
-            if (searchErr) {
-                return `<h3>Error: ${searchErr}</h3>`
-            }
-            if (!search) {
-                return "<h3>Searching...</h3>"
-            }
-
-            window.scrollTo({top: 0, left: 0, behavior: 'auto'});
-
-            const results = search(term);
-
-            let html;
-            if (results.length === 0) {
-                html = `No search results for '${escapeHTML(term)}'.`
-            } else {
-                html = `<h4>${results.length} search result${results.length > 1 ? "s" : ""} for '${escapeHTML(term)}'.</h4>`;
-            }
-            for (let result of results.slice(0, 10)) {
-                let doc = result.doc;
-                let url = `${doc.modulename.replaceAll(".", "/")}.html`;
-                if (doc.qualname) {
-                    url += `#${doc.qualname}`;
-                }
-
-                let heading;
-                switch (result.doc.kind) {
-                    case "function":
-                        if (doc.fullname.endsWith(".__init__")) {
-                            heading = `<span class="name">${doc.fullname.replace(/\.__init__$/, "")}</span>${doc.signature}`;
-                        } else {
-                            heading = `<span class="def">${doc.funcdef}</span> <span class="name">${doc.fullname}</span>${doc.signature}`;
-                        }
-                        break;
-                    case "class":
-                        heading = `<span class="def">class</span> <span class="name">${doc.fullname}</span>`;
-                        if (doc.bases)
-                            heading += `<wbr>(<span class="base">${doc.bases}</span>)`;
-                        heading += `:`;
-                        break;
-                    case "variable":
-                        heading = `<span class="name">${doc.fullname}</span>`;
-                        if (doc.annotation)
-                            heading += `<span class="annotation">${doc.annotation}</span>`;
-                        if (doc.default_value)
-                            heading += `<span class="default_value"> = ${doc.default_value}</span>`;
-                        break;
-                    default:
-                        heading = `<span class="name">${doc.fullname}</span>`;
-                        break;
-                }
-                html += `
-                        <section class="search-result">
-                        <a href="${url}" class="attr ${doc.kind}">${heading}</a>
-                        <div class="docstring">${doc.doc}</div>
-                        </section>
-                    `;
-
-            }
-            return html;
-        })());
-    }
-
-    if (getSearchTerm()) {
-        initialize();
-        searchBox.value = getSearchTerm();
-        onInput();
-    } else {
-        searchBox.addEventListener("focus", initialize, {once: true});
-    }
-
-    searchBox.addEventListener("keydown", e => {
-        if (["ArrowDown", "ArrowUp", "Enter"].includes(e.key)) {
-            let focused = currentContent.querySelector(".search-result.focused");
-            if (!focused) {
-                currentContent.querySelector(".search-result").classList.add("focused");
-            } else if (
-                e.key === "ArrowDown"
-                && focused.nextElementSibling
-                && focused.nextElementSibling.classList.contains("search-result")
-            ) {
-                focused.classList.remove("focused");
-                focused.nextElementSibling.classList.add("focused");
-                focused.nextElementSibling.scrollIntoView({
-                    behavior: "smooth",
-                    block: "nearest",
-                    inline: "nearest"
-                });
-            } else if (
-                e.key === "ArrowUp"
-                && focused.previousElementSibling
-                && focused.previousElementSibling.classList.contains("search-result")
-            ) {
-                focused.classList.remove("focused");
-                focused.previousElementSibling.classList.add("focused");
-                focused.previousElementSibling.scrollIntoView({
-                    behavior: "smooth",
-                    block: "nearest",
-                    inline: "nearest"
-                });
-            } else if (
-                e.key === "Enter"
-            ) {
-                focused.querySelector("a").click();
-            }
-        }
-    });
-</script></body>
+</body>
 </html>
