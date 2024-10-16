@@ -11,9 +11,7 @@ def test_get_logger(caplog: pytest.LogCaptureFixture) -> None:
     """Test the wristpy logger with level set to default 20 (info)."""
     if logging.getLogger("wristpy").handlers:
         logging.getLogger("wristpy").handlers.clear()
-        logger = config.get_logger()
-    else:
-        logger = config.get_logger()
+    logger = config.get_logger()
 
     logger.debug("Debug message here.")
     logger.info("Info message here.")
