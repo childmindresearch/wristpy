@@ -13,6 +13,34 @@ class Measurement(BaseModel):
     measurements: np.ndarray
     time: pl.Series
 
+    @classmethod
+    def from_data_frame(cls, data_frame: pl.DataFrame) -> "Measurement":
+        """Creates a measurement from a Polars DataFrame.
+
+        Args:
+            data_frame: The Polars DataFrame, must have a time column. All
+                non-time columns will be used as the 'measurements' input.
+        """
+        return Measurement(
+            measurements=data_frame.drop("time").to_numpy().squeeze(),
+            time=data_frame["time"],
+        )
+
+    def lazy_frame(self) -> pl.LazyFrame:
+        """Converts the measurement to a LazyFrame.
+
+        Returns:
+            The Measurement as a LazyFrame. The time property will have column name
+                'time'. Other column names should not be relied upon.
+        """
+        return pl.concat(
+            [
+                pl.LazyFrame(self.measurements),
+                pl.LazyFrame({"time": self.time}).set_sorted("time"),
+            ],
+            how="horizontal",
+        )
+
     class Config:
         """Config to allow for ndarray as input."""
 

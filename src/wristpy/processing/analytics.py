@@ -387,11 +387,7 @@ def remove_nonwear_from_sleep(
 
 def compute_physical_activty_categories(
     enmo_epoch1: models.Measurement,
-    thresholds: Tuple[float, float, float] = (
-        0.0563,
-        0.1916,
-        0.6948,
-    ),
+    thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
 ) -> models.Measurement:
     """Compute the physical activity categories based on the ENMO data.
 
@@ -414,15 +410,14 @@ def compute_physical_activty_categories(
         The temporal resolution is the same as enmo_epoch1.
 
     Raises:
-        ValueError: If the threshold values are not in ascending order.
-
-    References:
-        Hildebrand, M., et al. Age group comparability of raw accelerometer output
-            from wrist- and hip-worn monitors. Medicine and Science in
-            Sports and Exercise, 46(9), 1816-1824 (2014).
-            https://doi.org/10.1249/mss.0000000000000289
+        ValueError: If the threshold values are not poisitive, unique and  in ascending
+        order.
     """
     logger.debug("Computing physical activity levels, thresholds: %s", thresholds)
+    if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):
+        message = "Thresholds must be positive, unique, and given in ascending order."
+        logger.error(message)
+        raise ValueError(message)
 
     activity_levels = (
         (

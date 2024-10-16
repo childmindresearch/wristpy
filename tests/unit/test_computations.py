@@ -162,7 +162,7 @@ def test_moving_median(window_size: int, expected_output: np.ndarray) -> None:
     """Testing proper function of moving median function."""
     dummy_date = datetime(2024, 5, 2)
     dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(3)]
-    dummy_datetime_pl = pl.Series("time", dummy_datetime_list)
+    dummy_datetime_pl = pl.Series(dummy_datetime_list)
     test_matrix = np.array(
         [
             [1.0, 2.0, 3.0],
@@ -175,7 +175,7 @@ def test_moving_median(window_size: int, expected_output: np.ndarray) -> None:
         measurements=test_matrix, time=dummy_datetime_pl
     )
 
-    test_result = computations.moving_median(test_measurement, window_size=window_size)
+    test_result = computations.moving_median(test_measurement, epoch_length=window_size)
 
     assert test_result.measurements.shape == expected_output.shape, (
         f"measurements array are not the same shape. Expected {expected_output.shape}, "
