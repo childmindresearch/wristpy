@@ -13,7 +13,7 @@ from wristpy.processing import analytics
 
 
 @pytest.fixture
-def sleep_detection() -> analytics.GGIRSleepDetection:
+def sleep_detection() -> analytics.GgirSleepDetection:
     """Return a GGIRSleepDetection instance with dummy data."""
     dummy_date = datetime.datetime(2024, 5, 2)
     dummy_datetime_list = [
@@ -22,11 +22,11 @@ def sleep_detection() -> analytics.GGIRSleepDetection:
     test_time = pl.Series("time", dummy_datetime_list)
     anglez = np.random.randint(-90, 90, size=3600)
     anglez_measurement = models.Measurement(measurements=anglez, time=test_time)
-    return analytics.GGIRSleepDetection(anglez_measurement)
+    return analytics.GgirSleepDetection(anglez_measurement)
 
 
 def test_fill_false_blocks(
-    sleep_detection: analytics.GGIRSleepDetection,
+    sleep_detection: analytics.GgirSleepDetection,
 ) -> None:
     """Test the _fill_false_short_blocks method."""
     gap_block = 3
@@ -45,7 +45,7 @@ def test_fill_false_blocks(
 
 
 def test_compute_abs_diff_mean_anglez(
-    sleep_detection: analytics.GGIRSleepDetection,
+    sleep_detection: analytics.GgirSleepDetection,
 ) -> None:
     """Test the _compute_abs_diff_mean_anglez method."""
     sleep_detection.anglez.measurements = np.ones(
@@ -151,7 +151,7 @@ def test_remove_nonwear_periods_no_overlap() -> None:
     assert result == expected_result, f"Expected {expected_result}, but got {result}"
 
 
-def test_spt_window(sleep_detection: analytics.GGIRSleepDetection) -> None:
+def test_spt_window(sleep_detection: analytics.GgirSleepDetection) -> None:
     """Test the _spt_window method."""
     sleep_detection.anglez.measurements = np.zeros(
         len(sleep_detection.anglez.measurements)
@@ -169,7 +169,7 @@ def test_spt_window(sleep_detection: analytics.GGIRSleepDetection) -> None:
     ), f"Expected {expected_length}, but got {len(result.time)}"
 
 
-def test_spt_window_null(sleep_detection: analytics.GGIRSleepDetection) -> None:
+def test_spt_window_null(sleep_detection: analytics.GgirSleepDetection) -> None:
     """Test the _spt_window method."""
     expected_length = int(len(sleep_detection.anglez.measurements) / 5) - 1
     expected_result = np.zeros(expected_length)
@@ -184,7 +184,7 @@ def test_spt_window_null(sleep_detection: analytics.GGIRSleepDetection) -> None:
     ), f"Expected {expected_length}, but got {len(result.time)}"
 
 
-def test_calculate_sib_periods(sleep_detection: analytics.GGIRSleepDetection) -> None:
+def test_calculate_sib_periods(sleep_detection: analytics.GgirSleepDetection) -> None:
     """Test the _calculate_sib_periods method."""
     expected_length = math.ceil(len(sleep_detection.anglez.measurements) / 300)
     expected_result = np.zeros(expected_length)
@@ -199,7 +199,7 @@ def test_calculate_sib_periods(sleep_detection: analytics.GGIRSleepDetection) ->
     ), f"Expected {expected_length}, but got {len(result.measurements)}"
 
 
-def test_find_onset_wakeup_times(sleep_detection: analytics.GGIRSleepDetection) -> None:
+def test_find_onset_wakeup_times(sleep_detection: analytics.GgirSleepDetection) -> None:
     """Test the _find_onset_wakeup_times method."""
     dummy_date = datetime.datetime(2024, 5, 2)
     spt_periods = [
@@ -225,7 +225,7 @@ def test_find_onset_wakeup_times(sleep_detection: analytics.GGIRSleepDetection) 
     assert result[0].wakeup == expected_output.wakeup
 
 
-def test_run_sleep_detection(sleep_detection: analytics.GGIRSleepDetection) -> None:
+def test_run_sleep_detection(sleep_detection: analytics.GgirSleepDetection) -> None:
     """Test the full sleep detection process."""
     result = sleep_detection.run_sleep_detection()
 

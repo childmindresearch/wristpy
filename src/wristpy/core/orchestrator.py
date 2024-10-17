@@ -241,7 +241,7 @@ def run(
 
     non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
 
-    sleep_detector = analytics.GGIRSleepDetection(anglez)
+    sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
     physical_activity_levels = analytics.compute_physical_activty_categories(
         enmo,
