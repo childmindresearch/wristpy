@@ -46,7 +46,7 @@ class AbstractSleepDetector(abc.ABC):
         pass
 
 
-class GGIRSleepDetection(AbstractSleepDetector):
+class GgirSleepDetection(AbstractSleepDetector):
     """Sleep Detection algorithm based on the GGIR method.
 
     This class implements the GGIR method for sleep detection. The method uses the
