@@ -32,7 +32,7 @@ The package currently supports the following formats:
 - Metrics Calculation: Calculates various metrics on the calibrated data, namely ENMO (euclidean norm , minus one) and angle-Z (angle of acceleration relative to the *x-y* axis).
 - Non-wear detection: We find periods of non-wear based on the acceleration data. #TODO
 - Sleep Detection: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.
-- Physical activity levels: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 stduy <sup>3</sup>
+- Physical activity levels: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.
 - Filtering of detected sleep windows: removal of non-wear overlap. #TODO
 
 ## Installation

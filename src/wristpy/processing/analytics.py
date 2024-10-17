@@ -412,6 +412,12 @@ def compute_physical_activty_categories(
     Raises:
         ValueError: If the threshold values are not poisitive, unique and  in ascending
         order.
+
+    References:
+        Hildebrand, M., et al. Age group comparability of raw accelerometer output
+            from wrist- and hip-worn monitors. Medicine and Science in
+            Sports and Exercise, 46(9), 1816-1824 (2014).
+            https://doi.org/10.1249/mss.0000000000000289
     """
     logger.debug("Computing physical activity levels, thresholds: %s", thresholds)
     if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):
