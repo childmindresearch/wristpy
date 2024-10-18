@@ -55,9 +55,9 @@ We can also view and process these outputs from the saved `.csv` output file:
 ```python
 import polars as pl
 import matplotlib.pyplot as plt
-output_results = pl.read_csv('output_three_nights.csv')
-output_results = output_results.with_columns(
-    pl.col('time').str.to_datetime(format='%Y-%m-%dT%H:%M:%S%.f'))
+output_results = pl.read_csv('output_three_nights.csv', try_parse_dates=True)
+
+
 plt.plot(output_results['time'], output_results['physical_activity_levels'])
 ```
 ![Example of plotting physical activity levels from csv](phys_levels_example1.png)
@@ -87,8 +87,32 @@ Inactivity percent: 86.47099146257868
 
 Example 2: Loading data and plotting the raw signals
 ----------------------------------------------------
-- load data
-plot raw acceleration
+
+In this example we will go over the built-in functions to directly read the raw accelerometer and light data, and how to quickly visualize this information.
+
+The built in `readers` module can be used to load all the sensor and metadata from one of the support wrist-watches (`.gt3x` or `.bin`), the reader will automatically select the appropirate loading methodology. 
+
+```python
+from wristpy.io.readers import readers
+
+watch_data = readers.read_watch_data('/path/to/geneactive/file.bin')
+```
+
+We can then visualize the raw accelerometer and light sensor values very easily as follows:
+
+Plot the raw acceleration along the *x*-axis:
+
+`plt.plot(watch_data.acceleration.time, watch_data.acceleration.measurements[0:1])`
+
+![Plot raw acceleration data from watch_data](raw_accel_example2.png)
+
+Plot the light data:
+
+`plt.plot(watch_data.lux.time, watch_data.lux.measurements)`
+
+![Plot the light data](light_example2.png)
+
+
 
 Example 3: 
 ----------------------------------------------------
