@@ -38,7 +38,7 @@ from matplotlib import pyplot as plt
 plt.plot(results.enmo.time, results.enmo.measurements)
 ```
 
-![Example of the ENMO result](enmo_tutorial1.png)
+![Example of the ENMO result](enmo_example1.png)
 
 Plot the sleep windows with normalized angle-z data:
 ```python
@@ -48,7 +48,7 @@ plt.plot(results.sleep_windows_epoch.time, results.sleep_windows_epoch.measureme
 plt.legend(['Angle Z', 'Sleep Windows'])
 plt.show()
 ```
-![Example of the Sleep and Anglez](sleep_anglez_tutorial1.png)
+![Example of the Sleep and Anglez](sleep_anglez_example1.png)
 
 We can also view and process these outputs from the saved `.csv` output file:
 
@@ -114,18 +114,78 @@ Plot the light data:
 
 
 
-Example 3: 
+Example 3:  Plot the epoch1 level measurements
 ----------------------------------------------------
-- load data
-- calibrate data
--compute metrics
-plot enmo and anglez
+In this example we will expand on the skills learned in `Example2`: we will load the sensor data, calibrate, and then calculate the ENMO and angle-z data in 5s windows (epoch 1 data).
 
-Example 4:
+```python
+from wristpy.io.readers import readers
+from wristpy.processing import calibration, metrics
+from wristpy.core import computations
+
+watch_data = readers.read_watch_data('/path/to/geneactive/file.binn')
+calibrator_object = calibration.ConstrainedMinimizationCalibration()
+calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
+
+enmo = metrics.euclidean_norm_minus_one(calibrated_data)
+anglez = metrics.angle_relative_to_horizontal(calibrated_data)
+
+enmo_epoch1 = computations.moving_mean(enmo)
+anglez_epoch1 = computations.moving_mean(anglez)
+```
+
+We can then visualize the `epoch1` measurements as:
+```python
+
+fig, ax1 = plt.subplots()
+
+
+ax1.plot(enmo_epoch1.time, enmo_epoch1.measurements, color='blue')
+ax1.set_ylabel('ENMO', color='blue')
+
+ax2 = ax1.twinx()
+ax2.plot(anglez_epoch1.time, anglez_epoch1.measurements, color='red')
+ax2.set_ylabel('Anglez', color='red')
+
+plt.show()
+```
+![Plot the epoch1 data](enmo_anglez_example3.png)
+
+
+Example 4: Visualize the detected non-wear times
 ----------------------------------------------------
- - get nonwear, plot vs enmo
+In this example we will build on `Example3` by also solving for the non-wear periods, as follows:
 
-Example 5:
+```python
+from wristpy.io.readers import readers
+from wristpy.processing import calibration, metrics
+from wristpy.core import computations
+
+watch_data = readers.read_watch_data('/Users/adam.santorelli/Downloads/adam_three_nights.bin')
+calibrator_object = calibration.ConstrainedMinimizationCalibration()
+calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
+non_wear_array = metrics.detect_nonwear(calibrated_data)
+
+```
+
+We can then visualize the non-wear periods, in comparison to movement (ENMO at the epoch1 level):
+```python
+enmo = metrics.euclidean_norm_minus_one(calibrated_data)
+anglez = metrics.angle_relative_to_horizontal(calibrated_data)
+
+enmo_epoch1 = computations.moving_mean(enmo)
+anglez_epoch1 = computations.moving_mean(anglez)
+
+plt.plot(enmo_epoch1.time, enmo_epoch1.measurements)
+plt.plot(non_wear_array.time, non_wear_array.measurements)
+
+plt.legend(['ENMO Epoch1', 'Non-wear'])
+```
+![Plot the nonwear periods compared to the ENMO data](nonwear_example4.png)
+
+
+
+Example 5: Find and filter the sleep windows
 ----------------------------------------------------
  - get sleep, plot vs anglez
  - plot sleep, nonwear, and anglez

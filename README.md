@@ -1,7 +1,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13883191.svg)](https://doi.org/10.5281/zenodo.13883191)
 
-# Wristpy: Wrist-Worn Accelerometer Data Processing <img src="https://raw.githubusercontent.com/childmindresearch/wristpy/main/logo.png" align="right" width="25%"/>
-
+# `wristpy` <img src="https://raw.githubusercontent.com/childmindresearch/wristpy/main/logo.png" align="right" width="25%"/>
+ A Python package for wrist-worn accelerometer data processing 
 
 
 
@@ -12,7 +12,7 @@
 [![LGPL--2.1 License](https://img.shields.io/badge/license-LGPL--2.1-blue.svg)](https://github.com/childmindresearch/wristpy/blob/main/LICENSE)
 [![pages](https://img.shields.io/badge/api-docs-blue)](https://childmindresearch.github.io/wristpy)
 
-Welcome to wristpy, a Python library designed for processing and analyzing wrist-worn accelerometer data. This library provides a set of tools for calibrating raw accelerometer data, calculating physical activity metrics (ENMO derived) and sleep metrics (angle-Z derived), finding non-wear periods, and detecing sleep periods (onset and wakeup times). Additionally, we provide access to other sensor data that may be recorded by the watch, including; temperature, luminosity, capacitive sensing, battery voltage, and all metadata.
+Welcome to wristpy, a Python library designed for processing and analyzing wrist-worn accelerometer data. This library provides a set of tools for loading sensor information, calibrating raw accelerometer data, calculating physical activity metrics (ENMO derived) and sleep metrics (angle-Z derived), finding non-wear periods, and detecing sleep periods (onset and wakeup times). Additionally, we provide access to other sensor data that may be recorded by the watch, including; temperature, luminosity, capacitive sensing, battery voltage, and all metadata.
 
 ## Supported formats & devices
 
@@ -26,14 +26,17 @@ The package currently supports the following formats:
 **Special Note**   
     The `idle_sleep_mode` for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this [here](https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained)). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, the authors of this pacakge do not take any steps to impute data during these time gaps and would caution to not use data collected with this mode enabled. Of course, users can make use of the readers within wristpy for their own analysis with this type of data.
 
-## Features
+## Processing pipeline implementation
 
-- Data Calibration: Three options: ... #TODO Applies the GGIR calibration procedure to raw accelerometer data.
+Below is a list of the various stages that make up the main processing pipeline of the wristpy module:
+
+- Data loading: sensor data is loaded using [`actfast`](https://github.com/childmindresearch/actfast), a `WatchData` object is created to store all sensor data
+- Data calibration: A post-manufacturer calibration step can be applied, to ensure that the acceleration sensor is measuring 1*g* force during periods of no motion. There are four possible options: `None`, `gradient`, `ggir`.
 - Metrics Calculation: Calculates various metrics on the calibrated data, namely ENMO (euclidean norm , minus one) and angle-Z (angle of acceleration relative to the *x-y* axis).
-- Non-wear detection: We find periods of non-wear based on the acceleration data. #TODO
+- Non-wear detection: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide `wear` or `not wear`.
 - Sleep Detection: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.
 - Physical activity levels: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.
-- Filtering of detected sleep windows: removal of non-wear overlap. #TODO
+
 
 ## Installation
 
