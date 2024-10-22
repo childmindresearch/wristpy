@@ -9,7 +9,7 @@ This tutorial will guide you through the basic steps of using Wristpy to analyze
 we will cover the following topics through a few examples:
    - running the default processor, analyzing the output data, and visualizing the results
    - loading data and plotting the raw signals
-   - how to calibrate the data, the different options, computing ENMO and angle-z from the calibrated data and then plotting those metrics
+   - how to calibrate the data, computing ENMO and angle-z from the calibrated data and then plotting those metrics
    - how to obtain non-wear windows and visualize them
    - how to obtain sleep windows and visualize them
       - how we can filter sleep windows that overlap with non-wear
@@ -123,7 +123,7 @@ from wristpy.io.readers import readers
 from wristpy.processing import calibration, metrics
 from wristpy.core import computations
 
-watch_data = readers.read_watch_data('/path/to/geneactive/file.binn')
+watch_data = readers.read_watch_data('/path/to/geneactive/file.bin')
 calibrator_object = calibration.ConstrainedMinimizationCalibration()
 calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
 
@@ -159,9 +159,9 @@ In this example we will build on `Example3` by also solving for the non-wear per
 ```python
 from wristpy.io.readers import readers
 from wristpy.processing import calibration, metrics
-from wristpy.core import computations
 
-watch_data = readers.read_watch_data('/Users/adam.santorelli/Downloads/adam_three_nights.bin')
+
+watch_data = readers.read_watch_data('/path/to/geneactive/file.bin')
 calibrator_object = calibration.ConstrainedMinimizationCalibration()
 calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
 non_wear_array = metrics.detect_nonwear(calibrated_data)
@@ -170,6 +170,8 @@ non_wear_array = metrics.detect_nonwear(calibrated_data)
 
 We can then visualize the non-wear periods, in comparison to movement (ENMO at the epoch1 level):
 ```python
+from wristpy.core import computations
+
 enmo = metrics.euclidean_norm_minus_one(calibrated_data)
 anglez = metrics.angle_relative_to_horizontal(calibrated_data)
 
@@ -188,5 +190,71 @@ plt.legend(['ENMO Epoch1', 'Non-wear'])
 Example 5: Find and filter the sleep windows
 ----------------------------------------------------
  - get sleep, plot vs anglez
- - plot sleep, nonwear, and anglez
- - filter nonwear from sleep, plot filtered sleep vs anglez vs nonwear
+  
+Get the sleep windows
+  
+```python
+from wristpy.io.readers import readers
+from wristpy.processing import analytics, calibration, metrics
+
+
+watch_data = readers.read_watch_data('/path/to/geneactive/file.bin')
+calibrator_object = calibration.ConstrainedMinimizationCalibration()
+calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
+enmo = metrics.euclidean_norm_minus_one(calibrated_data)
+anglez = metrics.angle_relative_to_horizontal(calibrated_data)
+non_wear_array = metrics.detect_nonwear(calibrated_data)
+sleep_detector = analytics.GgirSleepDetection(anglez)
+sleep_windows = sleep_detector.run_sleep_detection()
+```
+
+Visualize in comparison to the anglez data and the non-wear periods, where sleep periods are visualized by a horizontal blue line, and non-wear periods are visualized with a:
+
+```python
+import matplotlib.pyplot as plt
+
+fig, ax1 = plt.subplots()
+
+# Plot each sleep window as a horizontal line
+for sw in sleep_windows:
+    if sw.onset is not None and sw.wakeup is not None:
+        plt.hlines(1, sw.onset, sw.wakeup, colors='blue', linestyles='solid')
+
+plt.plot(non_wear_array.time, non_wear_array.measurements, color='green')
+ax2 = ax1.twinx()
+ax2.plot(anglez.time, anglez.measurements, color='red', alpha=0.5)
+ax2.set_ylabel('Anglez Epoch1', color='red')
+
+ax1.set_ylabel('Sleep Period/Non-wear')
+ax1.set_ylim(0, 1.5)
+
+plt.show()
+```
+![Plot the sleep periods compared to angelz data.](sleep_angz_example5.png)
+
+
+The filtered sleep windows can easily be obtained with the following function. This removes all sleep periods that have any overlap with non-wear time.
+
+`filtered_sleep_windows = analytics.remove_nonwear_from_sleep(non_wear_array, sleep_windows )`
+
+And these can be visualized and compared to angle-z and the non-wear periods as previously:
+```python
+import matplotlib.pyplot as plt
+
+fig, ax1 = plt.subplots()
+
+for sw in filtered_sleep_windows:
+    if sw.onset is not None and sw.wakeup is not None:
+        plt.hlines(1, sw.onset, sw.wakeup, colors='blue', linestyles='solid')
+
+plt.plot(non_wear_array.time, non_wear_array.measurements, color='green')
+ax2 = ax1.twinx()
+ax2.plot(anglez.time, anglez.measurements, color='red', alpha=0.5)
+ax2.set_ylabel('Anglez Epoch1', color='red')
+
+ax1.set_ylabel('Sleep Period/Non-wear')
+ax1.set_ylim(0, 1.5)
+
+plt.show()
+```
+![Plot the filtered sleep windows.](filtered_sleep_windows.png)
