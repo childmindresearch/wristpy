@@ -1,6 +1,6 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13883191.svg)](https://doi.org/10.5281/zenodo.13883191)
 
-# `wristpy` <img src="https://raw.githubusercontent.com/childmindresearch/wristpy/main/logo.png" align="right" width="25%"/>
+# `wristpy` <img src="docs/wristpy_logo.png" align="right" width="25%"/>
  A Python package for wrist-worn accelerometer data processing 
 
 
