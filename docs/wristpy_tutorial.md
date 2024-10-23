@@ -55,7 +55,7 @@ We can also view and process these outputs from the saved `.csv` output file:
 ```python
 import polars as pl
 import matplotlib.pyplot as plt
-output_results = pl.read_csv('output_three_nights.csv', try_parse_dates=True)
+output_results = pl.read_csv('path/to/save/file_name.csv', try_parse_dates=True)
 
 
 plt.plot(output_results['time'], output_results['physical_activity_levels'])
