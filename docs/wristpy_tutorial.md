@@ -189,9 +189,7 @@ plt.legend(['ENMO Epoch1', 'Non-wear'])
 
 Example 5: Find and filter the sleep windows
 ----------------------------------------------------
- - get sleep, plot vs anglez
-  
-Get the sleep windows
+The following script will obtain the sleep window pairs (onset,wakeup):
   
 ```python
 from wristpy.io.readers import readers
