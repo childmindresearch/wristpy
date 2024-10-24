@@ -26,8 +26,7 @@ jobs:
         poetry install --with docs
     - name: Build docs
       run: |
-        APP_MODULE_NAME=$(ls src -U | head -1)  # Get the first module name in the src directory
-        poetry run pdoc src/"$APP_MODULE_NAME" -o docs_build -t docs/pdoc-theme --docformat google
+        poetry run pdoc src/wristpy -o docs_build -t docs/pdoc-theme --docformat google
         touch docs_build/.nojekyll
     - uses: JamesIves/github-pages-deploy-action@v4
       with:

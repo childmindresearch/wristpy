@@ -1,1 +1,3 @@
-""".. include:: ../../README.md"""  # noqa: D415
+""".. include:: ../../README.md
+.. include:: ../../docs/wristpy_tutorial.md
+"""  # noqa: D205, D415
