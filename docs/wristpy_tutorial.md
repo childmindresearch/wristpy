@@ -56,9 +56,9 @@ We can also view and process these outputs from the saved `.csv` output file:
 import polars as pl
 import matplotlib.pyplot as plt
 output_results = pl.read_csv('path/to/save/file_name.csv', try_parse_dates=True)
+phys_activity = output_results['physical_activity_levels'].cast(pl.Categorical).to_physical()
 
-
-plt.plot(output_results['time'], output_results['physical_activity_levels'])
+plt.plot(output_results['time'], phys_activity)
 ```
 ![Example of plotting physical activity levels from csv](phys_levels_example1.png)
 
