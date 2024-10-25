@@ -92,13 +92,13 @@ def format_sleep_data(
             the timestamps in the reference_measure.
     """
     logger.debug("Formatting sleep array from sleep windows.")
-    sleep_array = np.zeros(len(reference_measure.time), dtype=bool)
+    sleep_array = np.full(len(reference_measure.time), "Awake")
 
     for window in sleep_windows:
         sleep_mask = (reference_measure.time >= window.onset) & (
             reference_measure.time <= window.wakeup
         )
-        sleep_array[sleep_mask] = 1
+        sleep_array[sleep_mask] = "Sleep"
 
     return sleep_array
 
@@ -136,10 +136,13 @@ def format_nonwear_data(
         }
     ).set_sorted("time")
 
-    nonwear_array = np.zeros(len(reference_measure.time), dtype=bool)
+    nonwear_array = np.full(len(reference_measure.time), "Wear", dtype="<U8")
 
     for row in nonwear_df.iter_rows(named=True):
-        nonwear_value = row["nonwear"]
+        if row["nonwear"] == 1:
+            nonwear_value = "Non-Wear"
+        else:
+            nonwear_value = "Wear"
         time = row["time"]
         nonwear_mask = (reference_measure.time >= time) & (
             reference_measure.time
