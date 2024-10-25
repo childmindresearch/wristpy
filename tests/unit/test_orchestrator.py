@@ -54,9 +54,7 @@ def test_format_sleep() -> None:
     assert (
         len(sleep_array) == len(dummy_measure.measurements) == len(dummy_measure.time)
     )
-    assert np.all(
-        sleep_array == np.array(["Sleep", "Sleep", "Awake", "Sleep", "Sleep"])
-    )
+    assert np.all(sleep_array == np.array([1, 1, 0, 1, 1]))
 
 
 def test_format_nonwear() -> None:
@@ -80,7 +78,7 @@ def test_format_nonwear() -> None:
     )
 
     assert len(nonwear_epoch) == len(dummy_epoch.measurements) == len(dummy_epoch.time)
-    assert np.all(nonwear_epoch == np.array(["Non-Wear", "Non-Wear", "Wear", "Wear"]))
+    assert np.all(nonwear_epoch == np.array([1, 1, 0, 0]))
 
 
 def test_bad_calibrator(sample_data_gt3x: pathlib.Path) -> None:

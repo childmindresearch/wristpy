@@ -88,17 +88,17 @@ def format_sleep_data(
         reference_measure: The measure from which the temporal resolution will be taken.
 
     Returns:
-        1-D np.ndarray of string values ('Sleep' or 'Awake'). Will be of the same length
-            as the timestamps in the reference_measure.
+        1-D np.ndarray, with 1 indicating sleep. Will be of the same length as
+            the timestamps in the reference_measure.
     """
     logger.debug("Formatting sleep array from sleep windows.")
-    sleep_array = np.full(len(reference_measure.time), "Awake")
+    sleep_array = np.zeros(len(reference_measure.time), dtype=bool)
 
     for window in sleep_windows:
         sleep_mask = (reference_measure.time >= window.onset) & (
             reference_measure.time <= window.wakeup
         )
-        sleep_array[sleep_mask] = "Sleep"
+        sleep_array[sleep_mask] = 1
 
     return sleep_array
 
@@ -125,7 +125,7 @@ def format_nonwear_data(
             nonwear_data.
 
     Returns:
-        1-D np.ndarray of strings values ('Non-Wear' or 'Wear). Will match the
+        1-D np.ndarray with 1 indicating a nonwear timepoint. Will match the
             length of the reference measure.
     """
     logger.debug("Upsampling nonwear data.")
@@ -136,13 +136,10 @@ def format_nonwear_data(
         }
     ).set_sorted("time")
 
-    nonwear_array = np.full(len(reference_measure.time), "Wear", dtype="<U8")
+    nonwear_array = np.zeros(len(reference_measure.time), dtype=bool)
 
     for row in nonwear_df.iter_rows(named=True):
-        if row["nonwear"] == 1:
-            nonwear_value = "Non-Wear"
-        else:
-            nonwear_value = "Wear"
+        nonwear_value = row["nonwear"]
         time = row["time"]
         nonwear_mask = (reference_measure.time >= time) & (
             reference_measure.time
