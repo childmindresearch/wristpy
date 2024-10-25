@@ -88,8 +88,8 @@ def format_sleep_data(
         reference_measure: The measure from which the temporal resolution will be taken.
 
     Returns:
-        1-D np.ndarray, with 1 indicating sleep. Will be of the same length as
-            the timestamps in the reference_measure.
+        1-D np.ndarray of string values ('Sleep' or 'Awake'). Will be of the same length
+            as the timestamps in the reference_measure.
     """
     logger.debug("Formatting sleep array from sleep windows.")
     sleep_array = np.full(len(reference_measure.time), "Awake")
@@ -125,7 +125,7 @@ def format_nonwear_data(
             nonwear_data.
 
     Returns:
-        1-D np.ndarray with 1 indicating a nonwear timepoint. Will match the
+        1-D np.ndarray of strings values ('Non-Wear' or 'Wear). Will match the
             length of the reference measure.
     """
     logger.debug("Upsampling nonwear data.")
