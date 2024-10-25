@@ -241,14 +241,7 @@ def test_physical_activity_thresholds() -> None:
     time = pl.Series("time", dummy_datetime_list)
     tmp_measurement = models.Measurement(measurements=tmp_data, time=time)
     thresholds = (0, 1, 2)
-    expected_result = np.array(
-        [
-            0,
-            1,
-            2,
-            3,
-        ]
-    )
+    expected_result = np.array(["Inactive", "Light", "Moderate", "Vigorous"])
 
     result = analytics.compute_physical_activty_categories(tmp_measurement, thresholds)
 
