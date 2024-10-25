@@ -42,9 +42,16 @@ plt.plot(results.enmo.time, results.enmo.measurements)
 
 Plot the sleep windows with normalized angle-z data:
 ```python
+import polars as pl
 from matplotlib import pyplot as plt
+
+sleep_data_frame = pl.DataFrame({'time': results.sleep_windows_epoch.time, 
+        'sleep_windows': results.sleep_windows_epoch.measurements})
+sleep_data_frame = sleep_data_frame.with_columns(pl.col('sleep_windows').cast(pl.Categorical).to_physical())
+
+
 plt.plot(results.anglez.time, results.anglez.measurements/90)
-plt.plot(results.sleep_windows_epoch.time, results.sleep_windows_epoch.measurements)
+plt.plot(sleep_data_frame["time"], sleep_data_frame["sleep_windows"])
 plt.legend(['Angle Z', 'Sleep Windows'])
 plt.show()
 ```

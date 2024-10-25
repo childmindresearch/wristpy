@@ -1,1 +1,1 @@
-"""This is the readers submodule."""
+"""This is the readers submodule for loading raw sensor data."""
