@@ -7,12 +7,12 @@ Introduction
 Wristpy is a Python library designed for processing and analyzing wrist-worn accelerometer data. 
 This tutorial will guide you through the basic steps of using Wristpy to analyze your accelerometer data. Specifically,
 we will cover the following topics through a few examples:
-   - running the default processor, analyzing the output data, and visualizing the results
-   - loading data and plotting the raw signals
-   - how to calibrate the data, computing ENMO and angle-z from the calibrated data and then plotting those metrics
-   - how to obtain non-wear windows and visualize them
-   - how to obtain sleep windows and visualize them
-      - how we can filter sleep windows that overlap with non-wear
+   - running the default processor, analyzing the output data, and visualizing the results.
+   - loading data and plotting the raw signals.
+   - how to calibrate the data, computing ENMO and angle-z from the calibrated data and then plotting those metrics.
+   - how to obtain non-wear windows and visualize them.
+   - how to obtain sleep windows and visualize them.
+      - how we can filter sleep windows that overlap with non-wear periods.
 
 
 Example 1: Running the default processor
@@ -42,16 +42,10 @@ plt.plot(results.enmo.time, results.enmo.measurements)
 
 Plot the sleep windows with normalized angle-z data:
 ```python
-import polars as pl
 from matplotlib import pyplot as plt
 
-sleep_data_frame = pl.DataFrame({'time': results.sleep_windows_epoch.time, 
-        'sleep_windows': results.sleep_windows_epoch.measurements})
-sleep_data_frame = sleep_data_frame.with_columns(pl.col('sleep_windows').cast(pl.Categorical).to_physical())
-
-
 plt.plot(results.anglez.time, results.anglez.measurements/90)
-plt.plot(sleep_data_frame["time"], sleep_data_frame["sleep_windows"])
+plt.plot(results.sleep_windows_epoch.time, results.sleep_windows_epoch.measurements)
 plt.legend(['Angle Z', 'Sleep Windows'])
 plt.show()
 ```
@@ -69,7 +63,7 @@ plt.plot(output_results['time'], phys_activity)
 ```
 ![Example of plotting physical activity levels from csv](phys_levels_example1.png)
 
-It is also possible to do some analysis on these output variables, for example, if we ant to find the percent of time spent inactive, or in light, moderate, or vigorous physical activity:
+It is also possible to do some analysis on these output variables, for example, if we want to find the percent of time spent inactive, or in light, moderate, or vigorous physical activity:
 
 ```python
 inactivity_count = sum(output_results['physical_activity_levels'] == 0)
@@ -109,7 +103,7 @@ We can then visualize the raw accelerometer and light sensor values very easily 
 
 Plot the raw acceleration along the *x*-axis:
 
-`plt.plot(watch_data.acceleration.time, watch_data.acceleration.measurements[0:1])`
+`plt.plot(watch_data.acceleration.time, watch_data.acceleration.measurements[:,0])`
 
 ![Plot raw acceleration data from watch_data](raw_accel_example2.png)
 
@@ -123,7 +117,7 @@ Plot the light data:
 
 Example 3:  Plot the epoch1 level measurements
 ----------------------------------------------------
-In this example we will expand on the skills learned in `Example2`: we will load the sensor data, calibrate, and then calculate the ENMO and angle-z data in 5s windows (epoch 1 data).
+In this example we will expand on the skills learned in `Example 2`: we will load the sensor data, calibrate, and then calculate the ENMO and angle-z data in 5s windows (epoch 1 data).
 
 ```python
 from wristpy.io.readers import readers
@@ -131,12 +125,16 @@ from wristpy.processing import calibration, metrics
 from wristpy.core import computations
 
 watch_data = readers.read_watch_data('/path/to/geneactive/file.bin')
+
+#Calibration phase
 calibrator_object = calibration.ConstrainedMinimizationCalibration()
 calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
 
+#Compute the desired metrics
 enmo = metrics.euclidean_norm_minus_one(calibrated_data)
 anglez = metrics.angle_relative_to_horizontal(calibrated_data)
 
+#Obtain the epoch1 level data
 enmo_epoch1 = computations.moving_mean(enmo)
 anglez_epoch1 = computations.moving_mean(anglez)
 ```
@@ -161,7 +159,7 @@ plt.show()
 
 Example 4: Visualize the detected non-wear times
 ----------------------------------------------------
-In this example we will build on `Example3` by also solving for the non-wear periods, as follows:
+In this example we will build on `Example 3` by also solving for the non-wear periods, as follows:
 
 ```python
 from wristpy.io.readers import readers
@@ -171,6 +169,8 @@ from wristpy.processing import calibration, metrics
 watch_data = readers.read_watch_data('/path/to/geneactive/file.bin')
 calibrator_object = calibration.ConstrainedMinimizationCalibration()
 calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
+
+#Find non-wear periods
 non_wear_array = metrics.detect_nonwear(calibrated_data)
 
 ```
@@ -180,10 +180,8 @@ We can then visualize the non-wear periods, in comparison to movement (ENMO at t
 from wristpy.core import computations
 
 enmo = metrics.euclidean_norm_minus_one(calibrated_data)
-anglez = metrics.angle_relative_to_horizontal(calibrated_data)
-
 enmo_epoch1 = computations.moving_mean(enmo)
-anglez_epoch1 = computations.moving_mean(anglez)
+
 
 plt.plot(enmo_epoch1.time, enmo_epoch1.measurements)
 plt.plot(non_wear_array.time, non_wear_array.measurements)
@@ -206,14 +204,13 @@ from wristpy.processing import analytics, calibration, metrics
 watch_data = readers.read_watch_data('/path/to/geneactive/file.bin')
 calibrator_object = calibration.ConstrainedMinimizationCalibration()
 calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
-enmo = metrics.euclidean_norm_minus_one(calibrated_data)
 anglez = metrics.angle_relative_to_horizontal(calibrated_data)
-non_wear_array = metrics.detect_nonwear(calibrated_data)
+
 sleep_detector = analytics.GgirSleepDetection(anglez)
 sleep_windows = sleep_detector.run_sleep_detection()
 ```
 
-Visualize in comparison to the anglez data and the non-wear periods, where sleep periods are visualized by a horizontal blue line, and non-wear periods are visualized with a:
+We can then visualize the sleep periods in comparison to the angle-z data and the non-wear periods, where sleep periods are visualized by a horizontal blue line, and non-wear periods are visualized with a green trace and the angle-z data with the semi-transparent red trace:
 
 ```python
 import matplotlib.pyplot as plt

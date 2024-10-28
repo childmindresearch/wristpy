@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "wristpy"
 version = "0.1.0"
-description = "wristpy is Python library designed for processing and analyzing wrist-worn accelerometer data."
+description = "wristpy is a Python package designed for processing and analyzing wrist-worn accelerometer data."
 authors = [
   "Adam Santorelli <adam.santorelli@childmind.org>", 
   "Florian Rupprecht <florian.rupprecht@childmind.org>",

@@ -2,7 +2,7 @@
 
 # `wristpy` <img src="https://media.githubusercontent.com/media/childmindresearch/wristpy/refs/heads/feat/issue-56/update-package-metadata/docs/wristpy_logo.png" align="right" width="25%"/>
 
- A Python package for wrist-worn accelerometer data processing 
+ A Python package for wrist-worn accelerometer data processing.
 
 
 
@@ -29,13 +29,13 @@ The package currently supports the following formats:
 
 ## Processing pipeline implementation
 
-Below is a list of the various stages that make up the main processing pipeline of the wristpy module:
+The main processing pipeline of the wristpy module can be described as follows:
 
-- Data loading: sensor data is loaded using [`actfast`](https://github.com/childmindresearch/actfast), a `WatchData` object is created to store all sensor data
-- Data calibration: A post-manufacturer calibration step can be applied, to ensure that the acceleration sensor is measuring 1*g* force during periods of no motion. There are four possible options: `None`, `gradient`, `ggir`.
+- Data loading: sensor data is loaded using [`actfast`](https://github.com/childmindresearch/actfast), and a `WatchData` object is created to store all sensor data
+- Data calibration: A post-manufacturer calibration step can be applied, to ensure that the acceleration sensor is measuring 1*g* force during periods of no motion. There are three possible options: `None`, `gradient`, `ggir`.
 - Metrics Calculation: Calculates various metrics on the calibrated data, namely ENMO (euclidean norm , minus one) and angle-Z (angle of acceleration relative to the *x-y* axis).
 - Non-wear detection: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide `wear` or `not wear`.
-- Sleep Detection: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.
+- Sleep Detection: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.
 - Physical activity levels: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.
 
 
