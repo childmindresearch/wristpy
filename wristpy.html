@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 14.6.1"/>
+    <meta name="generator" content="pdoc 14.7.0"/>
     <title>wristpy API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -18,20 +18,37 @@
         <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
         <div>
 
+            <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
+                   pattern=".+" required>
 
             <h2>Contents</h2>
             <ul>
-  <li><a href="#wristpy-wrist-worn-accelerometer-data-processing-img-srclogopng-alignright-width25">Wristpy: Wrist-Worn Accelerometer Data Processing <img src="logo.png" align="right" width="25%"/></a>
+  <li><a href="#wristpy-img-srchttpsmediagithubusercontentcommediachildmindresearchwristpyrefsheadsfeatissue-56update-package-metadatadocswristpy_logopng-alignright-width25"><code>wristpy</code> <img src="https://media.githubusercontent.com/media/childmindresearch/wristpy/refs/heads/feat/issue-56/update-package-metadata/docs/wristpy_logo.png" align="right" width="25%"/></a>
   <ul>
     <li><a href="#supported-formats-devices">Supported formats &amp; devices</a></li>
-    <li><a href="#features">Features</a></li>
+    <li><a href="#processing-pipeline-implementation">Processing pipeline implementation</a></li>
     <li><a href="#installation">Installation</a></li>
     <li><a href="#quick-start">Quick start</a></li>
     <li><a href="#references">References</a></li>
   </ul></li>
+  <li><a href="#wristpy-tutorial">Wristpy Tutorial</a>
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#example-1-running-the-default-processor">Example 1: Running the default processor</a></li>
+    <li><a href="#example-2-loading-data-and-plotting-the-raw-signals">Example 2: Loading data and plotting the raw signals</a></li>
+    <li><a href="#example-3-plot-the-epoch1-level-measurements">Example 3:  Plot the epoch1 level measurements</a></li>
+    <li><a href="#example-4-visualize-the-detected-non-wear-times">Example 4: Visualize the detected non-wear times</a></li>
+    <li><a href="#example-5-find-and-filter-the-sleep-windows">Example 5: Find and filter the sleep windows</a></li>
+  </ul></li>
 </ul>
 
 
+            <h2>Submodules</h2>
+            <ul>
+                    <li><a href="wristpy/core.html">core</a></li>
+                    <li><a href="wristpy/io.html">io</a></li>
+                    <li><a href="wristpy/processing.html">processing</a></li>
+            </ul>
 
 
 
@@ -47,9 +64,11 @@
                     <h1 class="modulename">
 wristpy    </h1>
 
-                        <div class="docstring"><p><a href="https://zenodo.org/doi/10.5281/zenodo.10383685"><img src="https://zenodo.org/badge/657341621.svg" alt="DOI" /></a></p>
+                        <div class="docstring"><p><a href="https://doi.org/10.5281/zenodo.13883191"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.13883191.svg" alt="DOI" /></a></p>
 
-<h1 id="wristpy-wrist-worn-accelerometer-data-processing-img-srclogopng-alignright-width25">Wristpy: Wrist-Worn Accelerometer Data Processing <img src="logo.png" align="right" width="25%"/></h1>
+<h1 id="wristpy-img-srchttpsmediagithubusercontentcommediachildmindresearchwristpyrefsheadsfeatissue-56update-package-metadatadocswristpy_logopng-alignright-width25"><code><a href="">wristpy</a></code> <img src="https://media.githubusercontent.com/media/childmindresearch/wristpy/refs/heads/feat/issue-56/update-package-metadata/docs/wristpy_logo.png" align="right" width="25%"/></h1>
+
+<p>A Python package for wrist-worn accelerometer data processing.</p>
 
 <p><a href="https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml?query=branch%3Amain"><img src="https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml/badge.svg?branch=main" alt="Build" /></a>
 <a href="https://codecov.io/gh/childmindresearch/wristpy"><img src="https://codecov.io/gh/childmindresearch/wristpy/branch/main/graph/badge.svg?token=22HWWFWPW5" alt="codecov" /></a>
@@ -58,7 +77,7 @@ wristpy    </h1>
 <a href="https://github.com/childmindresearch/wristpy/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-LGPL--2.1-blue.svg" alt="LGPL--2.1 License" /></a>
 <a href="https://childmindresearch.github.io/wristpy"><img src="https://img.shields.io/badge/api-docs-blue" alt="pages" /></a></p>
 
-<p>Welcome to wristpy, a Python library designed for processing and analyzing wrist-worn accelerometer data. This library provides a set of tools for calibrating raw accelerometer data, calculating physical activity metrics (ENMO derived) and sleep metrics (angle-Z derived), finding non-wear periods, and detecing sleep periods (onset and wakeup times). Additionally, we provide access to other sensor dat that may be recorded by the watch, including; temperature, luminosity, capacitive sensing, battery voltage, and all metadata.</p>
+<p>Welcome to wristpy, a Python library designed for processing and analyzing wrist-worn accelerometer data. This library provides a set of tools for loading sensor information, calibrating raw accelerometer data, calculating physical activity metrics (ENMO derived) and sleep metrics (angle-Z derived), finding non-wear periods, and detecting sleep periods (onset and wakeup times). Additionally, we provide access to other sensor data that may be recorded by the watch, including; temperature, luminosity, capacitive sensing, battery voltage, and all metadata.</p>
 
 <h2 id="supported-formats-devices">Supported formats &amp; devices</h2>
 
@@ -89,29 +108,28 @@ wristpy    </h1>
 </tbody>
 </table>
 
-<h2 id="features">Features</h2>
+<p><strong>Special Note</strong><br />
+    The <code>idle_sleep_mode</code> for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this <a href="https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained">here</a>). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, the authors of this package do not take any steps to impute data during these time gaps and would caution to not use data collected with this mode enabled. Of course, users can make use of the readers within wristpy for their own analysis with this type of data.</p>
+
+<h2 id="processing-pipeline-implementation">Processing pipeline implementation</h2>
+
+<p>The main processing pipeline of the wristpy module can be described as follows:</p>
 
 <ul>
-<li>GGIR Calibration: Applies the GGIR calibration procedure to raw accelerometer data.</li>
+<li>Data loading: sensor data is loaded using <a href="https://github.com/childmindresearch/actfast"><code>actfast</code></a>, and a <code>WatchData</code> object is created to store all sensor data</li>
+<li>Data calibration: A post-manufacturer calibration step can be applied, to ensure that the acceleration sensor is measuring 1<em>g</em> force during periods of no motion. There are three possible options: <code>None</code>, <code>gradient</code>, <code>ggir</code>.</li>
 <li>Metrics Calculation: Calculates various metrics on the calibrated data, namely ENMO (euclidean norm , minus one) and angle-Z (angle of acceleration relative to the <em>x-y</em> axis).</li>
-<li>Physical activity levels: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. </li>
-<li>Non-wear detection: We find periods of non-wear based on the acceleration data. </li>
-<li>Sleep Detection: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.</li>
+<li>Non-wear detection: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide <code>wear</code> or <code>not wear</code>.</li>
+<li>Sleep Detection: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.</li>
+<li>Physical activity levels: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.</li>
 </ul>
 
 <h2 id="installation">Installation</h2>
 
-<p>Install this package via :</p>
+<p>Install this package from PyPI via :</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>wristpy
-</code></pre>
-</div>
-
-<p>Or get the newest development version via:</p>
-
-<div class="pdoc-code codehilite">
-<pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/childmindresearch/wristpy
 </code></pre>
 </div>
 
@@ -127,7 +145,7 @@ wristpy    </h1>
 <h3 id="using-wristpy-through-a-python-script-or-notebook">Using Wristpy through a python script or notebook:</h3>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn">wristpy.core</span> <span class="kn">import</span> <span class="n">orchestrator</span>
+<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">orchestrator</span>
 
 <span class="c1"># Define input file path and output location</span>
 <span class="c1"># Support for saving as .csv and .parquet</span>
@@ -156,21 +174,486 @@ wristpy    </h1>
 <li>van Hees, V.T., Sabia, S., Jones, S.E. et al. Estimating sleep parameters
 using an accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
 <a href="https://doi.org/10.1038/s41598-018-31266-z">https://doi.org/10.1038/s41598-018-31266-z</a></li>
-<li>van Hees, V. T. et al. A Novel, Open Access Method to Assess Sleep
+<li>van Hees, V. T., et al. A Novel, Open Access Method to Assess Sleep
 Duration Using a Wrist-Worn Accelerometer. PLoS One 10, e0142533 (2015).
 <a href="https://doi.org/10.1371/journal.pone.0142533">https://doi.org/10.1371/journal.pone.0142533</a></li>
+<li>Hildebrand, M., et al. Age group comparability of raw accelerometer output
+from wrist- and hip-worn monitors. Medicine and Science in
+Sports and Exercise, 46(9), 1816-1824 (2014).
+<a href="https://doi.org/10.1249/mss.0000000000000289">https://doi.org/10.1249/mss.0000000000000289</a></li>
 </ol>
+
+<h1 id="wristpy-tutorial">Wristpy Tutorial</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Wristpy is a Python library designed for processing and analyzing wrist-worn accelerometer data. 
+This tutorial will guide you through the basic steps of using Wristpy to analyze your accelerometer data. Specifically,
+we will cover the following topics through a few examples:</p>
+
+<ul>
+<li>running the default processor, analyzing the output data, and visualizing the results.</li>
+<li>loading data and plotting the raw signals.</li>
+<li>how to calibrate the data, computing ENMO and angle-z from the calibrated data and then plotting those metrics.</li>
+<li>how to obtain non-wear windows and visualize them.</li>
+<li>how to obtain sleep windows and visualize them.
+<ul>
+<li>how we can filter sleep windows that overlap with non-wear periods.</li>
+</ul></li>
+</ul>
+
+<h2 id="example-1-running-the-default-processor">Example 1: Running the default processor</h2>
+
+<p>The <code>orchestrator</code> module of wristpy contains the default processor that will run the entire wristpy processing pipeline. This can be called as simply as:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">orchestrator</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+   <span class="nb">input</span> <span class="o">=</span> <span class="s1">&#39;/path/to/your/file.gt3x&#39;</span><span class="p">,</span>
+   <span class="n">output</span> <span class="o">=</span> <span class="s1">&#39;path/to/save/file_name.csv&#39;</span>
+<span class="p">)</span>
+</code></pre>
+</div>
+
+<p>This runs the processing pipeline with all the default arguments, creates an output <code>.csv</code> file, and will create a <code>results</code> object that contains the various output metrics (namely, enmo, angle-z, physical activity values, non-wear detection, sleep detection).</p>
+
+<p>We can visualize some of the outputs within the <code>results</code> object, directly, with the following scripts:</p>
+
+<p>Plot the ENMO across the entire data set:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">enmo</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">enmo</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><img src="data:image/png;base64,dmVyc2lvbiBodHRwczovL2dpdC1sZnMuZ2l0aHViLmNvbS9zcGVjL3YxCm9pZCBzaGEyNTY6YjEzYTRhZDYxOTMzYmQ1MzBmNzRjMjkwN2NmNTE4NDExZjRjMzhlNmRlNWYxODQzMWE5ODNhMTU1YTU2MWEzYwpzaXplIDE5NjI1Cg==" alt="Example of the ENMO result" /></p>
+
+<p>Plot the sleep windows with normalized angle-z data:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">anglez</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">anglez</span><span class="o">.</span><span class="n">measurements</span><span class="o">/</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">sleep_windows_epoch</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">sleep_windows_epoch</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Angle Z&#39;</span><span class="p">,</span> <span class="s1">&#39;Sleep Windows&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><img src="data:image/png;base64,dmVyc2lvbiBodHRwczovL2dpdC1sZnMuZ2l0aHViLmNvbS9zcGVjL3YxCm9pZCBzaGEyNTY6NjQxYjMzMzA4NjVhMjYxZDdjNWE1NGU4Mzk3NzgyZWE2ODIxZDc1ZWQ5YmUyMzhmNjExYWMwMjk0ODExM2EzMgpzaXplIDM3NzQxCg==" alt="Example of the Sleep and Anglez" /></p>
+
+<p>We can also view and process these outputs from the saved <code>.csv</code> output file:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">output_results</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;path/to/save/file_name.csv&#39;</span><span class="p">,</span> <span class="n">try_parse_dates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">phys_activity</span> <span class="o">=</span> <span class="n">output_results</span><span class="p">[</span><span class="s1">&#39;physical_activity_levels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">Categorical</span><span class="p">)</span><span class="o">.</span><span class="n">to_physical</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">output_results</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">phys_activity</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><img src="data:image/png;base64,dmVyc2lvbiBodHRwczovL2dpdC1sZnMuZ2l0aHViLmNvbS9zcGVjL3YxCm9pZCBzaGEyNTY6NGQ4NDIwZTdjZTgwOTQ4YTA0NzUzYmYwYTJhZjdjMDZhNDM5YWEzMzcyNGVkN2VhZDM1Y2UwOWZiOGEwYzQyMApzaXplIDE1Mjg4Cg==" alt="Example of plotting physical activity levels from csv" /></p>
+
+<p>It is also possible to do some analysis on these output variables, for example, if we want to find the percent of time spent inactive, or in light, moderate, or vigorous physical activity:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="n">inactivity_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">output_results</span><span class="p">[</span><span class="s1">&#39;physical_activity_levels&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">light_activity_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">output_results</span><span class="p">[</span><span class="s1">&#39;physical_activity_levels&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">moderate_activity_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">output_results</span><span class="p">[</span><span class="s1">&#39;physical_activity_levels&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">vigorous_activity_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">output_results</span><span class="p">[</span><span class="s1">&#39;physical_activity_levels&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">total_activity_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_results</span><span class="p">[</span><span class="s1">&#39;physical_activity_levels&#39;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Light activity percent: </span><span class="si">{</span><span class="n">light_activity_count</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="n">total_activity_count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Moderate activity percent: </span><span class="si">{</span><span class="n">moderate_activity_count</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="n">total_activity_count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Vigorous activity percent: </span><span class="si">{</span><span class="n">vigorous_activity_count</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="n">total_activity_count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Inactivity percent: </span><span class="si">{</span><span class="n">inactivity_count</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="n">total_activity_count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<pre><code>Light activity percent: 12.394840157038699
+Moderate activity percent: 1.1030099083940923
+Vigorous activity percent: 0.031158471988533682
+Inactivity percent: 86.47099146257868
+</code></pre>
+
+<h2 id="example-2-loading-data-and-plotting-the-raw-signals">Example 2: Loading data and plotting the raw signals</h2>
+
+<p>In this example we will go over the built-in functions to directly read the raw accelerometer and light data, and how to quickly visualize this information.</p>
+
+<p>The built in <code>readers</code> module can be used to load all the sensor and metadata from one of the support wrist-watches (<code>.gt3x</code> or <code>.bin</code>), the reader will automatically select the appropriate loading methodology. </p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span> <span class="kn">import</span> <span class="n">readers</span>
+
+<span class="n">watch_data</span> <span class="o">=</span> <span class="n">readers</span><span class="o">.</span><span class="n">read_watch_data</span><span class="p">(</span><span class="s1">&#39;/path/to/geneactive/file.bin&#39;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>We can then visualize the raw accelerometer and light sensor values very easily as follows:</p>
+
+<p>Plot the raw acceleration along the <em>x</em>-axis:</p>
+
+<p><code>plt.plot(watch_data.acceleration.time, watch_data.acceleration.measurements[:,0])</code></p>
+
+<p><img src="data:image/png;base64,dmVyc2lvbiBodHRwczovL2dpdC1sZnMuZ2l0aHViLmNvbS9zcGVjL3YxCm9pZCBzaGEyNTY6NTdjYzMwN2YwYWYxNDdmZjFjNmFiYmZlNTgwNzRiMzhkMDM4M2M5ZjdkYjUxMmI3MjBmOTg1MjJiMDBiZTk2NApzaXplIDIyODcwCg==" alt="Plot raw acceleration data from watch_data" /></p>
+
+<p>Plot the light data:</p>
+
+<p><code>plt.plot(watch_data.lux.time, watch_data.lux.measurements)</code></p>
+
+<p><img src="data:image/png;base64,dmVyc2lvbiBodHRwczovL2dpdC1sZnMuZ2l0aHViLmNvbS9zcGVjL3YxCm9pZCBzaGEyNTY6YjdkMTZlZGNjYzVjOTJiZDY4MjNkY2VkODY4ZDUzMWFjMTU4YWViOWRhODJkOTEyOGUwMWViNGFkNGExYWQwNQpzaXplIDIwNzAyCg==" alt="Plot the light data" /></p>
+
+<h2 id="example-3-plot-the-epoch1-level-measurements">Example 3:  Plot the epoch1 level measurements</h2>
+
+<p>In this example we will expand on the skills learned in <code>Example 2</code>: we will load the sensor data, calibrate, and then calculate the ENMO and angle-z data in 5s windows (epoch 1 data).</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span> <span class="kn">import</span> <span class="n">readers</span>
+<span class="kn">from</span> <span class="nn"><a href="wristpy/processing.html">wristpy.processing</a></span> <span class="kn">import</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">metrics</span>
+<span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">computations</span>
+
+<span class="n">watch_data</span> <span class="o">=</span> <span class="n">readers</span><span class="o">.</span><span class="n">read_watch_data</span><span class="p">(</span><span class="s1">&#39;/path/to/geneactive/file.bin&#39;</span><span class="p">)</span>
+
+<span class="c1">#Calibration phase</span>
+<span class="n">calibrator_object</span> <span class="o">=</span> <span class="n">calibration</span><span class="o">.</span><span class="n">ConstrainedMinimizationCalibration</span><span class="p">()</span>
+<span class="n">calibrated_data</span> <span class="o">=</span> <span class="n">calibrator_object</span><span class="o">.</span><span class="n">run_calibration</span><span class="p">(</span><span class="n">watch_data</span><span class="o">.</span><span class="n">acceleration</span><span class="p">)</span>
+
+<span class="c1">#Compute the desired metrics</span>
+<span class="n">enmo</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">euclidean_norm_minus_one</span><span class="p">(</span><span class="n">calibrated_data</span><span class="p">)</span>
+<span class="n">anglez</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">angle_relative_to_horizontal</span><span class="p">(</span><span class="n">calibrated_data</span><span class="p">)</span>
+
+<span class="c1">#Obtain the epoch1 level data</span>
+<span class="n">enmo_epoch1</span> <span class="o">=</span> <span class="n">computations</span><span class="o">.</span><span class="n">moving_mean</span><span class="p">(</span><span class="n">enmo</span><span class="p">)</span>
+<span class="n">anglez_epoch1</span> <span class="o">=</span> <span class="n">computations</span><span class="o">.</span><span class="n">moving_mean</span><span class="p">(</span><span class="n">anglez</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>We can then visualize the <code>epoch1</code> measurements as:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;ENMO&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">anglez_epoch1</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">anglez_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Anglez&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><img src="data:image/png;base64,dmVyc2lvbiBodHRwczovL2dpdC1sZnMuZ2l0aHViLmNvbS9zcGVjL3YxCm9pZCBzaGEyNTY6ODQ3ZmUyMzRjMmI5ZjA3NDYzMTc1Y2EyNDFjMTU2MDhkNGE1NjUxYmNmZmI1MTUwYmZmMzExY2ZmOTQwMmE1NwpzaXplIDM3MDcyCg==" alt="Plot the epoch1 data" /></p>
+
+<h2 id="example-4-visualize-the-detected-non-wear-times">Example 4: Visualize the detected non-wear times</h2>
+
+<p>In this example we will build on <code>Example 3</code> by also solving for the non-wear periods, as follows:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span> <span class="kn">import</span> <span class="n">readers</span>
+<span class="kn">from</span> <span class="nn"><a href="wristpy/processing.html">wristpy.processing</a></span> <span class="kn">import</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">metrics</span>
+
+
+<span class="n">watch_data</span> <span class="o">=</span> <span class="n">readers</span><span class="o">.</span><span class="n">read_watch_data</span><span class="p">(</span><span class="s1">&#39;/path/to/geneactive/file.bin&#39;</span><span class="p">)</span>
+<span class="n">calibrator_object</span> <span class="o">=</span> <span class="n">calibration</span><span class="o">.</span><span class="n">ConstrainedMinimizationCalibration</span><span class="p">()</span>
+<span class="n">calibrated_data</span> <span class="o">=</span> <span class="n">calibrator_object</span><span class="o">.</span><span class="n">run_calibration</span><span class="p">(</span><span class="n">watch_data</span><span class="o">.</span><span class="n">acceleration</span><span class="p">)</span>
+
+<span class="c1">#Find non-wear periods</span>
+<span class="n">non_wear_array</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">detect_nonwear</span><span class="p">(</span><span class="n">calibrated_data</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>We can then visualize the non-wear periods, in comparison to movement (ENMO at the epoch1 level):</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">computations</span>
+
+<span class="n">enmo</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">euclidean_norm_minus_one</span><span class="p">(</span><span class="n">calibrated_data</span><span class="p">)</span>
+<span class="n">enmo_epoch1</span> <span class="o">=</span> <span class="n">computations</span><span class="o">.</span><span class="n">moving_mean</span><span class="p">(</span><span class="n">enmo</span><span class="p">)</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">non_wear_array</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">non_wear_array</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;ENMO Epoch1&#39;</span><span class="p">,</span> <span class="s1">&#39;Non-wear&#39;</span><span class="p">])</span>
+</code></pre>
+</div>
+
+<p><img src="data:image/png;base64,dmVyc2lvbiBodHRwczovL2dpdC1sZnMuZ2l0aHViLmNvbS9zcGVjL3YxCm9pZCBzaGEyNTY6NGUxNjcyYTU0YzJhNGI2NWQzYWRhYWUzN2RjNmUxNGM2ZmU2OWE0YWFlYzI1NzA2ZTczODk2YzQ1ZjVmOTA2OApzaXplIDI1MTk3Cg==" alt="Plot the nonwear periods compared to the ENMO data" /></p>
+
+<h2 id="example-5-find-and-filter-the-sleep-windows">Example 5: Find and filter the sleep windows</h2>
+
+<p>The following script will obtain the sleep window pairs (onset,wakeup):</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span> <span class="kn">import</span> <span class="n">readers</span>
+<span class="kn">from</span> <span class="nn"><a href="wristpy/processing.html">wristpy.processing</a></span> <span class="kn">import</span> <span class="n">analytics</span><span class="p">,</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">metrics</span>
+
+
+<span class="n">watch_data</span> <span class="o">=</span> <span class="n">readers</span><span class="o">.</span><span class="n">read_watch_data</span><span class="p">(</span><span class="s1">&#39;/path/to/geneactive/file.bin&#39;</span><span class="p">)</span>
+<span class="n">calibrator_object</span> <span class="o">=</span> <span class="n">calibration</span><span class="o">.</span><span class="n">ConstrainedMinimizationCalibration</span><span class="p">()</span>
+<span class="n">calibrated_data</span> <span class="o">=</span> <span class="n">calibrator_object</span><span class="o">.</span><span class="n">run_calibration</span><span class="p">(</span><span class="n">watch_data</span><span class="o">.</span><span class="n">acceleration</span><span class="p">)</span>
+<span class="n">anglez</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">angle_relative_to_horizontal</span><span class="p">(</span><span class="n">calibrated_data</span><span class="p">)</span>
+
+<span class="n">sleep_detector</span> <span class="o">=</span> <span class="n">analytics</span><span class="o">.</span><span class="n">GgirSleepDetection</span><span class="p">(</span><span class="n">anglez</span><span class="p">)</span>
+<span class="n">sleep_windows</span> <span class="o">=</span> <span class="n">sleep_detector</span><span class="o">.</span><span class="n">run_sleep_detection</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p>We can then visualize the sleep periods in comparison to the angle-z data and the non-wear periods, where sleep periods are visualized by a horizontal blue line, and non-wear periods are visualized with a green trace and the angle-z data with the semi-transparent red trace:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="c1"># Plot each sleep window as a horizontal line</span>
+<span class="k">for</span> <span class="n">sw</span> <span class="ow">in</span> <span class="n">sleep_windows</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">sw</span><span class="o">.</span><span class="n">onset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">sw</span><span class="o">.</span><span class="n">wakeup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sw</span><span class="o">.</span><span class="n">onset</span><span class="p">,</span> <span class="n">sw</span><span class="o">.</span><span class="n">wakeup</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">non_wear_array</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">non_wear_array</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">anglez</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">anglez</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Anglez Epoch1&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Sleep Period/Non-wear&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><img src="data:image/png;base64,dmVyc2lvbiBodHRwczovL2dpdC1sZnMuZ2l0aHViLmNvbS9zcGVjL3YxCm9pZCBzaGEyNTY6ZGFhYTM4YzMyMjJkYjkyNDI0NzNmNTViZWRhMmM5Y2E1ZmExMGM2ZDg0MDgzNDAxYzU5MWFmNDdlM2U2MGM0MApzaXplIDMxMTcyCg==" alt="Plot the sleep periods compared to angelz data." /></p>
+
+<p>The filtered sleep windows can easily be obtained with the following function. This removes all sleep periods that have any overlap with non-wear time.</p>
+
+<p><code>filtered_sleep_windows = analytics.remove_nonwear_from_sleep(non_wear_array, sleep_windows )</code></p>
+
+<p>And these can be visualized and compared to angle-z and the non-wear periods as previously:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">sw</span> <span class="ow">in</span> <span class="n">filtered_sleep_windows</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">sw</span><span class="o">.</span><span class="n">onset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">sw</span><span class="o">.</span><span class="n">wakeup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sw</span><span class="o">.</span><span class="n">onset</span><span class="p">,</span> <span class="n">sw</span><span class="o">.</span><span class="n">wakeup</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">non_wear_array</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">non_wear_array</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">anglez</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">anglez</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Anglez Epoch1&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Sleep Period/Non-wear&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p><img src="data:image/png;base64,dmVyc2lvbiBodHRwczovL2dpdC1sZnMuZ2l0aHViLmNvbS9zcGVjL3YxCm9pZCBzaGEyNTY6M2U3NTQ2NjY1M2M3MWVkMmZjN2ExNWM4OTZhZmQ5NDMxMTUyMTg3Y2ExOWVjZTg5OTQzNGEwN2VkYmRmMzAyZQpzaXplIDMxMTM0Cg==" alt="Plot the filtered sleep windows." /></p>
 </div>
 
                         <input id="mod-wristpy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-wristpy-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="sd">&quot;&quot;&quot;.. include:: ../../README.md&quot;&quot;&quot;</span>  <span class="c1"># noqa: D415</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="sd">&quot;&quot;&quot;.. include:: ../../README.md</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">2</span></a><span class="sd">.. include:: ../../docs/wristpy_tutorial.md</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">3</span></a><span class="sd">&quot;&quot;&quot;</span>  <span class="c1"># noqa: D205, D415</span>
 </span></pre></div>
 
 
             </section>
     </main>
-</body>
+<script>
+    function escapeHTML(html) {
+        return document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
+    }
+
+    const originalContent = document.querySelector("main.pdoc");
+    let currentContent = originalContent;
+
+    function setContent(innerHTML) {
+        let elem;
+        if (innerHTML) {
+            elem = document.createElement("main");
+            elem.classList.add("pdoc");
+            elem.innerHTML = innerHTML;
+        } else {
+            elem = originalContent;
+        }
+        if (currentContent !== elem) {
+            currentContent.replaceWith(elem);
+            currentContent = elem;
+        }
+    }
+
+    function getSearchTerm() {
+        return (new URL(window.location)).searchParams.get("search");
+    }
+
+    const searchBox = document.querySelector(".pdoc input[type=search]");
+    searchBox.addEventListener("input", function () {
+        let url = new URL(window.location);
+        if (searchBox.value.trim()) {
+            url.hash = "";
+            url.searchParams.set("search", searchBox.value);
+        } else {
+            url.searchParams.delete("search");
+        }
+        history.replaceState("", "", url.toString());
+        onInput();
+    });
+    window.addEventListener("popstate", onInput);
+
+
+    let search, searchErr;
+
+    async function initialize() {
+        try {
+            search = await new Promise((resolve, reject) => {
+                const script = document.createElement("script");
+                script.type = "text/javascript";
+                script.async = true;
+                script.onload = () => resolve(window.pdocSearch);
+                script.onerror = (e) => reject(e);
+                script.src = "search.js";
+                document.getElementsByTagName("head")[0].appendChild(script);
+            });
+        } catch (e) {
+            console.error("Cannot fetch pdoc search index");
+            searchErr = "Cannot fetch search index.";
+        }
+        onInput();
+
+        document.querySelector("nav.pdoc").addEventListener("click", e => {
+            if (e.target.hash) {
+                searchBox.value = "";
+                searchBox.dispatchEvent(new Event("input"));
+            }
+        });
+    }
+
+    function onInput() {
+        setContent((() => {
+            const term = getSearchTerm();
+            if (!term) {
+                return null
+            }
+            if (searchErr) {
+                return `<h3>Error: ${searchErr}</h3>`
+            }
+            if (!search) {
+                return "<h3>Searching...</h3>"
+            }
+
+            window.scrollTo({top: 0, left: 0, behavior: 'auto'});
+
+            const results = search(term);
+
+            let html;
+            if (results.length === 0) {
+                html = `No search results for '${escapeHTML(term)}'.`
+            } else {
+                html = `<h4>${results.length} search result${results.length > 1 ? "s" : ""} for '${escapeHTML(term)}'.</h4>`;
+            }
+            for (let result of results.slice(0, 10)) {
+                let doc = result.doc;
+                let url = `${doc.modulename.replaceAll(".", "/")}.html`;
+                if (doc.qualname) {
+                    url += `#${doc.qualname}`;
+                }
+
+                let heading;
+                switch (result.doc.kind) {
+                    case "function":
+                        if (doc.fullname.endsWith(".__init__")) {
+                            heading = `<span class="name">${doc.fullname.replace(/\.__init__$/, "")}</span>${doc.signature}`;
+                        } else {
+                            heading = `<span class="def">${doc.funcdef}</span> <span class="name">${doc.fullname}</span>${doc.signature}`;
+                        }
+                        break;
+                    case "class":
+                        heading = `<span class="def">class</span> <span class="name">${doc.fullname}</span>`;
+                        if (doc.bases)
+                            heading += `<wbr>(<span class="base">${doc.bases}</span>)`;
+                        heading += `:`;
+                        break;
+                    case "variable":
+                        heading = `<span class="name">${doc.fullname}</span>`;
+                        if (doc.annotation)
+                            heading += `<span class="annotation">${doc.annotation}</span>`;
+                        if (doc.default_value)
+                            heading += `<span class="default_value"> = ${doc.default_value}</span>`;
+                        break;
+                    default:
+                        heading = `<span class="name">${doc.fullname}</span>`;
+                        break;
+                }
+                html += `
+                        <section class="search-result">
+                        <a href="${url}" class="attr ${doc.kind}">${heading}</a>
+                        <div class="docstring">${doc.doc}</div>
+                        </section>
+                    `;
+
+            }
+            return html;
+        })());
+    }
+
+    if (getSearchTerm()) {
+        initialize();
+        searchBox.value = getSearchTerm();
+        onInput();
+    } else {
+        searchBox.addEventListener("focus", initialize, {once: true});
+    }
+
+    searchBox.addEventListener("keydown", e => {
+        if (["ArrowDown", "ArrowUp", "Enter"].includes(e.key)) {
+            let focused = currentContent.querySelector(".search-result.focused");
+            if (!focused) {
+                currentContent.querySelector(".search-result").classList.add("focused");
+            } else if (
+                e.key === "ArrowDown"
+                && focused.nextElementSibling
+                && focused.nextElementSibling.classList.contains("search-result")
+            ) {
+                focused.classList.remove("focused");
+                focused.nextElementSibling.classList.add("focused");
+                focused.nextElementSibling.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                    inline: "nearest"
+                });
+            } else if (
+                e.key === "ArrowUp"
+                && focused.previousElementSibling
+                && focused.previousElementSibling.classList.contains("search-result")
+            ) {
+                focused.classList.remove("focused");
+                focused.previousElementSibling.classList.add("focused");
+                focused.previousElementSibling.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                    inline: "nearest"
+                });
+            } else if (
+                e.key === "Enter"
+            ) {
+                focused.querySelector("a").click();
+            }
+        }
+    });
+</script></body>
 </html>
