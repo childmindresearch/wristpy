@@ -235,14 +235,13 @@ def run(
 
     enmo = metrics.euclidean_norm_minus_one(calibrated_acceleration)
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
+    sleep_detector = analytics.GgirSleepDetection(anglez)
+    sleep_windows = sleep_detector.run_sleep_detection()
+
     if epoch_length is not None:
         enmo = computations.moving_mean(enmo, epoch_length=epoch_length)
         anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
-
     non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
-
-    sleep_detector = analytics.GgirSleepDetection(anglez)
-    sleep_windows = sleep_detector.run_sleep_detection()
     physical_activity_levels = analytics.compute_physical_activty_categories(
         enmo,
         thresholds,
