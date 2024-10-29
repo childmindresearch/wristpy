@@ -116,9 +116,9 @@ class GgirSleepDetection(AbstractSleepDetector):
             SPT windows and corresponding time stamps.
 
         References:
-            van Hees, V.T., Sabia, S., Jones, S.E. et al. Estimating sleep parameters
-              using an accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
-              https://doi.org/10.1038/s41598-018-31266-z
+            van Hees, V.T., et al. Estimating sleep parameters using an
+                accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
+                https://doi.org/10.1038/s41598-018-31266-z
         """
         logger.debug("Finding spt windows, Threshold: %s", threshold)
         long_epoch_median = 300
@@ -163,8 +163,8 @@ class GgirSleepDetection(AbstractSleepDetector):
 
         References:
             van Hees, V. T. et al. A Novel, Open Access Method to Assess Sleep
-            Duration Using a Wrist-Worn Accelerometer. PLoS One 10, e0142533 (2015).
-            https://doi.org/10.1371/journal.pone.0142533
+                Duration Using a Wrist-Worn Accelerometer. PLoS One 10, e0142533 (2015).
+                https://doi.org/10.1371/journal.pone.0142533
         """
         logger.debug("Calculating SIB period threshold: %s degrees", threshold_degrees)
         anglez_abs_diff = self._compute_abs_diff_mean_anglez(anglez_data)
@@ -394,6 +394,9 @@ def compute_physical_activty_categories(
     This function uses the enmo_epoch1 data (5s aggregated data) to compute three
     physical activity levels: light, moderate, and vigorous.
 
+    Default values are taken from the Hildebrand 2014 study, and is best suited for
+    children aged 7 - 11 years.
+
     Args:
         enmo_epoch1: The enmo epoch1 data, as physical activity data should be computed
             on aggregated data.
@@ -409,6 +412,12 @@ def compute_physical_activty_categories(
     Raises:
         ValueError: If the threshold values are not poisitive, unique and  in ascending
         order.
+
+    References:
+        Hildebrand, M., et al. Age group comparability of raw accelerometer output
+            from wrist- and hip-worn monitors. Medicine and Science in
+            Sports and Exercise, 46(9), 1816-1824 (2014).
+            https://doi.org/10.1249/mss.0000000000000289
     """
     logger.debug("Computing physical activity levels, thresholds: %s", thresholds)
     if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):

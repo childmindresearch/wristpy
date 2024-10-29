@@ -1,8 +1,14 @@
 [tool.poetry]
 name = "wristpy"
-version = "0.0.1a0"
-description = "A beautiful description."
-authors = ["Florian Rupprecht <florian.rupprecht@childmind.org>"]
+version = "0.1.0"
+description = "wristpy is a Python package designed for processing and analyzing wrist-worn accelerometer data."
+authors = [
+  "Adam Santorelli <adam.santorelli@childmind.org>", 
+  "Florian Rupprecht <florian.rupprecht@childmind.org>",
+  "Freymon Perez <freymon.perez@childmind.org>",
+  "Greg Kiar <gregory.kiar@childmind.org>",
+  "Reinder Vos de Wael <reinder.vosdewael@childmind.org>"
+]
 license = "LGPL-2.1"
 readme = "README.md"
 packages = [{include = "wristpy", from = "src"}]
@@ -12,7 +18,7 @@ python = ">=3.9"
 polars = ">=0.20.6"
 scikit-learn = "^1.4.1.post1"
 pyarrow = "^15.0.0"
-actfast = "^1.0.0"
+actfast = "^1.1.0"
 numpy = ">=1.26.0, <3.0.0"
 pydantic = "^2.7.1"
 pydantic-settings = "^2.3.4"
@@ -73,7 +79,7 @@ src = ["src"]
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["ANN", "D", "E", "F", "I"]
+select = ["ANN", "D", "E", "F", "I", "INP"]
 ignore = [
   "ANN101",  # self should not be annotated.
   "ANN102"  # cls should not be annotated.
