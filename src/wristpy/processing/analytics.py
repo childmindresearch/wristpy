@@ -405,9 +405,9 @@ def compute_physical_activty_categories(
                 (light_threshold, moderate_threshold, vigorous_threshold).
 
     Returns:
-        A Measurement instance with the physical activity categories;
-        1 for light, 2 for moderate, 3 for vigorous. 0 represents inactivity.
-        The temporal resolution is the same as enmo_epoch1.
+        A Measurement instance with the physical activity categories. Categories are
+        Inactive, Light, Moderate, Vigorous. The temporal resolution is the same as
+        enmo_epoch1.
 
     Raises:
         ValueError: If the threshold values are not poisitive, unique and  in ascending
@@ -425,17 +425,15 @@ def compute_physical_activty_categories(
         logger.error(message)
         raise ValueError(message)
 
-    activity_levels = (
-        (
+    activity_levels = np.select(
+        [
+            enmo_epoch1.measurements <= thresholds[0],
             (thresholds[0] < enmo_epoch1.measurements)
-            & (enmo_epoch1.measurements <= thresholds[1])
-        )
-        * 1
-        + (
+            & (enmo_epoch1.measurements <= thresholds[1]),
             (thresholds[1] < enmo_epoch1.measurements)
-            & (enmo_epoch1.measurements <= thresholds[2])
-        )
-        * 2
-        + (enmo_epoch1.measurements > thresholds[2]) * 3
+            & (enmo_epoch1.measurements <= thresholds[2]),
+            thresholds[2] < enmo_epoch1.measurements,
+        ],
+        ["inactive", "light", "moderate", "vigorous"],
     )
     return models.Measurement(measurements=activity_levels, time=enmo_epoch1.time)
