@@ -1,6 +1,6 @@
 name: Development Task
 description: This is a template for a development task
-projects: ["childmindresearch/5"]
+projects: [childmindresearch/5]
 title: 'Task: '
 labels: [task]
 body:

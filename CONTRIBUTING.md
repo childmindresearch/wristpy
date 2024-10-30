@@ -5,7 +5,7 @@ Pull requests are always welcome, and we appreciate any help you give. Note that
 When submitting a pull request, we ask you to check the following:
 
 1. **Unit tests**, **documentation**, and **code style** are in order.
-   See the Continuous Integration for up to date information on the current code style, tests, and any other requirements. 
+   See the Continuous Integration for up to date information on the current code style, tests, and any other requirements.
 
    See the following [Google Python style guide](https://google.github.io/styleguide/pyguide.html#3164-guidelines-derived-from-guidos-recommendations) for coding style guidelines.
 
