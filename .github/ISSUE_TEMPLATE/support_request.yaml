@@ -1,6 +1,6 @@
 name: Support Request
 description: This is a template for submitting a support request.
-projects: ["childmindresearch/5"]
+projects: [childmindresearch/5]
 title: 'Support: '
 labels: [question]
 body:
