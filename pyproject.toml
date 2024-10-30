@@ -3,7 +3,7 @@ name = "wristpy"
 version = "0.1.0"
 description = "wristpy is a Python package designed for processing and analyzing wrist-worn accelerometer data."
 authors = [
-  "Adam Santorelli <adam.santorelli@childmind.org>", 
+  "Adam Santorelli <adam.santorelli@childmind.org>",
   "Florian Rupprecht <florian.rupprecht@childmind.org>",
   "Freymon Perez <freymon.perez@childmind.org>",
   "Greg Kiar <gregory.kiar@childmind.org>",

@@ -4,7 +4,7 @@ Wristpy Tutorial
 Introduction
 ------------
 
-Wristpy is a Python library designed for processing and analyzing wrist-worn accelerometer data. 
+Wristpy is a Python library designed for processing and analyzing wrist-worn accelerometer data.
 This tutorial will guide you through the basic steps of using Wristpy to analyze your accelerometer data. Specifically,
 we will cover the following topics through a few examples:
    - running the default processor, analyzing the output data, and visualizing the results.
@@ -91,7 +91,7 @@ Example 2: Loading data and plotting the raw signals
 
 In this example we will go over the built-in functions to directly read the raw accelerometer and light data, and how to quickly visualize this information.
 
-The built in `readers` module can be used to load all the sensor and metadata from one of the support wrist-watches (`.gt3x` or `.bin`), the reader will automatically select the appropriate loading methodology. 
+The built in `readers` module can be used to load all the sensor and metadata from one of the support wrist-watches (`.gt3x` or `.bin`), the reader will automatically select the appropriate loading methodology.
 
 ```python
 from wristpy.io.readers import readers
@@ -195,7 +195,7 @@ plt.legend(['ENMO Epoch1', 'Non-wear'])
 Example 5: Find and filter the sleep windows
 ----------------------------------------------------
 The following script will obtain the sleep window pairs (onset,wakeup):
-  
+
 ```python
 from wristpy.io.readers import readers
 from wristpy.processing import analytics, calibration, metrics

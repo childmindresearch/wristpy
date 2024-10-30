@@ -24,7 +24,7 @@ The package currently supports the following formats:
 | GT3X | Actigraph | wGT3X-BT | ✅ |
 | BIN | GENEActiv | GENEActiv | ✅ |
 
-**Special Note**   
+**Special Note**
     The `idle_sleep_mode` for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this [here](https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained)). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, the authors of this package do not take any steps to impute data during these time gaps and would caution to not use data collected with this mode enabled. Of course, users can make use of the readers within wristpy for their own analysis with this type of data.
 
 ## Processing pipeline implementation
@@ -91,4 +91,3 @@ sleep_windows = results.sleep_windows_epoch
             from wrist- and hip-worn monitors. Medicine and Science in
             Sports and Exercise, 46(9), 1816-1824 (2014).
             https://doi.org/10.1249/mss.0000000000000289
-
