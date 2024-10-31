@@ -245,3 +245,99 @@ def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.
     nonwear_value_array[condition] = 2
 
     return nonwear_value_array
+
+
+def combined_temp_accel_detect_nonwear(
+    acceleration: models.Measurement,
+    temperature: models.Measurement,
+    std_criteria: float = 0.013,
+    temperature_threshold: int = 26,
+) -> models.Measurement:
+    """This function uses the both temperature and acceleration data to detect non-wear.
+
+    The function implements the algorithm described in the Zhou 2014 paper. Briefly,
+    data is chunked into one minute windows. Each windows is classified as "wear" or
+    "non-wear", here denoted by 0 and 1, respectively.
+
+    Args:
+        acceleration: The Measurment instance that contains the calibrated acceleration.
+        temperature: The Measurment instance that contains the temperature data.
+        std_criteria: Threshold criteria for standard deviation.
+        temperature_threshold: The temperature threshold for non-wear detection.
+
+    Returns:
+        A new Measurment instance with the non-wear flag and corresponding timestamps.
+
+    References:
+        Zhou S, Hill RA, Morgan K, et alClassification of accelerometer wear and
+        non-wear events in seconds for monitoring free-living physical activityBMJ
+        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447
+    """
+    logger.debug("Combined temperature and accelereation non-wear detection algorithm.")
+    acceleration_grouped_by_window = _group_acceleration_data_by_time(acceleration, 60)
+    temperature_grouped_by_window = _group_temperature_data_by_time(temperature, 60)
+
+    total_n_short_windows = len(acceleration_grouped_by_window)
+
+    nonwear_value_array = np.zeros(total_n_short_windows)
+
+    for window_n in range(total_n_short_windows):
+        mean_temp = temperature_grouped_by_window["temperature"][window_n].mean()
+        accel_value = (
+            acceleration_grouped_by_window[window_n]
+            .select(
+                pl.col("X", "Y", "Z").map_batches(
+                    lambda df: _compute_nonwear_value_per_axis(
+                        df,
+                        std_criteria,
+                    )
+                )
+            )
+            .sum_horizontal()
+            .to_numpy()
+        )
+        if mean_temp < temperature_threshold and (accel_value == 3):
+            nonwear_value_array[window_n] = 1
+        else:
+            if window_n > 0 and mean_temp < temperature_threshold:
+                mean_temp_previous = temperature_grouped_by_window["temperature"][
+                    window_n - 1
+                ].mean()
+                if mean_temp < mean_temp_previous:
+                    nonwear_value_array[window_n] = 1
+                if mean_temp == mean_temp_previous:
+                    nonwear_value_array[window_n] = nonwear_value_array[window_n - 1]
+
+    return models.Measurement(
+        measurements=nonwear_value_array,
+        time=acceleration_grouped_by_window["time"],
+    )
+
+
+def _group_temperature_data_by_time(
+    temperature: models.Measurement, window_length: int
+) -> pl.DataFrame:
+    """Helper function to group the acceleration data by short windows.
+
+    Args:
+       temperature: The Measurment instance that contains temperature data.
+       window_length: The window size, in seconds.
+
+    Returns:
+        A polars DataFrame with the temperature data grouped by window_length.
+    """
+    temperature_polars_df = pl.DataFrame(
+        {
+            "temperature": temperature.measurements,
+            "time": temperature.time,
+        }
+    )
+    temperature_polars_df = temperature_polars_df.with_columns(
+        pl.col("time").set_sorted()
+    )
+
+    temperature_grouped_by_window_length = temperature_polars_df.group_by_dynamic(
+        index_column="time", every=(str(window_length) + "s")
+    ).agg([pl.all().exclude(["time"])])
+
+    return temperature_grouped_by_window_length
