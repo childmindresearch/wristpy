@@ -251,7 +251,7 @@ def combined_temp_accel_detect_nonwear(
     acceleration: models.Measurement,
     temperature: models.Measurement,
     std_criteria: float = 0.013,
-    temperature_threshold: int = 26,
+    temperature_threshold: float = 26.0,
 ) -> models.Measurement:
     """This function uses the both temperature and acceleration data to detect non-wear.
 
