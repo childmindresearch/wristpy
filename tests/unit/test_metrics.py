@@ -30,6 +30,21 @@ def create_acceleration() -> pl.DataFrame:
     return acceleration_polars_df
 
 
+@pytest.fixture
+def create_temperature() -> pl.DataFrame:
+    """Fixture to create a dummy temperature DataFrame to be used in multiple tests."""
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(1000)]
+    test_time = pl.Series("time", dummy_datetime_list)
+    temperature_polars_df = pl.DataFrame(
+        {
+            "temperature": np.ones(1000),
+            "time": test_time,
+        }
+    )
+    return temperature_polars_df
+
+
 @pytest.mark.parametrize(
     "x,y,z, expected_enmo",
     [
@@ -226,3 +241,54 @@ def test_detect_nonwear(
     assert (
         len(test_result.time) == expected_time_length
     ), f"Expected time to be {expected_time_length}, got: {len(test_result.time)}"
+
+
+@pytest.mark.parametrize("temp_length", [498, 500])
+def test_pre_proc_temp(create_acceleration: pl.DataFrame, temp_length: int) -> None:
+    """Test the pre-process temperature function for time padding."""
+    acceleration_df = create_acceleration
+    acceleration = models.Measurement(
+        measurements=acceleration_df.select(["X", "Y", "Z"]).to_numpy(),
+        time=acceleration_df["time"],
+    )
+
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + timedelta(seconds=2 * i) for i in range(temp_length)
+    ]
+    temp_time = pl.Series("time", dummy_datetime_list).cast(pl.Datetime("ns"))
+    temperature = models.Measurement(
+        measurements=np.ones(len(temp_time), dtype=np.float32), time=temp_time
+    )
+    expected_time_length = len(acceleration.time)
+    expected_end_time = int(acceleration.time[-1].timestamp())
+
+    low_pass_temp = metrics.pre_process_temperature(temperature, acceleration)
+
+    assert len(low_pass_temp["time"]) == expected_time_length
+    assert int(low_pass_temp["time"][-1].timestamp()) == expected_end_time
+    assert np.all(low_pass_temp["temperature"].to_numpy() == 1.0)
+
+
+def test_cta_non_wear(
+    create_acceleration: pl.DataFrame, create_temperature: pl.DataFrame
+) -> None:
+    """Test the cta non wear function."""
+    acceleration_df = create_acceleration
+    acceleration = models.Measurement(
+        measurements=acceleration_df.select(["X", "Y", "Z"]).to_numpy(),
+        time=acceleration_df["time"],
+    )
+    temperature_df = create_temperature
+    temperature = models.Measurement(
+        measurements=temperature_df["temperature"].to_numpy(),
+        time=temperature_df["time"],
+    )
+    expected_time_length = math.ceil(len(acceleration.time) / 60)
+
+    non_wear_array = metrics.combined_temp_accel_detect_nonwear(
+        acceleration, temperature
+    )
+
+    assert len(non_wear_array.time) == expected_time_length
+    assert np.all(non_wear_array.measurements == 1)

@@ -274,47 +274,10 @@ def combined_temp_accel_detect_nonwear(
         Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447
     """
     logger.debug("Combined temperature and accelereation non-wear detection algorithm.")
-    temperature_polars_df = pl.DataFrame(
-        {
-            "time": temperature.time,
-            "temperature": temperature.measurements,
-        }
-    )
-    temperature_polars_df = temperature_polars_df.with_columns(
-        pl.col("time").set_sorted()
-    )
-
-    if acceleration.time[-1] > temperature.time[-1]:
-        new_row = pl.DataFrame(
-            {"time": acceleration.time[-1], "temperature": temperature.measurements[-1]}
-        )
-        new_row = new_row.with_columns(
-            [
-                pl.col("time").cast(pl.Datetime("ns")),
-                pl.col("temperature").cast(pl.Float32),
-            ]
-        )
-
-        temperature_polars_df = temperature_polars_df.vstack(new_row)
-        temperature_polars_df = temperature_polars_df.with_columns(
-            pl.col("time").set_sorted()
-        )
-        upsample_temp = temperature_polars_df.upsample(
-            time_column="time", every="1s", maintain_order=True
-        ).interpolate()
-        upsample_temp = upsample_temp.with_columns(
-            pl.col("temperature").fill_null(strategy="forward")
-        )
-    else:
-        upsample_temp = temperature_polars_df.upsample(
-            time_column="time", every="1s", maintain_order=True
-        ).interpolate()
-
-    low_pass_temp = upsample_temp.rolling(index_column="time", period="120s").agg(
-        [pl.mean("temperature")]
-    )
 
     acceleration_grouped_by_window = _group_acceleration_data_by_time(acceleration, 60)
+    low_pass_temp = pre_process_temperature(temperature, acceleration)
+
     temperature_grouped_by_window = low_pass_temp.group_by_dynamic(
         index_column="time", every="60s"
     ).agg([pl.all().exclude(["time"])])
@@ -354,3 +317,62 @@ def combined_temp_accel_detect_nonwear(
         measurements=nonwear_value_array,
         time=acceleration_grouped_by_window["time"],
     )
+
+
+def pre_process_temperature(
+    temperature: models.Measurement, acceleration: models.Measurement
+) -> pl.DataFrame:
+    """Pre-process temperature data for non-wear detection.
+
+    This function ensures that the temperature and acceleration Measurements end
+    at the same time (due to the inherent sampling rate differences on the device),
+    upsamples the temperature data to 1 second intervals and then low-pass filters
+    the data by applying a 2 minute rolling mean.
+
+    Args:
+        temperature: The Measurment instance that contains the temperature data.
+        acceleration: The Measurment instance that contains the acceleration data.
+
+    Returns:
+        A polars DataFrame with the pre-processed temperature data.
+    """
+    temperature_polars_df = pl.DataFrame(
+        {
+            "time": temperature.time,
+            "temperature": temperature.measurements,
+        }
+    )
+    temperature_polars_df = temperature_polars_df.with_columns(
+        pl.col("time").set_sorted()
+    )
+
+    if acceleration.time[-1] > temperature.time[-1]:
+        new_row = pl.DataFrame(
+            {"time": acceleration.time[-1], "temperature": temperature.measurements[-1]}
+        )
+        new_row = new_row.with_columns(
+            [
+                pl.col("time").cast(pl.Datetime("ns")),
+                pl.col("temperature").cast(pl.Float32),
+            ]
+        )
+
+        temperature_polars_df = temperature_polars_df.vstack(new_row)
+        temperature_polars_df = temperature_polars_df.with_columns(
+            pl.col("time").set_sorted()
+        )
+        upsample_temp = temperature_polars_df.upsample(
+            time_column="time", every="1s", maintain_order=True
+        ).interpolate()
+        upsample_temp = upsample_temp.with_columns(
+            pl.col("temperature").fill_null(strategy="forward")
+        )
+    else:
+        upsample_temp = temperature_polars_df.upsample(
+            time_column="time", every="1s", maintain_order=True
+        ).interpolate()
+
+    low_pass_temp = upsample_temp.rolling(index_column="time", period="120s").agg(
+        [pl.mean("temperature")]
+    )
+    return low_pass_temp
