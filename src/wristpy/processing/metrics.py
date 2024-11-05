@@ -303,15 +303,14 @@ def combined_temp_accel_detect_nonwear(
         )
         if mean_temp < temperature_threshold and (accel_value >= 2):
             nonwear_value_array[window_n] = 1
-        else:
-            if window_n > 0 and mean_temp < temperature_threshold:
-                mean_temp_previous = temperature_grouped_by_window["temperature"][
-                    window_n - 1
-                ].mean()
-                if mean_temp < mean_temp_previous:
-                    nonwear_value_array[window_n] = 1
-                if mean_temp == mean_temp_previous:
-                    nonwear_value_array[window_n] = nonwear_value_array[window_n - 1]
+        elif window_n > 0 and mean_temp < temperature_threshold:
+            mean_temp_previous = temperature_grouped_by_window["temperature"][
+                window_n - 1
+            ].mean()
+            if mean_temp < mean_temp_previous:
+                nonwear_value_array[window_n] = 1
+            elif mean_temp == mean_temp_previous:
+                nonwear_value_array[window_n] = nonwear_value_array[window_n - 1]
 
     return models.Measurement(
         measurements=nonwear_value_array,
