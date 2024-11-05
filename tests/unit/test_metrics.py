@@ -270,8 +270,12 @@ def test_pre_proc_temp(create_acceleration: pl.DataFrame, temp_length: int) -> N
     assert np.all(low_pass_temp["temperature"].to_numpy() == 1.0)
 
 
+@pytest.mark.parametrize("std_criteria, expected_result", [(0, 0), (0.013, 1)])
 def test_cta_non_wear(
-    create_acceleration: pl.DataFrame, create_temperature: pl.DataFrame
+    create_acceleration: pl.DataFrame,
+    create_temperature: pl.DataFrame,
+    std_criteria: float,
+    expected_result: int,
 ) -> None:
     """Test the cta non wear function."""
     acceleration_df = create_acceleration
@@ -287,8 +291,8 @@ def test_cta_non_wear(
     expected_time_length = math.ceil(len(acceleration.time) / 60)
 
     non_wear_array = metrics.combined_temp_accel_detect_nonwear(
-        acceleration, temperature
+        acceleration, temperature, std_criteria=std_criteria
     )
 
     assert len(non_wear_array.time) == expected_time_length
-    assert np.all(non_wear_array.measurements == 1)
+    assert np.all(non_wear_array.measurements == expected_result)
