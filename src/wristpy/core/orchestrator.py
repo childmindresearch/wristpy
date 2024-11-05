@@ -1,6 +1,7 @@
 """Python based runner."""
 
 import datetime
+import itertools
 import pathlib
 from typing import List, Literal, Optional, Tuple, Union
 
@@ -151,6 +152,55 @@ def format_nonwear_data(
 
 
 def run(
+    input: Union[pathlib.Path, str],
+    output: Optional[Union[pathlib.Path, str]] = None,
+    thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
+    calibrator: Union[
+        None,
+        Literal["ggir", "gradient"],
+    ] = "gradient",
+    epoch_length: Union[int, None] = 5,
+    verbosity: int = 30,
+    output_dtype: Literal[".csv", ".parquet"] = ".csv",
+) -> Results:
+    """Runs main processing steps for wristpy as single files, or dirs."""
+    input = pathlib.Path(input)
+    if input.is_file():
+        return run_file(
+            input=input,
+            output=output,
+            thresholds=thresholds,
+            calibrator=calibrator,
+            epoch_length=epoch_length,
+            verbosity=verbosity,
+        )
+    elif input.is_dir():
+        if not output.is_dir():
+            raise ValueError("Directory: %s is not a valid directory", output)
+
+        file_names = sorted(
+            [
+                file
+                for file in itertools.chain(input.glob("*.gt3x"), input.glob("*.bin"))
+            ]
+        )
+
+        for file in file_names:
+            try:
+                output_file = output / pathlib.Path(file.stem).with_suffix(output_dtype)
+                return run_file(
+                    input=input / file,
+                    output=output_file,
+                    thresholds=thresholds,
+                    calibrator=calibrator,
+                    epoch_length=epoch_length,
+                    verbosity=verbosity,
+                )
+            except Exception as e:
+                logger.error("Did not run file: %s, Error: %s", file, e)
+
+
+def run_file(
     input: Union[pathlib.Path, str],
     output: Optional[Union[pathlib.Path, str]] = None,
     thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
