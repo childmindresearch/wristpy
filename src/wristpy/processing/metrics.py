@@ -301,7 +301,7 @@ def combined_temp_accel_detect_nonwear(
             .sum_horizontal()
             .to_numpy()
         )
-        if mean_temp < temperature_threshold and (accel_value == 3):
+        if mean_temp < temperature_threshold and (accel_value >= 2):
             nonwear_value_array[window_n] = 1
         else:
             if window_n > 0 and mean_temp < temperature_threshold:
