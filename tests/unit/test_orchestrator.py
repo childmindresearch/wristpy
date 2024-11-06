@@ -6,6 +6,7 @@ import pathlib
 import numpy as np
 import polars as pl
 import pytest
+import pytest_mock
 
 from wristpy.core import exceptions, models, orchestrator
 from wristpy.processing import analytics
@@ -115,3 +116,21 @@ def test_validate_output_invalid_directory() -> None:
         orchestrator.Results.validate_output(
             pathlib.Path("road/to/nowhere/good_file.csv")
         )
+
+
+def test_run_single_file(
+    mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
+) -> None:
+    """Test run function when pointed at a file."""
+
+
+def test_run_dir(
+    mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
+) -> None:
+    """Test run function when pointed at a directory."""
+
+
+def test_run_bad_dir(
+    mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
+) -> None:
+    """Test run function when input is a directory but output is invalid."""
