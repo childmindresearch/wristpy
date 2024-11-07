@@ -23,6 +23,12 @@ jobs:
       with:
         python-version: ${{ matrix.python_version }}
         cache: pip
+
+    - name: Install dependencies on macOS
+      if: runner.os == 'macOS'
+      run: |
+        brew install libomp
+
     - name: Install dependencies
       run: |
         poetry env use python
