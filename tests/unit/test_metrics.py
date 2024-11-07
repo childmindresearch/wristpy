@@ -263,7 +263,7 @@ def test_pre_proc_temp(create_acceleration: pl.DataFrame, temp_length: int) -> N
     expected_time_length = len(acceleration.time)
     expected_end_time = int(acceleration.time[-1].timestamp())
 
-    low_pass_temp = metrics.pre_process_temperature(temperature, acceleration)
+    low_pass_temp = metrics._pre_process_temperature(temperature, acceleration)
 
     assert len(low_pass_temp["time"]) == expected_time_length
     assert int(low_pass_temp["time"][-1].timestamp()) == expected_end_time
