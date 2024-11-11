@@ -2,7 +2,7 @@
 
 import numpy as np
 import polars as pl
-from scipy.interpolate import interp1d
+from scipy import interpolate
 from skdh.preprocessing import DETACH
 
 from wristpy.core import config, models
@@ -311,10 +311,8 @@ def combined_temp_accel_detect_nonwear(
             mean_temp_previous = temperature_grouped_by_window["temperature"][
                 window_n - 1
             ].mean()
-            if mean_temp < mean_temp_previous:
+            if mean_temp <= mean_temp_previous:
                 nonwear_value_array[window_n] = 1
-            elif mean_temp == mean_temp_previous:
-                nonwear_value_array[window_n] = nonwear_value_array[window_n - 1]
 
     return models.Measurement(
         measurements=nonwear_value_array,
@@ -351,7 +349,7 @@ def implement_DETACH_nonwear(
         """Helper function to upsample the temperature to match acceleration data."""
         x_temperature = np.linspace(0, 1, len(temperature))
         x_acceleration = np.linspace(0, 1, len(acceleration))
-        interpolated_temp = interp1d(x_temperature, temperature)
+        interpolated_temp = interpolate.interp1d(x_temperature, temperature)
         return interpolated_temp(x_acceleration)
 
     logger.debug("Running scikit DETACH algorithm.")
