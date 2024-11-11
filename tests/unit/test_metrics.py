@@ -38,7 +38,7 @@ def create_temperature() -> pl.DataFrame:
     test_time = pl.Series("time", dummy_datetime_list)
     temperature_polars_df = pl.DataFrame(
         {
-            "temperature": np.ones(1000),
+            "temperature": np.linspace(1.0, 25.0, 1000),
             "time": test_time,
         }
     )
