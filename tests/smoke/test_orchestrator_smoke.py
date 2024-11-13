@@ -1,5 +1,6 @@
 """Tests the main workflow of wristpy orchestrator."""
 
+import logging
 import pathlib
 
 import pytest
@@ -11,12 +12,16 @@ from wristpy.core import models, orchestrator
     "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
 )
 def test_orchestrator_happy_path(
-    file_name: pathlib.Path, tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path
+    file_name: pathlib.Path,
+    tmp_path: pathlib.Path,
+    sample_data_gt3x: pathlib.Path,
 ) -> None:
     """Happy path for orchestrator."""
-    results = orchestrator.run(input=sample_data_gt3x, output=tmp_path / file_name)
+    output_path = tmp_path / file_name
 
-    assert (tmp_path / file_name).exists()
+    results = orchestrator.run_file(input=sample_data_gt3x, output=output_path)
+
+    assert output_path.exists()
     assert isinstance(results, orchestrator.Results)
     assert isinstance(results.enmo, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
@@ -26,14 +31,17 @@ def test_orchestrator_happy_path(
 
 
 def test_orchestrator_different_epoch(
-    tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path
+    tmp_path: pathlib.Path,
+    sample_data_gt3x: pathlib.Path,
 ) -> None:
     """Test using none default epoch."""
-    results = orchestrator.run(
-        input=sample_data_gt3x, output=tmp_path / "good_file.csv", epoch_length=None
+    output_path = tmp_path / "good_file.csv"
+
+    results = orchestrator.run_file(
+        input=sample_data_gt3x, output=output_path, epoch_length=None
     )
 
-    assert (tmp_path / "good_file.csv").exists()
+    assert output_path.exists()
     assert isinstance(results, orchestrator.Results)
     assert isinstance(results.enmo, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)

@@ -1,6 +1,7 @@
 """Test the orchestrator.py module."""
 
 import datetime
+import logging
 import pathlib
 
 import numpy as np
@@ -10,6 +11,11 @@ import pytest_mock
 
 from wristpy.core import exceptions, models, orchestrator
 from wristpy.processing import analytics
+
+DEFAULT_THRESHOLDS = (0.0563, 0.1916, 0.6958)
+DEFAULT_CALIBRATOR = "gradient"
+DEFAULT_EPOCH_LENGTH = 5
+DEFAULT_VERBOSITY = 30
 
 
 @pytest.fixture
@@ -89,7 +95,7 @@ def test_bad_calibrator(sample_data_gt3x: pathlib.Path) -> None:
         match="Invalid calibrator: Ggir. Choose: 'ggir', 'gradient'. "
         "Enter None if no calibration is desired.",
     ):
-        orchestrator.run(input=sample_data_gt3x, calibrator="Ggir")  # type: ignore[arg-type]
+        orchestrator.run_file(input=sample_data_gt3x, calibrator="Ggir")  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize(
@@ -118,15 +124,54 @@ def test_validate_output_invalid_directory() -> None:
         )
 
 
-def test_run_single_file(
-    mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
+def mock_test_run_single_file(
+    mocker: pytest_mock.MockerFixture,
+    sample_data_gt3x: pathlib.Path,
+    tmp_path: pathlib.Path,
 ) -> None:
     """Test run function when pointed at a file."""
+    output_file_path = tmp_path / pathlib.Path("file_name.csv")
+    mock_results = mocker.Mock(spec=orchestrator.Results)
+    mock_run_file = mocker.patch.object(
+        orchestrator, "run_file", return_value=mock_results
+    )
+
+    results = orchestrator.run(
+        input=sample_data_gt3x,
+        output=output_file_path,
+        thresholds=DEFAULT_THRESHOLDS,
+        calibrator=DEFAULT_CALIBRATOR,
+        epoch_length=DEFAULT_EPOCH_LENGTH,
+        verbosity=DEFAULT_VERBOSITY,
+    )
+
+    mock_run_file.assert_called_once_with(
+        input=sample_data_gt3x,
+        output=output_file_path,
+        thresholds=DEFAULT_THRESHOLDS,
+        calibrator=DEFAULT_CALIBRATOR,
+        epoch_length=DEFAULT_EPOCH_LENGTH,
+        verbosity=DEFAULT_VERBOSITY,
+    )
+    assert isinstance(results, orchestrator.Results)
 
 
-def test_run_dir(
-    mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
+def test_run_single_file(
+    mocker: pytest_mock.MockerFixture,
+    sample_data_gt3x: pathlib.Path,
+    tmp_path: pathlib.Path,
 ) -> None:
+    """Testing without mock."""
+    output_file_path = pathlib.Path(tmp_path / pathlib.Path("file_name.csv"))
+    results = orchestrator.run(
+        input=sample_data_gt3x, output=output_file_path, verbosity=20
+    )
+
+    assert output_file_path.exists()
+    assert isinstance(results, orchestrator.Results)
+
+
+def test_run_dir(tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path) -> None:
     """Test run function when pointed at a directory."""
 
 

@@ -2,8 +2,9 @@
 
 import datetime
 import itertools
+import logging
 import pathlib
-from typing import List, Literal, Optional, Tuple, Union
+from typing import Generator, List, Literal, Optional, Tuple, Union
 
 import numpy as np
 import polars as pl
@@ -160,12 +161,17 @@ def run(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
-    verbosity: int = 30,
+    verbosity: int = logging.WARNING,
     output_dtype: Literal[".csv", ".parquet"] = ".csv",
-) -> Results:
+) -> Optional[Union[Results, Generator[Results, None, None]]]:
     """Runs main processing steps for wristpy as single files, or dirs."""
+    logger.setLevel(verbosity)
+
     input = pathlib.Path(input)
+
     if input.is_file():
+        logger.debug(f"Input is file, forwarding to run_file with output={output}")
+
         return run_file(
             input=input,
             output=output,
@@ -174,30 +180,41 @@ def run(
             epoch_length=epoch_length,
             verbosity=verbosity,
         )
-    elif input.is_dir():
+    if output is not None:
+        output = pathlib.Path(output)
         if not output.is_dir():
-            raise ValueError("Directory: %s is not a valid directory", output)
+            raise ValueError(f"Directory {output} is not a valid directory.")
 
-        file_names = sorted(
-            [
-                file
-                for file in itertools.chain(input.glob("*.gt3x"), input.glob("*.bin"))
-            ]
+    file_names = [
+        file for file in itertools.chain(input.glob("*.gt3x"), input.glob("*.bin"))
+    ]
+
+    if not file_names:
+        raise ValueError(f"Directory {input} contains no .gt3x or .bin files.")
+
+    for file in file_names:
+        output_file_path = (
+            output / pathlib.Path(file.stem).with_suffix(output_dtype)
+            if output
+            else None
         )
-
-        for file in file_names:
-            try:
-                output_file = output / pathlib.Path(file.stem).with_suffix(output_dtype)
-                return run_file(
-                    input=input / file,
-                    output=output_file,
-                    thresholds=thresholds,
-                    calibrator=calibrator,
-                    epoch_length=epoch_length,
-                    verbosity=verbosity,
-                )
-            except Exception as e:
-                logger.error("Did not run file: %s, Error: %s", file, e)
+        logger.debug(
+            "Processing directory: %s, current file: %s, save path: %s",
+            input,
+            file,
+            output_file_path,
+        )
+        try:
+            yield run_file(
+                input=input / file,
+                output=output_file_path,
+                thresholds=thresholds,
+                calibrator=calibrator,
+                epoch_length=epoch_length,
+                verbosity=verbosity,
+            )
+        except Exception as e:
+            logger.error("Did not run file: %s, Error: %s", file, e)
 
 
 def run_file(
@@ -209,7 +226,7 @@ def run_file(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
-    verbosity: int = 30,
+    verbosity: int = logging.WARNING,
 ) -> Results:
     """Runs main processing steps for wristpy and returns data for analysis.
 
