@@ -139,7 +139,7 @@ def test_run_dir(tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path) -> None
     results = orchestrator.run(input=input_dir, output=tmp_path)
 
     assert set(tmp_path.glob("*.csv")) == expected_files
-    assert isinstance(results, models.BatchedResults)
+    assert isinstance(results, models.ResultsDictionary)
 
 
 def test_run_bad_dir(

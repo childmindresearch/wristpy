@@ -196,7 +196,7 @@ class Results(pydantic.BaseModel):
             )
 
 
-class BatchedResults(pydantic.BaseModel):
+class ResultsDictionary(pydantic.BaseModel):
     """Data class containing dictionary like collection of Results."""
 
     results: dict[str, Results]
