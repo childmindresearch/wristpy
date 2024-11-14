@@ -101,7 +101,7 @@ def run(
     epoch_length: Union[int, None] = 5,
     verbosity: int = logging.WARNING,
     output_dtype: Literal[".csv", ".parquet"] = ".csv",
-) -> Optional[Union[models.Results, models.BatchedResults]]:
+) -> Optional[Union[models.Results, models.ResultsDictionary]]:
     """Runs main processing steps for wristpy as single files, or dirs."""
     logger.setLevel(verbosity)
 
@@ -130,7 +130,7 @@ def run(
     if not file_names:
         raise ValueError(f"Directory {input} contains no .gt3x or .bin files.")
 
-    batched_results = models.BatchedResults(results={})
+    results_dict = models.ResultsDictionary(results={})
     for file in file_names:
         output_file_path = (
             output / pathlib.Path(file.stem).with_suffix(output_dtype)
@@ -152,11 +152,11 @@ def run(
                 epoch_length=epoch_length,
                 verbosity=verbosity,
             )
-            batched_results.add_result(file=file.stem, result=result)
+            results_dict.add_result(file=file.stem, result=result)
         except Exception as e:
             logger.error("Did not run file: %s, Error: %s", file, e)
 
-    return batched_results
+    return results_dict
 
 
 def run_file(
