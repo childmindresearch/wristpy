@@ -3,7 +3,7 @@
 import argparse
 import logging
 import pathlib
-from typing import Generator, List, Optional, Union
+from typing import List, Optional
 
 from wristpy.core import config, orchestrator
 
@@ -122,7 +122,7 @@ def main(
 
     logger.debug("Running wristpy. arguments given: %s", arguments)
 
-    results = orchestrator.run(
+    orchestrator.run(
         input=arguments.input,
         output=arguments.output,
         thresholds=tuple(arguments.thresholds),  # type: ignore
@@ -130,7 +130,3 @@ def main(
         epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
         verbosity=log_level,
     )
-
-    if isinstance(results, Generator):
-        for _ in results:
-            pass

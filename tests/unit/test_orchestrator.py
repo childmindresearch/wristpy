@@ -1,7 +1,6 @@
 """Test the orchestrator.py module."""
 
 import datetime
-import logging
 import pathlib
 
 import numpy as np
@@ -11,11 +10,6 @@ import pytest_mock
 
 from wristpy.core import exceptions, models, orchestrator
 from wristpy.processing import analytics
-
-DEFAULT_THRESHOLDS = (0.0563, 0.1916, 0.6958)
-DEFAULT_CALIBRATOR = "gradient"
-DEFAULT_EPOCH_LENGTH = 5
-DEFAULT_VERBOSITY = 30
 
 
 @pytest.fixture
