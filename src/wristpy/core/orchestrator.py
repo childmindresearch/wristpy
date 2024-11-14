@@ -121,7 +121,7 @@ def run(
     if output is not None:
         output = pathlib.Path(output)
         if not output.is_dir():
-            raise ValueError(f"Output:{output} is not a directory.")
+            raise ValueError("Output is not a valid directory.")
 
     file_names = [
         file for file in itertools.chain(input.glob("*.gt3x"), input.glob("*.bin"))

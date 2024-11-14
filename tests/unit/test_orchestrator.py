@@ -131,14 +131,14 @@ def test_run_single_file(
 def test_run_dir(tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path) -> None:
     """Test run function when pointed at a directory."""
     input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
-    expected_files = [
+    expected_files = {
         tmp_path / "example_actigraph.csv",
         tmp_path / "example_geneactiv.csv",
-    ]
+    }
 
     results = orchestrator.run(input=input_dir, output=tmp_path)
 
-    assert list(tmp_path.glob("*.csv")) == expected_files
+    assert set(tmp_path.glob("*.csv")) == expected_files
     assert isinstance(results, models.BatchedResults)
 
 
@@ -149,7 +149,5 @@ def test_run_bad_dir(
     input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
     bad_output_dir = sample_data_gt3x
 
-    with pytest.raises(
-        ValueError, match=f"Output:{bad_output_dir} is not a directory."
-    ):
+    with pytest.raises(ValueError, match="Output is not a valid directory."):
         orchestrator.run(input=input_dir, output=bad_output_dir)
