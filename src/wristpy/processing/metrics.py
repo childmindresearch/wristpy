@@ -3,7 +3,7 @@
 import numpy as np
 import polars as pl
 from scipy import interpolate
-from skdh.preprocessing import DETACH
+from skdh.preprocessing import wear_detection
 
 from wristpy.core import config, models
 from wristpy.io.readers import readers
@@ -358,7 +358,7 @@ def implement_DETACH_nonwear(
         temperature.measurements, acceleration.measurements
     )
 
-    detach_class = DETACH(sd_thresh=std_criteria)
+    detach_class = wear_detection.DETACH(sd_thresh=std_criteria)
     nonwear_array = np.ones(len(time), dtype=np.float32)
     detach_wear = detach_class.predict(
         time=time / 1e9, accel=acceleration.measurements, temperature=upsample_temp
