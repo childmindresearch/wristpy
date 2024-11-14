@@ -19,7 +19,7 @@ DEFAULT_VERBOSITY = 30
 
 
 @pytest.fixture
-def dummy_results() -> orchestrator.Results:
+def dummy_results() -> models.Results:
     """Makes a results object for the purpose of testing."""
     dummy_date = datetime.datetime(2024, 5, 2)
     dummy_measure = models.Measurement(
@@ -28,7 +28,7 @@ def dummy_results() -> orchestrator.Results:
             [dummy_date + datetime.timedelta(seconds=i) for i in range(100)]
         ),
     )
-    dummy_results = orchestrator.Results(
+    dummy_results = models.Results(
         enmo=dummy_measure,
         anglez=dummy_measure,
         physical_activity_levels=dummy_measure,
@@ -102,7 +102,7 @@ def test_bad_calibrator(sample_data_gt3x: pathlib.Path) -> None:
     "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
 )
 def test_save_results(
-    dummy_results: orchestrator.Results, file_name: pathlib.Path, tmp_path: pathlib.Path
+    dummy_results: models.Results, file_name: pathlib.Path, tmp_path: pathlib.Path
 ) -> None:
     """Test saving."""
     dummy_results.save_results(tmp_path / file_name)
@@ -113,69 +113,49 @@ def test_save_results(
 def test_validate_output_invalid_file_type(tmp_path: pathlib.Path) -> None:
     """Test when a bad extention is given."""
     with pytest.raises(exceptions.InvalidFileTypeError):
-        orchestrator.Results.validate_output(tmp_path / "bad_file.oops")
+        models.Results.validate_output(tmp_path / "bad_file.oops")
 
 
 def test_validate_output_invalid_directory() -> None:
     """Test when a bad extention is given."""
     with pytest.raises(exceptions.DirectoryNotFoundError):
-        orchestrator.Results.validate_output(
-            pathlib.Path("road/to/nowhere/good_file.csv")
-        )
-
-
-def mock_test_run_single_file(
-    mocker: pytest_mock.MockerFixture,
-    sample_data_gt3x: pathlib.Path,
-    tmp_path: pathlib.Path,
-) -> None:
-    """Test run function when pointed at a file."""
-    output_file_path = tmp_path / pathlib.Path("file_name.csv")
-    mock_results = mocker.Mock(spec=orchestrator.Results)
-    mock_run_file = mocker.patch.object(
-        orchestrator, "run_file", return_value=mock_results
-    )
-
-    results = orchestrator.run(
-        input=sample_data_gt3x,
-        output=output_file_path,
-        thresholds=DEFAULT_THRESHOLDS,
-        calibrator=DEFAULT_CALIBRATOR,
-        epoch_length=DEFAULT_EPOCH_LENGTH,
-        verbosity=DEFAULT_VERBOSITY,
-    )
-
-    mock_run_file.assert_called_once_with(
-        input=sample_data_gt3x,
-        output=output_file_path,
-        thresholds=DEFAULT_THRESHOLDS,
-        calibrator=DEFAULT_CALIBRATOR,
-        epoch_length=DEFAULT_EPOCH_LENGTH,
-        verbosity=DEFAULT_VERBOSITY,
-    )
-    assert isinstance(results, orchestrator.Results)
+        models.Results.validate_output(pathlib.Path("road/to/nowhere/good_file.csv"))
 
 
 def test_run_single_file(
-    mocker: pytest_mock.MockerFixture,
     sample_data_gt3x: pathlib.Path,
     tmp_path: pathlib.Path,
 ) -> None:
-    """Testing without mock."""
-    output_file_path = pathlib.Path(tmp_path / pathlib.Path("file_name.csv"))
-    results = orchestrator.run(
-        input=sample_data_gt3x, output=output_file_path, verbosity=20
-    )
+    """Testing running a single file."""
+    output_file_path = tmp_path / "file_name.csv"
+    results = orchestrator.run(input=sample_data_gt3x, output=output_file_path)
 
     assert output_file_path.exists()
-    assert isinstance(results, orchestrator.Results)
+    assert isinstance(results, models.Results)
 
 
 def test_run_dir(tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path) -> None:
     """Test run function when pointed at a directory."""
+    input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
+    expected_files = [
+        tmp_path / "example_actigraph.csv",
+        tmp_path / "example_geneactiv.csv",
+    ]
+
+    results = orchestrator.run(input=input_dir, output=tmp_path)
+
+    assert list(tmp_path.glob("*.csv")) == expected_files
+    assert isinstance(results, models.BatchedResults)
 
 
 def test_run_bad_dir(
     mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
 ) -> None:
     """Test run function when input is a directory but output is invalid."""
+    input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
+    bad_output_dir = sample_data_gt3x
+
+    with pytest.raises(
+        ValueError, match=f"Output:{bad_output_dir} is not a directory."
+    ):
+        orchestrator.run(input=input_dir, output=bad_output_dir)

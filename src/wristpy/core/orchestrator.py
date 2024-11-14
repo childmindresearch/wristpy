@@ -4,11 +4,10 @@ import datetime
 import itertools
 import logging
 import pathlib
-from typing import Generator, List, Literal, Optional, Tuple, Union
+from typing import List, Literal, Optional, Tuple, Union
 
 import numpy as np
 import polars as pl
-import pydantic
 
 from wristpy.core import computations, config, exceptions, models
 from wristpy.io.readers import readers
@@ -17,67 +16,6 @@ from wristpy.processing import analytics, calibration, metrics
 logger = config.get_logger()
 
 VALID_FILE_TYPES = (".csv", ".parquet")
-
-
-class Results(pydantic.BaseModel):
-    """dataclass containing results of orchestrator.run()."""
-
-    enmo: models.Measurement
-    anglez: models.Measurement
-    physical_activity_levels: models.Measurement
-    nonwear_epoch: models.Measurement
-    sleep_windows_epoch: models.Measurement
-
-    def save_results(self, output: pathlib.Path) -> None:
-        """Convert to polars and save the dataframe as a csv or parquet file.
-
-        Args:
-            output: The path and file name of the data to be saved. as either a csv or
-                parquet files.
-
-        """
-        logger.debug("Saving results.")
-        self.validate_output(output=output)
-
-        results_dataframe = pl.DataFrame(
-            {"time": self.enmo.time}
-            | {name: value.measurements for name, value in self}
-        )
-
-        if output.suffix == ".csv":
-            results_dataframe.write_csv(output, separator=",")
-        elif output.suffix == ".parquet":
-            results_dataframe.write_parquet(output)
-        else:
-            raise exceptions.InvalidFileTypeError(
-                f"File type must be one of {VALID_FILE_TYPES}"
-            )
-
-        logger.debug("results saved in: %s", output)
-
-    @classmethod
-    def validate_output(cls, output: pathlib.Path) -> None:
-        """Validates that the output path exists and is a valid format.
-
-        Args:
-            output: the name of the file to be saved, and the directory it will
-            be saved in. Must be a .csv or .parquet file.
-
-        Raises:
-            InvalidFileTypeError:If the output file path ends with any extension other
-                    than csv or parquet.
-            DirectoryNotFoundError: If the directory for the file to be saved in does
-                not exist.
-        """
-        if not output.parent.exists():
-            raise exceptions.DirectoryNotFoundError(
-                f"The directory:{output.parent} does not exist."
-            )
-        if output.suffix not in VALID_FILE_TYPES:
-            raise exceptions.InvalidFileTypeError(
-                f"The extension: {output.suffix} is not supported."
-                "Please save the file as .csv or .parquet",
-            )
 
 
 def format_sleep_data(
@@ -163,7 +101,7 @@ def run(
     epoch_length: Union[int, None] = 5,
     verbosity: int = logging.WARNING,
     output_dtype: Literal[".csv", ".parquet"] = ".csv",
-) -> Optional[Union[Results, Generator[Results, None, None]]]:
+) -> Optional[Union[models.Results, models.BatchedResults]]:
     """Runs main processing steps for wristpy as single files, or dirs."""
     logger.setLevel(verbosity)
 
@@ -183,7 +121,7 @@ def run(
     if output is not None:
         output = pathlib.Path(output)
         if not output.is_dir():
-            raise ValueError(f"Directory {output} is not a valid directory.")
+            raise ValueError(f"Output:{output} is not a directory.")
 
     file_names = [
         file for file in itertools.chain(input.glob("*.gt3x"), input.glob("*.bin"))
@@ -192,6 +130,7 @@ def run(
     if not file_names:
         raise ValueError(f"Directory {input} contains no .gt3x or .bin files.")
 
+    batched_results = models.BatchedResults(results={})
     for file in file_names:
         output_file_path = (
             output / pathlib.Path(file.stem).with_suffix(output_dtype)
@@ -205,7 +144,7 @@ def run(
             output_file_path,
         )
         try:
-            yield run_file(
+            result = run_file(
                 input=input / file,
                 output=output_file_path,
                 thresholds=thresholds,
@@ -213,8 +152,11 @@ def run(
                 epoch_length=epoch_length,
                 verbosity=verbosity,
             )
+            batched_results.add_result(file=file.stem, result=result)
         except Exception as e:
             logger.error("Did not run file: %s, Error: %s", file, e)
+
+    return batched_results
 
 
 def run_file(
@@ -227,7 +169,7 @@ def run_file(
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
     verbosity: int = logging.WARNING,
-) -> Results:
+) -> models.Results:
     """Runs main processing steps for wristpy and returns data for analysis.
 
     The run() function will provide the user with enmo, anglez, physical activity levels
@@ -259,7 +201,7 @@ def run_file(
     input = pathlib.Path(input)
     if output is not None:
         output = pathlib.Path(output)
-        Results.validate_output(output=output)
+        models.Results.validate_output(output=output)
 
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
         msg = (
@@ -328,7 +270,7 @@ def run_file(
         time=enmo.time,
     )
 
-    results = Results(
+    results = models.Results(
         enmo=enmo,
         anglez=anglez,
         physical_activity_levels=physical_activity_levels,

@@ -1,6 +1,5 @@
 """Tests the main workflow of wristpy orchestrator."""
 
-import logging
 import pathlib
 
 import pytest
@@ -22,7 +21,7 @@ def test_orchestrator_happy_path(
     results = orchestrator.run_file(input=sample_data_gt3x, output=output_path)
 
     assert output_path.exists()
-    assert isinstance(results, orchestrator.Results)
+    assert isinstance(results, models.Results)
     assert isinstance(results.enmo, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
     assert isinstance(results.nonwear_epoch, models.Measurement)
@@ -42,7 +41,7 @@ def test_orchestrator_different_epoch(
     )
 
     assert output_path.exists()
-    assert isinstance(results, orchestrator.Results)
+    assert isinstance(results, models.Results)
     assert isinstance(results.enmo, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
     assert isinstance(results.nonwear_epoch, models.Measurement)
