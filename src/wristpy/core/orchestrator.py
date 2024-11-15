@@ -4,7 +4,7 @@ import datetime
 import itertools
 import logging
 import pathlib
-from typing import List, Literal, Optional, Tuple, Union
+from typing import Dict, List, Literal, Optional, Tuple, Union
 
 import numpy as np
 import polars as pl
@@ -101,8 +101,8 @@ def run(
     epoch_length: Union[int, None] = 5,
     verbosity: int = logging.WARNING,
     output_dtype: Literal[".csv", ".parquet"] = ".csv",
-) -> Optional[Union[models.Results, models.ResultsDictionary]]:
-    """Runs main processing steps for wristpy as single files, or dirs."""
+) -> Optional[Union[models.Results, Dict[str, models.Results]]]:
+    """Runs main processing steps for wristpy as single files, or directories."""
     logger.setLevel(verbosity)
 
     input = pathlib.Path(input)
@@ -130,7 +130,7 @@ def run(
     if not file_names:
         raise ValueError(f"Directory {input} contains no .gt3x or .bin files.")
 
-    results_dict = models.ResultsDictionary(results={})
+    results_dict = {}
     for file in file_names:
         output_file_path = (
             output / pathlib.Path(file.stem).with_suffix(output_dtype)
@@ -152,7 +152,7 @@ def run(
                 epoch_length=epoch_length,
                 verbosity=verbosity,
             )
-            results_dict.add_result(file=file.stem, result=result)
+            results_dict[file.stem] = result
         except Exception as e:
             logger.error("Did not run file: %s, Error: %s", file, e)
 

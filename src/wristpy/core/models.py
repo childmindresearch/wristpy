@@ -194,17 +194,3 @@ class Results(pydantic.BaseModel):
                 f"The extension: {output.suffix} is not supported."
                 "Please save the file as .csv or .parquet",
             )
-
-
-class ResultsDictionary(pydantic.BaseModel):
-    """Data class containing dictionary like collection of Results."""
-
-    results: dict[str, Results]
-
-    def add_result(self, file: str, result: Results) -> None:
-        """Add a new result to the results dictionary."""
-        self.results[file] = result
-
-    def get_result(self, file: str) -> Optional[Results]:
-        """Get a result object by it's file name."""
-        return self.results.get(file)
