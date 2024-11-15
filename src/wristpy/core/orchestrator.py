@@ -3,6 +3,7 @@
 import datetime
 import itertools
 import logging
+import os
 import pathlib
 from typing import Dict, List, Literal, Optional, Tuple, Union
 
@@ -102,7 +103,45 @@ def run(
     verbosity: int = logging.WARNING,
     output_dtype: Literal[".csv", ".parquet"] = ".csv",
 ) -> Optional[Union[models.Results, Dict[str, models.Results]]]:
-    """Runs main processing steps for wristpy as single files, or directories."""
+    """Runs main processing steps for wristpy on single files, or directories.
+
+    The run() function will execute the run_file() function on individual files, or on
+    entire directories. When the input path points to a file, the name of the save file
+    will be taken from the given output path (if any). When the input path points to a
+    directory the output path must be a valid directory as well. Output file names will
+    be derived from original file names in the case of directory processing.
+
+
+    Args:
+        input: Path to the input file or directory of files to be read. Currently
+            supports .bin and .gt3x
+        output: Path to directory data will be saved to. If processing a single file the
+            path should end in the save file name in either .csv or .parquet formats.
+        thresholds: The cut points for the light, moderate, and vigorous thresholds,
+            given in that order. Values must be asscending, unique, and greater than 0.
+            Default values are optimized for subjects ages 7-11 [1].
+        calibrator: The calibrator to be used on the input data.
+        epoch_length: The temporal resolution in seconds, the data will be down sampled
+            to. If None is given no down sampling is preformed.
+        verbosity: The logging level for the logger.
+        output_dtype: specifies the data format for the save files. Only relevant when
+            processing entire directories, otherwise data type will
+            be inferred from the given file name.
+
+    Returns:
+        All calculated data in a save ready format as a Results object or as a
+        dictionary of Results objects.
+
+    Raises:
+        ValueError: If processing a directory and the output given is not a directory.
+        ValueError: If the input directory contained no files of a valid file type.
+
+
+    References:
+        [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
+        output from wrist- and hip-worn monitors. Medicine and Science in Sports and
+        Exercise, 46(9), 1816-1824.
+    """
     logger.setLevel(verbosity)
 
     input = pathlib.Path(input)
@@ -172,8 +211,8 @@ def run_file(
 ) -> models.Results:
     """Runs main processing steps for wristpy and returns data for analysis.
 
-    The run() function will provide the user with enmo, anglez, physical activity levels
-    sleep detection and nonwear data. All measures will be in the same temporal
+    The run_file() function will provide the user with enmo, anglez, physical activity
+    levels sleep detection and nonwear data. All measures will be in the same temporal
     resolution. Users may choose from 'ggir' and 'gradient' calibration methods, or
     enter None to proceed without calibration.
 
@@ -282,7 +321,8 @@ def run_file(
             results.save_results(output=output)
         except (
             exceptions.InvalidFileTypeError,
-            exceptions.DirectoryNotFoundError,
+            PermissionError,
+            FileExistsError,
         ) as exc_info:
             # Allowed to pass to recover in Jupyter Notebook scenarios.
             logger.error(

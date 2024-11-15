@@ -177,18 +177,14 @@ class Results(pydantic.BaseModel):
 
         Args:
             output: the name of the file to be saved, and the directory it will
-            be saved in. Must be a .csv or .parquet file.
+                be saved in. Must be a .csv or .parquet file.
 
         Raises:
             InvalidFileTypeError:If the output file path ends with any extension other
                     than csv or parquet.
-            DirectoryNotFoundError: If the directory for the file to be saved in does
-                not exist.
         """
-        if not output.parent.exists():
-            raise exceptions.DirectoryNotFoundError(
-                f"The directory:{output.parent} does not exist."
-            )
+        output.parent.mkdir(parents=True, exist_ok=True)
+
         if output.suffix not in VALID_FILE_TYPES:
             raise exceptions.InvalidFileTypeError(
                 f"The extension: {output.suffix} is not supported."

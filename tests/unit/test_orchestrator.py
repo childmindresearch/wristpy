@@ -110,12 +110,6 @@ def test_validate_output_invalid_file_type(tmp_path: pathlib.Path) -> None:
         models.Results.validate_output(tmp_path / "bad_file.oops")
 
 
-def test_validate_output_invalid_directory() -> None:
-    """Test when a bad extention is given."""
-    with pytest.raises(exceptions.DirectoryNotFoundError):
-        models.Results.validate_output(pathlib.Path("road/to/nowhere/good_file.csv"))
-
-
 def test_run_single_file(
     sample_data_gt3x: pathlib.Path,
     tmp_path: pathlib.Path,
