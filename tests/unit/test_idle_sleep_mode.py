@@ -23,7 +23,6 @@ def test_idle_sleep_mode_resampling(
         dummy_date + timedelta(seconds=i / sampling_rate) for i in range(num_samples)
     ]
     test_time = pl.Series("time", dummy_datetime_list, dtype=pl.Datetime("ns"))
-
     acceleration = models.Measurement(
         measurements=np.ones((num_samples, 3)), time=test_time
     )
@@ -42,19 +41,20 @@ def test_idle_sleep_mode_gap_fill() -> None:
     dummy_datetime_list = [
         dummy_date + timedelta(seconds=i) for i in range(num_samples // 2)
     ]
-
     time_gap = dummy_date + timedelta(seconds=(1000))
     dummy_datetime_list += [
         time_gap + timedelta(seconds=i) for i in range(num_samples // 2, num_samples)
     ]
     test_time = pl.Series("time", dummy_datetime_list, dtype=pl.Datetime("ns"))
-
     acceleration = models.Measurement(
         measurements=np.ones((num_samples, 3)), time=test_time
     )
+    expected_acceleration = (np.finfo(float).eps, np.finfo(float).eps, -1)
 
     filled_acceleration = idle_sleep_mode_imputation.impute_idle_sleep_mode_gaps(
         acceleration
     )
+
     assert len(filled_acceleration.measurements) > len(acceleration.measurements)
     assert filled_acceleration.time.diff().mean() == 1e9
+    assert np.all(filled_acceleration.measurements[5010] == expected_acceleration)
