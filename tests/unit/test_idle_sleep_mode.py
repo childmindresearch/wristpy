@@ -1,0 +1,33 @@
+"""Testing the idle_sleep_mode functions."""
+
+from datetime import datetime, timedelta
+
+import numpy as np
+import polars as pl
+import pytest
+
+from wristpy.core import models
+from wristpy.processing import idle_sleep_mode_imputation
+
+
+@pytest.mark.parametrize(
+    "sampling_rate, effective_sampling_rate", [(30, 25), (20, 20), (1, 1)]
+)
+def test_idle_sleep_mode(sampling_rate: int, effective_sampling_rate: int) -> None:
+    """Test the idle_sleep_mode function."""
+    num_samples = 10000
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + timedelta(seconds=i / sampling_rate) for i in range(num_samples)
+    ]
+    test_time = pl.Series("time", dummy_datetime_list, dtype=pl.Datetime("ns"))
+
+    acceleration = models.Measurement(
+        measurements=np.ones((num_samples, 3)), time=test_time
+    )
+
+    filled_acceleration = idle_sleep_mode_imputation.impute_idle_sleep_mode_gaps(
+        acceleration
+    )
+
+    assert filled_acceleration.time.diff().mean() == 1e9 / effective_sampling_rate
