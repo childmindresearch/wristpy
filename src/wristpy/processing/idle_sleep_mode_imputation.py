@@ -53,7 +53,16 @@ def impute_idle_sleep_mode_gaps(acceleration: models.Measurement) -> models.Meas
         }
     )
     fill_value = np.finfo(float).eps
-    sampling_space_nanosec = round(acceleration.time[:100].diff().mean())
+    sampling_space_nanosec = round(
+        np.mean(
+            acceleration.time[:100]
+            .diff()
+            .drop_nulls()
+            .dt.total_nanoseconds()
+            .to_numpy()
+            .astype(dtype=float)
+        )
+    )
     sampling_rate = int(1e9 / sampling_space_nanosec)
 
     effective_sampling_rate = _find_effective_sampling_rate(sampling_rate)
