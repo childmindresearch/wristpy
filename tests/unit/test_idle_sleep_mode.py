@@ -31,7 +31,16 @@ def test_idle_sleep_mode_resampling(
         acceleration
     )
 
-    assert filled_acceleration.time.diff().mean() == 1e9 / effective_sampling_rate
+    assert (
+        np.mean(
+            filled_acceleration.time.diff()
+            .drop_nulls()
+            .dt.total_nanoseconds()
+            .to_numpy()
+            .astype(dtype=float)
+        )
+        == 1e9 / effective_sampling_rate
+    )
 
 
 def test_idle_sleep_mode_gap_fill() -> None:
@@ -56,5 +65,14 @@ def test_idle_sleep_mode_gap_fill() -> None:
     )
 
     assert len(filled_acceleration.measurements) > len(acceleration.measurements)
-    assert filled_acceleration.time.diff().mean() == 1e9
+    assert (
+        np.mean(
+            filled_acceleration.time.diff()
+            .drop_nulls()
+            .dt.total_nanoseconds()
+            .to_numpy()
+            .astype(dtype=float)
+        )
+        == 1e9
+    )
     assert np.all(filled_acceleration.measurements[5010] == expected_acceleration)
