@@ -10,7 +10,12 @@ import pydantic
 
 from wristpy.core import computations, config, exceptions, models
 from wristpy.io.readers import readers
-from wristpy.processing import analytics, calibration, metrics
+from wristpy.processing import (
+    analytics,
+    calibration,
+    metrics,
+    idle_sleep_mode_imputation,
+)
 
 logger = config.get_logger()
 
@@ -203,6 +208,13 @@ def run(
         raise ValueError(msg)
 
     watch_data = readers.read_watch_data(input)
+    if watch_data.idle_sleep_mode_flag:
+        logger.debug("Imputing idle sleep mode gaps.")
+        watch_data.acceleration = (
+            idle_sleep_mode_imputation.impute_idle_sleep_mode_gaps(
+                watch_data.acceleration
+            )
+        )
 
     calibrator_object: Union[
         calibration.GgirCalibration, calibration.ConstrainedMinimizationCalibration
