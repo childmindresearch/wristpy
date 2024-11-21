@@ -13,8 +13,8 @@ from wristpy.io.readers import readers
 from wristpy.processing import (
     analytics,
     calibration,
-    metrics,
     idle_sleep_mode_imputation,
+    metrics,
 )
 
 logger = config.get_logger()
