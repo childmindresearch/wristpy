@@ -298,6 +298,26 @@ def test_cta_non_wear(
     assert np.all(non_wear_array.measurements == expected_result)
 
 
+def test_cta_non_wear_decreasing_temp() -> None:
+    """Test the CTA algorithm when temperature is decreasing."""
+    num_samples = int(1000)
+    time_list = [
+        datetime(2024, 5, 2) + timedelta(milliseconds=100 * i)
+        for i in range(num_samples)
+    ]
+    time = pl.Series("time", time_list, dtype=pl.Datetime("ns"))
+    acceleration = models.Measurement(measurements=np.ones((num_samples, 3)), time=time)
+    temperature = models.Measurement(
+        measurements=np.linspace(20, 25, num_samples)[::-1], time=time
+    )
+
+    non_wear_array = metrics.combined_temp_accel_detect_nonwear(
+        acceleration, temperature, std_criteria=0
+    )
+
+    assert np.all(non_wear_array.measurements[1:] == 1)
+
+
 def test_DETACH_non_wear() -> None:
     """Test the DETACH non wear function."""
     num_samples = int(1e5)
