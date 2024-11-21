@@ -184,3 +184,106 @@ def test_moving_median(window_size: int, expected_output: np.ndarray) -> None:
     assert np.all(
         np.isclose(test_result.measurements, expected_output)
     ), "Test results do not match the expected output"
+
+
+def test_resample_downsample() -> None:
+    """Test the downsampling happy-path."""
+    time = [datetime(1990, 1, 1) + timedelta(seconds=secs) for secs in range(4)]
+    measurement = models.Measurement(
+        measurements=np.array([1, 2, 3, 4]),
+        time=pl.Series(time),
+    )
+    delta_t = 2
+    expected = models.Measurement(
+        measurements=np.array([1.5, 3.5]), time=pl.Series("time", time[0::2])
+    )
+
+    actual = computations.resample(measurement, delta_t)
+
+    assert np.allclose(actual.measurements, expected.measurements)
+    assert all(actual.time == expected.time)
+
+
+def test_resample_upsample() -> None:
+    """Test the upsampling happy-path."""
+    time = [
+        datetime(1990, 1, 1, second=1),
+        datetime(1990, 1, 1, second=2),
+    ]
+    expected_time = [
+        time[0],
+        datetime(1990, 1, 1, second=1, microsecond=500000),
+        time[1],
+    ]
+    measurement = models.Measurement(
+        measurements=np.array([1, 2]),
+        time=pl.Series(time),
+    )
+    delta_t = 0.5
+    expected = models.Measurement(
+        measurements=np.array([1, 1.5, 2]), time=pl.Series("time", expected_time)
+    )
+
+    actual = computations.resample(measurement, delta_t)
+
+    assert np.allclose(actual.measurements, expected.measurements)
+    assert all(actual.time == expected.time)
+
+
+def test_resample_same() -> None:
+    """Test that the measurement remains unaltered at the same delta time."""
+    time = [
+        datetime(1990, 1, 1, second=1),
+        datetime(1990, 1, 1, second=2),
+    ]
+    expected = models.Measurement(
+        measurements=np.array([1, 2]),
+        time=pl.Series("time", time),
+    )
+    delta_t = 1
+
+    actual = computations.resample(expected, delta_t)
+
+    assert (
+        actual is expected
+    ), "Input and output do not point to the same location in memory."
+
+
+def test_resample_faulty_delta_t() -> None:
+    """Tests that a correct error is thrown for a faulty delta t."""
+    time = [
+        datetime(1990, 1, 1, second=1),
+        datetime(1990, 1, 1, second=2),
+        datetime(1990, 1, 1, second=4),
+    ]
+    measurement = models.Measurement(
+        measurements=np.array([1, 2, 3]),
+        time=pl.Series("time", time),
+    )
+
+    with pytest.raises(NotImplementedError) as exc_info:
+        computations.resample(measurement, 1)
+
+    assert "Resampling function only" in str(exc_info.value)
+
+
+def test_nonwear_majority_vote() -> None:
+    """Tests the majority vote function for nonwear."""
+    time1 = [datetime(1990, 1, 1) + timedelta(seconds=secs) for secs in range(901)]
+    time2 = [
+        datetime(1990, 1, 1) + timedelta(milliseconds=secs) for secs in range(900001)
+    ]
+    time3 = [datetime(1990, 1, 1) + timedelta(seconds=100 * secs) for secs in range(10)]
+    nonwear1 = models.Measurement(
+        measurements=np.ones(len(time1)), time=pl.Series("time", time1)
+    )
+    nonwear2 = models.Measurement(
+        measurements=np.ones(len(time2)), time=pl.Series("time", time2)
+    )
+    nonwear3 = models.Measurement(
+        measurements=np.ones(len(time3)), time=pl.Series("time", time3)
+    )
+
+    nonwear = computations.majority_vote_non_wear(nonwear1, nonwear2, nonwear3)
+
+    assert np.all(nonwear.measurements == 1)
