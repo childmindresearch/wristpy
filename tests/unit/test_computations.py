@@ -251,8 +251,13 @@ def test_resample_same() -> None:
 
 def test_nonwear_majority_vote() -> None:
     """Tests the majority vote function for nonwear."""
-    time1 = [datetime(1990, 1, 1) + timedelta(seconds=60 * secs) for secs in range(900)]
-    time3 = [datetime(1990, 1, 1) + timedelta(seconds=100 * secs) for secs in range(11)]
+    time1 = [
+        datetime(1990, 1, 1, 1, 1) + timedelta(seconds=60 * secs) for secs in range(900)
+    ]
+    time3 = [
+        datetime(1990, 1, 1, 1, 1, 10) + timedelta(seconds=100 * secs)
+        for secs in range(11)
+    ]
     nonwear1 = models.Measurement(
         measurements=np.ones(len(time1)),
         time=pl.Series("time", time1, dtype=pl.Datetime("ns")),
