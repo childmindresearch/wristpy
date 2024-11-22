@@ -181,5 +181,7 @@ def test_bad_file_type(
 
     with pytest.raises(ValueError, match=re.escape(expected_message)):
         orchestrator.run(
-            input=input_dir, output=tmp_path, output_filetype=invalid_file_type
+            input=input_dir,
+            output=tmp_path,
+            output_filetype=invalid_file_type,  # type: ignore[arg-type]
         )
