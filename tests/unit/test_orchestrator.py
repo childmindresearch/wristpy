@@ -172,7 +172,6 @@ def test_bad_file_type(
 ) -> None:
     """Test run function when output file type is invalid."""
     VALID_FILE_TYPES = (".csv", ".parquet")
-    invalid_file_type = ".zip"
     input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
     expected_message = (
         "Invalid output_filetype: "
