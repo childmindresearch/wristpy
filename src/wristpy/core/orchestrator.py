@@ -123,17 +123,18 @@ def run(
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. If None is given no down sampling is preformed.
         verbosity: The logging level for the logger.
-        output_filetype: specifies the data format for the save files. Only relevant when
-            processing entire directories, otherwise data type will
-            be inferred from the given file name.
+        output_filetype: Specifies the data format for the save files. Must be None when
+            processing files, must be a valid file type when processing directories.
 
     Returns:
         All calculated data in a save ready format as a Results object or as a
         dictionary of Results objects.
 
     Raises:
+        ValueError: If processing a file and the output_filetype is not None
+        ValueError: If processing a directory and output_filetype is not a valid type.
         ValueError: If processing a directory and the output given is not a directory.
-        ValueError: If the input directory contained no files of a valid file type.
+        FileNotFoundError: If the input directory contained no files of a valid type.
 
 
     References:

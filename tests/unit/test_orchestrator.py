@@ -2,11 +2,12 @@
 
 import datetime
 import pathlib
+import re
+from typing import Optional
 
 import numpy as np
 import polars as pl
 import pytest
-import pytest_mock
 
 from wristpy.core import exceptions, models, orchestrator
 from wristpy.processing import analytics
@@ -122,6 +123,23 @@ def test_run_single_file(
     assert isinstance(results, models.Results)
 
 
+def test_run_single_file_bad_output_filetype(
+    sample_data_gt3x: pathlib.Path,
+    tmp_path: pathlib.Path,
+) -> None:
+    """Testing running a single file."""
+    output_file_path = tmp_path / "file_name.csv"
+
+    with pytest.raises(
+        ValueError,
+        match="When processing single files, output_filetype should be None - "
+        "the file type will be determined from the output path.",
+    ):
+        orchestrator.run(
+            input=sample_data_gt3x, output=output_file_path, output_filetype=".csv"
+        )
+
+
 def test_run_dir(tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path) -> None:
     """Test run function when pointed at a directory."""
     input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
@@ -130,18 +148,38 @@ def test_run_dir(tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path) -> None
         tmp_path / "example_geneactiv.csv",
     }
 
-    results = orchestrator.run(input=input_dir, output=tmp_path)
+    results = orchestrator.run(input=input_dir, output=tmp_path, output_filetype=".csv")
 
     assert set(tmp_path.glob("*.csv")) == expected_files
     assert isinstance(results, dict)
 
 
-def test_run_bad_dir(
-    mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
-) -> None:
+def test_run_bad_dir(sample_data_gt3x: pathlib.Path) -> None:
     """Test run function when input is a directory but output is invalid."""
     input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
     bad_output_dir = sample_data_gt3x
 
-    with pytest.raises(ValueError, match="Output is not a valid directory."):
+    with pytest.raises(
+        ValueError,
+        match="Output is a file, but must be a directory when input is a directory.",
+    ):
         orchestrator.run(input=input_dir, output=bad_output_dir)
+
+
+@pytest.mark.parametrize("invalid_file_type", [".zip", None])
+def test_bad_file_type(
+    tmp_path: pathlib.Path, invalid_file_type: Optional[str]
+) -> None:
+    """Test run function when output file type is invalid."""
+    VALID_FILE_TYPES = (".csv", ".parquet")
+    invalid_file_type = ".zip"
+    input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
+    expected_message = (
+        "Invalid output_filetype: "
+        f"{invalid_file_type}. Valid options are: {VALID_FILE_TYPES}."
+    )
+
+    with pytest.raises(ValueError, match=re.escape(expected_message)):
+        orchestrator.run(
+            input=input_dir, output=tmp_path, output_filetype=invalid_file_type
+        )
