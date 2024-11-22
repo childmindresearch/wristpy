@@ -1,11 +1,11 @@
-"""Calculate base metrics, anglez and enmo."""
+"""Calculate base metrics, anglez and enmo, and nonwear detection."""
 
 import numpy as np
 import polars as pl
 from scipy import interpolate
 from skdh.preprocessing import wear_detection
 
-from wristpy.core import config, models
+from wristpy.core import computations, config, models
 from wristpy.io.readers import readers
 
 logger = config.get_logger()
@@ -327,6 +327,8 @@ def implement_DETACH_nonwear(
 ) -> models.Measurement:
     """This function implements the scikit DETACH algorithm for non-wear detection.
 
+    The nonwear array is downsampled to 60 second resolution.
+
     Args:
         acceleration: The Measurment instance that contains the calibrated acceleration.
         temperature: The Measurment instance that contains the temperature data.
@@ -334,7 +336,7 @@ def implement_DETACH_nonwear(
 
     Returns:
         A new Measurment instance with the non-wear flag and corresponding timestamps.
-        The temporal resolutions is the same as acceleration data.
+        The temporal resolutions is one minute to match CTA.
 
     References:
         A. Vert et al., “Detecting accelerometer non-wear periods using change
@@ -351,6 +353,16 @@ def implement_DETACH_nonwear(
         x_acceleration = np.linspace(0, 1, len(acceleration))
         interpolated_temp = interpolate.interp1d(x_temperature, temperature)
         return interpolated_temp(x_acceleration)
+
+    def cleanup_DETACH_nonwear(nonwear: models.Measurement) -> models.Measurement:
+        """Helper function to downsample DETACH ouptut to 60s."""
+        nonwear_downsample = computations.moving_mean(nonwear, 60)
+
+        nonwear_downsample.measurements = np.where(
+            nonwear_downsample.measurements >= 0.5, 1, 0
+        )
+
+        return nonwear_downsample
 
     logger.debug("Running scikit DETACH algorithm.")
     time = acceleration.time.dt.timestamp(time_unit="ns").to_numpy()
@@ -369,7 +381,9 @@ def implement_DETACH_nonwear(
 
     non_wear_time = readers.unix_epoch_time_to_polars_datetime(time)
 
-    return models.Measurement(measurements=nonwear_array, time=non_wear_time)
+    nonwear = models.Measurement(measurements=nonwear_array, time=non_wear_time)
+
+    return cleanup_DETACH_nonwear(nonwear)
 
 
 def _pre_process_temperature(

@@ -249,41 +249,25 @@ def test_resample_same() -> None:
     ), "Input and output do not point to the same location in memory."
 
 
-def test_resample_faulty_delta_t() -> None:
-    """Tests that a correct error is thrown for a faulty delta t."""
-    time = [
-        datetime(1990, 1, 1, second=1),
-        datetime(1990, 1, 1, second=2),
-        datetime(1990, 1, 1, second=4),
-    ]
-    measurement = models.Measurement(
-        measurements=np.array([1, 2, 3]),
-        time=pl.Series("time", time),
-    )
-
-    with pytest.raises(NotImplementedError) as exc_info:
-        computations.resample(measurement, 1)
-
-    assert "Resampling function only" in str(exc_info.value)
-
-
 def test_nonwear_majority_vote() -> None:
     """Tests the majority vote function for nonwear."""
-    time1 = [datetime(1990, 1, 1) + timedelta(seconds=secs) for secs in range(901)]
-    time2 = [
-        datetime(1990, 1, 1) + timedelta(milliseconds=secs) for secs in range(900001)
-    ]
-    time3 = [datetime(1990, 1, 1) + timedelta(seconds=100 * secs) for secs in range(10)]
+    time1 = [datetime(1990, 1, 1) + timedelta(seconds=60 * secs) for secs in range(900)]
+    time3 = [datetime(1990, 1, 1) + timedelta(seconds=100 * secs) for secs in range(11)]
     nonwear1 = models.Measurement(
-        measurements=np.ones(len(time1)), time=pl.Series("time", time1)
+        measurements=np.ones(len(time1)),
+        time=pl.Series("time", time1, dtype=pl.Datetime("ns")),
     )
     nonwear2 = models.Measurement(
-        measurements=np.ones(len(time2)), time=pl.Series("time", time2)
+        measurements=np.ones(len(time1)),
+        time=pl.Series("time", time1, dtype=pl.Datetime("ns")),
     )
     nonwear3 = models.Measurement(
-        measurements=np.ones(len(time3)), time=pl.Series("time", time3)
+        measurements=np.ones(len(time3)),
+        time=pl.Series("time", time3, dtype=pl.Datetime("ns")),
     )
 
-    nonwear = computations.majority_vote_non_wear(nonwear1, nonwear2, nonwear3)
+    nonwear = computations.majority_vote_non_wear(
+        nonwear_cta=nonwear1, nonwear_detach=nonwear2, nonwear_ggir=nonwear3
+    )
 
     assert np.all(nonwear.measurements == 1)

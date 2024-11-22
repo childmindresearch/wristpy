@@ -331,7 +331,7 @@ def test_DETACH_non_wear() -> None:
         measurements=np.random.randint(low=22, high=32, size=num_samples), time=time
     )
 
-    expected_time_length = len(acceleration.time)
+    expected_time_length = round(num_samples / 600)
 
     non_wear_array = metrics.implement_DETACH_nonwear(
         acceleration, temperature, std_criteria=0.013
