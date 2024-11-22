@@ -3,7 +3,7 @@
 import argparse
 import logging
 import pathlib
-from typing import List, Optional
+from typing import List, Optional, Tuple, cast
 
 from wristpy.core import config, orchestrator
 
@@ -125,7 +125,7 @@ def main(
     orchestrator.run(
         input=arguments.input,
         output=arguments.output,
-        thresholds=tuple(arguments.thresholds),  # type: ignore
+        thresholds=cast(Tuple[float, float, float], tuple(arguments.thresholds)),
         calibrator=None if arguments.calibrator == "none" else arguments.calibrator,
         epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
         verbosity=log_level,

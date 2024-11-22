@@ -100,7 +100,7 @@ def run(
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
     verbosity: int = logging.WARNING,
-    output_dtype: Literal[".csv", ".parquet"] = ".csv",
+    output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Optional[Union[models.Results, Dict[str, models.Results]]]:
     """Runs main processing steps for wristpy on single files, or directories.
 
@@ -123,7 +123,7 @@ def run(
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. If None is given no down sampling is preformed.
         verbosity: The logging level for the logger.
-        output_dtype: specifies the data format for the save files. Only relevant when
+        output_filetype: specifies the data format for the save files. Only relevant when
             processing entire directories, otherwise data type will
             be inferred from the given file name.
 
@@ -146,7 +146,12 @@ def run(
     input = pathlib.Path(input)
 
     if input.is_file():
-        logger.debug(f"Input is file, forwarding to run_file with output={output}")
+        if output_filetype is not None:
+            raise ValueError(
+                "When processing single files, output_filetype should be None - "
+                "the file type will be determined from the output path."
+            )
+        logger.debug("Input is file, forwarding to run_file with output=%s", output)
 
         return run_file(
             input=input,
@@ -158,20 +163,26 @@ def run(
         )
     if output is not None:
         output = pathlib.Path(output)
-        if not output.is_dir():
-            raise ValueError("Output is not a valid directory.")
+        if output.is_file():
+            raise ValueError(
+                "Output is a file, but must be a directory when input is a directory."
+            )
 
-    file_names = [
-        file for file in itertools.chain(input.glob("*.gt3x"), input.glob("*.bin"))
-    ]
+    if output_filetype is None or output_filetype not in VALID_FILE_TYPES:
+        raise ValueError(
+            "Invalid output_filetype: "
+            f"{output_filetype}. Valid options are: {VALID_FILE_TYPES}."
+        )
+
+    file_names = list(itertools.chain(input.glob("*.gt3x"), input.glob("*.bin")))
 
     if not file_names:
-        raise ValueError(f"Directory {input} contains no .gt3x or .bin files.")
+        raise FileNotFoundError(f"Directory {input} contains no .gt3x or .bin files.")
 
     results_dict = {}
     for file in file_names:
         output_file_path = (
-            output / pathlib.Path(file.stem).with_suffix(output_dtype)
+            output / pathlib.Path(file.stem).with_suffix(output_filetype)
             if output
             else None
         )
@@ -182,7 +193,7 @@ def run(
             output_file_path,
         )
         try:
-            result = run_file(
+            results_dict[file.stem] = run_file(
                 input=input / file,
                 output=output_file_path,
                 thresholds=thresholds,
@@ -190,7 +201,6 @@ def run(
                 epoch_length=epoch_length,
                 verbosity=verbosity,
             )
-            results_dict[file.stem] = result
         except Exception as e:
             logger.error("Did not run file: %s, Error: %s", file, e)
 
@@ -211,9 +221,9 @@ def run_file(
     """Runs main processing steps for wristpy and returns data for analysis.
 
     The run_file() function will provide the user with enmo, anglez, physical activity
-    levels sleep detection and nonwear data. All measures will be in the same temporal
-    resolution. Users may choose from 'ggir' and 'gradient' calibration methods, or
-    enter None to proceed without calibration.
+    levels, detected sleep periods, and nonwear data. All measures will be in the same
+    temporal resolution. Users may choose from 'ggir' and 'gradient' calibration
+    methods, or enter None to proceed without calibration.
 
     Args:
         input: Path to the input file to be read. Currently supports .bin and .gt3x

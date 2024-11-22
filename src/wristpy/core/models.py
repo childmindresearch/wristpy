@@ -136,7 +136,7 @@ class WatchData(BaseModel):
 
 
 class Results(pydantic.BaseModel):
-    """dataclass containing results of orchestrator.run()."""
+    """Dataclass containing results of orchestrator.run()."""
 
     enmo: Measurement
     anglez: Measurement
@@ -154,6 +154,7 @@ class Results(pydantic.BaseModel):
         """
         logger.debug("Saving results.")
         self.validate_output(output=output)
+        output.parent.mkdir(parents=True, exist_ok=True)
 
         results_dataframe = pl.DataFrame(
             {"time": self.enmo.time}
@@ -183,8 +184,6 @@ class Results(pydantic.BaseModel):
             InvalidFileTypeError:If the output file path ends with any extension other
                     than csv or parquet.
         """
-        output.parent.mkdir(parents=True, exist_ok=True)
-
         if output.suffix not in VALID_FILE_TYPES:
             raise exceptions.InvalidFileTypeError(
                 f"The extension: {output.suffix} is not supported."
