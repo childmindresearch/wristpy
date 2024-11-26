@@ -14,7 +14,7 @@ from wristpy.processing import analytics
 
 
 @pytest.fixture
-def dummy_results() -> models.Results:
+def dummy_results() -> models.OrchestratorResults:
     """Makes a results object for the purpose of testing."""
     dummy_date = datetime.datetime(2024, 5, 2)
     dummy_measure = models.Measurement(
@@ -23,7 +23,7 @@ def dummy_results() -> models.Results:
             [dummy_date + datetime.timedelta(seconds=i) for i in range(100)]
         ),
     )
-    dummy_results = models.Results(
+    dummy_results = models.OrchestratorResults(
         enmo=dummy_measure,
         anglez=dummy_measure,
         physical_activity_levels=dummy_measure,
@@ -90,14 +90,16 @@ def test_bad_calibrator(sample_data_gt3x: pathlib.Path) -> None:
         match="Invalid calibrator: Ggir. Choose: 'ggir', 'gradient'. "
         "Enter None if no calibration is desired.",
     ):
-        orchestrator.run_file(input=sample_data_gt3x, calibrator="Ggir")  # type: ignore[arg-type]
+        orchestrator._run_file(input=sample_data_gt3x, calibrator="Ggir")  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize(
     "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
 )
 def test_save_results(
-    dummy_results: models.Results, file_name: pathlib.Path, tmp_path: pathlib.Path
+    dummy_results: models.OrchestratorResults,
+    file_name: pathlib.Path,
+    tmp_path: pathlib.Path,
 ) -> None:
     """Test saving."""
     dummy_results.save_results(tmp_path / file_name)
@@ -108,7 +110,7 @@ def test_save_results(
 def test_validate_output_invalid_file_type(tmp_path: pathlib.Path) -> None:
     """Test when a bad extention is given."""
     with pytest.raises(exceptions.InvalidFileTypeError):
-        models.Results.validate_output(tmp_path / "bad_file.oops")
+        models.OrchestratorResults.validate_output(tmp_path / "bad_file.oops")
 
 
 def test_run_single_file(
@@ -120,7 +122,7 @@ def test_run_single_file(
     results = orchestrator.run(input=sample_data_gt3x, output=output_file_path)
 
     assert output_file_path.exists()
-    assert isinstance(results, models.Results)
+    assert isinstance(results, models.OrchestratorResults)
 
 
 def test_run_single_file_bad_output_filetype(
@@ -171,11 +173,10 @@ def test_bad_file_type(
     tmp_path: pathlib.Path, invalid_file_type: Optional[str]
 ) -> None:
     """Test run function when output file type is invalid."""
-    VALID_FILE_TYPES = (".csv", ".parquet")
     input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
     expected_message = (
         "Invalid output_filetype: "
-        f"{invalid_file_type}. Valid options are: {VALID_FILE_TYPES}."
+        f"{invalid_file_type}. Valid options are: {orchestrator.VALID_FILE_TYPES}."
     )
 
     with pytest.raises(ValueError, match=re.escape(expected_message)):

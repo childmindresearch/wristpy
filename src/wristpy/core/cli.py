@@ -36,6 +36,15 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "-O",
+        "--output_filetype",
+        type=str,
+        default=None,
+        help="Format for save files when processing directories. "
+        "Leave as None when processing single files.",
+    )
+
+    parser.add_argument(
         "-c",
         "--calibrator",
         type=str,
@@ -129,4 +138,5 @@ def main(
         calibrator=None if arguments.calibrator == "none" else arguments.calibrator,
         epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
         verbosity=log_level,
+        output_filetype=arguments.output_filetype,
     )

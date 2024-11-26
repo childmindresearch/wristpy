@@ -68,6 +68,7 @@ def test_main_default(
         calibrator=None,
         epoch_length=5,
         verbosity=logging.WARNING,
+        output_filetype=None,
     )
 
 
@@ -103,6 +104,7 @@ def test_main_with_options(
         calibrator="gradient",
         epoch_length=None,
         verbosity=logging.WARNING,
+        output_filetype=None,
     )
 
 

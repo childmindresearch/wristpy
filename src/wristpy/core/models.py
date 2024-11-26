@@ -135,7 +135,7 @@ class WatchData(BaseModel):
         return v
 
 
-class Results(pydantic.BaseModel):
+class OrchestratorResults(pydantic.BaseModel):
     """Dataclass containing results of orchestrator.run()."""
 
     enmo: Measurement

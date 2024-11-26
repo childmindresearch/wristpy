@@ -101,14 +101,15 @@ def run(
     epoch_length: Union[int, None] = 5,
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
-) -> Optional[Union[models.Results, Dict[str, models.Results]]]:
+) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
     """Runs main processing steps for wristpy on single files, or directories.
 
-    The run() function will execute the run_file() function on individual files, or on
-    entire directories. When the input path points to a file, the name of the save file
-    will be taken from the given output path (if any). When the input path points to a
-    directory the output path must be a valid directory as well. Output file names will
-    be derived from original file names in the case of directory processing.
+    The run() function will execute the run_file() function on individual files, or
+    run_directory entire directories. When the input path points to a file, the name of
+    the save file will be taken from the given output path (if any). When the input
+    path points to a directory the output path must be a valid directory as well.
+    Output file names will be derived from original file names in the case of directory
+    processing.
 
 
     Args:
@@ -128,14 +129,11 @@ def run(
 
     Returns:
         All calculated data in a save ready format as a Results object or as a
-        dictionary of Results objects.
+        dictionary of OrchestratorResults objects.
 
     Raises:
         ValueError: If processing a file and the output_filetype is not None
-        ValueError: If processing a directory and output_filetype is not a valid type.
-        ValueError: If processing a directory and the output given is not a directory.
-        FileNotFoundError: If the input directory contained no files of a valid type.
-
+        ValueError: If output is None but output_filetype is not None.
 
     References:
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
@@ -145,6 +143,7 @@ def run(
     logger.setLevel(verbosity)
 
     input = pathlib.Path(input)
+    output = pathlib.Path(output) if output is not None else None
 
     if input.is_file():
         if output_filetype is not None:
@@ -154,7 +153,7 @@ def run(
             )
         logger.debug("Input is file, forwarding to run_file with output=%s", output)
 
-        return run_file(
+        return _run_file(
             input=input,
             output=output,
             thresholds=thresholds,
@@ -162,18 +161,80 @@ def run(
             epoch_length=epoch_length,
             verbosity=verbosity,
         )
+
+    if output is None and output_filetype is not None:
+        raise ValueError("If no output is given, output_filetype must be None.")
+
+    return _run_directory(
+        input=input,
+        output=output,
+        thresholds=thresholds,
+        calibrator=calibrator,
+        epoch_length=epoch_length,
+        verbosity=verbosity,
+        output_filetype=output_filetype,
+    )
+
+
+def _run_directory(
+    input: pathlib.Path,
+    output: Optional[pathlib.Path] = None,
+    thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
+    calibrator: Union[
+        None,
+        Literal["ggir", "gradient"],
+    ] = "gradient",
+    epoch_length: Union[int, None] = 5,
+    verbosity: int = logging.WARNING,
+    output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
+) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
+    """Runs main processing steps for wristpy on  directories.
+
+    The run_directory() function will execute the run_file() function on individual files, or on
+    entire directories. When the input path points to a file, the name of the save file
+    will be taken from the given output path (if any). When the input path points to a
+    directory the output path must be a valid directory as well. Output file names will
+    be derived from original file names in the case of directory processing.
+
+
+    Args:
+        input: Path to the input directory of files to be read. Currently
+            supports .bin and .gt3x
+        output: Path to directory data will be saved to.
+        thresholds: The cut points for the light, moderate, and vigorous thresholds,
+            given in that order. Values must be asscending, unique, and greater than 0.
+            Default values are optimized for subjects ages 7-11 [1].
+        calibrator: The calibrator to be used on the input data.
+        epoch_length: The temporal resolution in seconds, the data will be down sampled
+            to. If None is given no down sampling is preformed.
+        verbosity: The logging level for the logger.
+        output_filetype: Specifies the data format for the save files.
+
+    Returns:
+        All calculated data in a save ready format as a Results object or as a
+        dictionary of OrchestratorResults objects.
+
+    Raises:
+        ValueError: The output given is not a directory.
+        ValueError: The output_filetype is not a valid type.
+        FileNotFoundError: If the input directory contained no files of a valid type.
+
+
+    References:
+        [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
+        output from wrist- and hip-worn monitors. Medicine and Science in Sports and
+        Exercise, 46(9), 1816-1824.
+    """
     if output is not None:
-        output = pathlib.Path(output)
         if output.is_file():
             raise ValueError(
                 "Output is a file, but must be a directory when input is a directory."
             )
-
-    if output_filetype is None or output_filetype not in VALID_FILE_TYPES:
-        raise ValueError(
-            "Invalid output_filetype: "
-            f"{output_filetype}. Valid options are: {VALID_FILE_TYPES}."
-        )
+        if output_filetype not in VALID_FILE_TYPES:
+            raise ValueError(
+                "Invalid output_filetype: "
+                f"{output_filetype}. Valid options are: {VALID_FILE_TYPES}."
+            )
 
     file_names = list(itertools.chain(input.glob("*.gt3x"), input.glob("*.bin")))
 
@@ -183,7 +244,7 @@ def run(
     results_dict = {}
     for file in file_names:
         output_file_path = (
-            output / pathlib.Path(file.stem).with_suffix(output_filetype)
+            output / pathlib.Path(file.stem).with_suffix(output_filetype)  # type: ignore[arg-type]
             if output
             else None
         )
@@ -194,7 +255,7 @@ def run(
             output_file_path,
         )
         try:
-            results_dict[file.stem] = run_file(
+            results_dict[str(file)] = _run_file(
                 input=input / file,
                 output=output_file_path,
                 thresholds=thresholds,
@@ -208,9 +269,9 @@ def run(
     return results_dict
 
 
-def run_file(
-    input: Union[pathlib.Path, str],
-    output: Optional[Union[pathlib.Path, str]] = None,
+def _run_file(
+    input: pathlib.Path,
+    output: Optional[pathlib.Path] = None,
     thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
     calibrator: Union[
         None,
@@ -218,7 +279,7 @@ def run_file(
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
     verbosity: int = logging.WARNING,
-) -> models.Results:
+) -> models.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
 
     The run_file() function will provide the user with enmo, anglez, physical activity
@@ -239,7 +300,7 @@ def run_file(
         verbosity: The logging level for the logger.
 
     Returns:
-        All calculated data in a save ready format as a Results object.
+        All calculated data in a save ready format as a OrchestratorResults object.
 
     References:
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
@@ -250,7 +311,7 @@ def run_file(
     input = pathlib.Path(input)
     if output is not None:
         output = pathlib.Path(output)
-        models.Results.validate_output(output=output)
+        models.OrchestratorResults.validate_output(output=output)
 
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
         msg = (
@@ -319,7 +380,7 @@ def run_file(
         time=enmo.time,
     )
 
-    results = models.Results(
+    results = models.OrchestratorResults(
         enmo=enmo,
         anglez=anglez,
         physical_activity_levels=physical_activity_levels,

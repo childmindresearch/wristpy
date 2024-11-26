@@ -18,10 +18,10 @@ def test_orchestrator_happy_path(
     """Happy path for orchestrator."""
     output_path = tmp_path / file_name
 
-    results = orchestrator.run_file(input=sample_data_gt3x, output=output_path)
+    results = orchestrator._run_file(input=sample_data_gt3x, output=output_path)
 
     assert output_path.exists()
-    assert isinstance(results, models.Results)
+    assert isinstance(results, models.OrchestratorResults)
     assert isinstance(results.enmo, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
     assert isinstance(results.nonwear_epoch, models.Measurement)
@@ -36,12 +36,12 @@ def test_orchestrator_different_epoch(
     """Test using none default epoch."""
     output_path = tmp_path / "good_file.csv"
 
-    results = orchestrator.run_file(
+    results = orchestrator._run_file(
         input=sample_data_gt3x, output=output_path, epoch_length=None
     )
 
     assert output_path.exists()
-    assert isinstance(results, models.Results)
+    assert isinstance(results, models.OrchestratorResults)
     assert isinstance(results.enmo, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
     assert isinstance(results.nonwear_epoch, models.Measurement)
