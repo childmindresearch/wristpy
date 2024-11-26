@@ -105,9 +105,9 @@ def run(
     """Runs main processing steps for wristpy on single files, or directories.
 
     The run() function will execute the run_file() function on individual files, or
-    run_directory entire directories. When the input path points to a file, the name of
-    the save file will be taken from the given output path (if any). When the input
-    path points to a directory the output path must be a valid directory as well.
+    run_directory() on entire directories. When the input path points to a file, the
+    name of the save file will be taken from the given output path (if any). When the
+    input path points to a directory the output path must be a valid directory as well.
     Output file names will be derived from original file names in the case of directory
     processing.
 
