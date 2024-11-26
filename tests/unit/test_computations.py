@@ -249,6 +249,22 @@ def test_resample_same() -> None:
     ), "Input and output do not point to the same location in memory."
 
 
+def test_resample_value_error() -> None:
+    """Test that the ValueError is raised for negative delta_t."""
+    time = [
+        datetime(1990, 1, 1, second=1),
+        datetime(1990, 1, 1, second=2),
+    ]
+    expected = models.Measurement(
+        measurements=np.array([1, 2]),
+        time=pl.Series("time", time),
+    )
+    delta_t = -1
+
+    with pytest.raises(ValueError):
+        computations.resample(expected, delta_t)
+
+
 def test_nonwear_majority_vote() -> None:
     """Tests the majority vote function for nonwear."""
     time1 = [
