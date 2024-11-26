@@ -37,12 +37,11 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
             measurements[sensor_name] = models.Measurement(
                 measurements=sensor_values, time=time
             )
+    idle_sleep_mode_flag = False
     if os.path.splitext(file_name)[1] == ".gt3x":
         idle_sleep_mode_flag = (
             data["metadata"]["device_feature_enabled"]["sleep_mode"].lower() == "true"
         )
-    else:
-        idle_sleep_mode_flag = False
 
     return models.WatchData(
         acceleration=measurements["acceleration"],
