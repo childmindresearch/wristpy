@@ -56,9 +56,9 @@ wristpy /input/file/path.gt3x -o /save/path/file_name.csv -c gradient
 ```
 
 #### Run entire directories:
-```sh 
+```sh
 wristpy /path/to/files/input_dir -o /path/to/files/output_dir -c gradient -O .csv
-``` 
+```
 
 ### Using Wristpy through a python script or notebook:
 
