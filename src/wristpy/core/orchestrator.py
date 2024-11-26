@@ -187,7 +187,7 @@ def _run_directory(
     epoch_length: Union[int, None] = 5,
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
-) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
+) -> Dict[str, models.OrchestratorResults]:
     """Runs main processing steps for wristpy on  directories.
 
     The run_directory() function will execute the run_file() function on entire
@@ -210,8 +210,8 @@ def _run_directory(
         output_filetype: Specifies the data format for the save files.
 
     Returns:
-        All calculated data in a save ready format as a Results object or as a
-        dictionary of OrchestratorResults objects.
+        All calculated data in a save ready format as a dictionary of
+        OrchestratorResults objects.
 
     Raises:
         ValueError: The output given is not a directory.
