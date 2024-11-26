@@ -190,11 +190,10 @@ def _run_directory(
 ) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
     """Runs main processing steps for wristpy on  directories.
 
-    The run_directory() function will execute the run_file() function on individual files, or on
-    entire directories. When the input path points to a file, the name of the save file
-    will be taken from the given output path (if any). When the input path points to a
-    directory the output path must be a valid directory as well. Output file names will
-    be derived from original file names in the case of directory processing.
+    The run_directory() function will execute the run_file() function on entire
+    directories. The input and output (if any) paths must directories. An
+    output_filetype must be specified if and only if an output is given. Output file
+    names will be derived from input file names.
 
 
     Args:
