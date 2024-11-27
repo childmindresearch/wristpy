@@ -1,10 +1,18 @@
 """Internal data model."""
 
+import pathlib
 from typing import Optional
 
 import numpy as np
 import polars as pl
+import pydantic
 from pydantic import BaseModel, field_validator
+
+from wristpy.core import config, exceptions
+
+VALID_FILE_TYPES = (".csv", ".parquet")
+
+logger = config.get_logger()
 
 
 class Measurement(BaseModel):
@@ -125,3 +133,59 @@ class WatchData(BaseModel):
         if v.measurements.ndim != 2 or v.measurements.shape[1] != 3:
             raise ValueError("acceleration must be a 2D array with 3 columns")
         return v
+
+
+class OrchestratorResults(pydantic.BaseModel):
+    """Dataclass containing results of orchestrator.run()."""
+
+    enmo: Measurement
+    anglez: Measurement
+    physical_activity_levels: Measurement
+    nonwear_epoch: Measurement
+    sleep_windows_epoch: Measurement
+
+    def save_results(self, output: pathlib.Path) -> None:
+        """Convert to polars and save the dataframe as a csv or parquet file.
+
+        Args:
+            output: The path and file name of the data to be saved. as either a csv or
+                parquet files.
+
+        """
+        logger.debug("Saving results.")
+        self.validate_output(output=output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+
+        results_dataframe = pl.DataFrame(
+            {"time": self.enmo.time}
+            | {name: value.measurements for name, value in self}
+        )
+
+        if output.suffix == ".csv":
+            results_dataframe.write_csv(output, separator=",")
+        elif output.suffix == ".parquet":
+            results_dataframe.write_parquet(output)
+        else:
+            raise exceptions.InvalidFileTypeError(
+                f"File type must be one of {VALID_FILE_TYPES}"
+            )
+
+        logger.debug("results saved in: %s", output)
+
+    @classmethod
+    def validate_output(cls, output: pathlib.Path) -> None:
+        """Validates that the output path exists and is a valid format.
+
+        Args:
+            output: the name of the file to be saved, and the directory it will
+                be saved in. Must be a .csv or .parquet file.
+
+        Raises:
+            InvalidFileTypeError:If the output file path ends with any extension other
+                    than csv or parquet.
+        """
+        if output.suffix not in VALID_FILE_TYPES:
+            raise exceptions.InvalidFileTypeError(
+                f"The extension: {output.suffix} is not supported."
+                "Please save the file as .csv or .parquet",
+            )

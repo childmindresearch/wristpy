@@ -50,12 +50,19 @@ pip install wristpy
 ## Quick start
 
 ### Using Wristpy through the command-line:
+#### Run single files:
 ```sh
 wristpy /input/file/path.gt3x -o /save/path/file_name.csv -c gradient
 ```
 
+#### Run entire directories:
+```sh
+wristpy /path/to/files/input_dir -o /path/to/files/output_dir -c gradient -O .csv
+```
+
 ### Using Wristpy through a python script or notebook:
 
+#### Running single files:
 ```Python
 
 from wristpy.core import orchestrator
@@ -72,12 +79,41 @@ results = orchestrator.run(
     calibrator='gradient',  # Choose between 'ggir', 'gradient', or 'none'
 )
 
-#Data availble in results object
+#Data available in results object
 enmo = results.enmo
 anglez = results.anglez
 physical_activity_levels = results.physical_activity_levels
 nonwear_array = results.nonwear_epoch
 sleep_windows = results.sleep_windows_epoch
+```
+#### Running entire directories:
+```Python
+
+from wristpy.core import orchestrator
+
+# Define input file path and output location
+
+input_path = '/path/to/files/input_dir'
+output_path = '/path/to/files/output_dir'
+
+# Run the orchestrator
+# Specify the output file type, support for saving as .csv and .parquet
+results_dict = orchestrator.run(
+    input=input_path,
+    output=output_path,
+    calibrator='gradient',  # Choose between 'ggir', 'gradient', or 'none'
+    output_filetype = '.csv'
+)
+
+
+#Data available in dictionry of results.
+subject1 = results_dict['subject1']
+
+enmo = subject1.enmo
+anglez = subject1.anglez
+physical_activity_levels = subject1.physical_activity_levels
+nonwear_array = subject1.nonwear_epoch
+sleep_windows = subject1.sleep_windows_epoch
 ```
 
 ## References
