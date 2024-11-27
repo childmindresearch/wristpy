@@ -67,7 +67,7 @@
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span> <span class="nn">argparse</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span> <span class="nn">logging</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span> <span class="nn">pathlib</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">cast</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span> <span class="nn">wristpy.core</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">orchestrator</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
@@ -100,97 +100,110 @@
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>    <span class="p">)</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>        <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>        <span class="s2">&quot;--calibrator&quot;</span><span class="p">,</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>        <span class="s2">&quot;-O&quot;</span><span class="p">,</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>        <span class="s2">&quot;--output_filetype&quot;</span><span class="p">,</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;gradient&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">],</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pick which calibrator to use. Can be &#39;ggir&#39; or &#39;gradient&#39;.&quot;</span><span class="p">,</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Format for save files when processing directories. &quot;</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>        <span class="s2">&quot;Leave as None when processing single files.&quot;</span><span class="p">,</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>    <span class="p">)</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="s2">&quot;--thresholds&quot;</span><span class="p">,</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>        <span class="n">nargs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>        <span class="n">default</span><span class="o">=</span><span class="p">[</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>            <span class="mf">0.0563</span><span class="p">,</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>            <span class="mf">0.1916</span><span class="p">,</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>            <span class="mf">0.6958</span><span class="p">,</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>        <span class="p">],</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Provide three thresholds for light, moderate, and vigorous activity. &quot;</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>        <span class="s2">&quot;Values must be given in ascending order.&quot;</span><span class="p">,</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="p">)</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>        <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>        <span class="s2">&quot;--epoch_length&quot;</span><span class="p">,</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the sampling rate in seconds for all metrics. To skip resampling,&quot;</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>        <span class="s2">&quot; enter 0.&quot;</span><span class="p">,</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>        <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="s2">&quot;--calibrator&quot;</span><span class="p">,</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;gradient&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">],</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pick which calibrator to use. Can be &#39;ggir&#39; or &#39;gradient&#39;.&quot;</span><span class="p">,</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="p">)</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>        <span class="s2">&quot;--thresholds&quot;</span><span class="p">,</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>        <span class="n">nargs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>        <span class="n">default</span><span class="o">=</span><span class="p">[</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>            <span class="mf">0.0563</span><span class="p">,</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>            <span class="mf">0.1916</span><span class="p">,</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>            <span class="mf">0.6958</span><span class="p">,</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>        <span class="p">],</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Provide three thresholds for light, moderate, and vigorous activity. &quot;</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>        <span class="s2">&quot;Values must be given in ascending order.&quot;</span><span class="p">,</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="p">)</span>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>
 </span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>    <span class="p">)</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>        <span class="s2">&quot;-v&quot;</span><span class="p">,</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>        <span class="s2">&quot;--verbosity&quot;</span><span class="p">,</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Determines the level of verbosity. Use -v for info, -vv for debug.&quot;</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>        <span class="s2">&quot;Default for warning.&quot;</span><span class="p">,</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>        <span class="s2">&quot;--epoch_length&quot;</span><span class="p">,</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the sampling rate in seconds for all metrics. To skip resampling,&quot;</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>        <span class="s2">&quot; enter 0.&quot;</span><span class="p">,</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>    <span class="p">)</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>        <span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>    <span class="p">)</span>
 </span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">Results</span><span class="p">:</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs wristpy orchestrator with command line arguments.</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">    Args:</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">         args: A list of command line arguments given as strings. If None, the parser</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">            will take the args from `sys.argv`.</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">    Returns:</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">        A Results object containing enmo, anglez, physical activity levels, nonwear</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">        detection, and sleep detection.</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="n">arguments</span> <span class="o">=</span> <span class="n">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="k">elif</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>            <span class="sa">f</span><span class="s2">&quot;Value for epoch_length is:</span><span class="si">{</span><span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="si">}</span><span class="s2">.&quot;</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>            <span class="s2">&quot;Please enter an integer &gt;= 0.&quot;</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>        <span class="p">)</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="p">):</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Threshold values must be &gt;=0, unique, and in ascending order.&quot;</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running wristpy. arguments given: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="k">return</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        <span class="nb">input</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>        <span class="n">output</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>        <span class="n">thresholds</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">),</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>        <span class="n">calibrator</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span> <span class="k">else</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span><span class="p">,</span>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>        <span class="n">epoch_length</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="p">,</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>    <span class="p">)</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>        <span class="s2">&quot;-v&quot;</span><span class="p">,</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="s2">&quot;--verbosity&quot;</span><span class="p">,</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Determines the level of verbosity. Use -v for info, -vv for debug.&quot;</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>        <span class="s2">&quot;Default for warning.&quot;</span><span class="p">,</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="p">)</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    <span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs wristpy orchestrator with command line arguments.</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">    Args:</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">         args: A list of command line arguments given as strings. If None, the parser</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">            will take the args from `sys.argv`.</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">    Returns:</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">        A Results object containing enmo, anglez, physical activity levels, nonwear</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="sd">        detection, and sleep detection.</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="n">arguments</span> <span class="o">=</span> <span class="n">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="k">elif</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>            <span class="sa">f</span><span class="s2">&quot;Value for epoch_length is:</span><span class="si">{</span><span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="si">}</span><span class="s2">.&quot;</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>            <span class="s2">&quot;Please enter an integer &gt;= 0.&quot;</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>        <span class="p">)</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>        <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="p">):</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Threshold values must be &gt;=0, unique, and in ascending order.&quot;</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running wristpy. arguments given: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>    <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>        <span class="nb">input</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>        <span class="n">output</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>        <span class="n">thresholds</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">)),</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>        <span class="n">calibrator</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span> <span class="k">else</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span><span class="p">,</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>        <span class="n">epoch_length</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="p">,</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>        <span class="n">verbosity</span><span class="o">=</span><span class="n">log_level</span><span class="p">,</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>        <span class="n">output_filetype</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">output_filetype</span><span class="p">,</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>    <span class="p">)</span>
 </span></pre></div>
 
 
@@ -244,51 +257,60 @@
 </span><span id="parse_arguments-37"><a href="#parse_arguments-37"><span class="linenos">37</span></a>    <span class="p">)</span>
 </span><span id="parse_arguments-38"><a href="#parse_arguments-38"><span class="linenos">38</span></a>
 </span><span id="parse_arguments-39"><a href="#parse_arguments-39"><span class="linenos">39</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-40"><a href="#parse_arguments-40"><span class="linenos">40</span></a>        <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-41"><a href="#parse_arguments-41"><span class="linenos">41</span></a>        <span class="s2">&quot;--calibrator&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-40"><a href="#parse_arguments-40"><span class="linenos">40</span></a>        <span class="s2">&quot;-O&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-41"><a href="#parse_arguments-41"><span class="linenos">41</span></a>        <span class="s2">&quot;--output_filetype&quot;</span><span class="p">,</span>
 </span><span id="parse_arguments-42"><a href="#parse_arguments-42"><span class="linenos">42</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-</span><span id="parse_arguments-43"><a href="#parse_arguments-43"><span class="linenos">43</span></a>        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;gradient&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">],</span>
-</span><span id="parse_arguments-44"><a href="#parse_arguments-44"><span class="linenos">44</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-45"><a href="#parse_arguments-45"><span class="linenos">45</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pick which calibrator to use. Can be &#39;ggir&#39; or &#39;gradient&#39;.&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-43"><a href="#parse_arguments-43"><span class="linenos">43</span></a>        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="parse_arguments-44"><a href="#parse_arguments-44"><span class="linenos">44</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Format for save files when processing directories. &quot;</span>
+</span><span id="parse_arguments-45"><a href="#parse_arguments-45"><span class="linenos">45</span></a>        <span class="s2">&quot;Leave as None when processing single files.&quot;</span><span class="p">,</span>
 </span><span id="parse_arguments-46"><a href="#parse_arguments-46"><span class="linenos">46</span></a>    <span class="p">)</span>
 </span><span id="parse_arguments-47"><a href="#parse_arguments-47"><span class="linenos">47</span></a>
 </span><span id="parse_arguments-48"><a href="#parse_arguments-48"><span class="linenos">48</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-49"><a href="#parse_arguments-49"><span class="linenos">49</span></a>        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-50"><a href="#parse_arguments-50"><span class="linenos">50</span></a>        <span class="s2">&quot;--thresholds&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-51"><a href="#parse_arguments-51"><span class="linenos">51</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-</span><span id="parse_arguments-52"><a href="#parse_arguments-52"><span class="linenos">52</span></a>        <span class="n">nargs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-</span><span id="parse_arguments-53"><a href="#parse_arguments-53"><span class="linenos">53</span></a>        <span class="n">default</span><span class="o">=</span><span class="p">[</span>
-</span><span id="parse_arguments-54"><a href="#parse_arguments-54"><span class="linenos">54</span></a>            <span class="mf">0.0563</span><span class="p">,</span>
-</span><span id="parse_arguments-55"><a href="#parse_arguments-55"><span class="linenos">55</span></a>            <span class="mf">0.1916</span><span class="p">,</span>
-</span><span id="parse_arguments-56"><a href="#parse_arguments-56"><span class="linenos">56</span></a>            <span class="mf">0.6958</span><span class="p">,</span>
-</span><span id="parse_arguments-57"><a href="#parse_arguments-57"><span class="linenos">57</span></a>        <span class="p">],</span>
-</span><span id="parse_arguments-58"><a href="#parse_arguments-58"><span class="linenos">58</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Provide three thresholds for light, moderate, and vigorous activity. &quot;</span>
-</span><span id="parse_arguments-59"><a href="#parse_arguments-59"><span class="linenos">59</span></a>        <span class="s2">&quot;Values must be given in ascending order.&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-60"><a href="#parse_arguments-60"><span class="linenos">60</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-61"><a href="#parse_arguments-61"><span class="linenos">61</span></a>
-</span><span id="parse_arguments-62"><a href="#parse_arguments-62"><span class="linenos">62</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-63"><a href="#parse_arguments-63"><span class="linenos">63</span></a>        <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-64"><a href="#parse_arguments-64"><span class="linenos">64</span></a>        <span class="s2">&quot;--epoch_length&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-65"><a href="#parse_arguments-65"><span class="linenos">65</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-</span><span id="parse_arguments-66"><a href="#parse_arguments-66"><span class="linenos">66</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-</span><span id="parse_arguments-67"><a href="#parse_arguments-67"><span class="linenos">67</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the sampling rate in seconds for all metrics. To skip resampling,&quot;</span>
-</span><span id="parse_arguments-68"><a href="#parse_arguments-68"><span class="linenos">68</span></a>        <span class="s2">&quot; enter 0.&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-49"><a href="#parse_arguments-49"><span class="linenos">49</span></a>        <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-50"><a href="#parse_arguments-50"><span class="linenos">50</span></a>        <span class="s2">&quot;--calibrator&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-51"><a href="#parse_arguments-51"><span class="linenos">51</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+</span><span id="parse_arguments-52"><a href="#parse_arguments-52"><span class="linenos">52</span></a>        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;gradient&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">],</span>
+</span><span id="parse_arguments-53"><a href="#parse_arguments-53"><span class="linenos">53</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-54"><a href="#parse_arguments-54"><span class="linenos">54</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pick which calibrator to use. Can be &#39;ggir&#39; or &#39;gradient&#39;.&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-55"><a href="#parse_arguments-55"><span class="linenos">55</span></a>    <span class="p">)</span>
+</span><span id="parse_arguments-56"><a href="#parse_arguments-56"><span class="linenos">56</span></a>
+</span><span id="parse_arguments-57"><a href="#parse_arguments-57"><span class="linenos">57</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+</span><span id="parse_arguments-58"><a href="#parse_arguments-58"><span class="linenos">58</span></a>        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-59"><a href="#parse_arguments-59"><span class="linenos">59</span></a>        <span class="s2">&quot;--thresholds&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-60"><a href="#parse_arguments-60"><span class="linenos">60</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+</span><span id="parse_arguments-61"><a href="#parse_arguments-61"><span class="linenos">61</span></a>        <span class="n">nargs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+</span><span id="parse_arguments-62"><a href="#parse_arguments-62"><span class="linenos">62</span></a>        <span class="n">default</span><span class="o">=</span><span class="p">[</span>
+</span><span id="parse_arguments-63"><a href="#parse_arguments-63"><span class="linenos">63</span></a>            <span class="mf">0.0563</span><span class="p">,</span>
+</span><span id="parse_arguments-64"><a href="#parse_arguments-64"><span class="linenos">64</span></a>            <span class="mf">0.1916</span><span class="p">,</span>
+</span><span id="parse_arguments-65"><a href="#parse_arguments-65"><span class="linenos">65</span></a>            <span class="mf">0.6958</span><span class="p">,</span>
+</span><span id="parse_arguments-66"><a href="#parse_arguments-66"><span class="linenos">66</span></a>        <span class="p">],</span>
+</span><span id="parse_arguments-67"><a href="#parse_arguments-67"><span class="linenos">67</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Provide three thresholds for light, moderate, and vigorous activity. &quot;</span>
+</span><span id="parse_arguments-68"><a href="#parse_arguments-68"><span class="linenos">68</span></a>        <span class="s2">&quot;Values must be given in ascending order.&quot;</span><span class="p">,</span>
 </span><span id="parse_arguments-69"><a href="#parse_arguments-69"><span class="linenos">69</span></a>    <span class="p">)</span>
 </span><span id="parse_arguments-70"><a href="#parse_arguments-70"><span class="linenos">70</span></a>
 </span><span id="parse_arguments-71"><a href="#parse_arguments-71"><span class="linenos">71</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-72"><a href="#parse_arguments-72"><span class="linenos">72</span></a>        <span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
-</span><span id="parse_arguments-73"><a href="#parse_arguments-73"><span class="linenos">73</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-74"><a href="#parse_arguments-74"><span class="linenos">74</span></a>
-</span><span id="parse_arguments-75"><a href="#parse_arguments-75"><span class="linenos">75</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-76"><a href="#parse_arguments-76"><span class="linenos">76</span></a>        <span class="s2">&quot;-v&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-77"><a href="#parse_arguments-77"><span class="linenos">77</span></a>        <span class="s2">&quot;--verbosity&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-78"><a href="#parse_arguments-78"><span class="linenos">78</span></a>        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-79"><a href="#parse_arguments-79"><span class="linenos">79</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="parse_arguments-80"><a href="#parse_arguments-80"><span class="linenos">80</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Determines the level of verbosity. Use -v for info, -vv for debug.&quot;</span>
-</span><span id="parse_arguments-81"><a href="#parse_arguments-81"><span class="linenos">81</span></a>        <span class="s2">&quot;Default for warning.&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-72"><a href="#parse_arguments-72"><span class="linenos">72</span></a>        <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-73"><a href="#parse_arguments-73"><span class="linenos">73</span></a>        <span class="s2">&quot;--epoch_length&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-74"><a href="#parse_arguments-74"><span class="linenos">74</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+</span><span id="parse_arguments-75"><a href="#parse_arguments-75"><span class="linenos">75</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+</span><span id="parse_arguments-76"><a href="#parse_arguments-76"><span class="linenos">76</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the sampling rate in seconds for all metrics. To skip resampling,&quot;</span>
+</span><span id="parse_arguments-77"><a href="#parse_arguments-77"><span class="linenos">77</span></a>        <span class="s2">&quot; enter 0.&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-78"><a href="#parse_arguments-78"><span class="linenos">78</span></a>    <span class="p">)</span>
+</span><span id="parse_arguments-79"><a href="#parse_arguments-79"><span class="linenos">79</span></a>
+</span><span id="parse_arguments-80"><a href="#parse_arguments-80"><span class="linenos">80</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+</span><span id="parse_arguments-81"><a href="#parse_arguments-81"><span class="linenos">81</span></a>        <span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
 </span><span id="parse_arguments-82"><a href="#parse_arguments-82"><span class="linenos">82</span></a>    <span class="p">)</span>
 </span><span id="parse_arguments-83"><a href="#parse_arguments-83"><span class="linenos">83</span></a>
-</span><span id="parse_arguments-84"><a href="#parse_arguments-84"><span class="linenos">84</span></a>    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</span><span id="parse_arguments-84"><a href="#parse_arguments-84"><span class="linenos">84</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+</span><span id="parse_arguments-85"><a href="#parse_arguments-85"><span class="linenos">85</span></a>        <span class="s2">&quot;-v&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-86"><a href="#parse_arguments-86"><span class="linenos">86</span></a>        <span class="s2">&quot;--verbosity&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-87"><a href="#parse_arguments-87"><span class="linenos">87</span></a>        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-88"><a href="#parse_arguments-88"><span class="linenos">88</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="parse_arguments-89"><a href="#parse_arguments-89"><span class="linenos">89</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Determines the level of verbosity. Use -v for info, -vv for debug.&quot;</span>
+</span><span id="parse_arguments-90"><a href="#parse_arguments-90"><span class="linenos">90</span></a>        <span class="s2">&quot;Default for warning.&quot;</span><span class="p">,</span>
+</span><span id="parse_arguments-91"><a href="#parse_arguments-91"><span class="linenos">91</span></a>    <span class="p">)</span>
+</span><span id="parse_arguments-92"><a href="#parse_arguments-92"><span class="linenos">92</span></a>
+</span><span id="parse_arguments-93"><a href="#parse_arguments-93"><span class="linenos">93</span></a>    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -315,56 +337,60 @@ will take the args from <code>sys.argv</code>.</li>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">main</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="orchestrator.html#Results">wristpy.core.orchestrator.Results</a></span>:</span></span>
+        <span class="name">main</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="main-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#main"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="main-87"><a href="#main-87"><span class="linenos"> 87</span></a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">Results</span><span class="p">:</span>
-</span><span id="main-88"><a href="#main-88"><span class="linenos"> 88</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs wristpy orchestrator with command line arguments.</span>
-</span><span id="main-89"><a href="#main-89"><span class="linenos"> 89</span></a>
-</span><span id="main-90"><a href="#main-90"><span class="linenos"> 90</span></a><span class="sd">    Args:</span>
-</span><span id="main-91"><a href="#main-91"><span class="linenos"> 91</span></a><span class="sd">         args: A list of command line arguments given as strings. If None, the parser</span>
-</span><span id="main-92"><a href="#main-92"><span class="linenos"> 92</span></a><span class="sd">            will take the args from `sys.argv`.</span>
-</span><span id="main-93"><a href="#main-93"><span class="linenos"> 93</span></a>
-</span><span id="main-94"><a href="#main-94"><span class="linenos"> 94</span></a><span class="sd">    Returns:</span>
-</span><span id="main-95"><a href="#main-95"><span class="linenos"> 95</span></a><span class="sd">        A Results object containing enmo, anglez, physical activity levels, nonwear</span>
-</span><span id="main-96"><a href="#main-96"><span class="linenos"> 96</span></a><span class="sd">        detection, and sleep detection.</span>
-</span><span id="main-97"><a href="#main-97"><span class="linenos"> 97</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="main-98"><a href="#main-98"><span class="linenos"> 98</span></a>    <span class="n">arguments</span> <span class="o">=</span> <span class="n">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-</span><span id="main-99"><a href="#main-99"><span class="linenos"> 99</span></a>
-</span><span id="main-100"><a href="#main-100"><span class="linenos">100</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="main-101"><a href="#main-101"><span class="linenos">101</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-</span><span id="main-102"><a href="#main-102"><span class="linenos">102</span></a>    <span class="k">elif</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="main-103"><a href="#main-103"><span class="linenos">103</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
-</span><span id="main-104"><a href="#main-104"><span class="linenos">104</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="main-105"><a href="#main-105"><span class="linenos">105</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
-</span><span id="main-106"><a href="#main-106"><span class="linenos">106</span></a>
-</span><span id="main-107"><a href="#main-107"><span class="linenos">107</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
-</span><span id="main-108"><a href="#main-108"><span class="linenos">108</span></a>
-</span><span id="main-109"><a href="#main-109"><span class="linenos">109</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="main-110"><a href="#main-110"><span class="linenos">110</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="main-111"><a href="#main-111"><span class="linenos">111</span></a>            <span class="sa">f</span><span class="s2">&quot;Value for epoch_length is:</span><span class="si">{</span><span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="si">}</span><span class="s2">.&quot;</span>
-</span><span id="main-112"><a href="#main-112"><span class="linenos">112</span></a>            <span class="s2">&quot;Please enter an integer &gt;= 0.&quot;</span>
-</span><span id="main-113"><a href="#main-113"><span class="linenos">113</span></a>        <span class="p">)</span>
-</span><span id="main-114"><a href="#main-114"><span class="linenos">114</span></a>
-</span><span id="main-115"><a href="#main-115"><span class="linenos">115</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
-</span><span id="main-116"><a href="#main-116"><span class="linenos">116</span></a>        <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-</span><span id="main-117"><a href="#main-117"><span class="linenos">117</span></a>    <span class="p">):</span>
-</span><span id="main-118"><a href="#main-118"><span class="linenos">118</span></a>        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Threshold values must be &gt;=0, unique, and in ascending order.&quot;</span>
-</span><span id="main-119"><a href="#main-119"><span class="linenos">119</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-</span><span id="main-120"><a href="#main-120"><span class="linenos">120</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-</span><span id="main-121"><a href="#main-121"><span class="linenos">121</span></a>
-</span><span id="main-122"><a href="#main-122"><span class="linenos">122</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running wristpy. arguments given: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
-</span><span id="main-123"><a href="#main-123"><span class="linenos">123</span></a>
-</span><span id="main-124"><a href="#main-124"><span class="linenos">124</span></a>    <span class="k">return</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span id="main-125"><a href="#main-125"><span class="linenos">125</span></a>        <span class="nb">input</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
-</span><span id="main-126"><a href="#main-126"><span class="linenos">126</span></a>        <span class="n">output</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
-</span><span id="main-127"><a href="#main-127"><span class="linenos">127</span></a>        <span class="n">thresholds</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">),</span>
-</span><span id="main-128"><a href="#main-128"><span class="linenos">128</span></a>        <span class="n">calibrator</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span> <span class="k">else</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span><span class="p">,</span>
-</span><span id="main-129"><a href="#main-129"><span class="linenos">129</span></a>        <span class="n">epoch_length</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="p">,</span>
-</span><span id="main-130"><a href="#main-130"><span class="linenos">130</span></a>    <span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="main-96"><a href="#main-96"><span class="linenos"> 96</span></a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span>
+</span><span id="main-97"><a href="#main-97"><span class="linenos"> 97</span></a>    <span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="main-98"><a href="#main-98"><span class="linenos"> 98</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="main-99"><a href="#main-99"><span class="linenos"> 99</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs wristpy orchestrator with command line arguments.</span>
+</span><span id="main-100"><a href="#main-100"><span class="linenos">100</span></a>
+</span><span id="main-101"><a href="#main-101"><span class="linenos">101</span></a><span class="sd">    Args:</span>
+</span><span id="main-102"><a href="#main-102"><span class="linenos">102</span></a><span class="sd">         args: A list of command line arguments given as strings. If None, the parser</span>
+</span><span id="main-103"><a href="#main-103"><span class="linenos">103</span></a><span class="sd">            will take the args from `sys.argv`.</span>
+</span><span id="main-104"><a href="#main-104"><span class="linenos">104</span></a>
+</span><span id="main-105"><a href="#main-105"><span class="linenos">105</span></a><span class="sd">    Returns:</span>
+</span><span id="main-106"><a href="#main-106"><span class="linenos">106</span></a><span class="sd">        A Results object containing enmo, anglez, physical activity levels, nonwear</span>
+</span><span id="main-107"><a href="#main-107"><span class="linenos">107</span></a><span class="sd">        detection, and sleep detection.</span>
+</span><span id="main-108"><a href="#main-108"><span class="linenos">108</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="main-109"><a href="#main-109"><span class="linenos">109</span></a>    <span class="n">arguments</span> <span class="o">=</span> <span class="n">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</span><span id="main-110"><a href="#main-110"><span class="linenos">110</span></a>
+</span><span id="main-111"><a href="#main-111"><span class="linenos">111</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="main-112"><a href="#main-112"><span class="linenos">112</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
+</span><span id="main-113"><a href="#main-113"><span class="linenos">113</span></a>    <span class="k">elif</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="main-114"><a href="#main-114"><span class="linenos">114</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+</span><span id="main-115"><a href="#main-115"><span class="linenos">115</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="main-116"><a href="#main-116"><span class="linenos">116</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+</span><span id="main-117"><a href="#main-117"><span class="linenos">117</span></a>
+</span><span id="main-118"><a href="#main-118"><span class="linenos">118</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
+</span><span id="main-119"><a href="#main-119"><span class="linenos">119</span></a>
+</span><span id="main-120"><a href="#main-120"><span class="linenos">120</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="main-121"><a href="#main-121"><span class="linenos">121</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="main-122"><a href="#main-122"><span class="linenos">122</span></a>            <span class="sa">f</span><span class="s2">&quot;Value for epoch_length is:</span><span class="si">{</span><span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="si">}</span><span class="s2">.&quot;</span>
+</span><span id="main-123"><a href="#main-123"><span class="linenos">123</span></a>            <span class="s2">&quot;Please enter an integer &gt;= 0.&quot;</span>
+</span><span id="main-124"><a href="#main-124"><span class="linenos">124</span></a>        <span class="p">)</span>
+</span><span id="main-125"><a href="#main-125"><span class="linenos">125</span></a>
+</span><span id="main-126"><a href="#main-126"><span class="linenos">126</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+</span><span id="main-127"><a href="#main-127"><span class="linenos">127</span></a>        <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</span><span id="main-128"><a href="#main-128"><span class="linenos">128</span></a>    <span class="p">):</span>
+</span><span id="main-129"><a href="#main-129"><span class="linenos">129</span></a>        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Threshold values must be &gt;=0, unique, and in ascending order.&quot;</span>
+</span><span id="main-130"><a href="#main-130"><span class="linenos">130</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</span><span id="main-131"><a href="#main-131"><span class="linenos">131</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</span><span id="main-132"><a href="#main-132"><span class="linenos">132</span></a>
+</span><span id="main-133"><a href="#main-133"><span class="linenos">133</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running wristpy. arguments given: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
+</span><span id="main-134"><a href="#main-134"><span class="linenos">134</span></a>
+</span><span id="main-135"><a href="#main-135"><span class="linenos">135</span></a>    <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="main-136"><a href="#main-136"><span class="linenos">136</span></a>        <span class="nb">input</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+</span><span id="main-137"><a href="#main-137"><span class="linenos">137</span></a>        <span class="n">output</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+</span><span id="main-138"><a href="#main-138"><span class="linenos">138</span></a>        <span class="n">thresholds</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">)),</span>
+</span><span id="main-139"><a href="#main-139"><span class="linenos">139</span></a>        <span class="n">calibrator</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span> <span class="k">else</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span><span class="p">,</span>
+</span><span id="main-140"><a href="#main-140"><span class="linenos">140</span></a>        <span class="n">epoch_length</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="p">,</span>
+</span><span id="main-141"><a href="#main-141"><span class="linenos">141</span></a>        <span class="n">verbosity</span><span class="o">=</span><span class="n">log_level</span><span class="p">,</span>
+</span><span id="main-142"><a href="#main-142"><span class="linenos">142</span></a>        <span class="n">output_filetype</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">output_filetype</span><span class="p">,</span>
+</span><span id="main-143"><a href="#main-143"><span class="linenos">143</span></a>    <span class="p">)</span>
 </span></pre></div>
 
 

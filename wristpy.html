@@ -137,12 +137,23 @@ wristpy    </h1>
 
 <h3 id="using-wristpy-through-the-command-line">Using Wristpy through the command-line:</h3>
 
+<h4 id="run-single-files">Run single files:</h4>
+
 <div class="pdoc-code codehilite">
 <pre><span></span><code>wristpy<span class="w"> </span>/input/file/path.gt3x<span class="w"> </span>-o<span class="w"> </span>/save/path/file_name.csv<span class="w"> </span>-c<span class="w"> </span>gradient
 </code></pre>
 </div>
 
+<h4 id="run-entire-directories">Run entire directories:</h4>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>wristpy<span class="w"> </span>/path/to/files/input_dir<span class="w"> </span>-o<span class="w"> </span>/path/to/files/output_dir<span class="w"> </span>-c<span class="w"> </span>gradient<span class="w"> </span>-O<span class="w"> </span>.csv
+</code></pre>
+</div>
+
 <h3 id="using-wristpy-through-a-python-script-or-notebook">Using Wristpy through a python script or notebook:</h3>
+
+<h4 id="running-single-files">Running single files:</h4>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">orchestrator</span>
@@ -159,12 +170,43 @@ wristpy    </h1>
     <span class="n">calibrator</span><span class="o">=</span><span class="s1">&#39;gradient&#39;</span><span class="p">,</span>  <span class="c1"># Choose between &#39;ggir&#39;, &#39;gradient&#39;, or &#39;none&#39;</span>
 <span class="p">)</span>
 
-<span class="c1">#Data availble in results object</span>
+<span class="c1">#Data available in results object</span>
 <span class="n">enmo</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">enmo</span>
 <span class="n">anglez</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">anglez</span>
 <span class="n">physical_activity_levels</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">physical_activity_levels</span>
 <span class="n">nonwear_array</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">nonwear_epoch</span>
 <span class="n">sleep_windows</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">sleep_windows_epoch</span>
+</code></pre>
+</div>
+
+<h4 id="running-entire-directories">Running entire directories:</h4>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">orchestrator</span>
+
+<span class="c1"># Define input file path and output location</span>
+
+<span class="n">input_path</span> <span class="o">=</span> <span class="s1">&#39;/path/to/files/input_dir&#39;</span>
+<span class="n">output_path</span> <span class="o">=</span> <span class="s1">&#39;/path/to/files/output_dir&#39;</span>
+
+<span class="c1"># Run the orchestrator</span>
+<span class="c1"># Specify the output file type, support for saving as .csv and .parquet</span>
+<span class="n">results_dict</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="nb">input</span><span class="o">=</span><span class="n">input_path</span><span class="p">,</span>
+    <span class="n">output</span><span class="o">=</span><span class="n">output_path</span><span class="p">,</span>
+    <span class="n">calibrator</span><span class="o">=</span><span class="s1">&#39;gradient&#39;</span><span class="p">,</span>  <span class="c1"># Choose between &#39;ggir&#39;, &#39;gradient&#39;, or &#39;none&#39;</span>
+    <span class="n">output_filetype</span> <span class="o">=</span> <span class="s1">&#39;.csv&#39;</span>
+<span class="p">)</span>
+
+
+<span class="c1">#Data available in dictionry of results.</span>
+<span class="n">subject1</span> <span class="o">=</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;subject1&#39;</span><span class="p">]</span>
+
+<span class="n">enmo</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">enmo</span>
+<span class="n">anglez</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">anglez</span>
+<span class="n">physical_activity_levels</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">physical_activity_levels</span>
+<span class="n">nonwear_array</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">nonwear_epoch</span>
+<span class="n">sleep_windows</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">sleep_windows_epoch</span>
 </code></pre>
 </div>
 
@@ -217,6 +259,19 @@ we will cover the following topics through a few examples:</p>
 </div>
 
 <p>This runs the processing pipeline with all the default arguments, creates an output <code>.csv</code> file, and will create a <code>results</code> object that contains the various output metrics (namely, enmo, angle-z, physical activity values, non-wear detection, sleep detection).</p>
+
+<p>The orchestrator can also process entire directories. The call to the orchestrator remains largely the same but now output is expected to be a directory and the desired filetype for the saved files <strong>must</strong> be specified:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">orchestrator</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="s1">&#39;/path/to/input/dir&#39;</span><span class="p">,</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="s1">&#39;/path/to/output/dir&#39;</span><span class="p">,</span>
+    <span class="n">output_filetype</span> <span class="o">=</span> <span class="s2">&quot;.csv&quot;</span>
+<span class="p">)</span>
+</code></pre>
+</div>
 
 <p>We can visualize some of the outputs within the <code>results</code> object, directly, with the following scripts:</p>
 
