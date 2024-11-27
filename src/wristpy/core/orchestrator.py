@@ -162,9 +162,6 @@ def run(
             verbosity=verbosity,
         )
 
-    if output is None and output_filetype is not None:
-        raise ValueError("If no output is given, output_filetype must be None.")
-
     return _run_directory(
         input=input,
         output=output,
@@ -224,6 +221,9 @@ def _run_directory(
         output from wrist- and hip-worn monitors. Medicine and Science in Sports and
         Exercise, 46(9), 1816-1824.
     """
+    if output is None and output_filetype is not None:
+        raise ValueError("If no output is given, output_filetype must be None.")
+
     if output is not None:
         if output.is_file():
             raise ValueError(
@@ -243,7 +243,7 @@ def _run_directory(
     results_dict = {}
     for file in file_names:
         output_file_path = (
-            output / pathlib.Path(file.stem).with_suffix(output_filetype)  # type: ignore[arg-type]
+            output / pathlib.Path(file.stem).with_suffix(output_filetype)  # type: ignore[arg-type] # if output is defined, so is output_filetype
             if output
             else None
         )
