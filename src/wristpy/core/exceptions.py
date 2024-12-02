@@ -40,9 +40,3 @@ class InvalidFileTypeError(LoggedException):
     """Wristpy did not expect this file extension."""
 
     pass
-
-
-class DirectoryNotFoundError(LoggedException):
-    """Output save path not found."""
-
-    pass
