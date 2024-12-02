@@ -58,7 +58,7 @@ def test_idle_sleep_mode_gap_fill() -> None:
     acceleration = models.Measurement(
         measurements=np.ones((num_samples, 3)), time=test_time
     )
-    expected_acceleration = (np.finfo(float).eps, np.finfo(float).eps, -1)
+    expected_acceleration = (0, 0, -1)
 
     filled_acceleration = idle_sleep_mode_imputation.impute_idle_sleep_mode_gaps(
         acceleration

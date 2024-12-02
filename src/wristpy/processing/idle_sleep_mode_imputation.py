@@ -9,7 +9,7 @@ from wristpy.core import models
 def impute_idle_sleep_mode_gaps(acceleration: models.Measurement) -> models.Measurement:
     """This function imputes the gaps in the idle sleep mode data.
 
-    This function is called when the idle_sleep_mode_flag is True. It imputes the gaps
+    It imputes the gaps
     in the acceleration data by assuming the watch is idle in a face up position.
     The acceleration data is filled in at a linear sampling rate, estimated based on the
     first 100 samples timestamps, with (np.finfo(float).eps, np.finfo(float).eps, -1).
@@ -52,17 +52,16 @@ def impute_idle_sleep_mode_gaps(acceleration: models.Measurement) -> models.Meas
             "time": acceleration.time,
         }
     )
-    fill_value = np.finfo(float).eps
-    sampling_space_nanosec = round(
-        np.mean(
-            acceleration.time[:100]
-            .diff()
-            .drop_nulls()
-            .dt.total_nanoseconds()
-            .to_numpy()
-            .astype(dtype=float)
-        )
+
+    sampling_space_nanosec = np.mean(
+        acceleration.time[:100]
+        .diff()
+        .drop_nulls()
+        .dt.total_nanoseconds()
+        .to_numpy()
+        .astype(dtype=float)
     )
+
     sampling_rate = int(1e9 / sampling_space_nanosec)
 
     effective_sampling_rate = _find_effective_sampling_rate(sampling_rate)
@@ -74,8 +73,8 @@ def impute_idle_sleep_mode_gaps(acceleration: models.Measurement) -> models.Meas
         .agg(pl.exclude("time").mean())
         .upsample("time", every=f"{effective_sampling_interval}ns", maintain_order=True)
         .with_columns(
-            pl.col("X").fill_null(value=fill_value),
-            pl.col("Y").fill_null(value=fill_value),
+            pl.col("X").fill_null(value=0),
+            pl.col("Y").fill_null(value=0),
             pl.col("Z").fill_null(value=-1),
         )
     )
