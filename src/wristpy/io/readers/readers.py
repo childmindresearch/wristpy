@@ -15,6 +15,8 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
     """Read watch data from a file.
 
     Currently supported watch types are Actigraph .gt3x and GeneActiv .bin.
+    Assigns the idle_sleep_mode_flag to false unless the watchtype is .gt3x and
+    sleep_mode is enabled (based on watch metadata).
 
     Args:
         file_name: The filename to read the watch data from.
