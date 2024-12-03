@@ -9,10 +9,9 @@ from wristpy.core import models
 def impute_idle_sleep_mode_gaps(acceleration: models.Measurement) -> models.Measurement:
     """This function imputes the gaps in the idle sleep mode data.
 
-    It imputes the gaps
-    in the acceleration data by assuming the watch is idle in a face up position.
-    The acceleration data is filled in at a linear sampling rate, estimated based on the
-    first 100 samples timestamps, with (np.finfo(float).eps, np.finfo(float).eps, -1).
+    Gaps in the acceleration data are filled by assuming the watch is idle in a face up
+    position. The acceleration data is filled in at a linear sampling rate, estimated
+    based on the first 100 samples timestamps, with (0, 0, -1).
 
     In cases when the sampling rate leads to unevenly spaced samples within one second,
     eg. 30Hz sampling rate has samples spaced at 33333333ns and 33333343ns within one
