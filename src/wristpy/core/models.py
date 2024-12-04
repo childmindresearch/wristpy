@@ -113,6 +113,7 @@ class WatchData(BaseModel):
     battery: Optional[Measurement] = None
     capsense: Optional[Measurement] = None
     temperature: Optional[Measurement] = None
+    idle_sleep_mode_flag: Optional[bool] = None
 
     @field_validator("acceleration")
     def validate_acceleration(cls, v: Measurement) -> Measurement:

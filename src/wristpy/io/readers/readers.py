@@ -1,5 +1,6 @@
 """Function to read accelerometer data from a file."""
 
+import os
 import pathlib
 from typing import Literal, Union
 
@@ -14,6 +15,8 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
     """Read watch data from a file.
 
     Currently supported watch types are Actigraph .gt3x and GeneActiv .bin.
+    Assigns the idle_sleep_mode_flag to false unless the watchtype is .gt3x and
+    sleep_mode is enabled (based on watch metadata).
 
     Args:
         file_name: The filename to read the watch data from.
@@ -36,6 +39,11 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
             measurements[sensor_name] = models.Measurement(
                 measurements=sensor_values, time=time
             )
+    idle_sleep_mode_flag = False
+    if os.path.splitext(file_name)[1] == ".gt3x":
+        idle_sleep_mode_flag = (
+            data["metadata"]["device_feature_enabled"]["sleep_mode"].lower() == "true"
+        )
 
     return models.WatchData(
         acceleration=measurements["acceleration"],
@@ -43,6 +51,7 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
         battery=measurements.get("battery_voltage"),
         capsense=measurements.get("capsense"),
         temperature=measurements.get("temperature"),
+        idle_sleep_mode_flag=idle_sleep_mode_flag,
     )
 
 
