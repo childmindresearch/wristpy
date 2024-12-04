@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13883191.svg)](https://doi.org/10.5281/zenodo.13883191)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13883190.svg)](https://doi.org/10.5281/zenodo.13883190)
 
 # `wristpy` <img src="https://media.githubusercontent.com/media/childmindresearch/wristpy/main/docs/wristpy_logo.png" align="right" width="25%"/>
 
