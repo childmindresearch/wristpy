@@ -437,3 +437,24 @@ def compute_physical_activty_categories(
         ["inactive", "light", "moderate", "vigorous"],
     )
     return models.Measurement(measurements=activity_levels, time=enmo_epoch1.time)
+
+
+def _sleep_windows_as_measurement(
+    raw_acceleration: models.Measurement, sleep_windows: List[SleepWindow]
+) -> models.Measurement:
+    """Helper function to convert list of sleep windows to a Measurement instance.
+
+    The temporal resolution of the output Measurement instance is 60s.
+    """
+    start_time = raw_acceleration.time[0]
+    end_time = raw_acceleration.time[-1]
+    time_range = pl.datetime_range(start_time, end_time, interval="60s", eager=True)
+
+    sleep_value = np.zeros(len(time_range), dtype=int)
+
+    for sw in sleep_windows:
+        if sw.onset is not None and sw.wakeup is not None:
+            time_mask = (time_range >= sw.onset) & (time_range <= sw.wakeup)
+            sleep_value[time_mask] = 1
+
+    return models.Measurement(time=time_range, measurements=sleep_value)
