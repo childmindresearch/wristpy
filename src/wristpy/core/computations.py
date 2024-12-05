@@ -114,7 +114,7 @@ def majority_vote_non_wear(
     nonwear_ggir: models.Measurement,
     nonwear_cta: models.Measurement,
     nonwear_detach: models.Measurement,
-    temporal_resolution: float = 5.0,
+    temporal_resolution: float = 60.0,
 ) -> models.Measurement:
     """This function applies a majority vote on the three possible nonwear outputs.
 
@@ -149,6 +149,9 @@ def majority_vote_non_wear(
     nonwear_ggir = resample(nonwear_ggir, temporal_resolution)
     nonwear_cta = resample(nonwear_cta, temporal_resolution)
     nonwear_detach = resample(nonwear_detach, temporal_resolution)
+
+    nonwear_ggir.measurements = np.where(nonwear_ggir.measurements >= 0.5, 1, 0)
+    nonwear_cta.measurements = np.where(nonwear_cta.measurements >= 0.5, 1, 0)
 
     nonwear_value = np.where(
         (
