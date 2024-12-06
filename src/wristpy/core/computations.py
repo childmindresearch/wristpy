@@ -129,7 +129,7 @@ def majority_vote_non_wear(
         nonwear_cta: The nonwear algorithm output from the CTA algorithm.
         nonwear_detach: The nonwear algorithm output from the detach algorithm.
         temporal_resolution: The temporal resolution of the output, in seconds.
-            Defaults to 5.0.
+            Defaults to 60.0.
 
     Returns:
         A new Measurement instance at a new temporal resolution.
@@ -168,21 +168,25 @@ def majority_vote_non_wear(
 
 
 def _time_fix(
-    nonwear: models.Measurement,
+    measurement: models.Measurement,
     max_end_time: datetime.datetime,
     min_start_time: datetime.datetime,
 ) -> models.Measurement:
-    """Helper function to fix the time of the nonwear measurements."""
-    if nonwear.time[0] > min_start_time:
-        nonwear.time = pl.concat(
-            [pl.Series([min_start_time], dtype=pl.Datetime("ns")), nonwear.time]
+    """Helper function to fix the time of a measurement."""
+    if measurement.time[0] > min_start_time:
+        measurement.time = pl.concat(
+            [pl.Series([min_start_time], dtype=pl.Datetime("ns")), measurement.time]
         )
-        nonwear.measurements = np.append(nonwear.measurements[0], nonwear.measurements)
+        measurement.measurements = np.append(
+            measurement.measurements[0], measurement.measurements
+        )
 
-    if nonwear.time[-1] < max_end_time:
-        nonwear.time.append(pl.Series([max_end_time], dtype=pl.Datetime("ns")))
-        nonwear.measurements = np.append(nonwear.measurements, nonwear.measurements[-1])
-    return nonwear
+    if measurement.time[-1] < max_end_time:
+        measurement.time.append(pl.Series([max_end_time], dtype=pl.Datetime("ns")))
+        measurement.measurements = np.append(
+            measurement.measurements, measurement.measurements[-1]
+        )
+    return measurement
 
 
 def resample(measurement: models.Measurement, delta_t: float) -> models.Measurement:

@@ -336,70 +336,6 @@ def _find_periods(
     return all_periods
 
 
-def remove_nonwear_from_sleep(
-    non_wear_array: models.Measurement,
-    sleep_windows: List[SleepWindow],
-) -> List[SleepWindow]:
-    """Remove non-wear periods from sleep windows.
-
-    This function finds all the non-wear periods and removes any sleep windows that have
-    any overlap with the non-wear periods (including non-wear completely
-    within the sleep window).
-
-    Args:
-        non_wear_array: The non-wear array generated from metrics.detect_nonwear
-        sleep_windows : The list of sleep windows, where the entries are
-            instances of the SleepWindow class.
-
-    Returns:
-        A List of the filtered sleep windows.
-    """
-    logger.debug(
-        "Finding non-wear periods that overlap with any of the %s sleep windows.",
-        len(sleep_windows),
-    )
-    nonwear_periods = _find_periods(non_wear_array)
-
-    filtered_sleep_windows = []
-    for sleep_window in sleep_windows:
-        if isinstance(sleep_window.onset, datetime.datetime) and isinstance(
-            sleep_window.wakeup, datetime.datetime
-        ):
-            if not any(
-                (
-                    nonwear_period[0] <= sleep_window.onset <= nonwear_period[1]
-                    or nonwear_period[0] <= sleep_window.wakeup <= nonwear_period[1]
-                )
-                or (
-                    sleep_window.onset <= nonwear_period[0]
-                    and sleep_window.wakeup >= nonwear_period[1]
-                )
-                for nonwear_period in nonwear_periods
-            ):
-                filtered_sleep_windows.append(sleep_window)
-
-    logger.debug("Non-wear removed. %s sleep windows remain.", len(sleep_windows))
-    return filtered_sleep_windows
-
-
-def sleep_cleanup(
-    sleep: models.Measurement, nonwear_measurement: models.Measurement
-) -> models.Measurement:
-    """This function will filter the sleep measurement based on the nonwear measurement.
-
-    It will remove any sleep that overlaps with nonwear.
-    It will then remove any remaining sleep that is less than 15 minutes.
-    """
-    filtered_sleep = np.where(
-        (sleep.measurements - nonwear_measurement.measurements) > 0, 1, 0
-    )
-    cleaned_sleep = np.logical_not(
-        _fill_false_blocks(np.logical_not(filtered_sleep), 15)
-    )
-
-    return models.Measurement(time=sleep.time, measurements=cleaned_sleep)
-
-
 def compute_physical_activty_categories(
     enmo_epoch1: models.Measurement,
     thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
@@ -460,10 +396,20 @@ def _sleep_windows_as_measurement(
     """Helper function to convert list of sleep windows to a Measurement instance.
 
     The temporal resolution of the output Measurement instance is 60s.
+
+    Args:
+        raw_acceleration: The raw acceleration data.
+        sleep_windows: The list of sleep windows, where the entries are
+            instances of the SleepWindow class.
+
+    Returns:
+        A new Measurement instance with the sleep values.
     """
     start_time = raw_acceleration.time[0]
     end_time = raw_acceleration.time[-1]
-    time_range = pl.datetime_range(start_time, end_time, interval="60s", eager=True)
+    time_range = pl.datetime_range(
+        start_time, end_time, interval="60s", eager=True, time_unit="ns"
+    ).alias("time")
 
     sleep_value = np.zeros(len(time_range), dtype=int)
 
@@ -472,4 +418,74 @@ def _sleep_windows_as_measurement(
             time_mask = (time_range >= sw.onset) & (time_range <= sw.wakeup)
             sleep_value[time_mask] = 1
 
-    return models.Measurement(time=time_range, measurements=sleep_value)
+    return models.Measurement(time=time_range.dt.round("1m"), measurements=sleep_value)
+
+
+def sleep_cleanup(
+    sleep: models.Measurement, nonwear_measurement: models.Measurement
+) -> models.Measurement:
+    """This function will filter the sleep measurement based on the nonwear measurement.
+
+    It will remove any sleep that overlaps with nonwear.
+    It will then remove any remaining sleep that is less than 15 minutes.
+    """
+    if len(sleep.measurements) != len(nonwear_measurement.measurements):
+        sleep = computations._time_fix(
+            sleep,
+            max_end_time=nonwear_measurement.time[-1],
+            min_start_time=nonwear_measurement.time[0],
+        )
+    filtered_sleep = np.where(
+        (sleep.measurements - nonwear_measurement.measurements) > 0, 1, 0
+    )
+    cleaned_sleep = np.logical_not(
+        _fill_false_blocks(np.logical_not(filtered_sleep), 15)
+    )
+
+    return models.Measurement(time=sleep.time, measurements=cleaned_sleep.astype(int))
+
+
+def remove_nonwear_from_sleep(
+    non_wear_array: models.Measurement,
+    sleep_windows: List[SleepWindow],
+) -> List[SleepWindow]:
+    """Remove non-wear periods from sleep windows.
+
+    This function finds all the non-wear periods and removes any sleep windows that have
+    any overlap with the non-wear periods (including non-wear completely
+    within the sleep window).
+
+    Args:
+        non_wear_array: The non-wear array generated from metrics.detect_nonwear
+        sleep_windows : The list of sleep windows, where the entries are
+            instances of the SleepWindow class.
+
+    Returns:
+        A List of the filtered sleep windows.
+    """
+    logger.debug(
+        "Finding non-wear periods that overlap with any of the %s sleep windows.",
+        len(sleep_windows),
+    )
+    nonwear_periods = _find_periods(non_wear_array)
+
+    filtered_sleep_windows = []
+    for sleep_window in sleep_windows:
+        if isinstance(sleep_window.onset, datetime.datetime) and isinstance(
+            sleep_window.wakeup, datetime.datetime
+        ):
+            if not any(
+                (
+                    nonwear_period[0] <= sleep_window.onset <= nonwear_period[1]
+                    or nonwear_period[0] <= sleep_window.wakeup <= nonwear_period[1]
+                )
+                or (
+                    sleep_window.onset <= nonwear_period[0]
+                    and sleep_window.wakeup >= nonwear_period[1]
+                )
+                for nonwear_period in nonwear_periods
+            ):
+                filtered_sleep_windows.append(sleep_window)
+
+    logger.debug("Non-wear removed. %s sleep windows remain.", len(sleep_windows))
+    return filtered_sleep_windows
