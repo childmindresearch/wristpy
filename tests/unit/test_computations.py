@@ -288,7 +288,10 @@ def test_nonwear_majority_vote() -> None:
     )
 
     nonwear = computations.majority_vote_non_wear(
-        nonwear_cta=nonwear1, nonwear_detach=nonwear2, nonwear_ggir=nonwear3
+        nonwear_cta=nonwear1,
+        nonwear_detach=nonwear2,
+        nonwear_ggir=nonwear3,
+        temporal_resolution=5,
     )
 
     assert np.all(nonwear.measurements == 1)
