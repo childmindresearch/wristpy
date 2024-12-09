@@ -23,6 +23,7 @@ def test_gt3x_loader(sample_data_gt3x: pathlib.Path) -> None:
     assert isinstance(watch_data.battery, models.Measurement)
     assert isinstance(watch_data.capsense, models.Measurement)
     assert watch_data.temperature is None
+    assert watch_data.idle_sleep_mode_flag is False
 
 
 def test_geneactiv_bin_loader(sample_data_bin: pathlib.Path) -> None:
@@ -34,6 +35,7 @@ def test_geneactiv_bin_loader(sample_data_bin: pathlib.Path) -> None:
     assert isinstance(watch_data.battery, models.Measurement)
     assert isinstance(watch_data.temperature, models.Measurement)
     assert watch_data.capsense is None
+    assert watch_data.idle_sleep_mode_flag is False
 
 
 def test_nonexistent_file() -> None:

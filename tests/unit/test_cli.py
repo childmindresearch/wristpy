@@ -1,5 +1,6 @@
 """Test the wristpy cli."""
 
+import logging
 import pathlib
 
 import pytest
@@ -66,6 +67,8 @@ def test_main_default(
         thresholds=default_thresholds,
         calibrator=None,
         epoch_length=5,
+        verbosity=logging.WARNING,
+        output_filetype=None,
     )
 
 
@@ -100,6 +103,8 @@ def test_main_with_options(
         thresholds=(0.1, 1.0, 1.5),
         calibrator="gradient",
         epoch_length=None,
+        verbosity=logging.WARNING,
+        output_filetype=None,
     )
 
 

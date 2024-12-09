@@ -42,7 +42,9 @@ def test_watchdata_model() -> None:
     lux = models.Measurement(measurements=sensor_data, time=time)
     temp = models.Measurement(measurements=sensor_data, time=time)
 
-    watch_data = models.WatchData(acceleration=acceleration, lux=lux, temperature=temp)
+    watch_data = models.WatchData(
+        acceleration=acceleration, lux=lux, temperature=temp, idle_sleep_mode_flag=True
+    )
 
     if watch_data.lux is not None:
         assert np.array_equal(watch_data.lux.measurements, sensor_data)
@@ -53,6 +55,7 @@ def test_watchdata_model() -> None:
             np.array([1, 2, 3]) * 1000000,
         )
     assert isinstance(watch_data.battery, type(None))
+    assert watch_data.idle_sleep_mode_flag
 
 
 def test_measurement_model_time_type() -> None:
