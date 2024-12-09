@@ -1,16 +1,11 @@
 """Main function for wristpy."""
 
-from wristpy.core import cli, orchestrator
+from wristpy.core import cli
 
 
-def run_main() -> orchestrator.Results:
-    """Main entry point to wristpy.
-
-    Returns:
-        A Results object containing enmo, anglez, physical activity levels, nonwear
-        detection, and sleep detection.
-    """
-    return cli.main()
+def run_main() -> None:
+    """Main entry point to wristpy."""
+    cli.main()
 
 
 if __name__ == "__main__":

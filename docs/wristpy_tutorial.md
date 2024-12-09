@@ -30,6 +30,20 @@ results = orchestrator.run(
 ```
 This runs the processing pipeline with all the default arguments, creates an output `.csv` file, and will create a `results` object that contains the various output metrics (namely, enmo, angle-z, physical activity values, non-wear detection, sleep detection).
 
+The orchestrator can also process entire directories. The call to the orchestrator remains largely the same but now output is expected to be a directory and the desired filetype for the saved files **must** be specified:
+
+```python
+from wristpy.core import orchestrator
+
+results = orchestrator.run(
+    input = '/path/to/input/dir',
+    output = '/path/to/output/dir',
+    output_filetype = ".csv"
+)
+```
+
+
+
 We can visualize some of the outputs within the `results` object, directly, with the following scripts:
 
 Plot the ENMO across the entire data set:

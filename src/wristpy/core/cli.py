@@ -3,7 +3,7 @@
 import argparse
 import logging
 import pathlib
-from typing import List, Optional
+from typing import List, Optional, Tuple, cast
 
 from wristpy.core import config, orchestrator
 
@@ -33,6 +33,15 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         "--output",
         type=pathlib.Path,
         help="Path where data will be saved. Supports .csv and .parquet formats.",
+    )
+
+    parser.add_argument(
+        "-O",
+        "--output_filetype",
+        type=str,
+        default=None,
+        help="Format for save files when processing directories. "
+        "Leave as None when processing single files.",
     )
 
     parser.add_argument(
@@ -83,7 +92,9 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     return parser.parse_args(args)
 
 
-def main(args: Optional[List[str]] = None) -> orchestrator.Results:
+def main(
+    args: Optional[List[str]] = None,
+) -> None:
     """Runs wristpy orchestrator with command line arguments.
 
     Args:
@@ -120,10 +131,12 @@ def main(args: Optional[List[str]] = None) -> orchestrator.Results:
 
     logger.debug("Running wristpy. arguments given: %s", arguments)
 
-    return orchestrator.run(
+    orchestrator.run(
         input=arguments.input,
         output=arguments.output,
-        thresholds=tuple(arguments.thresholds),
+        thresholds=cast(Tuple[float, float, float], tuple(arguments.thresholds)),
         calibrator=None if arguments.calibrator == "none" else arguments.calibrator,
         epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
+        verbosity=log_level,
+        output_filetype=arguments.output_filetype,
     )
