@@ -11,7 +11,12 @@ import polars as pl
 
 from wristpy.core import computations, config, exceptions, models
 from wristpy.io.readers import readers
-from wristpy.processing import analytics, calibration, metrics
+from wristpy.processing import (
+    analytics,
+    calibration,
+    idle_sleep_mode_imputation,
+    metrics,
+)
 
 logger = config.get_logger()
 
@@ -350,7 +355,13 @@ def _run_file(
                 "Calibration FAILED: %s. Proceeding without calibration.", exc_info
             )
             calibrated_acceleration = watch_data.acceleration
-
+    if watch_data.idle_sleep_mode_flag:
+        logger.debug("Imputing idle sleep mode gaps.")
+        calibrated_acceleration = (
+            idle_sleep_mode_imputation.impute_idle_sleep_mode_gaps(
+                calibrated_acceleration
+            )
+        )
     enmo = metrics.euclidean_norm_minus_one(calibrated_acceleration)
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
     sleep_detector = analytics.GgirSleepDetection(anglez)

@@ -47,3 +47,21 @@ def test_orchestrator_different_epoch(
     assert isinstance(results.nonwear_epoch, models.Measurement)
     assert isinstance(results.sleep_windows_epoch, models.Measurement)
     assert isinstance(results.physical_activity_levels, models.Measurement)
+
+
+def test_orchestrator_idle_sleep_mode_run(
+    tmp_path: pathlib.Path,
+    sample_data_gt3x_idle_sleep_mode: pathlib.Path,
+) -> None:
+    """Idle sleep mode path for orchestrator."""
+    results = orchestrator.run(
+        input=sample_data_gt3x_idle_sleep_mode, output=tmp_path / "good_file.csv"
+    )
+
+    assert (tmp_path / "good_file.csv").exists()
+    assert isinstance(results, models.OrchestratorResults)
+    assert isinstance(results.enmo, models.Measurement)
+    assert isinstance(results.anglez, models.Measurement)
+    assert isinstance(results.nonwear_epoch, models.Measurement)
+    assert isinstance(results.sleep_windows_epoch, models.Measurement)
+    assert isinstance(results.physical_activity_levels, models.Measurement)

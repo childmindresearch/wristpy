@@ -148,6 +148,7 @@ def test_run_dir(tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path) -> None
     expected_files = {
         tmp_path / "example_actigraph.csv",
         tmp_path / "example_geneactiv.csv",
+        tmp_path / "example_actigraph_idle_sleep_mode.csv",
     }
 
     results = orchestrator.run(input=input_dir, output=tmp_path, output_filetype=".csv")
