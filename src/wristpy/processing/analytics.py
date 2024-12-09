@@ -427,7 +427,7 @@ def sleep_cleanup(
     """This function will filter the sleep measurement based on the nonwear measurement.
 
     It will remove any sleep that overlaps with nonwear.
-    It will then remove any remaining sleep that is less than 15 minutes.
+    It will then remove any remaining sleep periods that are less than 15 minutes.
     """
     if len(sleep.measurements) != len(nonwear_measurement.measurements):
         sleep = computations._time_fix(
@@ -435,6 +435,7 @@ def sleep_cleanup(
             max_end_time=nonwear_measurement.time[-1],
             min_start_time=nonwear_measurement.time[0],
         )
+        sleep = computations.resample_modified(sleep, 60)
     filtered_sleep = np.where(
         (sleep.measurements - nonwear_measurement.measurements) > 0, 1, 0
     )

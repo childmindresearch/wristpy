@@ -134,6 +134,21 @@ def majority_vote_non_wear(
     Returns:
         A new Measurement instance at a new temporal resolution.
     """
+
+    def _processor_helper(
+        measurement: models.Measurement,
+        max_end_time: datetime.datetime,
+        min_start_time: datetime.datetime,
+        temporal_resolution: float,
+    ) -> models.Measurement:
+        """Helper function to process the nonwear measurements."""
+        fixed_time = _time_fix(measurement, max_end_time, min_start_time)
+        resamped_measurement = resample_modified(fixed_time, temporal_resolution)
+        resamped_measurement.measurements = np.where(
+            resamped_measurement.measurements >= 0.5, 1, 0
+        )
+        return resamped_measurement
+
     min_start_time = min(
         [nonwear_ggir.time[0], nonwear_cta.time[0], nonwear_detach.time[0]]
     )
@@ -142,16 +157,26 @@ def majority_vote_non_wear(
         [nonwear_ggir.time[-1], nonwear_cta.time[-1], nonwear_detach.time[-1]]
     )
 
-    nonwear_ggir = _time_fix(nonwear_ggir, max_end_time, min_start_time)
-    nonwear_cta = _time_fix(nonwear_cta, max_end_time, min_start_time)
-    nonwear_detach = _time_fix(nonwear_detach, max_end_time, min_start_time)
+    nonwear_ggir = _processor_helper(
+        nonwear_ggir,
+        max_end_time=max_end_time,
+        min_start_time=min_start_time,
+        temporal_resolution=temporal_resolution,
+    )
 
-    nonwear_ggir = resample(nonwear_ggir, temporal_resolution)
-    nonwear_cta = resample(nonwear_cta, temporal_resolution)
-    nonwear_detach = resample(nonwear_detach, temporal_resolution)
+    nonwear_cta = _processor_helper(
+        nonwear_cta,
+        max_end_time=max_end_time,
+        min_start_time=min_start_time,
+        temporal_resolution=temporal_resolution,
+    )
 
-    nonwear_ggir.measurements = np.where(nonwear_ggir.measurements >= 0.5, 1, 0)
-    nonwear_cta.measurements = np.where(nonwear_cta.measurements >= 0.5, 1, 0)
+    nonwear_detach = _processor_helper(
+        nonwear_detach,
+        max_end_time=max_end_time,
+        min_start_time=min_start_time,
+        temporal_resolution=temporal_resolution,
+    )
 
     nonwear_value = np.where(
         (
@@ -164,7 +189,7 @@ def majority_vote_non_wear(
         0,
     )
 
-    return models.Measurement(measurements=nonwear_value, time=nonwear_ggir.time)
+    return models.Measurement(measurements=nonwear_value, time=nonwear_detach.time)
 
 
 def _time_fix(
@@ -189,8 +214,15 @@ def _time_fix(
     return measurement
 
 
-def resample(measurement: models.Measurement, delta_t: float) -> models.Measurement:
+def resample_modified(
+    measurement: models.Measurement, delta_t: float
+) -> models.Measurement:
     """Resamples a measurement to a different timescale.
+
+    This is a special modified case where even if the sampling rate is the same as
+    the requested resampled rate we will upsamnple and interpolate any gaps, this
+    is for the case when time points are added to the start of the time array
+    from `_time_fix`.
 
     Args:
         measurement: The measurement to resample.
@@ -214,16 +246,13 @@ def resample(measurement: models.Measurement, delta_t: float) -> models.Measurem
     current_delta_t = all_delta_t[0].seconds * n_nanoseconds_in_second
     requested_delta_t = round(delta_t * n_nanoseconds_in_second)
 
-    if current_delta_t == requested_delta_t:
-        return measurement
-
     measurement_df = (
         pl.from_numpy(measurement.measurements)
         .with_columns(time=measurement.time)
         .set_sorted("time")
     )
 
-    if current_delta_t > requested_delta_t:
+    if current_delta_t >= requested_delta_t:
         resampled_df = (
             measurement_df.upsample(
                 time_column="time", every=f"{requested_delta_t}ns", maintain_order=True

@@ -198,7 +198,7 @@ def test_resample_downsample() -> None:
         measurements=np.array([1.5, 3.5]), time=pl.Series("time", time[0::2])
     )
 
-    actual = computations.resample(measurement, delta_t)
+    actual = computations.resample_modified(measurement, delta_t)
 
     assert np.allclose(actual.measurements, expected.measurements)
     assert all(actual.time == expected.time)
@@ -224,29 +224,10 @@ def test_resample_upsample() -> None:
         measurements=np.array([1, 1.5, 2]), time=pl.Series("time", expected_time)
     )
 
-    actual = computations.resample(measurement, delta_t)
+    actual = computations.resample_modified(measurement, delta_t)
 
     assert np.allclose(actual.measurements, expected.measurements)
     assert all(actual.time == expected.time)
-
-
-def test_resample_same() -> None:
-    """Test that the measurement remains unaltered at the same delta time."""
-    time = [
-        datetime(1990, 1, 1, second=1),
-        datetime(1990, 1, 1, second=2),
-    ]
-    expected = models.Measurement(
-        measurements=np.array([1, 2]),
-        time=pl.Series("time", time),
-    )
-    delta_t = 1
-
-    actual = computations.resample(expected, delta_t)
-
-    assert (
-        actual is expected
-    ), "Input and output do not point to the same location in memory."
 
 
 def test_resample_value_error() -> None:
@@ -262,7 +243,7 @@ def test_resample_value_error() -> None:
     delta_t = -1
 
     with pytest.raises(ValueError):
-        computations.resample(expected, delta_t)
+        computations.resample_modified(expected, delta_t)
 
 
 def test_nonwear_majority_vote() -> None:
@@ -295,3 +276,21 @@ def test_nonwear_majority_vote() -> None:
     )
 
     assert np.all(nonwear.measurements == 1)
+
+
+def test_time_fix() -> None:
+    """Test the time fix helper function."""
+    time = [datetime(1987, 1, 1, 1, 5) + timedelta(seconds=secs) for secs in range(10)]
+    measurement = models.Measurement(
+        measurements=np.ones(len(time)),
+        time=pl.Series("time", time, dtype=pl.Datetime("ns")),
+    )
+    max_end_time = datetime(1987, 9, 1)
+    min_start_time = datetime(1987, 1, 1)
+
+    fixed_measurement = computations._time_fix(
+        measurement, max_end_time, min_start_time
+    )
+
+    assert fixed_measurement.time[0] == min_start_time
+    assert fixed_measurement.time[-1] == max_end_time
