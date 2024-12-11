@@ -27,6 +27,7 @@ jobs:
       run: |
         poetry env use python
         poetry run pip install uv
+        rm poetry.lock # Ensure lock file is not used for resolution.
         poetry run uv pip install --resolution=${{ matrix.resolution }} .
         poetry install --only dev
       shell: bash
