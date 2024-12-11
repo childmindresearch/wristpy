@@ -249,11 +249,10 @@ def test_resample_value_error() -> None:
 def test_nonwear_majority_vote() -> None:
     """Tests the majority vote function for nonwear."""
     time1 = [
-        datetime(1990, 1, 1, 1, 1) + timedelta(seconds=60 * secs) for secs in range(900)
+        datetime(1990, 1, 1, 2, 1) + timedelta(seconds=60 * secs) for secs in range(900)
     ]
     time3 = [
-        datetime(1990, 1, 1, 1, 1, 10) + timedelta(seconds=100 * secs)
-        for secs in range(11)
+        datetime(1990, 1, 1, 1, 1) + timedelta(seconds=600 * secs) for secs in range(11)
     ]
     nonwear1 = models.Measurement(
         measurements=np.ones(len(time1)),
@@ -269,10 +268,7 @@ def test_nonwear_majority_vote() -> None:
     )
 
     nonwear = computations.majority_vote_non_wear(
-        nonwear_cta=nonwear1,
-        nonwear_detach=nonwear2,
-        nonwear_ggir=nonwear3,
-        temporal_resolution=5,
+        nonwear_cta=nonwear1, nonwear_detach=nonwear2, nonwear_ggir=nonwear3
     )
 
     assert np.all(nonwear.measurements == 1)
