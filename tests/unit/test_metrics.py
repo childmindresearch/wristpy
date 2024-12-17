@@ -229,7 +229,7 @@ def test_detect_nonwear(
 
 
 def test_mean_amplitude_deviation_function(create_acceleration: pl.DataFrame) -> None:
-    """Test the mean amplitude difference function."""
+    """Test the mean amplitude deviation function."""
     acceleration_df = create_acceleration
     acceleration = models.Measurement(
         measurements=acceleration_df.select(["X", "Y", "Z"]).to_numpy(),
