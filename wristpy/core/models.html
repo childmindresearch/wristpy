@@ -69,12 +69,6 @@
                         <li>
                                 <a class="variable" href="#Measurement.model_config">model_config</a>
                         </li>
-                        <li>
-                                <a class="variable" href="#Measurement.model_fields">model_fields</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#Measurement.model_computed_fields">model_computed_fields</a>
-                        </li>
                 </ul>
 
             </li>
@@ -105,12 +99,6 @@
                         <li>
                                 <a class="variable" href="#WatchData.model_config">model_config</a>
                         </li>
-                        <li>
-                                <a class="variable" href="#WatchData.model_fields">model_fields</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#WatchData.model_computed_fields">model_computed_fields</a>
-                        </li>
                 </ul>
 
             </li>
@@ -140,12 +128,6 @@
                         </li>
                         <li>
                                 <a class="variable" href="#OrchestratorResults.model_config">model_config</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#OrchestratorResults.model_fields">model_fields</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#OrchestratorResults.model_computed_fields">model_computed_fields</a>
                         </li>
                 </ul>
 
@@ -736,38 +718,6 @@ and is sorted.</p>
 
 
                             </div>
-                            <div id="Measurement.model_fields" class="classattr">
-                                <div class="attr variable">
-            <span class="name">model_fields</span><span class="annotation">: ClassVar[Dict[str, pydantic.fields.FieldInfo]]</span>        =
-<input id="Measurement.model_fields-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="Measurement.model_fields-view-value"></label><span class="default_value">{&#39;measurements&#39;: FieldInfo(annotation=ndarray, required=True), &#39;time&#39;: FieldInfo(annotation=Series, required=True)}</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Measurement.model_fields"></a>
-    
-            <div class="docstring"><p>Metadata about the fields defined on the model,
-mapping of field names to [<code>FieldInfo</code>][pydantic.fields.FieldInfo] objects.</p>
-
-<p>This replaces <code>Model.__fields__</code> from Pydantic V1.</p>
-</div>
-
-
-                            </div>
-                            <div id="Measurement.model_computed_fields" class="classattr">
-                                <div class="attr variable">
-            <span class="name">model_computed_fields</span><span class="annotation">: ClassVar[Dict[str, pydantic.fields.ComputedFieldInfo]]</span>        =
-<span class="default_value">{}</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Measurement.model_computed_fields"></a>
-    
-            <div class="docstring"><p>A dictionary of computed field names and their corresponding <code>ComputedFieldInfo</code> objects.</p>
-</div>
-
-
-                            </div>
                 </section>
                 <section id="Measurement.Config">
                             <input id="Measurement.Config-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -994,38 +944,6 @@ It must not be mutated during processing.</p>
     <a class="headerlink" href="#WatchData.model_config"></a>
     
             <div class="docstring"><p>Configuration for the model, should be a dictionary conforming to [<code>ConfigDict</code>][pydantic.config.ConfigDict].</p>
-</div>
-
-
-                            </div>
-                            <div id="WatchData.model_fields" class="classattr">
-                                <div class="attr variable">
-            <span class="name">model_fields</span><span class="annotation">: ClassVar[Dict[str, pydantic.fields.FieldInfo]]</span>        =
-<input id="WatchData.model_fields-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="WatchData.model_fields-view-value"></label><span class="default_value">{&#39;acceleration&#39;: FieldInfo(annotation=Measurement, required=True), &#39;lux&#39;: FieldInfo(annotation=Union[Measurement, NoneType], required=False, default=None), &#39;battery&#39;: FieldInfo(annotation=Union[Measurement, NoneType], required=False, default=None), &#39;capsense&#39;: FieldInfo(annotation=Union[Measurement, NoneType], required=False, default=None), &#39;temperature&#39;: FieldInfo(annotation=Union[Measurement, NoneType], required=False, default=None), &#39;idle_sleep_mode_flag&#39;: FieldInfo(annotation=Union[bool, NoneType], required=False, default=None)}</span>
-
-        
-    </div>
-    <a class="headerlink" href="#WatchData.model_fields"></a>
-    
-            <div class="docstring"><p>Metadata about the fields defined on the model,
-mapping of field names to [<code>FieldInfo</code>][pydantic.fields.FieldInfo] objects.</p>
-
-<p>This replaces <code>Model.__fields__</code> from Pydantic V1.</p>
-</div>
-
-
-                            </div>
-                            <div id="WatchData.model_computed_fields" class="classattr">
-                                <div class="attr variable">
-            <span class="name">model_computed_fields</span><span class="annotation">: ClassVar[Dict[str, pydantic.fields.ComputedFieldInfo]]</span>        =
-<span class="default_value">{}</span>
-
-        
-    </div>
-    <a class="headerlink" href="#WatchData.model_computed_fields"></a>
-    
-            <div class="docstring"><p>A dictionary of computed field names and their corresponding <code>ComputedFieldInfo</code> objects.</p>
 </div>
 
 
@@ -1272,38 +1190,6 @@ than csv or parquet.</li>
     <a class="headerlink" href="#OrchestratorResults.model_config"></a>
     
             <div class="docstring"><p>Configuration for the model, should be a dictionary conforming to [<code>ConfigDict</code>][pydantic.config.ConfigDict].</p>
-</div>
-
-
-                            </div>
-                            <div id="OrchestratorResults.model_fields" class="classattr">
-                                <div class="attr variable">
-            <span class="name">model_fields</span><span class="annotation">: ClassVar[Dict[str, pydantic.fields.FieldInfo]]</span>        =
-<input id="OrchestratorResults.model_fields-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="OrchestratorResults.model_fields-view-value"></label><span class="default_value">{&#39;enmo&#39;: FieldInfo(annotation=Measurement, required=True), &#39;anglez&#39;: FieldInfo(annotation=Measurement, required=True), &#39;physical_activity_levels&#39;: FieldInfo(annotation=Measurement, required=True), &#39;nonwear_epoch&#39;: FieldInfo(annotation=Measurement, required=True), &#39;sleep_windows_epoch&#39;: FieldInfo(annotation=Measurement, required=True)}</span>
-
-        
-    </div>
-    <a class="headerlink" href="#OrchestratorResults.model_fields"></a>
-    
-            <div class="docstring"><p>Metadata about the fields defined on the model,
-mapping of field names to [<code>FieldInfo</code>][pydantic.fields.FieldInfo] objects.</p>
-
-<p>This replaces <code>Model.__fields__</code> from Pydantic V1.</p>
-</div>
-
-
-                            </div>
-                            <div id="OrchestratorResults.model_computed_fields" class="classattr">
-                                <div class="attr variable">
-            <span class="name">model_computed_fields</span><span class="annotation">: ClassVar[Dict[str, pydantic.fields.ComputedFieldInfo]]</span>        =
-<span class="default_value">{}</span>
-
-        
-    </div>
-    <a class="headerlink" href="#OrchestratorResults.model_computed_fields"></a>
-    
-            <div class="docstring"><p>A dictionary of computed field names and their corresponding <code>ComputedFieldInfo</code> objects.</p>
 </div>
 
 
