@@ -435,5 +435,6 @@ def compute_physical_activty_categories(
             thresholds[2] < enmo_epoch1.measurements,
         ],
         ["inactive", "light", "moderate", "vigorous"],
+        default="unknown",
     )
     return models.Measurement(measurements=activity_levels, time=enmo_epoch1.time)
