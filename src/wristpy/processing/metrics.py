@@ -2,6 +2,7 @@
 
 import numpy as np
 import polars as pl
+from scipy import interpolate
 
 from wristpy.core import config, models
 
@@ -245,3 +246,59 @@ def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.
     nonwear_value_array[condition] = 2
 
     return nonwear_value_array
+
+
+def monitor_independent_monitor_summary_unit(
+    acceleration: models.Measurement, new_frequency: int = 100
+) -> None:
+    """#TODO desc.
+
+    #TODO Args.
+    """
+    interpolated_acceleration = interpolate_measure(
+        acceleration=acceleration, new_frequency=new_frequency
+    )
+
+
+def interpolate_measure(
+    acceleration: models.Measurement, new_frequency: int = 100
+) -> models.Measurement:
+    """Interpolate the measure to a new sampling rate using cubic spline."""
+    old_time_array = acceleration.time.to_numpy()
+    new_time_array = np.arange(old_time_array[0], old_time_array[-1], 1 / new_frequency)
+
+    interpolated_data = np.zeros(
+        (len(new_time_array), acceleration.measurements.shape[1])
+    )
+
+    for axis in range(acceleration.measurements.shape[1]):
+        cubic_spline = interpolate.CubicSpline(
+            old_time_array, acceleration.measurements[:, axis]
+        )
+        interpolated_data[:, axis] = cubic_spline(new_time_array)
+
+    return models.Measurement(
+        measurements=interpolated_data, time=pl.Series(new_time_array)
+    )
+
+
+def extrapolate_data(
+    acceleration: models.Measurement, dynamic_range: tuple[float, float]
+) -> None:
+    pass
+
+
+def _find_extrapolation_edges() -> None:
+    pass
+
+
+def bandpass_filter() -> None:
+    pass
+
+
+def aggregate() -> None:
+    pass
+
+
+def truncate() -> None:
+    pass
