@@ -54,6 +54,17 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "-a",
+        "--activity_metric",
+        type=str,
+        choices=["ENMO", "MAD"],
+        default="ENMO",
+        help="Pick which physical activity metric should be used. "
+        "This will be used to determine physical activity categorization. "
+        "Can be 'ENMO' or 'MAD'.",
+    )
+
+    parser.add_argument(
         "-t",
         "--thresholds",
         type=float,
@@ -136,6 +147,7 @@ def main(
         output=arguments.output,
         thresholds=cast(Tuple[float, float, float], tuple(arguments.thresholds)),
         calibrator=None if arguments.calibrator == "none" else arguments.calibrator,
+        activity_metric=arguments.activity_metric,
         epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
         verbosity=log_level,
         output_filetype=arguments.output_filetype,

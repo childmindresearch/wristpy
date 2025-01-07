@@ -104,6 +104,7 @@ def run(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
+    activity_metric: Literal["ENMO", "MAD"] = "ENMO",
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
@@ -128,6 +129,7 @@ def run(
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. If None is given no down sampling is preformed.
+        activity_metric: The metric to be used for physical activity categorization.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files. Must be None when
             processing files, must be a valid file type when processing directories.
@@ -164,6 +166,7 @@ def run(
             thresholds=thresholds,
             calibrator=calibrator,
             epoch_length=epoch_length,
+            activity_metric=activity_metric,
             verbosity=verbosity,
         )
 
@@ -282,14 +285,16 @@ def _run_file(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
+    activity_metric: Literal["ENMO", "MAD"] = "ENMO",
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
 
-    The run_file() function will provide the user with enmo, anglez, physical activity
-    levels, detected sleep periods, and nonwear data. All measures will be in the same
-    temporal resolution. Users may choose from 'ggir' and 'gradient' calibration
-    methods, or enter None to proceed without calibration.
+    The run_file() function will provide the user with the specified physical activity
+    metric, anglez, physical activity levels, detected sleep periods, and nonwear data.
+    All measures will be in the same temporal resolution.
+    Users may choose from 'ggir' and 'gradient' calibration methods,
+    or enter None to proceed without calibration.
 
     Args:
         input: Path to the input file to be read. Currently supports .bin and .gt3x
@@ -301,6 +306,7 @@ def _run_file(
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. If None is given no down sampling is preformed.
+        activity_metric: The metric to be used for physical activity categorization.
         verbosity: The logging level for the logger.
 
     Returns:
@@ -310,6 +316,10 @@ def _run_file(
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
         output from wrist- and hip-worn monitors. Medicine and Science in Sports and
         Exercise, 46(9), 1816-1824.
+        [2] Aittasalo, M., Vähä-Ypyä, H., Vasankari, T. et al. Mean amplitude deviation
+        calculated from raw acceleration data: a novel method for classifying the
+        intensity of adolescents' physical activity irrespective of accelerometer brand.
+        BMC Sports Sci Med Rehabil 7, 18 (2015). https://doi.org/10.1186/s13102-015-0010-0.
     """
     logger.setLevel(verbosity)
     input = pathlib.Path(input)
@@ -362,36 +372,41 @@ def _run_file(
                 calibrated_acceleration
             )
         )
-    enmo = metrics.euclidean_norm_minus_one(calibrated_acceleration)
+    if activity_metric == "ENMO":
+        activity_measurement = metrics.enmo(calibrated_acceleration)
+    elif activity_metric == "MAD":
+        activity_measurement = metrics.mean_amplitude_deviation(calibrated_acceleration)
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
 
     if epoch_length is not None:
-        enmo = computations.moving_mean(enmo, epoch_length=epoch_length)
+        activity_measurement = computations.moving_mean(
+            activity_measurement, epoch_length=epoch_length
+        )
         anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
     non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
     physical_activity_levels = analytics.compute_physical_activty_categories(
-        enmo,
+        activity_measurement,
         thresholds,
     )
     sleep_array = models.Measurement(
         measurements=format_sleep_data(
-            sleep_windows=sleep_windows, reference_measure=enmo
+            sleep_windows=sleep_windows, reference_measure=activity_measurement
         ),
-        time=enmo.time,
+        time=activity_measurement.time,
     )
     nonwear_epoch = models.Measurement(
         measurements=format_nonwear_data(
             nonwear_data=non_wear_array,
-            reference_measure=enmo,
+            reference_measure=activity_measurement,
             original_temporal_resolution=900,
         ),
-        time=enmo.time,
+        time=activity_measurement.time,
     )
 
     results = models.OrchestratorResults(
-        enmo=enmo,
+        physical_activity_metric=activity_measurement,
         anglez=anglez,
         physical_activity_levels=physical_activity_levels,
         sleep_windows_epoch=sleep_array,

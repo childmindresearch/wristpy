@@ -58,7 +58,9 @@ def angle_relative_to_horizontal(
     return models.Measurement(measurements=angle_degrees, time=acceleration.time)
 
 
-def mean_amplitude_deviation(acceleration: models.Measurement) -> models.Measurement:
+def mean_amplitude_deviation(
+    acceleration: models.Measurement, epoch_length: int = 5
+) -> models.Measurement:
     """Calculate the mean amplitude deviation of the acceleration data.
 
     An alternative to ENMO to quantify the intensity of physical activity.
@@ -67,9 +69,16 @@ def mean_amplitude_deviation(acceleration: models.Measurement) -> models.Measure
 
     Args:
         acceleration: the calibrated acceleration data.
+        epoch_length: The length of the window in seconds.
 
     Returns:
         A new Measurement object containing the MAD values.
+
+    References:
+        Vähä-Ypyä H, Vasankari T, Husu P, Suni J, Sievänen H. A universal, accurate
+        intensity-based classification of different physical activities using raw data
+        of accelerometer. Clin Physiol Funct Imaging. 2015 Jan;35(1):64-70.
+        doi: 10.1111/cpf.12127. Epub 2014 Jan 7. PMID: 24393233.
     """
     acceleration_magnitude = np.linalg.norm(acceleration.measurements, axis=1)
 
@@ -78,7 +87,7 @@ def mean_amplitude_deviation(acceleration: models.Measurement) -> models.Measure
     ).set_sorted("time")
 
     mad_df = (
-        mad_lf.group_by_dynamic(index_column="time", every="5s")
+        mad_lf.group_by_dynamic(index_column="time", every=f"{epoch_length}s")
         .agg(
             [
                 (
