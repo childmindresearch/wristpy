@@ -24,7 +24,7 @@ def dummy_results() -> models.OrchestratorResults:
         ),
     )
     dummy_results = models.OrchestratorResults(
-        enmo=dummy_measure,
+        physical_activity_metric=dummy_measure,
         anglez=dummy_measure,
         physical_activity_levels=dummy_measure,
         nonwear_epoch=dummy_measure,

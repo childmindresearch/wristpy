@@ -66,6 +66,7 @@ def test_main_default(
         output=None,
         thresholds=default_thresholds,
         calibrator=None,
+        activity_metric="ENMO",
         epoch_length=5,
         verbosity=logging.WARNING,
         output_filetype=None,
@@ -94,6 +95,8 @@ def test_main_with_options(
             "1.5",
             "-e",
             "0",
+            "-a",
+            "MAD",
         ]
     )
 
@@ -102,6 +105,7 @@ def test_main_with_options(
         output=test_output,
         thresholds=(0.1, 1.0, 1.5),
         calibrator="gradient",
+        activity_metric="MAD",
         epoch_length=None,
         verbosity=logging.WARNING,
         output_filetype=None,

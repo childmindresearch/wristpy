@@ -373,7 +373,7 @@ def _run_file(
             )
         )
     if activity_metric == "ENMO":
-        activity_measurement = metrics.enmo(calibrated_acceleration)
+        activity_measurement = metrics.euclidean_norm_minus_one(calibrated_acceleration)
     elif activity_metric == "MAD":
         activity_measurement = metrics.mean_amplitude_deviation(calibrated_acceleration)
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
