@@ -251,10 +251,7 @@ def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.
 def monitor_independent_monitor_summary_unit(
     acceleration: models.Measurement, new_frequency: int = 100
 ) -> None:
-    """#TODO desc.
-
-    #TODO Args.
-    """
+    """Monitor Independent Monitor Summary Unit (MIMS), an alteratove to ENMO."""
     interpolated_acceleration = interpolate_measure(
         acceleration=acceleration, new_frequency=new_frequency
     )
@@ -264,22 +261,29 @@ def interpolate_measure(
     acceleration: models.Measurement, new_frequency: int = 100
 ) -> models.Measurement:
     """Interpolate the measure to a new sampling rate using cubic spline."""
-    old_time_array = acceleration.time.to_numpy()
-    new_time_array = np.arange(old_time_array[0], old_time_array[-1], 1 / new_frequency)
+    epoch_time_seconds = acceleration.time.dt.epoch(time_unit="ns").to_numpy() / 1e9
+    start_time = epoch_time_seconds[0]
+    end_time = epoch_time_seconds[-1]
 
-    interpolated_data = np.zeros(
-        (len(new_time_array), acceleration.measurements.shape[1])
-    )
+    duration_s = end_time - start_time
+    n_points = int(duration_s * new_frequency) + 1
 
-    for axis in range(acceleration.measurements.shape[1]):
+    interpolated_time = np.linspace(start_time, end_time, n_points, endpoint=True)
+
+    interpolated_data = np.zeros((len(interpolated_time), 3))
+
+    for axis in range(3):
         cubic_spline = interpolate.CubicSpline(
-            old_time_array, acceleration.measurements[:, axis]
+            epoch_time_seconds, acceleration.measurements[:, axis]
         )
-        interpolated_data[:, axis] = cubic_spline(new_time_array)
+        interpolated_data[:, axis] = cubic_spline(interpolated_time)
 
-    return models.Measurement(
-        measurements=interpolated_data, time=pl.Series(new_time_array)
+    new_time_ns = (interpolated_time * 1e9).astype(np.int64)
+    new_time_series = pl.Series(
+        "interpolated_time", new_time_ns, dtype=pl.Datetime("ns")
     )
+
+    return models.Measurement(measurements=interpolated_data, time=new_time_series)
 
 
 def extrapolate_data(
