@@ -254,7 +254,7 @@ def interpolate_measure(
     """Interpolate the measure to a new sampling rate using natural cubic spline.
 
     Args:
-        acceleration: Accelerameter data and associated timestamps.
+        acceleration: Accelerometer data and associated timestamps.
         new_frequency: The new frequency the measure will be interpolated to in hz. For
             the purposes of the MIMS algorithm defaults to 100hz.
 
