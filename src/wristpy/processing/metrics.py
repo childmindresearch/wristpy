@@ -274,7 +274,7 @@ def interpolate_measure(
 
     for axis in range(3):
         cubic_spline = interpolate.CubicSpline(
-            epoch_time_seconds, acceleration.measurements[:, axis]
+            epoch_time_seconds, acceleration.measurements[:, axis], bc_type="natural"
         )
         interpolated_data[:, axis] = cubic_spline(interpolated_time)
 
@@ -284,25 +284,3 @@ def interpolate_measure(
     )
 
     return models.Measurement(measurements=interpolated_data, time=new_time_series)
-
-
-def extrapolate_data(
-    acceleration: models.Measurement, dynamic_range: tuple[float, float]
-) -> None:
-    pass
-
-
-def _find_extrapolation_edges() -> None:
-    pass
-
-
-def bandpass_filter() -> None:
-    pass
-
-
-def aggregate() -> None:
-    pass
-
-
-def truncate() -> None:
-    pass

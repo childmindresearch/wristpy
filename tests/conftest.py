@@ -31,3 +31,13 @@ def sample_data_bin() -> pathlib.Path:
 def sample_data_txt() -> pathlib.Path:
     """Text data to test invalid file types."""
     return pathlib.Path(__file__).parent / "sample_data" / "example_text.txt"
+
+
+@pytest.fixture
+def actigraph_interpolation_r_version() -> pathlib.Path:
+    """The actigraphy sample data processed by the mims interpolate function in R."""
+    return (
+        pathlib.Path(__file__).parent
+        / "sample_data"
+        / "actigraph_interpolation_r_version.csv"
+    )
