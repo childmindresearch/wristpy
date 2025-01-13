@@ -17,8 +17,7 @@ def test_parse_arguments() -> None:
     assert args.output is None
     assert args.calibrator == "none"
     assert args.epoch_length == 5
-    assert isinstance(args.thresholds, list)
-    assert all(isinstance(threshold, float) for threshold in args.thresholds)
+    assert args.thresholds is None
 
 
 def test_parse_arguments_with_options() -> None:
@@ -30,10 +29,10 @@ def test_parse_arguments_with_options() -> None:
             "/path/to/output/file.csv",
             "-c",
             "ggir",
+            "-a",
+            "ENMO",
             "-t",
-            "0.1",
-            "1.0",
-            "1.5",
+            "0.1, 1.0, 1.5",
             "-e",
             "0",
         ]
@@ -42,6 +41,7 @@ def test_parse_arguments_with_options() -> None:
     assert args.input == pathlib.Path("/path/to/input/file.bin")
     assert args.output == pathlib.Path("/path/to/output/file.csv")
     assert args.calibrator == "ggir"
+    assert args.activity_metric == "ENMO"
     assert args.thresholds == [0.1, 1.0, 1.5]
     assert args.epoch_length == 0
 
@@ -56,8 +56,8 @@ def test_main_default(
     mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
 ) -> None:
     """Test cli with only necessary arguments."""
-    default_thresholds = (0.0563, 0.1916, 0.6958)
     mock_run = mocker.patch.object(orchestrator, "run")
+    default_thresholds = None
 
     cli.main([str(sample_data_gt3x)])
 
@@ -70,6 +70,46 @@ def test_main_default(
         epoch_length=5,
         verbosity=logging.WARNING,
         output_filetype=None,
+    )
+
+
+def test_main_ENMO_default(
+    mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
+) -> None:
+    """Test cli with only necessary arguments."""
+    mock_run = mocker.patch.object(orchestrator, "_run_file")
+    default_thresholds = (0.0563, 0.1916, 0.6958)
+
+    cli.main([str(sample_data_gt3x), "-a", "ENMO"])
+
+    mock_run.assert_called_once_with(
+        input=sample_data_gt3x,
+        output=None,
+        thresholds=default_thresholds,
+        calibrator=None,
+        activity_metric="ENMO",
+        epoch_length=5,
+        verbosity=logging.WARNING,
+    )
+
+
+def test_main_MAD_default(
+    mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
+) -> None:
+    """Test cli with only necessary arguments."""
+    mock_run = mocker.patch.object(orchestrator, "_run_file")
+    default_thresholds = (0.029, 0.338, 0.604)
+
+    cli.main([str(sample_data_gt3x), "-a", "MAD"])
+
+    mock_run.assert_called_once_with(
+        input=sample_data_gt3x,
+        output=None,
+        thresholds=default_thresholds,
+        calibrator=None,
+        activity_metric="MAD",
+        epoch_length=5,
+        verbosity=logging.WARNING,
     )
 
 
@@ -90,9 +130,7 @@ def test_main_with_options(
             "-c",
             "gradient",
             "-t",
-            "0.1",
-            "1.0",
-            "1.5",
+            "0.1, 1.0, 1.5",
             "-e",
             "0",
             "-a",
@@ -120,15 +158,7 @@ def test_main_with_bad_thresholds(
         ValueError,
         match="Threshold values must be >=0, unique, and in ascending order.",
     ):
-        cli.main(
-            [
-                str(sample_data_gt3x),
-                "-t",
-                "10.0",
-                "1.0",
-                "1.5",
-            ]
-        )
+        cli.main([str(sample_data_gt3x), "-t", "10.0, 1.0, 1.5"])
 
 
 def test_main_with_bad_epoch(

@@ -98,7 +98,7 @@ def format_nonwear_data(
 def run(
     input: Union[pathlib.Path, str],
     output: Optional[Union[pathlib.Path, str]] = None,
-    thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
+    thresholds: Optional[Tuple[float, float, float]] = None,
     calibrator: Union[
         None,
         Literal["ggir", "gradient"],
@@ -139,6 +139,8 @@ def run(
         dictionary of OrchestratorResults objects.
 
     Raises:
+        ValueError: If the physical activity thresholds are not unique or not in
+        ascending order.
         ValueError: If processing a file and the output_filetype is not None
         ValueError: If output is None but output_filetype is not None.
 
@@ -151,6 +153,16 @@ def run(
 
     input = pathlib.Path(input)
     output = pathlib.Path(output) if output is not None else None
+
+    if activity_metric == "ENMO":
+        thresholds = thresholds or (0.0563, 0.1916, 0.6958)
+    elif activity_metric == "MAD":
+        thresholds = thresholds or (0.029, 0.338, 0.604)
+
+    if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):
+        message = "Threshold values must be >=0, unique, and in ascending order."
+        logger.error(message)
+        raise ValueError(message)
 
     if input.is_file():
         if output_filetype is not None:

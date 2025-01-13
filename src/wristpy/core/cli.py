@@ -67,15 +67,10 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "-t",
         "--thresholds",
-        type=float,
-        nargs=3,
-        default=[
-            0.0563,
-            0.1916,
-            0.6958,
-        ],
+        type=_none_or_float_list,
+        default=None,
         help="Provide three thresholds for light, moderate, and vigorous activity. "
-        "Values must be given in ascending order.",
+        "Values must be given in ascending order, and comma seperated.",
     )
 
     parser.add_argument(
@@ -115,6 +110,9 @@ def main(
     Returns:
         A Results object containing enmo, anglez, physical activity levels, nonwear
         detection, and sleep detection.
+
+    Raises:
+        ValueError: If the epoch_length is less than 0.
     """
     arguments = parse_arguments(args)
 
@@ -133,22 +131,29 @@ def main(
             "Please enter an integer >= 0."
         )
 
-    if not (
-        0 < arguments.thresholds[0] < arguments.thresholds[1] < arguments.thresholds[2]
-    ):
-        message = "Threshold values must be >=0, unique, and in ascending order."
-        logger.error(message)
-        raise ValueError(message)
-
     logger.debug("Running wristpy. arguments given: %s", arguments)
 
     orchestrator.run(
         input=arguments.input,
         output=arguments.output,
-        thresholds=cast(Tuple[float, float, float], tuple(arguments.thresholds)),
         calibrator=None if arguments.calibrator == "none" else arguments.calibrator,
         activity_metric=arguments.activity_metric,
+        thresholds=None
+        if arguments.thresholds is None
+        else cast(Tuple[float, float, float], tuple(arguments.thresholds)),
         epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
         verbosity=log_level,
         output_filetype=arguments.output_filetype,
     )
+
+
+def _none_or_float_list(value: str) -> Optional[List[float]]:
+    """Helper function to process thresholds argument."""
+    if value.lower() == "none":
+        return None
+    try:
+        return [float(v) for v in value.split(",")]
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"Invalid value: {value}. Must be a comma-separated list or 'None'."
+        )
