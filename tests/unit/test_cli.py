@@ -47,6 +47,20 @@ def test_parse_arguments_with_options() -> None:
     assert args.epoch_length == 0
 
 
+def test_parse_arguments_with_none_threshold() -> None:
+    """Test running the argparser with an optional arg."""
+    args = cli.parse_arguments(
+        [
+            "/path/to/input/file.bin",
+            "-t",
+            "none",
+        ]
+    )
+
+    assert args.input == pathlib.Path("/path/to/input/file.bin")
+    assert args.thresholds is None
+
+
 def test_parse_arguements_no_input() -> None:
     """Test the error when required argument is missing."""
     with pytest.raises(SystemExit):
@@ -77,7 +91,7 @@ def test_main_default(
 def test_main_ENMO_default(
     mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
 ) -> None:
-    """Test cli with only necessary arguments."""
+    """Test that correct ENMO default thresholds are pulled."""
     mock_run = mocker.patch.object(orchestrator, "_run_file")
     default_thresholds = (0.0563, 0.1916, 0.6958)
 
@@ -97,7 +111,7 @@ def test_main_ENMO_default(
 def test_main_MAD_default(
     mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
 ) -> None:
-    """Test cli with only necessary arguments."""
+    """Test that correct MAD default thresholds are pulled."""
     mock_run = mocker.patch.object(orchestrator, "_run_file")
     default_thresholds = (0.029, 0.338, 0.604)
 
@@ -174,7 +188,7 @@ def test_main_with_bad_epoch(
 
 
 def test_non_comma_separated_thresholds() -> None:
-    """Test cli with non-comma separted thresholds."""
+    """Test threshold parser with non-comma separted thresholds."""
     with pytest.raises(
         argparse.ArgumentTypeError,
         match="Invalid value: 1 2 3. Must be a comma-separated list or 'None'.",
@@ -183,7 +197,7 @@ def test_non_comma_separated_thresholds() -> None:
 
 
 def test_incomplete_comma_separated_thresholds() -> None:
-    """Test cli with incomplete threshold list."""
+    """Test threshold parser with incomplete threshold list."""
     with pytest.raises(
         argparse.ArgumentTypeError,
         match="Invalid value: 1, 2."
