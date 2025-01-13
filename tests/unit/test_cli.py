@@ -191,9 +191,9 @@ def test_non_comma_separated_thresholds() -> None:
     """Test threshold parser with non-comma separted thresholds."""
     with pytest.raises(
         argparse.ArgumentTypeError,
-        match="Invalid value: 1 2 3. Must be a comma-separated list or 'None'.",
+        match="Invalid value: word. Must be a comma-separated list or 'None'.",
     ):
-        cli._none_or_float_list("1 2 3")
+        cli._none_or_float_list("word")
 
 
 def test_incomplete_comma_separated_thresholds() -> None:
