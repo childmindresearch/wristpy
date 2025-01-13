@@ -265,7 +265,7 @@ def interpolate_measure(
 
     for axis in range(3):
         cubic_spline = interpolate.CubicSpline(
-            epoch_time_seconds, acceleration.measurements[:, axis]
+            epoch_time_seconds, acceleration.measurements[:, axis], bc_type="natural"
         )
         interpolated_data[:, axis] = cubic_spline(interpolated_time)
 
