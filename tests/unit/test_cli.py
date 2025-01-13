@@ -1,5 +1,6 @@
 """Test the wristpy cli."""
 
+import argparse
 import logging
 import pathlib
 
@@ -170,3 +171,22 @@ def test_main_with_bad_epoch(
         match="Value for epoch_length is:-5." "Please enter an integer >= 0.",
     ):
         cli.main([str(sample_data_gt3x), "-e", "-5"])
+
+
+def test_non_comma_separated_thresholds() -> None:
+    """Test cli with non-comma separted thresholds."""
+    with pytest.raises(
+        argparse.ArgumentTypeError,
+        match="Invalid value: 1 2 3. Must be a comma-separated list or 'None'.",
+    ):
+        cli._none_or_float_list("1 2 3")
+
+
+def test_incomplete_comma_separated_thresholds() -> None:
+    """Test cli with incomplete threshold list."""
+    with pytest.raises(
+        argparse.ArgumentTypeError,
+        match="Invalid value: 1, 2."
+        "Must be a comma-separated list of exactly three floats or 'None'.",
+    ):
+        cli._none_or_float_list("1, 2")
