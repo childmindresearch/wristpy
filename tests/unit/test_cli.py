@@ -201,6 +201,6 @@ def test_incomplete_comma_separated_thresholds() -> None:
     with pytest.raises(
         argparse.ArgumentTypeError,
         match="Invalid value: 1, 2."
-        "Must be a comma-separated list of exactly three floats or 'None'.",
+        "Must be a comma-separated list of exactly three numbers or 'None'.",
     ):
         cli._none_or_float_list("1, 2")

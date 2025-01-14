@@ -173,7 +173,7 @@ def _none_or_float_list(value: str) -> Optional[List[float]]:
         if len(float_list) != 3:
             raise argparse.ArgumentTypeError(
                 f"Invalid value: {value}."
-                "Must be a comma-separated list of exactly three floats or 'None'."
+                "Must be a comma-separated list of exactly three numbers or 'None'."
             )
         return float_list
     except ValueError:
