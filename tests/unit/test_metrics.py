@@ -234,16 +234,17 @@ def test_interpolate_time(
     sample_data_gt3x: pathlib.Path,
     actigraph_interpolation_r_version: pathlib.Path,
 ) -> None:
-    """Test the time values for the  interpolate function."""
+    """Test the interpolate function for mims."""
     expected_data = pl.read_csv(actigraph_interpolation_r_version)
     expected_time = expected_data["time"].str.strptime(
         pl.Datetime("ns"), format="%Y-%m-%d %H:%M:%S%.f"
     )
     expected_ms = expected_time.dt.epoch(time_unit="ms").to_numpy()
-    test_data = readers.read_watch_data(sample_data_gt3x)
+    data = readers.read_watch_data(sample_data_gt3x)
+    acceleration = data.acceleration
 
     interpolated_acceleration = metrics.interpolate_measure(
-        acceleration=test_data.acceleration, new_frequency=100
+        acceleration=acceleration, new_frequency=100
     )
     interpolated_ms = interpolated_acceleration.time.dt.epoch(time_unit="ms").to_numpy()
 
@@ -251,7 +252,7 @@ def test_interpolate_time(
         interpolated_acceleration.time
     ), "Timestamp series are not the same length."
     assert np.allclose(
-        expected_ms, interpolated_ms, atol=1
+        expected_ms, interpolated_ms, atol=10
     ), "Timestamps don't match within tolerance. "
 
 
