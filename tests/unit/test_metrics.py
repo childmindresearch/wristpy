@@ -233,17 +233,16 @@ def test_interpolate_time(
     sample_data_gt3x: pathlib.Path,
     actigraph_interpolation_r_version: pathlib.Path,
 ) -> None:
-    """Test the interpolate function for mims."""
+    """Test the time values for the  interpolate function."""
     expected_data = pl.read_csv(actigraph_interpolation_r_version)
     expected_time = expected_data["time"].str.strptime(
         pl.Datetime("ns"), format="%Y-%m-%d %H:%M:%S%.f"
     )
     expected_ms = expected_time.dt.epoch(time_unit="ms").to_numpy()
-    data = readers.read_watch_data(sample_data_gt3x)
-    acceleration = data.acceleration
+    test_data = readers.read_watch_data(sample_data_gt3x)
 
     interpolated_acceleration = metrics.interpolate_measure(
-        acceleration=acceleration, new_frequency=100
+        acceleration=test_data.acceleration, new_frequency=100
     )
     interpolated_ms = interpolated_acceleration.time.dt.epoch(time_unit="ms").to_numpy()
 
@@ -251,5 +250,25 @@ def test_interpolate_time(
         interpolated_acceleration.time
     ), "Time data columns are not the same length."
     assert np.allclose(
-        expected_ms, interpolated_ms, atol=10
+        expected_ms, interpolated_ms, atol=1
     ), "Timestamps don't match within tolerance. "
+
+
+def test_interpolate_data(
+    sample_data_gt3x: pathlib.Path, actigraph_interpolation_r_version: pathlib.Path
+) -> None:
+    """Test the acceleration data from the interpolate."""
+    expected_data = pl.read_csv(actigraph_interpolation_r_version)
+    expected_acceleration = expected_data["X", "Y", "Z"].to_numpy()
+    test_data = readers.read_watch_data(sample_data_gt3x)
+
+    interpolated_acceleration = metrics.interpolate_measure(
+        acceleration=test_data.acceleration, new_frequency=100
+    )
+
+    assert (
+        expected_acceleration.shape == interpolated_acceleration.measurements.shape
+    ), "Shape error."
+    assert np.allclose(
+        expected_acceleration, interpolated_acceleration.measurements, rtol=0.1
+    ), f"Data diverges significantly. Absolute Differences: {np.mean((np.abs(expected_acceleration - interpolated_acceleration.measurements)))} "
