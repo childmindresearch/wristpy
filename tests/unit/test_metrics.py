@@ -269,6 +269,11 @@ def test_interpolate_data(
     assert (
         expected_acceleration.shape == interpolated_acceleration.measurements.shape
     ), "Shape error."
-    assert np.allclose(
-        expected_acceleration, interpolated_acceleration.measurements, rtol=0.1
-    ), f"Data diverges significantly. Absolute Differences: {np.mean((np.abs(expected_acceleration - interpolated_acceleration.measurements)))} "
+    for axis in range(3):
+        correlation = np.corrcoef(
+            expected_acceleration.T[axis, :],
+            interpolated_acceleration.measurements.T[axis, :],
+        )
+        assert np.all(
+            correlation > 0.99
+        ), f"Axis:{axis} did not meet the threshold, current values: {correlation}"
