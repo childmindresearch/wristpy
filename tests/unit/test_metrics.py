@@ -7,8 +7,9 @@ from datetime import datetime, timedelta
 import numpy as np
 import polars as pl
 import pytest
-from wristpy.io.readers import readers
+
 from wristpy.core import models
+from wristpy.io.readers import readers
 from wristpy.processing import metrics
 
 TEST_LENGTH = 100
