@@ -104,7 +104,7 @@ def run(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
-    activity_metric: Literal["ENMO", "MAD"] = "ENMO",
+    activity_metric: Literal["enmo", "mad"] = "enmo",
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
@@ -154,9 +154,9 @@ def run(
     input = pathlib.Path(input)
     output = pathlib.Path(output) if output is not None else None
 
-    if activity_metric == "ENMO":
+    if activity_metric == "enmo":
         thresholds = thresholds or (0.0563, 0.1916, 0.6958)
-    elif activity_metric == "MAD":
+    elif activity_metric == "mad":
         thresholds = thresholds or (0.029, 0.338, 0.604)
 
     if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):
@@ -297,7 +297,7 @@ def _run_file(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
-    activity_metric: Literal["ENMO", "MAD"] = "ENMO",
+    activity_metric: Literal["enmo", "mad"] = "enmo",
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
@@ -384,9 +384,9 @@ def _run_file(
                 calibrated_acceleration
             )
         )
-    if activity_metric == "ENMO":
+    if activity_metric == "enmo":
         activity_measurement = metrics.euclidean_norm_minus_one(calibrated_acceleration)
-    elif activity_metric == "MAD":
+    elif activity_metric == "mad":
         activity_measurement = metrics.mean_amplitude_deviation(calibrated_acceleration)
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
     sleep_detector = analytics.GgirSleepDetection(anglez)

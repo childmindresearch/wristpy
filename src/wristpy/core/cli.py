@@ -47,7 +47,7 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "-c",
         "--calibrator",
-        type=str,
+        type=lambda s: s.lower(),
         choices=["ggir", "gradient", "none"],
         default="none",
         help="Pick which calibrator to use. Can be 'ggir' or 'gradient'.",
@@ -56,12 +56,12 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "-a",
         "--activity_metric",
-        type=str,
-        choices=["ENMO", "MAD"],
-        default="ENMO",
+        type=lambda s: s.lower(),
+        choices=["enmo", "mad"],
+        default="enmo",
         help="Pick which physical activity metric should be used. "
         "This will be used to determine physical activity categorization. "
-        "Can be 'ENMO' or 'MAD'.",
+        "Can be 'enmo' or 'mad'.",
     )
 
     parser.add_argument(

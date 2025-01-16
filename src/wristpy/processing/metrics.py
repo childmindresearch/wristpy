@@ -59,7 +59,7 @@ def angle_relative_to_horizontal(
 
 
 def mean_amplitude_deviation(
-    acceleration: models.Measurement, epoch_length: int = 5
+    acceleration: models.Measurement, epoch_length: float = 5.0
 ) -> models.Measurement:
     """Calculate the mean amplitude deviation of the acceleration data.
 
@@ -87,7 +87,7 @@ def mean_amplitude_deviation(
     ).set_sorted("time")
 
     mad_df = (
-        mad_lf.group_by_dynamic(index_column="time", every=f"{epoch_length}s")
+        mad_lf.group_by_dynamic(index_column="time", every=f"{int(epoch_length*1e9)}ns")
         .agg(
             [
                 (

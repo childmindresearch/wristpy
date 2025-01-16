@@ -31,7 +31,7 @@ def test_parse_arguments_with_options() -> None:
             "-c",
             "ggir",
             "-a",
-            "ENMO",
+            "enmo",
             "-t",
             "0.1, 1.0, 1.5",
             "-e",
@@ -42,9 +42,29 @@ def test_parse_arguments_with_options() -> None:
     assert args.input == pathlib.Path("/path/to/input/file.bin")
     assert args.output == pathlib.Path("/path/to/output/file.csv")
     assert args.calibrator == "ggir"
-    assert args.activity_metric == "ENMO"
+    assert args.activity_metric == "enmo"
     assert args.thresholds == [0.1, 1.0, 1.5]
     assert args.epoch_length == 0
+
+
+def test_parse_arguments_with_lower_case_conversion() -> None:
+    """Test running the argparser lower case conversion."""
+    args = cli.parse_arguments(
+        [
+            "/path/to/input/file.bin",
+            "-o",
+            "/path/to/output/file.csv",
+            "-c",
+            "GGIR",
+            "-a",
+            "ENMO",
+        ]
+    )
+
+    assert args.input == pathlib.Path("/path/to/input/file.bin")
+    assert args.output == pathlib.Path("/path/to/output/file.csv")
+    assert args.calibrator == "ggir"
+    assert args.activity_metric == "enmo"
 
 
 def test_parse_arguments_with_none_threshold() -> None:
@@ -81,48 +101,48 @@ def test_main_default(
         output=None,
         thresholds=default_thresholds,
         calibrator=None,
-        activity_metric="ENMO",
+        activity_metric="enmo",
         epoch_length=5,
         verbosity=logging.WARNING,
         output_filetype=None,
     )
 
 
-def test_main_ENMO_default(
+def test_main_enmo_default(
     mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
 ) -> None:
-    """Test that correct ENMO default thresholds are pulled."""
+    """Test that correct enmo default thresholds are pulled."""
     mock_run = mocker.patch.object(orchestrator, "_run_file")
     default_thresholds = (0.0563, 0.1916, 0.6958)
 
-    cli.main([str(sample_data_gt3x), "-a", "ENMO"])
+    cli.main([str(sample_data_gt3x), "-a", "enmo"])
 
     mock_run.assert_called_once_with(
         input=sample_data_gt3x,
         output=None,
         thresholds=default_thresholds,
         calibrator=None,
-        activity_metric="ENMO",
+        activity_metric="enmo",
         epoch_length=5,
         verbosity=logging.WARNING,
     )
 
 
-def test_main_MAD_default(
+def test_main_mad_default(
     mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
 ) -> None:
-    """Test that correct MAD default thresholds are pulled."""
+    """Test that correct mad default thresholds are pulled."""
     mock_run = mocker.patch.object(orchestrator, "_run_file")
     default_thresholds = (0.029, 0.338, 0.604)
 
-    cli.main([str(sample_data_gt3x), "-a", "MAD"])
+    cli.main([str(sample_data_gt3x), "-a", "mad"])
 
     mock_run.assert_called_once_with(
         input=sample_data_gt3x,
         output=None,
         thresholds=default_thresholds,
         calibrator=None,
-        activity_metric="MAD",
+        activity_metric="mad",
         epoch_length=5,
         verbosity=logging.WARNING,
     )
@@ -149,7 +169,7 @@ def test_main_with_options(
             "-e",
             "0",
             "-a",
-            "MAD",
+            "mad",
         ]
     )
 
@@ -158,7 +178,7 @@ def test_main_with_options(
         output=test_output,
         thresholds=(0.1, 1.0, 1.5),
         calibrator="gradient",
-        activity_metric="MAD",
+        activity_metric="mad",
         epoch_length=None,
         verbosity=logging.WARNING,
         output_filetype=None,
