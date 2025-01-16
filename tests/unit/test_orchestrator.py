@@ -120,7 +120,7 @@ def test_run_single_file(
     """Testing running a single file."""
     output_file_path = tmp_path / "file_name.csv"
     results = orchestrator.run(
-        input=sample_data_gt3x, output=output_file_path, activity_metric="MAD"
+        input=sample_data_gt3x, output=output_file_path, activity_metric="mad"
     )
 
     assert output_file_path.exists()
