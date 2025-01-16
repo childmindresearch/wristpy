@@ -248,7 +248,7 @@ def test_interpolate_time(
 
     assert len(expected_time) == len(
         interpolated_acceleration.time
-    ), "Time data columns are not the same length."
+    ), "Timestamp series are not the same length."
     assert np.allclose(
         expected_ms, interpolated_ms, atol=1
     ), "Timestamps don't match within tolerance. "

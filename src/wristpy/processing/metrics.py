@@ -251,7 +251,16 @@ def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.
 def interpolate_measure(
     acceleration: models.Measurement, new_frequency: int = 100
 ) -> models.Measurement:
-    """Interpolate the measure to a new sampling rate using cubic spline."""
+    """Interpolate the measure to a new sampling rate using natural cubic spline.
+
+    Args:
+        acceleration: Accelerameter data and associated timestamps.
+        new_frequency: The new frequency the measure will be interpolated to in hz. For
+            the purposes of the MIMS algorithm defaults to 100hz.
+
+    Returns:
+        A Measurement object with interpolated acceleration data.
+    """
     epoch_time_seconds = acceleration.time.dt.epoch(time_unit="us").to_numpy() / 1e6
     start_time = epoch_time_seconds[0]
     end_time = epoch_time_seconds[-1]
@@ -260,7 +269,6 @@ def interpolate_measure(
     n_points = int(duration_s * new_frequency) + 1
 
     interpolated_time = np.linspace(start_time, end_time, n_points, endpoint=True)
-
     interpolated_data = np.zeros((len(interpolated_time), 3))
 
     for axis in range(3):
