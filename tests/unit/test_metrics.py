@@ -260,7 +260,8 @@ def test_interpolate_data(
 ) -> None:
     """Test the acceleration data from the interpolate."""
     expected_data = pl.read_csv(actigraph_interpolation_r_version)
-    expected_acceleration = expected_data["X", "Y", "Z"].to_numpy()
+    expected_acceleration = expected_data.select(["X", "Y", "Z"]).to_numpy()
+
     test_data = readers.read_watch_data(sample_data_gt3x)
 
     interpolated_acceleration = metrics.interpolate_measure(
