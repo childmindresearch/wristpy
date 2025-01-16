@@ -248,15 +248,6 @@ def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.
     return nonwear_value_array
 
 
-def monitor_independent_monitor_summary_unit(
-    acceleration: models.Measurement, new_frequency: int = 100
-) -> None:
-    """Monitor Independent Monitor Summary Unit (MIMS), an alteratove to ENMO."""
-    interpolated_acceleration = interpolate_measure(
-        acceleration=acceleration, new_frequency=new_frequency
-    )
-
-
 def interpolate_measure(
     acceleration: models.Measurement, new_frequency: int = 100
 ) -> models.Measurement:
