@@ -492,28 +492,28 @@
 </span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a>
 </span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a>
 </span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a><span class="k">def</span> <span class="nf">compute_physical_activty_categories</span><span class="p">(</span>
-</span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a>    <span class="n">enmo_epoch1</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span>
+</span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a>    <span class="n">activity_metric_epoch1</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span>
 </span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a>    <span class="n">thresholds</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0563</span><span class="p">,</span> <span class="mf">0.1916</span><span class="p">,</span> <span class="mf">0.6958</span><span class="p">),</span>
 </span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
-</span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the physical activity categories based on the ENMO data.</span>
+</span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the physical activity categories based on the specific activity metric.</span>
 </span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>
-</span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a><span class="sd">    This function uses the enmo_epoch1 data (5s aggregated data) to compute three</span>
-</span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a><span class="sd">    physical activity levels: light, moderate, and vigorous.</span>
+</span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a><span class="sd">    This function uses the activity_metric_epoch1 data (5s aggregated data) to compute</span>
+</span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a><span class="sd">    four physical activity levels: inactive, light, moderate, and vigorous.</span>
 </span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>
-</span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a><span class="sd">    Default values are taken from the Hildebrand 2014 study, and is best suited for</span>
-</span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a><span class="sd">    children aged 7 - 11 years.</span>
+</span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a><span class="sd">    Default values are specifically for ENMO data, taken from the Hildebrand 2014 study,</span>
+</span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a><span class="sd">    and is best suited for children aged 7 - 11 years.</span>
 </span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a>
 </span><span id="L-400"><a href="#L-400"><span class="linenos">400</span></a><span class="sd">    Args:</span>
-</span><span id="L-401"><a href="#L-401"><span class="linenos">401</span></a><span class="sd">        enmo_epoch1: The enmo epoch1 data, as physical activity data should be computed</span>
-</span><span id="L-402"><a href="#L-402"><span class="linenos">402</span></a><span class="sd">            on aggregated data.</span>
+</span><span id="L-401"><a href="#L-401"><span class="linenos">401</span></a><span class="sd">        activity_metric_epoch1: The specific activity metric epoch1 data, as physical</span>
+</span><span id="L-402"><a href="#L-402"><span class="linenos">402</span></a><span class="sd">            activity data should be computed on aggregated data.</span>
 </span><span id="L-403"><a href="#L-403"><span class="linenos">403</span></a><span class="sd">        thresholds: The threshold values for the physical activity categories.</span>
-</span><span id="L-404"><a href="#L-404"><span class="linenos">404</span></a><span class="sd">            The default values are</span>
-</span><span id="L-405"><a href="#L-405"><span class="linenos">405</span></a><span class="sd">                (light_threshold, moderate_threshold, vigorous_threshold).</span>
+</span><span id="L-404"><a href="#L-404"><span class="linenos">404</span></a><span class="sd">            The default values are:</span>
+</span><span id="L-405"><a href="#L-405"><span class="linenos">405</span></a><span class="sd">            (light_threshold, moderate_threshold, vigorous_threshold).</span>
 </span><span id="L-406"><a href="#L-406"><span class="linenos">406</span></a>
 </span><span id="L-407"><a href="#L-407"><span class="linenos">407</span></a><span class="sd">    Returns:</span>
 </span><span id="L-408"><a href="#L-408"><span class="linenos">408</span></a><span class="sd">        A Measurement instance with the physical activity categories. Categories are</span>
 </span><span id="L-409"><a href="#L-409"><span class="linenos">409</span></a><span class="sd">        Inactive, Light, Moderate, Vigorous. The temporal resolution is the same as</span>
-</span><span id="L-410"><a href="#L-410"><span class="linenos">410</span></a><span class="sd">        enmo_epoch1.</span>
+</span><span id="L-410"><a href="#L-410"><span class="linenos">410</span></a><span class="sd">        activity_metric_epoch1.</span>
 </span><span id="L-411"><a href="#L-411"><span class="linenos">411</span></a>
 </span><span id="L-412"><a href="#L-412"><span class="linenos">412</span></a><span class="sd">    Raises:</span>
 </span><span id="L-413"><a href="#L-413"><span class="linenos">413</span></a><span class="sd">        ValueError: If the threshold values are not poisitive, unique and  in ascending</span>
@@ -533,17 +533,19 @@
 </span><span id="L-427"><a href="#L-427"><span class="linenos">427</span></a>
 </span><span id="L-428"><a href="#L-428"><span class="linenos">428</span></a>    <span class="n">activity_levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
 </span><span id="L-429"><a href="#L-429"><span class="linenos">429</span></a>        <span class="p">[</span>
-</span><span id="L-430"><a href="#L-430"><span class="linenos">430</span></a>            <span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-</span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a>            <span class="p">(</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
-</span><span id="L-432"><a href="#L-432"><span class="linenos">432</span></a>            <span class="o">&amp;</span> <span class="p">(</span><span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-</span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a>            <span class="p">(</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
-</span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a>            <span class="o">&amp;</span> <span class="p">(</span><span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
-</span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a>            <span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span>
+</span><span id="L-430"><a href="#L-430"><span class="linenos">430</span></a>            <span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+</span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a>            <span class="p">(</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
+</span><span id="L-432"><a href="#L-432"><span class="linenos">432</span></a>            <span class="o">&amp;</span> <span class="p">(</span><span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+</span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a>            <span class="p">(</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
+</span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a>            <span class="o">&amp;</span> <span class="p">(</span><span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+</span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a>            <span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span>
 </span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a>        <span class="p">],</span>
 </span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a>        <span class="p">[</span><span class="s2">&quot;inactive&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">,</span> <span class="s2">&quot;moderate&quot;</span><span class="p">,</span> <span class="s2">&quot;vigorous&quot;</span><span class="p">],</span>
 </span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;unknown&quot;</span><span class="p">,</span>
 </span><span id="L-439"><a href="#L-439"><span class="linenos">439</span></a>    <span class="p">)</span>
-</span><span id="L-440"><a href="#L-440"><span class="linenos">440</span></a>    <span class="k">return</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span><span class="n">measurements</span><span class="o">=</span><span class="n">activity_levels</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+</span><span id="L-440"><a href="#L-440"><span class="linenos">440</span></a>    <span class="k">return</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span>
+</span><span id="L-441"><a href="#L-441"><span class="linenos">441</span></a>        <span class="n">measurements</span><span class="o">=</span><span class="n">activity_levels</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">time</span>
+</span><span id="L-442"><a href="#L-442"><span class="linenos">442</span></a>    <span class="p">)</span>
 </span></pre></div>
 
 
@@ -1192,35 +1194,35 @@ instances of the SleepWindow class.</li>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">compute_physical_activty_categories</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">enmo_epoch1</span><span class="p">:</span> <span class="n"><a href="../core/models.html#Measurement">wristpy.core.models.Measurement</a></span>,</span><span class="param">	<span class="n">thresholds</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0563</span><span class="p">,</span> <span class="mf">0.1916</span><span class="p">,</span> <span class="mf">0.6958</span><span class="p">)</span></span><span class="return-annotation">) -> <span class="n"><a href="../core/models.html#Measurement">wristpy.core.models.Measurement</a></span>:</span></span>
+        <span class="name">compute_physical_activty_categories</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">activity_metric_epoch1</span><span class="p">:</span> <span class="n"><a href="../core/models.html#Measurement">wristpy.core.models.Measurement</a></span>,</span><span class="param">	<span class="n">thresholds</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0563</span><span class="p">,</span> <span class="mf">0.1916</span><span class="p">,</span> <span class="mf">0.6958</span><span class="p">)</span></span><span class="return-annotation">) -> <span class="n"><a href="../core/models.html#Measurement">wristpy.core.models.Measurement</a></span>:</span></span>
 
                 <label class="view-source-button" for="compute_physical_activty_categories-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#compute_physical_activty_categories"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="compute_physical_activty_categories-389"><a href="#compute_physical_activty_categories-389"><span class="linenos">389</span></a><span class="k">def</span> <span class="nf">compute_physical_activty_categories</span><span class="p">(</span>
-</span><span id="compute_physical_activty_categories-390"><a href="#compute_physical_activty_categories-390"><span class="linenos">390</span></a>    <span class="n">enmo_epoch1</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span>
+</span><span id="compute_physical_activty_categories-390"><a href="#compute_physical_activty_categories-390"><span class="linenos">390</span></a>    <span class="n">activity_metric_epoch1</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span>
 </span><span id="compute_physical_activty_categories-391"><a href="#compute_physical_activty_categories-391"><span class="linenos">391</span></a>    <span class="n">thresholds</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0563</span><span class="p">,</span> <span class="mf">0.1916</span><span class="p">,</span> <span class="mf">0.6958</span><span class="p">),</span>
 </span><span id="compute_physical_activty_categories-392"><a href="#compute_physical_activty_categories-392"><span class="linenos">392</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
-</span><span id="compute_physical_activty_categories-393"><a href="#compute_physical_activty_categories-393"><span class="linenos">393</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the physical activity categories based on the ENMO data.</span>
+</span><span id="compute_physical_activty_categories-393"><a href="#compute_physical_activty_categories-393"><span class="linenos">393</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the physical activity categories based on the specific activity metric.</span>
 </span><span id="compute_physical_activty_categories-394"><a href="#compute_physical_activty_categories-394"><span class="linenos">394</span></a>
-</span><span id="compute_physical_activty_categories-395"><a href="#compute_physical_activty_categories-395"><span class="linenos">395</span></a><span class="sd">    This function uses the enmo_epoch1 data (5s aggregated data) to compute three</span>
-</span><span id="compute_physical_activty_categories-396"><a href="#compute_physical_activty_categories-396"><span class="linenos">396</span></a><span class="sd">    physical activity levels: light, moderate, and vigorous.</span>
+</span><span id="compute_physical_activty_categories-395"><a href="#compute_physical_activty_categories-395"><span class="linenos">395</span></a><span class="sd">    This function uses the activity_metric_epoch1 data (5s aggregated data) to compute</span>
+</span><span id="compute_physical_activty_categories-396"><a href="#compute_physical_activty_categories-396"><span class="linenos">396</span></a><span class="sd">    four physical activity levels: inactive, light, moderate, and vigorous.</span>
 </span><span id="compute_physical_activty_categories-397"><a href="#compute_physical_activty_categories-397"><span class="linenos">397</span></a>
-</span><span id="compute_physical_activty_categories-398"><a href="#compute_physical_activty_categories-398"><span class="linenos">398</span></a><span class="sd">    Default values are taken from the Hildebrand 2014 study, and is best suited for</span>
-</span><span id="compute_physical_activty_categories-399"><a href="#compute_physical_activty_categories-399"><span class="linenos">399</span></a><span class="sd">    children aged 7 - 11 years.</span>
+</span><span id="compute_physical_activty_categories-398"><a href="#compute_physical_activty_categories-398"><span class="linenos">398</span></a><span class="sd">    Default values are specifically for ENMO data, taken from the Hildebrand 2014 study,</span>
+</span><span id="compute_physical_activty_categories-399"><a href="#compute_physical_activty_categories-399"><span class="linenos">399</span></a><span class="sd">    and is best suited for children aged 7 - 11 years.</span>
 </span><span id="compute_physical_activty_categories-400"><a href="#compute_physical_activty_categories-400"><span class="linenos">400</span></a>
 </span><span id="compute_physical_activty_categories-401"><a href="#compute_physical_activty_categories-401"><span class="linenos">401</span></a><span class="sd">    Args:</span>
-</span><span id="compute_physical_activty_categories-402"><a href="#compute_physical_activty_categories-402"><span class="linenos">402</span></a><span class="sd">        enmo_epoch1: The enmo epoch1 data, as physical activity data should be computed</span>
-</span><span id="compute_physical_activty_categories-403"><a href="#compute_physical_activty_categories-403"><span class="linenos">403</span></a><span class="sd">            on aggregated data.</span>
+</span><span id="compute_physical_activty_categories-402"><a href="#compute_physical_activty_categories-402"><span class="linenos">402</span></a><span class="sd">        activity_metric_epoch1: The specific activity metric epoch1 data, as physical</span>
+</span><span id="compute_physical_activty_categories-403"><a href="#compute_physical_activty_categories-403"><span class="linenos">403</span></a><span class="sd">            activity data should be computed on aggregated data.</span>
 </span><span id="compute_physical_activty_categories-404"><a href="#compute_physical_activty_categories-404"><span class="linenos">404</span></a><span class="sd">        thresholds: The threshold values for the physical activity categories.</span>
-</span><span id="compute_physical_activty_categories-405"><a href="#compute_physical_activty_categories-405"><span class="linenos">405</span></a><span class="sd">            The default values are</span>
-</span><span id="compute_physical_activty_categories-406"><a href="#compute_physical_activty_categories-406"><span class="linenos">406</span></a><span class="sd">                (light_threshold, moderate_threshold, vigorous_threshold).</span>
+</span><span id="compute_physical_activty_categories-405"><a href="#compute_physical_activty_categories-405"><span class="linenos">405</span></a><span class="sd">            The default values are:</span>
+</span><span id="compute_physical_activty_categories-406"><a href="#compute_physical_activty_categories-406"><span class="linenos">406</span></a><span class="sd">            (light_threshold, moderate_threshold, vigorous_threshold).</span>
 </span><span id="compute_physical_activty_categories-407"><a href="#compute_physical_activty_categories-407"><span class="linenos">407</span></a>
 </span><span id="compute_physical_activty_categories-408"><a href="#compute_physical_activty_categories-408"><span class="linenos">408</span></a><span class="sd">    Returns:</span>
 </span><span id="compute_physical_activty_categories-409"><a href="#compute_physical_activty_categories-409"><span class="linenos">409</span></a><span class="sd">        A Measurement instance with the physical activity categories. Categories are</span>
 </span><span id="compute_physical_activty_categories-410"><a href="#compute_physical_activty_categories-410"><span class="linenos">410</span></a><span class="sd">        Inactive, Light, Moderate, Vigorous. The temporal resolution is the same as</span>
-</span><span id="compute_physical_activty_categories-411"><a href="#compute_physical_activty_categories-411"><span class="linenos">411</span></a><span class="sd">        enmo_epoch1.</span>
+</span><span id="compute_physical_activty_categories-411"><a href="#compute_physical_activty_categories-411"><span class="linenos">411</span></a><span class="sd">        activity_metric_epoch1.</span>
 </span><span id="compute_physical_activty_categories-412"><a href="#compute_physical_activty_categories-412"><span class="linenos">412</span></a>
 </span><span id="compute_physical_activty_categories-413"><a href="#compute_physical_activty_categories-413"><span class="linenos">413</span></a><span class="sd">    Raises:</span>
 </span><span id="compute_physical_activty_categories-414"><a href="#compute_physical_activty_categories-414"><span class="linenos">414</span></a><span class="sd">        ValueError: If the threshold values are not poisitive, unique and  in ascending</span>
@@ -1240,36 +1242,38 @@ instances of the SleepWindow class.</li>
 </span><span id="compute_physical_activty_categories-428"><a href="#compute_physical_activty_categories-428"><span class="linenos">428</span></a>
 </span><span id="compute_physical_activty_categories-429"><a href="#compute_physical_activty_categories-429"><span class="linenos">429</span></a>    <span class="n">activity_levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
 </span><span id="compute_physical_activty_categories-430"><a href="#compute_physical_activty_categories-430"><span class="linenos">430</span></a>        <span class="p">[</span>
-</span><span id="compute_physical_activty_categories-431"><a href="#compute_physical_activty_categories-431"><span class="linenos">431</span></a>            <span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-</span><span id="compute_physical_activty_categories-432"><a href="#compute_physical_activty_categories-432"><span class="linenos">432</span></a>            <span class="p">(</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
-</span><span id="compute_physical_activty_categories-433"><a href="#compute_physical_activty_categories-433"><span class="linenos">433</span></a>            <span class="o">&amp;</span> <span class="p">(</span><span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-</span><span id="compute_physical_activty_categories-434"><a href="#compute_physical_activty_categories-434"><span class="linenos">434</span></a>            <span class="p">(</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
-</span><span id="compute_physical_activty_categories-435"><a href="#compute_physical_activty_categories-435"><span class="linenos">435</span></a>            <span class="o">&amp;</span> <span class="p">(</span><span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
-</span><span id="compute_physical_activty_categories-436"><a href="#compute_physical_activty_categories-436"><span class="linenos">436</span></a>            <span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span>
+</span><span id="compute_physical_activty_categories-431"><a href="#compute_physical_activty_categories-431"><span class="linenos">431</span></a>            <span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+</span><span id="compute_physical_activty_categories-432"><a href="#compute_physical_activty_categories-432"><span class="linenos">432</span></a>            <span class="p">(</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
+</span><span id="compute_physical_activty_categories-433"><a href="#compute_physical_activty_categories-433"><span class="linenos">433</span></a>            <span class="o">&amp;</span> <span class="p">(</span><span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+</span><span id="compute_physical_activty_categories-434"><a href="#compute_physical_activty_categories-434"><span class="linenos">434</span></a>            <span class="p">(</span><span class="n">thresholds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
+</span><span id="compute_physical_activty_categories-435"><a href="#compute_physical_activty_categories-435"><span class="linenos">435</span></a>            <span class="o">&amp;</span> <span class="p">(</span><span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+</span><span id="compute_physical_activty_categories-436"><a href="#compute_physical_activty_categories-436"><span class="linenos">436</span></a>            <span class="n">thresholds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span>
 </span><span id="compute_physical_activty_categories-437"><a href="#compute_physical_activty_categories-437"><span class="linenos">437</span></a>        <span class="p">],</span>
 </span><span id="compute_physical_activty_categories-438"><a href="#compute_physical_activty_categories-438"><span class="linenos">438</span></a>        <span class="p">[</span><span class="s2">&quot;inactive&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">,</span> <span class="s2">&quot;moderate&quot;</span><span class="p">,</span> <span class="s2">&quot;vigorous&quot;</span><span class="p">],</span>
 </span><span id="compute_physical_activty_categories-439"><a href="#compute_physical_activty_categories-439"><span class="linenos">439</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;unknown&quot;</span><span class="p">,</span>
 </span><span id="compute_physical_activty_categories-440"><a href="#compute_physical_activty_categories-440"><span class="linenos">440</span></a>    <span class="p">)</span>
-</span><span id="compute_physical_activty_categories-441"><a href="#compute_physical_activty_categories-441"><span class="linenos">441</span></a>    <span class="k">return</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span><span class="n">measurements</span><span class="o">=</span><span class="n">activity_levels</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">enmo_epoch1</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+</span><span id="compute_physical_activty_categories-441"><a href="#compute_physical_activty_categories-441"><span class="linenos">441</span></a>    <span class="k">return</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span>
+</span><span id="compute_physical_activty_categories-442"><a href="#compute_physical_activty_categories-442"><span class="linenos">442</span></a>        <span class="n">measurements</span><span class="o">=</span><span class="n">activity_levels</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">activity_metric_epoch1</span><span class="o">.</span><span class="n">time</span>
+</span><span id="compute_physical_activty_categories-443"><a href="#compute_physical_activty_categories-443"><span class="linenos">443</span></a>    <span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Compute the physical activity categories based on the ENMO data.</p>
+            <div class="docstring"><p>Compute the physical activity categories based on the specific activity metric.</p>
 
-<p>This function uses the enmo_epoch1 data (5s aggregated data) to compute three
-physical activity levels: light, moderate, and vigorous.</p>
+<p>This function uses the activity_metric_epoch1 data (5s aggregated data) to compute
+four physical activity levels: inactive, light, moderate, and vigorous.</p>
 
-<p>Default values are taken from the Hildebrand 2014 study, and is best suited for
-children aged 7 - 11 years.</p>
+<p>Default values are specifically for ENMO data, taken from the Hildebrand 2014 study,
+and is best suited for children aged 7 - 11 years.</p>
 
 <h6 id="arguments">Arguments:</h6>
 
 <ul>
-<li><strong>enmo_epoch1:</strong>  The enmo epoch1 data, as physical activity data should be computed
-on aggregated data.</li>
+<li><strong>activity_metric_epoch1:</strong>  The specific activity metric epoch1 data, as physical
+activity data should be computed on aggregated data.</li>
 <li><strong>thresholds:</strong>  The threshold values for the physical activity categories.
-The default values are
-    (light_threshold, moderate_threshold, vigorous_threshold).</li>
+The default values are:
+(light_threshold, moderate_threshold, vigorous_threshold).</li>
 </ul>
 
 <h6 id="returns">Returns:</h6>
@@ -1277,7 +1281,7 @@ The default values are
 <blockquote>
   <p>A Measurement instance with the physical activity categories. Categories are
   Inactive, Light, Moderate, Vigorous. The temporal resolution is the same as
-  enmo_epoch1.</p>
+  activity_metric_epoch1.</p>
 </blockquote>
 
 <h6 id="raises">Raises:</h6>
