@@ -24,7 +24,7 @@ def dummy_results() -> models.OrchestratorResults:
         ),
     )
     dummy_results = models.OrchestratorResults(
-        enmo=dummy_measure,
+        physical_activity_metric=dummy_measure,
         anglez=dummy_measure,
         physical_activity_levels=dummy_measure,
         nonwear_epoch=dummy_measure,
@@ -119,7 +119,9 @@ def test_run_single_file(
 ) -> None:
     """Testing running a single file."""
     output_file_path = tmp_path / "file_name.csv"
-    results = orchestrator.run(input=sample_data_gt3x, output=output_file_path)
+    results = orchestrator.run(
+        input=sample_data_gt3x, output=output_file_path, activity_metric="mad"
+    )
 
     assert output_file_path.exists()
     assert isinstance(results, models.OrchestratorResults)
@@ -142,7 +144,7 @@ def test_run_single_file_bad_output_filetype(
         )
 
 
-def test_run_dir(tmp_path: pathlib.Path, sample_data_gt3x: pathlib.Path) -> None:
+def test_run_dir(tmp_path: pathlib.Path) -> None:
     """Test run function when pointed at a directory."""
     input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
     expected_files = {

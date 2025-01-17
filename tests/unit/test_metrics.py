@@ -226,3 +226,19 @@ def test_detect_nonwear(
     assert (
         len(test_result.time) == expected_time_length
     ), f"Expected time to be {expected_time_length}, got: {len(test_result.time)}"
+
+
+def test_mean_amplitude_deviation_function(create_acceleration: pl.DataFrame) -> None:
+    """Test the mean amplitude deviation function."""
+    acceleration = models.Measurement.from_data_frame(create_acceleration)
+    expected_result = 0
+    expected_time = len(acceleration.time) / 5
+
+    test_result = metrics.mean_amplitude_deviation(acceleration)
+
+    assert np.all(
+        test_result.measurements == expected_result
+    ), f"Expected MAD value to be {expected_result}, got: {test_result}"
+    assert (
+        len(test_result.time) == expected_time
+    ), f"Expected time to be {expected_time}, got: {len(test_result.time)}"
