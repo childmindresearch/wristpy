@@ -284,25 +284,3 @@ def interpolate_measure(
     )
 
     return models.Measurement(measurements=interpolated_data, time=new_time_series)
-
-
-def extrapolate_data(
-    acceleration: models.Measurement, dynamic_range: tuple[float, float]
-) -> None:
-    pass
-
-
-def _find_extrapolation_edges() -> None:
-    pass
-
-
-def bandpass_filter() -> None:
-    pass
-
-
-def aggregate() -> None:
-    pass
-
-
-def truncate() -> None:
-    pass
