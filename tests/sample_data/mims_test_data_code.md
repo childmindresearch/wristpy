@@ -1,6 +1,6 @@
 # MIMS Example Data Documentation
 
-This document provides details on how the test data for the MIMS (Monitor Independent Movement Summary) metric and its subfunctions were generated. 
+This document provides details on how the test data for the MIMS (Monitor Independent Movement Summary) metric and its subfunctions were generated.
 
 
 ## Data Generation Process
@@ -12,9 +12,9 @@ The MIMS algorithm consists of 5 main steps:
 * Aggregation
 * Truncation
 
-Each major step has associated test data that was used to validate the wristpy implementation. 
+Each major step has associated test data that was used to validate the wristpy implementation.
 
-### 1. Interpolation Test data 
+### 1. Interpolation Test data
 
 The interpolation test data was generated using the following R script and saved as 'actigraph_interpolation_r_version.csv' :
 
