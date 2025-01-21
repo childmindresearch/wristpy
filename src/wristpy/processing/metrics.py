@@ -255,8 +255,8 @@ def interpolate_measure(
 
     Args:
         acceleration: Accelerometer data and associated timestamps.
-        new_frequency: The new frequency the measure will be interpolated to in hz. For
-            the purposes of the MIMS algorithm defaults to 100hz.
+        new_frequency: The new frequency the measure will be interpolated to in Hz. For
+            the purposes of the MIMS algorithm defaults to 100Hz.
 
     Returns:
         A Measurement object with interpolated acceleration data.
