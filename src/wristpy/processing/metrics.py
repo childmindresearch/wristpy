@@ -261,7 +261,7 @@ def interpolate_measure(
     Returns:
         A Measurement object with interpolated acceleration data.
     """
-    epoch_time_seconds = acceleration.time.dt.epoch(time_unit="us").to_numpy() / 1e6
+    epoch_time_seconds = acceleration.time.dt.epoch(time_unit="ns").to_numpy() / 1e9
     start_time = epoch_time_seconds[0]
     end_time = epoch_time_seconds[-1]
 
@@ -277,9 +277,9 @@ def interpolate_measure(
         )
         interpolated_data[:, axis] = cubic_spline(interpolated_time)
 
-    new_time_ns = (interpolated_time * 1e6).astype(np.int64)
+    new_time_ns = (interpolated_time * 1e9).astype(np.int64)
     new_time_series = pl.Series(
-        "interpolated_time", new_time_ns, dtype=pl.Datetime("us")
+        "interpolated_time", new_time_ns, dtype=pl.Datetime("ns")
     )
 
     return models.Measurement(measurements=interpolated_data, time=new_time_series)
