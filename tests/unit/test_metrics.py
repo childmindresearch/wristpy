@@ -1,6 +1,7 @@
 """Testing functions of metrics module."""
 
 import math
+import pathlib
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -8,6 +9,7 @@ import polars as pl
 import pytest
 
 from wristpy.core import models
+from wristpy.io.readers import readers
 from wristpy.processing import metrics
 
 TEST_LENGTH = 100
@@ -226,3 +228,55 @@ def test_detect_nonwear(
     assert (
         len(test_result.time) == expected_time_length
     ), f"Expected time to be {expected_time_length}, got: {len(test_result.time)}"
+
+
+def test_interpolate_time(
+    sample_data_gt3x: pathlib.Path,
+    actigraph_interpolation_r_version: pathlib.Path,
+) -> None:
+    """Test the interpolate function for mims."""
+    expected_data = pl.read_csv(actigraph_interpolation_r_version)
+    expected_time = expected_data["time"].str.strptime(
+        pl.Datetime("ns"), format="%Y-%m-%d %H:%M:%S%.f"
+    )
+    expected_ms = expected_time.dt.epoch(time_unit="ms").to_numpy()
+    data = readers.read_watch_data(sample_data_gt3x)
+    acceleration = data.acceleration
+
+    interpolated_acceleration = metrics.interpolate_measure(
+        acceleration=acceleration, new_frequency=100
+    )
+    interpolated_ms = interpolated_acceleration.time.dt.epoch(time_unit="ms").to_numpy()
+
+    assert len(expected_time) == len(
+        interpolated_acceleration.time
+    ), "Timestamp series are not the same length."
+    assert np.allclose(
+        expected_ms, interpolated_ms, atol=10
+    ), "Timestamps don't match within tolerance. "
+
+
+def test_interpolate_data(
+    sample_data_gt3x: pathlib.Path, actigraph_interpolation_r_version: pathlib.Path
+) -> None:
+    """Test the acceleration data from the interpolate."""
+    expected_data = pl.read_csv(actigraph_interpolation_r_version)
+    expected_acceleration = expected_data.select(["X", "Y", "Z"]).to_numpy()
+
+    test_data = readers.read_watch_data(sample_data_gt3x)
+
+    interpolated_acceleration = metrics.interpolate_measure(
+        acceleration=test_data.acceleration, new_frequency=100
+    )
+
+    assert (
+        expected_acceleration.shape == interpolated_acceleration.measurements.shape
+    ), "Shape error."
+    for axis in range(3):
+        correlation = np.corrcoef(
+            expected_acceleration.T[axis, :],
+            interpolated_acceleration.measurements.T[axis, :],
+        )
+        assert np.all(
+            correlation > 0.99
+        ), f"Axis:{axis} did not meet the threshold, current values: {correlation}"
