@@ -2,6 +2,7 @@
 
 import numpy as np
 import polars as pl
+from skdh.utility import activity_counts
 
 from wristpy.core import config, models
 
@@ -103,6 +104,50 @@ def mean_amplitude_deviation(
     )
 
     return models.Measurement.from_data_frame(mad_df)
+
+
+def actigraph_activity_counts(
+    acceleration: models.Measurement, epoch_length: int = 60
+) -> models.Measurement:
+    """Compute Actigraph acitivty counts.
+
+    Args:
+        acceleration: The calibrated acceleration data.
+        epoch_length: The length of the epoch in seconds, defaults to 60s.
+
+    Returns:
+        The activity counts as a Measurement object.
+
+    References:
+        [1] A. Neishabouri et al., “Quantification of acceleration as activity counts
+        in ActiGraph wearable,” Sci Rep, vol. 12, no. 1, Art. no. 1, Jul. 2022,
+        doi: 10.1038/s41598-022-16003-x.
+    """
+    logger.debug("Running activty count physical activity metric.")
+
+    sampling_rate = int(
+        1 / (acceleration.time[1] - acceleration.time[0]).total_seconds()
+    )
+    time = acceleration.time.dt.timestamp(time_unit="ns").to_numpy()
+    activity_count_values = activity_counts.get_activity_counts(
+        fs=sampling_rate,
+        accel=acceleration.measurements,
+        time=time / 1e9,
+        epoch_seconds=epoch_length,
+    )
+
+    minute_time_series = (
+        acceleration.time.filter((acceleration.time.dt.second() == 0))
+        .dt.round("1m")
+        .unique()
+    )
+
+    if acceleration.time[1].second > 0:
+        minute_time_series = minute_time_series[1:]
+
+    return models.Measurement(
+        time=minute_time_series, measurements=activity_count_values
+    )
 
 
 def detect_nonwear(
