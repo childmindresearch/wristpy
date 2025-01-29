@@ -1,8 +1,10 @@
 """Calculate base metrics, anglez and enmo."""
 
+from typing import Tuple
+
 import numpy as np
 import polars as pl
-from scipy import interpolate
+from scipy import interpolate, stats
 
 from wristpy.core import config, models
 
@@ -283,3 +285,93 @@ def interpolate_measure(
     )
 
     return models.Measurement(measurements=interpolated_data, time=new_time_series)
+
+
+def extrapolate_points(
+    acceleration: models.Measurement,
+    dynamic_range: Tuple[float, float],
+    noise_std: float = 0.3,
+    num_std: int = 5,
+    smoothing: float = 0.6,
+    scale: float = 1,
+    probability: float = 0.95,
+) -> None:
+    """Identify maxed out values, and extrapolate points.
+
+    Args:
+        acceleration: Acceleration data that has been interpolated to 100Hz.
+        dynamic_range: Dynamic range of device used.
+        noise_level: Device noise level
+        num_std: How many standard deviations,
+        smoothing: Smoothing parameter for spline function. A value of 0 would fit the
+            points linearly, a value of 1 would fit every point.
+        scale: theta value, scale parameter for gamma dist.
+        probability = probability threshold for finding k(Shape) parameter.
+
+    Returns:
+        Acceleration data with extrapolated points.
+    """
+    maxed_out_likelihood = _find_maxed_out_likelihood(
+        acceleration=acceleration,
+        dynamic_range=dynamic_range,
+        num_std=num_std,
+        noise_std=noise_std,
+        scale=scale,
+    )
+
+    return None
+
+
+def _find_maxed_out_likelihood(
+    dynamic_range: Tuple[float, float],
+    num_std: int,
+    noise_std: float,
+    acceleration: models.Measurement,
+    scale: float = 1,
+    probability: float = 0.95,
+) -> np.ndarray:
+    """Find probability values are maxed out."""
+    range_max = max(dynamic_range)
+    buffer_threshold = range_max - num_std * noise_std
+    distance = np.abs(acceleration.measurements) - buffer_threshold
+
+    k = _brute_force_k(
+        target_probability=probability,
+        step=0.001,
+        standard_deviation=num_std * noise_std,
+    )
+
+    raw_likelihood = stats.gamma.cdf(distance, k, scale=scale)
+    return np.where(distance < 0, 0, raw_likelihood)
+
+
+def _brute_force_k(
+    standard_deviation: float,
+    target_probability: float = 0.95,
+    step: float = 0.001,
+    scale: float = 1.0,
+) -> float:
+    """Find the shape value for gamma distribution."""
+    k_values = np.arange(0.5, 0.001, -step)
+    previous_probability = 1.0
+    previous_k = 0
+    result = 0
+
+    for k in k_values:
+        current_probability = stats.gamma.cdf(standard_deviation, a=k, scale=scale)
+
+        if (
+            previous_probability < target_probability
+            and current_probability >= target_probability
+        ):
+            if abs(target_probability - previous_probability) > abs(
+                current_probability - target_probability
+            ):
+                result = k
+            else:
+                result = previous_k
+            break
+        previous_probability = current_probability
+        previous_k = k
+
+    return result
