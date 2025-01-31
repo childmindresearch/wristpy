@@ -184,3 +184,63 @@ def test_moving_median(window_size: int, expected_output: np.ndarray) -> None:
     assert np.all(
         np.isclose(test_result.measurements, expected_output)
     ), "Test results do not match the expected output"
+
+
+def test_resample_downsample() -> None:
+    """Test the downsampling happy-path."""
+    time = [datetime(1990, 1, 1) + timedelta(seconds=secs) for secs in range(4)]
+    measurement = models.Measurement(
+        measurements=np.array([1, 2, 3, 4]),
+        time=pl.Series(time),
+    )
+    delta_t = 2
+    expected = models.Measurement(
+        measurements=np.array([1.5, 3.5]), time=pl.Series("time", time[0::2])
+    )
+
+    actual = computations.resample(measurement, delta_t)
+
+    assert np.allclose(actual.measurements, expected.measurements)
+    assert all(actual.time == expected.time)
+
+
+def test_resample_upsample() -> None:
+    """Test the upsampling happy-path."""
+    time = [
+        datetime(1990, 1, 1, second=1),
+        datetime(1990, 1, 1, second=2),
+    ]
+    expected_time = [
+        time[0],
+        datetime(1990, 1, 1, second=1, microsecond=500000),
+        time[1],
+    ]
+    measurement = models.Measurement(
+        measurements=np.array([1, 2]),
+        time=pl.Series(time),
+    )
+    delta_t = 0.5
+    expected = models.Measurement(
+        measurements=np.array([1, 1.5, 2]), time=pl.Series("time", expected_time)
+    )
+
+    actual = computations.resample(measurement, delta_t)
+
+    assert np.allclose(actual.measurements, expected.measurements)
+    assert all(actual.time == expected.time)
+
+
+def test_resample_value_error() -> None:
+    """Test that the ValueError is raised for negative delta_t."""
+    time = [
+        datetime(1990, 1, 1, second=1),
+        datetime(1990, 1, 1, second=2),
+    ]
+    measurement = models.Measurement(
+        measurements=np.array([1, 2]),
+        time=pl.Series("time", time),
+    )
+    delta_t = -1
+
+    with pytest.raises(ValueError):
+        computations.resample(measurement, delta_t)

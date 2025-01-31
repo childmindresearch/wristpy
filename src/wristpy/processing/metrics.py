@@ -2,9 +2,9 @@
 
 import numpy as np
 import polars as pl
-from skdh.utility import activity_counts
+from scipy import signal
 
-from wristpy.core import config, models
+from wristpy.core import computations, config, models
 
 logger = config.get_logger()
 
@@ -111,6 +111,11 @@ def actigraph_activity_counts(
 ) -> models.Measurement:
     """Compute Actigraph acitivty counts.
 
+    This function computes the Actigraph activity counts based on [1].
+    The acceleartion data is downsample to 30Hz, bandpass filtered, scaled,
+    and then thresholded. The counts are then summed along each axis for
+    the chosen epoch length.
+
     Args:
         acceleration: The calibrated acceleration data.
         epoch_length: The length of the epoch in seconds, defaults to 60s.
@@ -125,29 +130,69 @@ def actigraph_activity_counts(
     """
     logger.debug("Running activty count physical activity metric.")
 
-    sampling_rate = int(
-        1 / (acceleration.time[1] - acceleration.time[0]).total_seconds()
+    input_coef = np.array(
+        [
+            -0.009341062898525,
+            -0.025470289659360,
+            -0.004235264826105,
+            0.044152415456420,
+            0.036493718347760,
+            -0.011893961934740,
+            -0.022917390623150,
+            -0.006788163862310,
+            0.000000000000000,
+        ],
+        dtype=np.float64,
     )
-    time = acceleration.time.dt.timestamp(time_unit="ns").to_numpy()
-    activity_count_values = activity_counts.get_activity_counts(
-        fs=sampling_rate,
-        accel=acceleration.measurements,
-        time=time / 1e9,
-        epoch_seconds=epoch_length,
+    output_coef = np.array(
+        [
+            1.00000000000000000000,
+            -3.63367395910957000000,
+            5.03689812757486000000,
+            -3.09612247819666000000,
+            0.50620507633883000000,
+            0.32421701566682000000,
+            -0.15685485875559000000,
+            0.01949130205890000000,
+            0.00000000000000000000,
+        ],
+        dtype=np.float64,
+    )
+    acceleration_30Hz = computations.resample(acceleration, 1 / 30)
+
+    initial_conditions = signal.lfilter_zi(input_coef, output_coef).reshape((-1, 1))
+
+    acceleration_bpf, _ = signal.lfilter(
+        input_coef,
+        output_coef,
+        acceleration_30Hz.measurements,
+        zi=np.repeat(
+            initial_conditions, acceleration_30Hz.measurements.shape[1], axis=-1
+        )
+        * acceleration_30Hz.measurements[0],
+        axis=0,
     )
 
-    minute_time_series = (
-        acceleration.time.filter((acceleration.time.dt.second() == 0))
-        .dt.round("1m")
-        .unique()
+    scaled_acceleration = acceleration_bpf * (3 / 4096) / (2.6 / 256) * 237.5
+    threshold_acceleration = np.floor(np.minimum(np.abs(scaled_acceleration), 128))
+    threshold_acceleration[threshold_acceleration < 4] = 0
+
+    acceleration_10Hz = computations.resample(
+        models.Measurement(
+            measurements=threshold_acceleration, time=acceleration_30Hz.time
+        ),
+        1 / 10,
+    )
+    acceleration_10Hz.measurements = np.floor(acceleration_10Hz.measurements)
+
+    aggregator = pl.exclude(["time"]).drop_nans()
+    epcoh_counts = (
+        acceleration_10Hz.lazy_frame()
+        .group_by_dynamic("time", every=f"{epoch_length}s")
+        .agg(aggregator.sum())
     )
 
-    if acceleration.time[1].second > 0:
-        minute_time_series = minute_time_series[1:]
-
-    return models.Measurement(
-        time=minute_time_series, measurements=activity_count_values
-    )
+    return models.Measurement.from_data_frame(epcoh_counts.collect())
 
 
 def detect_nonwear(
