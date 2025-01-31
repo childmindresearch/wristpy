@@ -242,3 +242,51 @@ def test_mean_amplitude_deviation_function(create_acceleration: pl.DataFrame) ->
     assert (
         len(test_result.time) == expected_time
     ), f"Expected time to be {expected_time}, got: {len(test_result.time)}"
+
+
+def test_ag_counts_null(create_acceleration: pl.DataFrame) -> None:
+    """Test the ag counts function when acceleration is 0."""
+    acceleration = models.Measurement.from_data_frame(create_acceleration)
+    acceleration.measurements = np.zeros_like(acceleration.measurements)
+    expected_result = 0
+    expected_time = math.ceil(len(acceleration.time) / 60)
+
+    ag_counts = metrics.actigraph_activity_counts(acceleration)
+
+    assert np.all(
+        ag_counts.measurements == expected_result
+    ), f"Expected activity counts to be {expected_result}, got: {ag_counts}"
+    assert len(ag_counts.time) == expected_time
+
+
+def test_ag_counts_max() -> None:
+    """Test the ag counts function when acceleration is at the maximum."""
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + timedelta(milliseconds=20 * i) for i in range(30000)
+    ]
+    test_time = pl.Series("time", dummy_datetime_list)
+    t = np.arange(0, len(test_time) / 50, 1 / 50)  # time vector
+
+    # Sine wave for X, Y, Z
+    X = np.sin(2 * np.pi * t)
+    Y = np.sin(2 * np.pi * t)
+    Z = np.sin(2 * np.pi * t)
+
+    acceleration_polars_df = pl.DataFrame(
+        {
+            "X": X * 100,
+            "Y": Y * 100,
+            "Z": Z * 100,
+            "time": test_time,
+        }
+    )
+    acceleration = models.Measurement.from_data_frame(acceleration_polars_df)
+
+    expected_result = 600 * 128
+
+    ag_counts = metrics.actigraph_activity_counts(acceleration)
+
+    assert np.all(
+        ag_counts.measurements[2:, :] == expected_result
+    ), f"Expected activity counts to be {expected_result}, got: {ag_counts}"

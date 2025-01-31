@@ -107,7 +107,7 @@ def mean_amplitude_deviation(
 
 
 def actigraph_activity_counts(
-    acceleration: models.Measurement, epoch_length: int = 60
+    acceleration: models.Measurement, epoch_length: float = 60.0
 ) -> models.Measurement:
     """Compute Actigraph acitivty counts.
 
@@ -129,6 +129,8 @@ def actigraph_activity_counts(
         doi: 10.1038/s41598-022-16003-x.
     """
     logger.debug("Running activty count physical activity metric.")
+
+    epoch_length_nanoseconds = round(epoch_length * 1e9)
 
     input_coef = np.array(
         [
@@ -188,7 +190,7 @@ def actigraph_activity_counts(
     aggregator = pl.exclude(["time"]).drop_nans()
     epcoh_counts = (
         acceleration_10Hz.lazy_frame()
-        .group_by_dynamic("time", every=f"{epoch_length}s")
+        .group_by_dynamic("time", every=f"{epoch_length_nanoseconds}ns")
         .agg(aggregator.sum())
     )
 
