@@ -162,7 +162,7 @@ def run(
         thresholds = thresholds or (0.0563, 0.1916, 0.6958)
     elif activity_metric == "mad":
         thresholds = thresholds or (0.029, 0.338, 0.604)
-    elif activity_metric == "agcount":
+    elif activity_metric == "ag_count":
         thresholds = thresholds or (100, 3000, 5200)
 
     if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):
@@ -303,7 +303,7 @@ def _run_file(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
-    activity_metric: Literal["enmo", "mad", "agcount"] = "enmo",
+    activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
@@ -394,7 +394,7 @@ def _run_file(
         activity_measurement = metrics.euclidean_norm_minus_one(calibrated_acceleration)
     elif activity_metric == "mad":
         activity_measurement = metrics.mean_amplitude_deviation(calibrated_acceleration)
-    elif activity_metric == "agcount":
+    elif activity_metric == "ag_count":
         activity_measurement = metrics.actigraph_activity_counts(
             calibrated_acceleration
         )
@@ -403,7 +403,7 @@ def _run_file(
     sleep_windows = sleep_detector.run_sleep_detection()
 
     if epoch_length is not None:
-        if activity_measurement == "agcount":
+        if activity_measurement == "ag_count":
             activity_measurement = computations.resample(
                 activity_measurement, delta_t=epoch_length
             )
