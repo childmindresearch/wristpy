@@ -188,13 +188,20 @@ def actigraph_activity_counts(
     acceleration_10Hz.measurements = np.floor(acceleration_10Hz.measurements)
 
     aggregator = pl.exclude(["time"]).drop_nans()
-    epcoh_counts = (
+    epoch_counts = (
         acceleration_10Hz.lazy_frame()
         .group_by_dynamic("time", every=f"{epoch_length_nanoseconds}ns")
         .agg(aggregator.sum())
-    )
+    ).collect()
 
-    return models.Measurement.from_data_frame(epcoh_counts.collect())
+    ag_counts = epoch_counts.with_columns(
+        (pl.col("column_0") ** 2 + pl.col("column_1") ** 2 + pl.col("column_2") ** 2)
+        .sqrt()
+        .alias("magnitude")
+    )
+    ag_counts = ag_counts.drop(["column_0", "column_1", "column_2"])
+
+    return models.Measurement.from_data_frame(ag_counts)
 
 
 def detect_nonwear(

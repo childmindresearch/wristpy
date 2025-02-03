@@ -104,7 +104,7 @@ def run(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
-    activity_metric: Literal["enmo", "mad"] = "enmo",
+    activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
@@ -140,7 +140,7 @@ def run(
 
     Raises:
         ValueError: If the physical activity thresholds are not unique or not in
-        ascending order.
+            ascending order.
         ValueError: If processing a file and the output_filetype is not None
         ValueError: If output is None but output_filetype is not None.
 
@@ -148,6 +148,10 @@ def run(
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
         output from wrist- and hip-worn monitors. Medicine and Science in Sports and
         Exercise, 46(9), 1816-1824.
+        [2] Treuth MS, Schmitz K, Catellier DJ, McMurray RG, Murray DM, Almeida MJ,
+        Going S, Norman JE, Pate R. Defining accelerometer thresholds for activity
+        intensities in adolescent girls. Med Sci Sports Exerc. 2004 Jul;36(7):1259-66.
+        PMID: 15235335; PMCID: PMC2423321.
     """
     logger.setLevel(verbosity)
 
@@ -158,6 +162,8 @@ def run(
         thresholds = thresholds or (0.0563, 0.1916, 0.6958)
     elif activity_metric == "mad":
         thresholds = thresholds or (0.029, 0.338, 0.604)
+    elif activity_metric == "agcount":
+        thresholds = thresholds or (100, 3000, 5200)
 
     if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):
         message = "Threshold values must be >=0, unique, and in ascending order."
@@ -297,7 +303,7 @@ def _run_file(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[int, None] = 5,
-    activity_metric: Literal["enmo", "mad"] = "enmo",
+    activity_metric: Literal["enmo", "mad", "agcount"] = "enmo",
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
@@ -388,14 +394,23 @@ def _run_file(
         activity_measurement = metrics.euclidean_norm_minus_one(calibrated_acceleration)
     elif activity_metric == "mad":
         activity_measurement = metrics.mean_amplitude_deviation(calibrated_acceleration)
+    elif activity_metric == "agcount":
+        activity_measurement = metrics.actigraph_activity_counts(
+            calibrated_acceleration
+        )
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
 
     if epoch_length is not None:
-        activity_measurement = computations.moving_mean(
-            activity_measurement, epoch_length=epoch_length
-        )
+        if activity_measurement == "agcount":
+            activity_measurement = computations.resample(
+                activity_measurement, delta_t=epoch_length
+            )
+        else:
+            activity_measurement = computations.moving_mean(
+                activity_measurement, epoch_length=epoch_length
+            )
         anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
     non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
     physical_activity_levels = analytics.compute_physical_activty_categories(

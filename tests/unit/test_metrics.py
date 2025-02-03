@@ -283,10 +283,10 @@ def test_ag_counts_max() -> None:
     )
     acceleration = models.Measurement.from_data_frame(acceleration_polars_df)
 
-    expected_result = 600 * 128
+    expected_result = np.sqrt(3 * ((600 * 128) ** 2))
 
     ag_counts = metrics.actigraph_activity_counts(acceleration)
 
     assert np.all(
-        ag_counts.measurements[2:, :] == expected_result
+        ag_counts.measurements[2:] == expected_result
     ), f"Expected activity counts to be {expected_result}, got: {ag_counts}"
