@@ -395,9 +395,14 @@ def _run_file(
     elif activity_metric == "mad":
         activity_measurement = metrics.mean_amplitude_deviation(calibrated_acceleration)
     elif activity_metric == "ag_count":
-        activity_measurement = metrics.actigraph_activity_counts(
-            calibrated_acceleration, epoch_length=epoch_length
-        )
+        if epoch_length is not None:
+            activity_measurement = metrics.actigraph_activity_counts(
+                calibrated_acceleration, epoch_length=float(epoch_length)
+            )
+        else:
+            activity_measurement = metrics.actigraph_activity_counts(
+                calibrated_acceleration
+            )
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
