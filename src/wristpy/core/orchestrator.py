@@ -396,18 +396,14 @@ def _run_file(
         activity_measurement = metrics.mean_amplitude_deviation(calibrated_acceleration)
     elif activity_metric == "ag_count":
         activity_measurement = metrics.actigraph_activity_counts(
-            calibrated_acceleration
+            calibrated_acceleration, epoch_length=epoch_length
         )
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
 
     if epoch_length is not None:
-        if activity_measurement == "ag_count":
-            activity_measurement = computations.resample(
-                activity_measurement, delta_t=epoch_length
-            )
-        else:
+        if activity_metric != "ag_count":
             activity_measurement = computations.moving_mean(
                 activity_measurement, epoch_length=epoch_length
             )

@@ -127,6 +127,20 @@ def test_run_single_file(
     assert isinstance(results, models.OrchestratorResults)
 
 
+def test_run_single_file_agcount(
+    sample_data_bin: pathlib.Path,
+    tmp_path: pathlib.Path,
+) -> None:
+    """Testing running a single file."""
+    output_file_path = tmp_path / "file_name.csv"
+    results = orchestrator.run(
+        input=sample_data_bin, output=output_file_path, activity_metric="ag_count"
+    )
+
+    assert output_file_path.exists()
+    assert isinstance(results, models.OrchestratorResults)
+
+
 def test_run_single_file_bad_output_filetype(
     sample_data_gt3x: pathlib.Path,
     tmp_path: pathlib.Path,
