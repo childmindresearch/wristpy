@@ -207,22 +207,24 @@ def test_resample_downsample() -> None:
 def test_resample_upsample() -> None:
     """Test the upsampling happy-path."""
     time = [
-        datetime(1990, 1, 1, second=1),
-        datetime(1990, 1, 1, second=2),
+        datetime(1990, 1, 1, second=1) + timedelta(milliseconds=secs)
+        for secs in range(2)
     ]
     expected_time = [
         time[0],
-        datetime(1990, 1, 1, second=1, microsecond=500000),
+        datetime(1990, 1, 1, second=1, microsecond=500),
         time[1],
     ]
+
     measurement = models.Measurement(
         measurements=np.array([1, 2]),
         time=pl.Series(time),
     )
-    delta_t = 0.5
+
     expected = models.Measurement(
         measurements=np.array([1, 1.5, 2]), time=pl.Series("time", expected_time)
     )
+    delta_t = 0.0005
 
     actual = computations.resample(measurement, delta_t)
 

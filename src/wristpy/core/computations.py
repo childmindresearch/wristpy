@@ -129,7 +129,7 @@ def resample(measurement: models.Measurement, delta_t: float) -> models.Measurem
     all_delta_t = (measurement.time[1:] - measurement.time[:-1]).unique()
 
     n_nanoseconds_in_second = 1_000_000_000
-    current_delta_t = all_delta_t[0].seconds * n_nanoseconds_in_second
+    current_delta_t = all_delta_t[0].total_seconds() * n_nanoseconds_in_second
     requested_delta_t = round(delta_t * n_nanoseconds_in_second)
 
     measurement_df = (
@@ -139,12 +139,17 @@ def resample(measurement: models.Measurement, delta_t: float) -> models.Measurem
     )
 
     if current_delta_t >= requested_delta_t:
+        tmp = (
+            measurement_df.group_by_dynamic(
+                "time", every=f"{requested_delta_t}ns", start_by="datapoint"
+            )
+        ).agg(pl.exclude("time").mean())
         resampled_df = (
-            measurement_df.upsample(
+            tmp.upsample(
                 time_column="time", every=f"{requested_delta_t}ns", maintain_order=True
             )
             .interpolate()
-            .fill_null("forward")
+            .fill_null(strategy="forward")
         )
     else:
         resampled_df = measurement_df.group_by_dynamic(
