@@ -141,10 +141,7 @@ def resample(measurement: models.Measurement, delta_t: float) -> models.Measurem
     if current_delta_t >= requested_delta_t:
         resampled_df = (
             measurement_df.upsample(
-                time_column="time",
-                every=f"{requested_delta_t}ns",
-                maintain_order=True,
-                start_by="datapoint",
+                time_column="time", every=f"{requested_delta_t}ns", maintain_order=True
             )
             .interpolate()
             .fill_null("forward")
