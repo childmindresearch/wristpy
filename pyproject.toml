@@ -15,7 +15,7 @@ packages = [{include = "wristpy", from = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.9"
-polars = ">=0.20.6"
+polars = "^1.0.0"
 scikit-learn = "^1.4.1.post1"
 pyarrow = ">=15,<19"
 actfast = "^1.1.0"
