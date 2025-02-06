@@ -186,7 +186,7 @@ def test_moving_median(window_size: int, expected_output: np.ndarray) -> None:
     ), "Test results do not match the expected output"
 
 
-def test_resample_downsample() -> None:
+def test_resample_downsample_simple() -> None:
     """Test the downsampling happy-path."""
     time = [datetime(1990, 1, 1) + timedelta(seconds=secs) for secs in range(4)]
     measurement = models.Measurement(
@@ -202,6 +202,34 @@ def test_resample_downsample() -> None:
 
     assert np.allclose(actual.measurements, expected.measurements)
     assert all(actual.time == expected.time)
+
+
+def test_resample_downsample_mismatch_time_start() -> None:
+    """Test the downsampling with 60 and 30Hz.
+
+    This test is specifically to catch any issues that arise with sampling
+    associated with imprecise detla_t values.
+    This test will fail without the `start_by` option in the
+    polars`group_by_dynamic` function used by computations.resample.
+    """
+    time = [
+        datetime(1990, 1, 1) + timedelta(microseconds=16666 * secs)
+        for secs in range(100)
+    ]
+    measurement = models.Measurement(
+        measurements=np.ones(len(time)),
+        time=pl.Series(time),
+    )
+    delta_t = 1 / 30
+    expected_sampling_rate = 30
+    expected_time_length = len(time) / 2
+
+    actual = computations.resample(measurement, delta_t)
+    actual_sampling_rate = 1 / (actual.time[1] - actual.time[0]).total_seconds()
+
+    assert len(actual.time) == expected_time_length
+    assert time[0] == actual.time[0]
+    assert round(actual_sampling_rate) == expected_sampling_rate
 
 
 def test_resample_upsample() -> None:

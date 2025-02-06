@@ -139,18 +139,20 @@ def resample(measurement: models.Measurement, delta_t: float) -> models.Measurem
     )
 
     if current_delta_t >= requested_delta_t:
-        tmp = (
-            measurement_df.group_by_dynamic(
-                "time", every=f"{requested_delta_t}ns", start_by="datapoint"
-            )
-        ).agg(pl.exclude("time").mean())
         resampled_df = (
-            tmp.upsample(
+            (
+                measurement_df.group_by_dynamic(
+                    "time", every=f"{requested_delta_t}ns", start_by="datapoint"
+                )
+            )
+            .agg(pl.exclude("time").mean())
+            .upsample(
                 time_column="time", every=f"{requested_delta_t}ns", maintain_order=True
             )
             .interpolate()
             .fill_null(strategy="forward")
         )
+
     else:
         resampled_df = measurement_df.group_by_dynamic(
             "time", every=f"{requested_delta_t}ns", start_by="datapoint"
