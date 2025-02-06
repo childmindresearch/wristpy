@@ -223,6 +223,12 @@ def test_resample_downsample_mismatch_time_start() -> None:
     delta_t = 1 / 30
     expected_sampling_rate = 30
     expected_time_length = len(time) / 2
+    expected_time = pl.Series(
+        [
+            time[0] + timedelta(microseconds=delta_t * 1_000_000 * secs)
+            for secs in range(round(expected_time_length))
+        ]
+    )
 
     actual = computations.resample(measurement, delta_t)
     actual_sampling_rate = 1 / (actual.time[1] - actual.time[0]).total_seconds()
@@ -230,34 +236,40 @@ def test_resample_downsample_mismatch_time_start() -> None:
     assert len(actual.time) == expected_time_length
     assert time[0] == actual.time[0]
     assert round(actual_sampling_rate) == expected_sampling_rate
+    assert np.allclose(
+        actual.time.dt.timestamp().to_numpy(), expected_time.dt.timestamp().to_numpy()
+    )
 
 
 def test_resample_upsample() -> None:
     """Test the upsampling happy-path."""
     time = [
-        datetime(1990, 1, 1, second=1) + timedelta(milliseconds=secs)
-        for secs in range(2)
+        datetime(1990, 1, 1) + timedelta(microseconds=16666 * secs)
+        for secs in range(10)
     ]
-    expected_time = [
-        time[0],
-        datetime(1990, 1, 1, second=1, microsecond=500),
-        time[1],
-    ]
-
     measurement = models.Measurement(
-        measurements=np.array([1, 2]),
+        measurements=np.arange(len(time)),
         time=pl.Series(time),
     )
+    delta_t = 1 / 120
 
+    expected_length = len(time) * 2 - 1
+    expected_time = [
+        time[0] + timedelta(microseconds=delta_t * 1_000_000 * secs)
+        for secs in range(expected_length)
+    ]
     expected = models.Measurement(
-        measurements=np.array([1, 1.5, 2]), time=pl.Series("time", expected_time)
+        measurements=np.arange(0, expected_length * 0.5, 0.5),
+        time=pl.Series("time", expected_time),
     )
-    delta_t = 0.0005
 
     actual = computations.resample(measurement, delta_t)
 
-    assert np.allclose(actual.measurements, expected.measurements)
-    assert all(actual.time == expected.time)
+    assert len(actual.time) == expected_length
+    assert all(actual.measurements == expected.measurements)
+    assert np.allclose(
+        actual.time.dt.timestamp().to_numpy(), expected.time.dt.timestamp().to_numpy()
+    )
 
 
 def test_resample_value_error() -> None:
