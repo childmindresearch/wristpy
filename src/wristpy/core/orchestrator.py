@@ -413,6 +413,9 @@ def _run_file(
                 activity_measurement, epoch_length=epoch_length
             )
         anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
+    elif (epoch_length is None) and (activity_metric == "ag_count"):
+        anglez = computations.moving_mean(anglez, epoch_length=5)
+
     non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
     physical_activity_levels = analytics.compute_physical_activty_categories(
         activity_measurement,

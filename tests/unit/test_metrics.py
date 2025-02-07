@@ -249,7 +249,7 @@ def test_ag_counts_null(create_acceleration: pl.DataFrame) -> None:
     acceleration = models.Measurement.from_data_frame(create_acceleration)
     acceleration.measurements = np.zeros_like(acceleration.measurements)
     expected_result = 0
-    expected_time = math.ceil(len(acceleration.time) / 60)
+    expected_time = math.ceil(len(acceleration.time) / 5)
 
     ag_counts = metrics.actigraph_activity_counts(acceleration)
 
@@ -266,9 +266,7 @@ def test_ag_counts_max() -> None:
         dummy_date + timedelta(milliseconds=20 * i) for i in range(30000)
     ]
     test_time = pl.Series("time", dummy_datetime_list)
-    t = np.arange(0, len(test_time) / 50, 1 / 50)  # time vector
-
-    # Sine wave for X, Y, Z
+    t = np.arange(0, len(test_time) / 50, 1 / 50)
     X = np.sin(2 * np.pi * t)
     Y = np.sin(2 * np.pi * t)
     Z = np.sin(2 * np.pi * t)
@@ -283,7 +281,7 @@ def test_ag_counts_max() -> None:
     )
     acceleration = models.Measurement.from_data_frame(acceleration_polars_df)
 
-    expected_result = np.sqrt(3 * ((600 * 128) ** 2))
+    expected_result = np.sqrt(3 * ((50 * 128) ** 2))
 
     ag_counts = metrics.actigraph_activity_counts(acceleration)
 

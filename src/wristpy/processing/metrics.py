@@ -107,7 +107,7 @@ def mean_amplitude_deviation(
 
 
 def actigraph_activity_counts(
-    acceleration: models.Measurement, epoch_length: float = 60.0
+    acceleration: models.Measurement, epoch_length: float = 5.0
 ) -> models.Measurement:
     """Compute Actigraph acitivty counts.
 
