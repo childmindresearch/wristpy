@@ -281,6 +281,7 @@ def test_ag_counts_max() -> None:
     )
     acceleration = models.Measurement.from_data_frame(acceleration_polars_df)
 
+    # Magnitude of 3D array with all max values (128) along each axis, at 50Hz.
     expected_result = np.sqrt(3 * ((50 * 128) ** 2))
 
     ag_counts = metrics.actigraph_activity_counts(acceleration)

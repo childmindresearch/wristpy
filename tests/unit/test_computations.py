@@ -213,8 +213,7 @@ def test_resample_downsample_mismatch_time_start() -> None:
     polars`group_by_dynamic` function used by computations.resample.
     """
     time = [
-        datetime(1990, 1, 1) + timedelta(microseconds=16666 * secs)
-        for secs in range(100)
+        datetime(1990, 1, 1) + timedelta(microseconds=16666 * idx) for idx in range(100)
     ]
     measurement = models.Measurement(
         measurements=np.ones(len(time)),
@@ -225,8 +224,8 @@ def test_resample_downsample_mismatch_time_start() -> None:
     expected_time_length = len(time) / 2
     expected_time = pl.Series(
         [
-            time[0] + timedelta(microseconds=delta_t * 1_000_000 * secs)
-            for secs in range(round(expected_time_length))
+            time[0] + timedelta(microseconds=delta_t * 1_000_000 * idx)
+            for idx in range(round(expected_time_length))
         ]
     )
 
@@ -235,7 +234,7 @@ def test_resample_downsample_mismatch_time_start() -> None:
 
     assert len(actual.time) == expected_time_length
     assert time[0] == actual.time[0]
-    assert round(actual_sampling_rate) == expected_sampling_rate
+    assert np.isclose(actual_sampling_rate, expected_sampling_rate)
     assert np.allclose(
         actual.time.dt.timestamp().to_numpy(), expected_time.dt.timestamp().to_numpy()
     )
@@ -244,8 +243,7 @@ def test_resample_downsample_mismatch_time_start() -> None:
 def test_resample_upsample() -> None:
     """Test the upsampling happy-path."""
     time = [
-        datetime(1990, 1, 1) + timedelta(microseconds=16666 * secs)
-        for secs in range(10)
+        datetime(1990, 1, 1) + timedelta(microseconds=16666 * idx) for idx in range(10)
     ]
     measurement = models.Measurement(
         measurements=np.arange(len(time)),
@@ -255,8 +253,8 @@ def test_resample_upsample() -> None:
 
     expected_length = len(time) * 2 - 1
     expected_time = [
-        time[0] + timedelta(microseconds=delta_t * 1_000_000 * secs)
-        for secs in range(expected_length)
+        time[0] + timedelta(microseconds=delta_t * 1_000_000 * idx)
+        for idx in range(expected_length)
     ]
     expected = models.Measurement(
         measurements=np.arange(0, expected_length * 0.5, 0.5),

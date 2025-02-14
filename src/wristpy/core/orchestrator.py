@@ -323,7 +323,9 @@ def _run_file(
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given no down sampling is preformed.
+            to. If None is given, and `enmo` is the chosen physical activity metric,
+            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a chosen
+            epoch length of `None` will be forced to the default value of 5.0s.
         activity_metric: The metric to be used for physical activity categorization.
         verbosity: The logging level for the logger.
 
@@ -390,31 +392,40 @@ def _run_file(
                 calibrated_acceleration
             )
         )
+
+    anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
     if activity_metric == "enmo":
         activity_measurement = metrics.euclidean_norm_minus_one(calibrated_acceleration)
+        if epoch_length is not None:
+            activity_measurement = computations.moving_mean(
+                activity_measurement, epoch_length=epoch_length
+            )
+            anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
     elif activity_metric == "mad":
-        activity_measurement = metrics.mean_amplitude_deviation(calibrated_acceleration)
+        if epoch_length is not None:
+            activity_measurement = metrics.mean_amplitude_deviation(
+                calibrated_acceleration, epoch_length=float(epoch_length)
+            )
+            anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
+        else:
+            activity_measurement = metrics.mean_amplitude_deviation(
+                calibrated_acceleration
+            )
+            anglez = computations.moving_mean(anglez, epoch_length=5.0)
     elif activity_metric == "ag_count":
         if epoch_length is not None:
             activity_measurement = metrics.actigraph_activity_counts(
                 calibrated_acceleration, epoch_length=float(epoch_length)
             )
+            anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
         else:
             activity_measurement = metrics.actigraph_activity_counts(
                 calibrated_acceleration
             )
-    anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
+            anglez = computations.moving_mean(anglez, epoch_length=5.0)
+
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
-
-    if epoch_length is not None:
-        if activity_metric != "ag_count":
-            activity_measurement = computations.moving_mean(
-                activity_measurement, epoch_length=epoch_length
-            )
-        anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
-    elif (epoch_length is None) and (activity_metric == "ag_count"):
-        anglez = computations.moving_mean(anglez, epoch_length=5)
 
     non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
     physical_activity_levels = analytics.compute_physical_activty_categories(

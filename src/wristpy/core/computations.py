@@ -120,7 +120,7 @@ def resample(measurement: models.Measurement, delta_t: float) -> models.Measurem
         The resampled measurement.
 
     Raises:
-        ValueError: Raised for negative delta_t.
+        ValueError: Raised for zero or negative delta_t.
     """
     if delta_t <= 0:
         msg = "delta_t must be positive."

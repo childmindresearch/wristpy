@@ -132,6 +132,7 @@ def actigraph_activity_counts(
 
     epoch_length_nanoseconds = round(epoch_length * 1e9)
 
+    # input and output coefficients for the bandpass filter from [1]
     input_coef = np.array(
         [
             -0.009341062898525,
@@ -160,36 +161,40 @@ def actigraph_activity_counts(
         ],
         dtype=np.float64,
     )
-    acceleration_30Hz = computations.resample(acceleration, 1 / 30)
+
+    # scaling factor from [1]
+    scaling_factor = (3 / 4096) / (2.6 / 256) * 237.5
+
+    acceleration_30hz = computations.resample(acceleration, 1 / 30)
 
     initial_conditions = signal.lfilter_zi(input_coef, output_coef).reshape((-1, 1))
 
     acceleration_bpf, _ = signal.lfilter(
         input_coef,
         output_coef,
-        acceleration_30Hz.measurements,
+        acceleration_30hz.measurements,
         zi=np.repeat(
-            initial_conditions, acceleration_30Hz.measurements.shape[1], axis=-1
+            initial_conditions, acceleration_30hz.measurements.shape[1], axis=-1
         )
-        * acceleration_30Hz.measurements[0],
+        * acceleration_30hz.measurements[0],
         axis=0,
     )
 
-    scaled_acceleration = acceleration_bpf * (3 / 4096) / (2.6 / 256) * 237.5
+    scaled_acceleration = acceleration_bpf * scaling_factor
     threshold_acceleration = np.floor(np.minimum(np.abs(scaled_acceleration), 128))
     threshold_acceleration[threshold_acceleration < 4] = 0
 
-    acceleration_10Hz = computations.resample(
+    acceleration_10hz = computations.resample(
         models.Measurement(
-            measurements=threshold_acceleration, time=acceleration_30Hz.time
+            measurements=threshold_acceleration, time=acceleration_30hz.time
         ),
         1 / 10,
     )
-    acceleration_10Hz.measurements = np.floor(acceleration_10Hz.measurements)
+    acceleration_10hz.measurements = np.floor(acceleration_10hz.measurements)
 
     aggregator = pl.exclude(["time"]).drop_nans()
     epoch_counts = (
-        acceleration_10Hz.lazy_frame()
+        acceleration_10hz.lazy_frame()
         .group_by_dynamic("time", every=f"{epoch_length_nanoseconds}ns")
         .agg(aggregator.sum())
     ).collect()
