@@ -393,36 +393,43 @@ def _run_file(
             )
         )
 
+    default_activity_epoch = 5
+
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
-    if activity_metric == "enmo":
+
+    if activity_metric == "ag_count":
+        if epoch_length is not None:
+            activity_measurement = metrics.actigraph_activity_counts(
+                calibrated_acceleration, epoch_length=epoch_length
+            )
+            anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
+        else:
+            activity_measurement = metrics.actigraph_activity_counts(
+                calibrated_acceleration
+            )
+            anglez = computations.moving_mean(
+                anglez, epoch_length=default_activity_epoch
+            )
+    elif activity_metric == "mad":
+        if epoch_length is not None:
+            activity_measurement = metrics.mean_amplitude_deviation(
+                calibrated_acceleration, epoch_length=epoch_length
+            )
+            anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
+        else:
+            activity_measurement = metrics.mean_amplitude_deviation(
+                calibrated_acceleration
+            )
+            anglez = computations.moving_mean(
+                anglez, epoch_length=default_activity_epoch
+            )
+    else:
         activity_measurement = metrics.euclidean_norm_minus_one(calibrated_acceleration)
         if epoch_length is not None:
             activity_measurement = computations.moving_mean(
                 activity_measurement, epoch_length=epoch_length
             )
             anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
-    elif activity_metric == "mad":
-        if epoch_length is not None:
-            activity_measurement = metrics.mean_amplitude_deviation(
-                calibrated_acceleration, epoch_length=float(epoch_length)
-            )
-            anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
-        else:
-            activity_measurement = metrics.mean_amplitude_deviation(
-                calibrated_acceleration
-            )
-            anglez = computations.moving_mean(anglez, epoch_length=5.0)
-    elif activity_metric == "ag_count":
-        if epoch_length is not None:
-            activity_measurement = metrics.actigraph_activity_counts(
-                calibrated_acceleration, epoch_length=float(epoch_length)
-            )
-            anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
-        else:
-            activity_measurement = metrics.actigraph_activity_counts(
-                calibrated_acceleration
-            )
-            anglez = computations.moving_mean(anglez, epoch_length=5.0)
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
