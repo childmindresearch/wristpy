@@ -141,14 +141,17 @@ def test_run_single_file_agcount_default(
     assert isinstance(results, models.OrchestratorResults)
 
 
-def test_run_single_file_mad_default(
+def test_run_single_file_mad_epoch_none(
     sample_data_bin: pathlib.Path,
     tmp_path: pathlib.Path,
 ) -> None:
     """Testing running a single file."""
     output_file_path = tmp_path / "file_name.csv"
     results = orchestrator.run(
-        input=sample_data_bin, output=output_file_path, activity_metric="mad"
+        input=sample_data_bin,
+        output=output_file_path,
+        activity_metric="mad",
+        epoch_length=None,
     )
 
     assert output_file_path.exists()
