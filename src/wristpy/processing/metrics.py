@@ -35,11 +35,12 @@ def euclidean_norm_minus_one(
     enmo = np.linalg.norm(acceleration.measurements, axis=1) - 1
 
     enmo = np.maximum(enmo, 0)
+
+    enmo_metric = models.Measurement(measurements=enmo, time=acceleration.time)
     if epoch_length is not None:
-        enmo = computations.moving_mean(enmo, epoch_length)
-        return enmo
+        return computations.moving_mean(enmo_metric, epoch_length)
     else:
-        return models.Measurement(measurements=enmo, time=acceleration.time)
+        return enmo_metric
 
 
 def angle_relative_to_horizontal(
