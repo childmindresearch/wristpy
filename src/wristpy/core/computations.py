@@ -9,7 +9,7 @@ from wristpy.core import models
 
 def _moving(
     measurement: models.Measurement,
-    epoch_length: int,
+    epoch_length: float,
     aggregation: Literal["mean", "std", "median"],
     *,
     centered: bool = False,
@@ -57,7 +57,9 @@ def _moving(
     return models.Measurement.from_data_frame(aggregated_df.collect())
 
 
-def moving_mean(array: models.Measurement, epoch_length: int = 5) -> models.Measurement:
+def moving_mean(
+    array: models.Measurement, epoch_length: float = 5
+) -> models.Measurement:
     """Calculate the moving mean of the sensor data in array.
 
     Args:
@@ -73,7 +75,9 @@ def moving_mean(array: models.Measurement, epoch_length: int = 5) -> models.Meas
     return _moving(array, epoch_length, "mean")
 
 
-def moving_std(array: models.Measurement, epoch_length: int = 5) -> models.Measurement:
+def moving_std(
+    array: models.Measurement, epoch_length: float = 5
+) -> models.Measurement:
     """Calculate the moving standard deviation (std) of the sensor data in array.
 
     Args:
@@ -89,7 +93,7 @@ def moving_std(array: models.Measurement, epoch_length: int = 5) -> models.Measu
     return _moving(array, epoch_length, "std")
 
 
-def moving_median(array: models.Measurement, epoch_length: int) -> models.Measurement:
+def moving_median(array: models.Measurement, epoch_length: float) -> models.Measurement:
     """Applies moving median to acceleration data.
 
     Step size for the window is hard-coded to 1 sample.

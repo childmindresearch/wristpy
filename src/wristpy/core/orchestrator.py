@@ -103,7 +103,7 @@ def run(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[int, None] = 5,
+    epoch_length: Union[float, None] = 5,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
@@ -207,7 +207,7 @@ def _run_directory(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[int, None] = 5,
+    epoch_length: Union[float, None] = 5,
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Dict[str, models.OrchestratorResults]:
@@ -302,7 +302,7 @@ def _run_file(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[int, None] = 5,
+    epoch_length: Union[float, None] = 5,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
@@ -342,9 +342,7 @@ def _run_file(
         BMC Sports Sci Med Rehabil 7, 18 (2015). https://doi.org/10.1186/s13102-015-0010-0.
     """
     logger.setLevel(verbosity)
-    input = pathlib.Path(input)
     if output is not None:
-        output = pathlib.Path(output)
         models.OrchestratorResults.validate_output(output=output)
 
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
@@ -357,34 +355,14 @@ def _run_file(
 
     watch_data = readers.read_watch_data(input)
 
-    calibrator_object: Union[
-        calibration.GgirCalibration, calibration.ConstrainedMinimizationCalibration
-    ]
     if calibrator is None:
         logger.debug("Running without calibration")
         calibrated_acceleration = watch_data.acceleration
     else:
-        if calibrator == "ggir":
-            calibrator_object = calibration.GgirCalibration()
-        elif calibrator == "gradient":
-            calibrator_object = calibration.ConstrainedMinimizationCalibration()
-        else:
-            raise ValueError(f"Invalid calibrator given:{calibrator}")
+        calibrated_acceleration = calibration.CalibrationDispatcher(calibrator).run(
+            watch_data.acceleration, return_input_on_error=True
+        )
 
-        logger.debug("Running calibration with calibrator: %s", calibrator)
-        try:
-            calibrated_acceleration = calibrator_object.run_calibration(
-                watch_data.acceleration
-            )
-        except (
-            exceptions.CalibrationError,
-            exceptions.SphereCriteriaError,
-            exceptions.NoMotionError,
-        ) as exc_info:
-            logger.error(
-                "Calibration FAILED: %s. Proceeding without calibration.", exc_info
-            )
-            calibrated_acceleration = watch_data.acceleration
     if watch_data.idle_sleep_mode_flag:
         logger.debug("Imputing idle sleep mode gaps.")
         calibrated_acceleration = (
@@ -393,43 +371,12 @@ def _run_file(
             )
         )
 
-    default_activity_epoch = 5
-
     anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
-
-    if activity_metric == "ag_count":
-        if epoch_length is not None:
-            activity_measurement = metrics.actigraph_activity_counts(
-                calibrated_acceleration, epoch_length=epoch_length
-            )
-            anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
-        else:
-            activity_measurement = metrics.actigraph_activity_counts(
-                calibrated_acceleration
-            )
-            anglez = computations.moving_mean(
-                anglez, epoch_length=default_activity_epoch
-            )
-    elif activity_metric == "mad":
-        if epoch_length is not None:
-            activity_measurement = metrics.mean_amplitude_deviation(
-                calibrated_acceleration, epoch_length=epoch_length
-            )
-            anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
-        else:
-            activity_measurement = metrics.mean_amplitude_deviation(
-                calibrated_acceleration
-            )
-            anglez = computations.moving_mean(
-                anglez, epoch_length=default_activity_epoch
-            )
-    else:
-        activity_measurement = metrics.euclidean_norm_minus_one(calibrated_acceleration)
-        if epoch_length is not None:
-            activity_measurement = computations.moving_mean(
-                activity_measurement, epoch_length=epoch_length
-            )
-            anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
+    if epoch_length is not None:
+        anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
+    activity_measurement = _compute_activity(
+        calibrated_acceleration, activity_metric, epoch_length
+    )
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
@@ -439,6 +386,7 @@ def _run_file(
         activity_measurement,
         thresholds,
     )
+
     sleep_array = models.Measurement(
         measurements=format_sleep_data(
             sleep_windows=sleep_windows, reference_measure=activity_measurement
@@ -479,3 +427,22 @@ def _run_file(
             )
 
     return results
+
+
+def _compute_activity(
+    acceleration: models.Measurement,
+    activity_metric: Literal["ag_count", "mad", "enmo"],
+    epoch_length: float | None,
+) -> models.Measurement:
+    """DOCSTRING"""
+    if activity_metric in ("ag_count", "mad") and epoch_length is None:
+        raise ValueError("If using 'ag_count' or 'mad', epoch_length must be provided.")
+
+    if activity_metric == "ag_count":
+        return metrics.actigraph_activity_counts(
+            acceleration,
+            epoch_length=epoch_length,  # type: ignore[arg-type] # Guarded by the ValueError statement above.
+        )
+    elif activity_metric == "mad":
+        return metrics.mean_amplitude_deviation(acceleration, epoch_length=epoch_length)  # type: ignore[arg-type] # Guarded by the ValueError statement above.
+    return metrics.euclidean_norm_minus_one(acceleration, epoch_length=epoch_length)
