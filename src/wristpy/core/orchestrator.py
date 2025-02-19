@@ -319,7 +319,7 @@ def _run_file(
         output: Path to save data to. The path should end in the save file name in
             either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
-            given in that order. Values must be asscending, unique, and greater than 0.
+            given in that order. Values must be ascending, unique, and greater than 0.
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
@@ -434,7 +434,24 @@ def _compute_activity(
     activity_metric: Literal["ag_count", "mad", "enmo"],
     epoch_length: float | None,
 ) -> models.Measurement:
-    """DOCSTRING"""
+    """This is a helper function to organize the computation of the activity metric.
+
+    This function organizes the logic for computing the requested physical activity
+    metric at the desired temporal resolution.
+
+    Args:
+        acceleration: The acceleration data to compute the activity metric from.
+        activity_metric: The metric to be used for physical activity categorization.
+        epoch_length: The temporal resolution in seconds, the data will be down sampled
+            to.
+
+    Returns:
+        A Measurement object with the computed physical activity metric.
+
+    Raises:
+        ValueError: If the activity_metric is 'ag_count' or 'mad' and epoch_length is
+            None.
+    """
     if activity_metric in ("ag_count", "mad") and epoch_length is None:
         raise ValueError("If using 'ag_count' or 'mad', epoch_length must be provided.")
 

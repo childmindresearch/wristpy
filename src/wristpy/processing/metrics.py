@@ -1,5 +1,7 @@
 """Calculate base metrics, anglez and enmo."""
 
+from typing import Optional
+
 import numpy as np
 import polars as pl
 from scipy import signal
@@ -9,7 +11,9 @@ from wristpy.core import computations, config, models
 logger = config.get_logger()
 
 
-def euclidean_norm_minus_one(acceleration: models.Measurement) -> models.Measurement:
+def euclidean_norm_minus_one(
+    acceleration: models.Measurement, epoch_length: Optional[float | None] = None
+) -> models.Measurement:
     """Compute ENMO, the Euclidean Norm Minus One (1 standard gravity unit).
 
     Negative values of ENMO are set to zero because ENMO is meant as a measure of
@@ -22,6 +26,7 @@ def euclidean_norm_minus_one(acceleration: models.Measurement) -> models.Measure
         it will have two attributes. 1) measurements, containing the three dimensional
         accelerometer data in an np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
+        epoch_length: The length of the window in seconds.
 
     Returns:
         A Measurement object containing the calculated ENMO values and the
@@ -30,8 +35,11 @@ def euclidean_norm_minus_one(acceleration: models.Measurement) -> models.Measure
     enmo = np.linalg.norm(acceleration.measurements, axis=1) - 1
 
     enmo = np.maximum(enmo, 0)
-
-    return models.Measurement(measurements=enmo, time=acceleration.time)
+    if epoch_length is not None:
+        enmo = computations.moving_mean(enmo, epoch_length)
+        return enmo
+    else:
+        return models.Measurement(measurements=enmo, time=acceleration.time)
 
 
 def angle_relative_to_horizontal(

@@ -5,7 +5,7 @@ import math
 from collections.abc import Generator
 from dataclasses import dataclass
 from datetime import datetime
-from typing import cast
+from typing import Literal, Union, cast
 
 import numpy as np
 import polars as pl
@@ -600,3 +600,33 @@ def _extract_no_motion(
         )
 
     return no_motion_data
+
+
+class CalibrationDispatcher:
+    _calibrator: Union[GgirCalibration, ConstrainedMinimizationCalibration]
+
+    def __init__(self, name: Literal["ggir", "gradient"]) -> None:
+        """Docstring"""
+        if name == "ggir":
+            self._calibrator = GgirCalibration()
+        elif name == "gradient":
+            self._calibrator = ConstrainedMinimizationCalibration()
+        else:
+            raise ValueError("Unknown calibrator.")
+
+    def run(
+        self, acceleration: models.Measurement, *, return_input_on_error: bool = False
+    ) -> models.Measurement:
+        try:
+            return self._calibrator.run_calibration(acceleration)
+        except (
+            exceptions.CalibrationError,
+            exceptions.SphereCriteriaError,
+            exceptions.NoMotionError,
+        ) as exc_info:
+            if not return_input_on_error:
+                raise
+            logger.error(
+                "Calibration FAILED: %s. Proceeding without calibration.", exc_info
+            )
+            return acceleration
