@@ -1,6 +1,6 @@
 """Calculate base metrics, anglez and enmo."""
 
-from typing import Tuple
+from typing import Tuple, Literal
 
 import numpy as np
 import polars as pl
@@ -289,70 +289,103 @@ def interpolate_measure(
 
 def extrapolate_points(
     acceleration: models.Measurement,
-    dynamic_range: Tuple[float, float],
-    noise_std: float = 0.3,
-    num_std: int = 5,
+    dynamic_range: Tuple[float, float] = (-8.0, 8.0),
+    noise: float = 0.3,
     smoothing: float = 0.6,
     scale: float = 1,
-    probability: float = 0.95,
+    target__probability: float = 0.95,
+    confident: float = 0.5,
+    neighborhood_size: float = 0.05,
+    sampling_rate: int = 100,
 ) -> None:
     """Identify maxed out values, and extrapolate points.
 
     Args:
         acceleration: Acceleration data that has been interpolated to 100Hz.
         dynamic_range: Dynamic range of device used.
-        noise_level: Device noise level
-        num_std: How many standard deviations,
+        noise: Device noise level
         smoothing: Smoothing parameter for spline function. A value of 0 would fit the
             points linearly, a value of 1 would fit every point.
         scale: theta value, scale parameter for gamma dist.
-        probability = probability threshold for finding k(Shape) parameter.
+        target_probability = probability threshold for finding k(Shape) parameter.
+        confident: Threshold for what constitutes a major jump or drop in value.
+        neighborhood_size = The size of the neighborhood around hills and valleys to be
+            used in extrapolation. Measured in seconds.
+        sampling_rate: The sampling rate in Hz. Assumed to take place after
+            interpolation so it will typically be 100.
 
     Returns:
         Acceleration data with extrapolated points.
     """
-    maxed_out_likelihood = _find_maxed_out_likelihood(
-        acceleration=acceleration,
-        dynamic_range=dynamic_range,
-        num_std=num_std,
-        noise_std=noise_std,
-        scale=scale,
-    )
+    for axis in acceleration.measurements.T:
+        marker = _find_markers(
+            axis=axis,
+            dynamic_range=dynamic_range,
+            noise=noise,
+            scale=scale,
+            target_probability=target__probability,
+        )
+        neighbors = _extrapolate_neighbors(
+            marker=marker, neighborhood_size=neighborhood_size, confident=confident
+        )
+        points = _extrapolate_fit(
+            axis=axis,
+            time=acceleration.time.to_numpy(),
+            marker=marker,
+            neighbors=neighbors,
+            smoothing=smoothing,
+            sampling_rate=sampling_rate,
+            neighborhood_size=neighborhood_size,
+        )
+        data_interpolated = _extrapolate_interpolate(
+            axis=axis,
+            time=acceleration.time.to_numpy(),
+            marker=marker,
+            points=points,
+            sampling_rate=sampling_rate,
+        )
 
     return None
 
 
-def _find_maxed_out_likelihood(
+def _find_markers(
     dynamic_range: Tuple[float, float],
-    num_std: int,
-    noise_std: float,
-    acceleration: models.Measurement,
-    scale: float = 1,
-    probability: float = 0.95,
+    noise: float,
+    axis: np.ndarray,
+    scale: float = 1.0,
+    target_probability: float = 0.95,
 ) -> np.ndarray:
     """Find probability values are maxed out."""
-    range_max = max(dynamic_range)
-    buffer_threshold = range_max - num_std * noise_std
-    distance = np.abs(acceleration.measurements) - buffer_threshold
 
-    k = _brute_force_k(
-        target_probability=probability,
-        step=0.001,
-        standard_deviation=num_std * noise_std,
+    noise += 1e-5
+    positive_buffer_zone = max(dynamic_range) - 5 * noise
+    negative_buffer_zone = min(dynamic_range) + 5 * noise
+    shape_k = _brute_force_k(
+        standard_deviation=3 * noise,
+        target_probability=target_probability,
+        scale=scale,
+    )
+    marker = np.zeros(len(axis))
+    positive_idx = axis >= 0
+    negative_idx = axis < 0
+
+    marker[positive_idx] = stats.gamma.cdf(
+        axis[positive_idx] - positive_buffer_zone, shape=shape_k, scale=scale
+    )
+    marker[negative_idx] = -stats.gamma.cdf(
+        -axis[negative_idx] + negative_buffer_zone, shape=shape_k, scale=scale
     )
 
-    raw_likelihood = stats.gamma.cdf(distance, k, scale=scale)
-    return np.where(distance < 0, 0, raw_likelihood)
+    return marker
 
 
 def _brute_force_k(
     standard_deviation: float,
     target_probability: float = 0.95,
-    step: float = 0.001,
     scale: float = 1.0,
 ) -> float:
     """Find the shape value for gamma distribution."""
-    k_values = np.arange(0.5, 0.001, -step)
+    k_values = np.arange(0.5, 0.001, -0.001)
     previous_probability = 1.0
     previous_k = 0
     result = 0
@@ -375,3 +408,203 @@ def _brute_force_k(
         previous_k = k
 
     return result
+
+
+def _extrapolate_neighbors(
+    marker: np.ndarray,
+    neighborhood_size: float = 0.05,
+    sampling_rate: int = 100,
+    confident: float = 0.5,
+):
+    n_neighbor = int(sampling_rate * neighborhood_size)
+    edges_indicies = _extrapolate_edges(
+        marker=marker, confident=confident, sampling_rate=sampling_rate
+    )
+    marker_length = len(marker)
+
+    expanded = edges_indicies.with_columns(
+        [
+            (pl.col("start") - n_neighbor).alias("left_neighborhood"),
+            (pl.col("end") + n_neighbor).alias("right_neighborhood"),
+        ]
+    )
+
+    neighborhoods = expanded.with_columns(
+        [
+            pl.when(pl.col("start") == -1)
+            .then(-1)
+            .otherwise(pl.col("left_neighborhood").clip(0, marker_length - 1))
+            .alias("left_neighborhood"),
+            pl.when(pl.col("end") == -1)
+            .then(-1)
+            .otherwise(pl.col("right_neighborhood").clip(0, marker_length - 1))
+            .alias("right_neighborhood"),
+        ]
+    )
+
+    return neighborhoods
+
+
+def _extrapolate_edges(
+    marker: np.ndarray, confident: float = 0.5, sampling_rate: int = 100
+):
+    marker_diff_left = np.concatenate(([0], np.diff(marker)))
+    marker_diff_right = np.concatenate((np.diff(marker), [0]))
+
+    threshold_maxout = sampling_rate * 5
+
+    positive_left_end = np.where((marker_diff_left > confident) & (marker > 0))[0]
+    positive_right_start = np.where((marker_diff_right < -confident) & (marker > 0))[0]
+    hills = _handle_edge_cases(
+        marker=marker,
+        left=positive_left_end,
+        right=positive_right_start,
+        threshold_maxout=threshold_maxout,
+        sign="hill",
+    )
+
+    negative_left_end = np.where((marker_diff_left < -confident) & (marker < 0))[0]
+    negative_right_start = np.where((marker_diff_right > confident) & (marker < 0))[0]
+    valleys = _handle_edge_cases(
+        marker=marker,
+        left=negative_left_end,
+        right=negative_right_start,
+        threshold_maxout=threshold_maxout,
+        sign="valley",
+    )
+
+    return pl.concat([hills, valleys], how="vertical")
+
+
+def _handle_edge_cases(
+    marker: np.ndarray,
+    left: np.ndarray,
+    right: np.ndarray,
+    threshold_maxout: int,
+    sign: Literal["hill", "valley"],
+):
+    if len(left) - len(right) == 1:
+        if len(marker) - left[-1] > threshold_maxout:
+            right = np.concatenate((right, [-1]))
+        else:
+            if len(left) == 1:
+                left = np.array([])
+            else:
+                left = left[:-1]
+
+    elif len(left) - len(right) == -1:
+        if right[0] > threshold_maxout:
+            left = np.concatenate(([-1], left))
+        else:
+            if len(right) == 1:
+                right = np.array([])
+            else:
+                right = right[1:]
+
+    if np.abs(len(left) - len(right)) > 2:
+        raise ValueError(
+            f"Mismatch in {sign} edges. # left: {len(left)}, # right: {len(right)}"
+        )
+
+    if np.any((right - left) < 0) and (len(right) > 1):
+        left = left[:-1]
+        right = right[1:]
+
+    maxed_out_areas = pl.DataFrame({"start": left, "end": right})
+    return maxed_out_areas
+
+
+def _extrapolate_fit(
+    axis: np.ndarray,
+    time: np.ndarray,
+    marker: np.ndarray,
+    neighbors: pl.DataFrame,
+    smoothing: float = 0.6,
+    sampling_rate: int = 100,
+    neighborhood_size: float = 0.05,
+):
+    extrapolate_points = []
+
+    for row in neighbors.iter_rows(named=True):
+        left_start, left_end = row["left_neighborhood"], row["start"]
+        right_start, right_end = row["end"], row["right_neighborhood"]
+
+        fitted_left = _fit_weighted(
+            axis=axis,
+            time=time,
+            marker=marker,
+            start=left_start,
+            end=left_end,
+            smoothing=smoothing,
+            sampling_rate=sampling_rate,
+            neighborhood_size=neighborhood_size,
+        )
+        fitted_right = _fit_weighted(
+            axis=axis,
+            time=time,
+            marker=marker,
+            start=right_start,
+            end=right_end,
+            smoothing=smoothing,
+            sampling_rate=sampling_rate,
+            neighborhood_size=neighborhood_size,
+        )
+
+        if fitted_left is None or fitted_right is None:
+            continue
+
+        middle_t = (time[left_end] + time[right_start]) / 2
+
+        left_extrapolated = fitted_left(middle_t)
+        right_extrapolated = fitted_right(middle_t)
+
+        extrapolated_value = (
+            np.array(left_extrapolated) + np.array(right_extrapolated)
+        ) / 2
+
+        extrapolate_points.append((middle_t, extrapolated_value))
+
+    return extrapolate_points
+
+
+def _fit_weighted(
+    axis: np.ndarray,
+    time: np.ndarray,
+    marker: np.ndarray,
+    start: int,
+    end: int,
+    smoothing: float = 0.6,
+    sampling_rate: int = 100,
+    neighborhood_size: float = 0.05,
+):
+    n_over = int(sampling_rate * neighborhood_size)
+
+    if start == -1 and end == -1:
+        return None
+
+    sub_t = time[start : end + 1]
+    sub_value = axis[start : end + 1]
+    weight = 1 - marker[start : end + 1]
+
+    if len(sub_t) < 2:
+        return None
+
+    over_t = np.linspace(sub_t[0], sub_t[-1], n_over)
+    over_value = np.interp(over_t, sub_t, sub_value)
+    over_weight = np.interp(over_t, sub_t, weight)
+
+    fitted = interpolate.UnivariateSpline(
+        over_t, over_value, w=over_weight, s=smoothing
+    )
+
+    return fitted
+
+
+def _extrapolate_interpolate(
+    axis: np.ndarray,
+    time: np.ndarray,
+    marker: np.ndarray,
+    points: list,
+    sampling_rate: int,
+):
+    pass
