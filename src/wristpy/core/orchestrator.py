@@ -371,9 +371,9 @@ def _run_file(
             )
         )
 
-    anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
-    if epoch_length is not None:
-        anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
+    anglez = metrics.angle_relative_to_horizontal(
+        calibrated_acceleration, epoch_length=epoch_length
+    )
     activity_measurement = _compute_activity(
         calibrated_acceleration, activity_metric, epoch_length
     )

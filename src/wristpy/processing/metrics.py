@@ -1,6 +1,6 @@
 """Calculate base metrics, anglez and enmo."""
 
-from typing import Optional
+from typing import Union
 
 import numpy as np
 import polars as pl
@@ -12,7 +12,7 @@ logger = config.get_logger()
 
 
 def euclidean_norm_minus_one(
-    acceleration: models.Measurement, epoch_length: Optional[float | None] = None
+    acceleration: models.Measurement, epoch_length: Union[float, None] = None
 ) -> models.Measurement:
     """Compute ENMO, the Euclidean Norm Minus One (1 standard gravity unit).
 
@@ -21,12 +21,15 @@ def euclidean_norm_minus_one(
     the device would have no meaningful interpretation in this context and would be
     detrimental to the intended analysis.
 
+    The data can be downsampled to a temporal resolution of epoch_length seconds.
+
     Args:
         acceleration: the three dimensional accelerometer data. A Measurement object,
         it will have two attributes. 1) measurements, containing the three dimensional
         accelerometer data in an np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
-        epoch_length: The length of the window in seconds.
+        epoch_length: The temporal resolution of the downsampled enmo, in seconds.
+            Defaults to `None`, which means no downsampling.
 
     Returns:
         A Measurement object containing the calculated ENMO values and the
@@ -36,23 +39,28 @@ def euclidean_norm_minus_one(
 
     enmo = np.maximum(enmo, 0)
 
-    enmo_metric = models.Measurement(measurements=enmo, time=acceleration.time)
     if epoch_length is not None:
-        return computations.moving_mean(enmo_metric, epoch_length)
+        return computations.moving_mean(
+            models.Measurement(measurements=enmo, time=acceleration.time), epoch_length
+        )
     else:
-        return enmo_metric
+        return models.Measurement(measurements=enmo, time=acceleration.time)
 
 
 def angle_relative_to_horizontal(
-    acceleration: models.Measurement,
+    acceleration: models.Measurement, epoch_length: Union[float, None] = None
 ) -> models.Measurement:
     """Calculate the angle of the acceleration vector relative to the horizontal plane.
+
+     The data can be downsampled to a temporal resolution of epoch_length seconds.
 
     Args:
         acceleration: the three dimensional accelerometer data. A Measurement object,
         it will have two attributes. 1) measurements, containing the three dimensional
         accelerometer data in an np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
+        epoch_length: The temporal resolution of the downsampled anglez, in seconds.
+            Defaults to `None`, which means no downsampling.
 
     Returns:
         A Measurement instance containing the values of the angle relative to the
@@ -64,8 +72,13 @@ def angle_relative_to_horizontal(
     angle_radians = np.arctan(acceleration.measurements[:, 2] / xy_projection_magnitute)
 
     angle_degrees = np.degrees(angle_radians)
-
-    return models.Measurement(measurements=angle_degrees, time=acceleration.time)
+    if epoch_length is not None:
+        return computations.moving_mean(
+            models.Measurement(measurements=angle_degrees, time=acceleration.time),
+            epoch_length,
+        )
+    else:
+        return models.Measurement(measurements=angle_degrees, time=acceleration.time)
 
 
 def mean_amplitude_deviation(

@@ -603,10 +603,19 @@ def _extract_no_motion(
 
 
 class CalibrationDispatcher:
+    """Class used to select and implement appropriate calibrator."""
+
     _calibrator: Union[GgirCalibration, ConstrainedMinimizationCalibration]
 
     def __init__(self, name: Literal["ggir", "gradient"]) -> None:
-        """Docstring"""
+        """Initializes the calibrator to one of the predefined calibrators.
+
+        Args:
+            name: The name of the calibrator to use. Options are "ggir" or "gradient".
+
+        Raises:
+            ValueError: If an unknown calibrator is given
+        """
         if name == "ggir":
             self._calibrator = GgirCalibration()
         elif name == "gradient":
@@ -617,6 +626,17 @@ class CalibrationDispatcher:
     def run(
         self, acceleration: models.Measurement, *, return_input_on_error: bool = False
     ) -> models.Measurement:
+        """Runs calibration on acceleration data.
+
+        Args:
+            acceleration: the accelerometer data containing x,y,z axis
+                data and time stamps.
+            return_input_on_error: If true, will return the input acceleration data
+                if calibration fails. If false, will raise an exception.
+
+        Returns:
+            A Measurement object that contains the calibrated acceleration data.
+        """
         try:
             return self._calibrator.run_calibration(acceleration)
         except (
