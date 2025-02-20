@@ -1,7 +1,7 @@
 """test the calibration module."""
 
 from datetime import datetime, timedelta
-from typing import Union
+from typing import Literal, Union
 
 import numpy as np
 import polars as pl
@@ -348,3 +348,12 @@ def test_run_chunked_calibration() -> None:
         result.measurements, expected_data.measurements, atol=1e-3
     ), "Measurement data did not match"
     assert result.time.equals(expected_data.time), "Time series are not equal"
+
+
+def test_calibration_dispatcher_bad() -> None:
+    """Test calibration dispatcher with bad calibrator."""
+    dummy_measure = create_dummy_measurement(sampling_rate=1, duration_hours=84)
+    bad_calibrator_name = "bad"
+
+    with pytest.raises(ValueError, match="Unknown calibrator."):
+        calibration.CalibrationDispatcher(bad_calibrator_name).run(dummy_measure)  # type: ignore[arg-type] # failing on purpose due to bad calibrator name
