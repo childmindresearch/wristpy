@@ -1,7 +1,7 @@
 """test the calibration module."""
 
 from datetime import datetime, timedelta
-from typing import Literal, Union
+from typing import Union
 
 import numpy as np
 import polars as pl
