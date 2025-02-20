@@ -9,7 +9,7 @@ from typing import Dict, List, Literal, Optional, Tuple, Union
 import numpy as np
 import polars as pl
 
-from wristpy.core import computations, config, exceptions, models
+from wristpy.core import config, exceptions, models
 from wristpy.io.readers import readers
 from wristpy.processing import (
     analytics,
@@ -432,7 +432,7 @@ def _run_file(
 def _compute_activity(
     acceleration: models.Measurement,
     activity_metric: Literal["ag_count", "mad", "enmo"],
-    epoch_length: float | None,
+    epoch_length: Union[float, None],
 ) -> models.Measurement:
     """This is a helper function to organize the computation of the activity metric.
 
