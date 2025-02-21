@@ -1,14 +1,19 @@
 """Calculate base metrics, anglez and enmo."""
 
+from typing import Union
+
 import numpy as np
 import polars as pl
+from scipy import signal
 
-from wristpy.core import config, models
+from wristpy.core import computations, config, models
 
 logger = config.get_logger()
 
 
-def euclidean_norm_minus_one(acceleration: models.Measurement) -> models.Measurement:
+def euclidean_norm_minus_one(
+    acceleration: models.Measurement, epoch_length: Union[float, None] = None
+) -> models.Measurement:
     """Compute ENMO, the Euclidean Norm Minus One (1 standard gravity unit).
 
     Negative values of ENMO are set to zero because ENMO is meant as a measure of
@@ -16,11 +21,15 @@ def euclidean_norm_minus_one(acceleration: models.Measurement) -> models.Measure
     the device would have no meaningful interpretation in this context and would be
     detrimental to the intended analysis.
 
+    The data can be downsampled to a temporal resolution of `epoch_length` seconds.
+
     Args:
         acceleration: the three dimensional accelerometer data. A Measurement object,
         it will have two attributes. 1) measurements, containing the three dimensional
         accelerometer data in an np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
+        epoch_length: The temporal resolution of the downsampled enmo, in seconds.
+            Defaults to `None`, which means no downsampling.
 
     Returns:
         A Measurement object containing the calculated ENMO values and the
@@ -30,19 +39,28 @@ def euclidean_norm_minus_one(acceleration: models.Measurement) -> models.Measure
 
     enmo = np.maximum(enmo, 0)
 
-    return models.Measurement(measurements=enmo, time=acceleration.time)
+    if epoch_length is not None:
+        return computations.moving_mean(
+            models.Measurement(measurements=enmo, time=acceleration.time), epoch_length
+        )
+    else:
+        return models.Measurement(measurements=enmo, time=acceleration.time)
 
 
 def angle_relative_to_horizontal(
-    acceleration: models.Measurement,
+    acceleration: models.Measurement, epoch_length: Union[float, None] = None
 ) -> models.Measurement:
     """Calculate the angle of the acceleration vector relative to the horizontal plane.
+
+     The data can be downsampled to a temporal resolution of `epoch_length` seconds.
 
     Args:
         acceleration: the three dimensional accelerometer data. A Measurement object,
         it will have two attributes. 1) measurements, containing the three dimensional
         accelerometer data in an np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
+        epoch_length: The temporal resolution of the downsampled anglez, in seconds.
+            Defaults to `None`, which means no downsampling.
 
     Returns:
         A Measurement instance containing the values of the angle relative to the
@@ -54,8 +72,13 @@ def angle_relative_to_horizontal(
     angle_radians = np.arctan(acceleration.measurements[:, 2] / xy_projection_magnitute)
 
     angle_degrees = np.degrees(angle_radians)
-
-    return models.Measurement(measurements=angle_degrees, time=acceleration.time)
+    if epoch_length is not None:
+        return computations.moving_mean(
+            models.Measurement(measurements=angle_degrees, time=acceleration.time),
+            epoch_length,
+        )
+    else:
+        return models.Measurement(measurements=angle_degrees, time=acceleration.time)
 
 
 def mean_amplitude_deviation(
@@ -103,6 +126,109 @@ def mean_amplitude_deviation(
     )
 
     return models.Measurement.from_data_frame(mad_df)
+
+
+def actigraph_activity_counts(
+    acceleration: models.Measurement, epoch_length: float = 5.0
+) -> models.Measurement:
+    """Compute Actigraph acitivty counts.
+
+    This function computes the Actigraph activity counts based on [1].
+    The acceleartion data is downsample to 30Hz, bandpass filtered, scaled,
+    and then thresholded. The counts are then summed along each axis for
+    the chosen epoch length.
+
+    Args:
+        acceleration: The calibrated acceleration data.
+        epoch_length: The length of the epoch in seconds, defaults to 60s.
+
+    Returns:
+        The activity counts as a Measurement object.
+
+    References:
+        [1] A. Neishabouri et al., “Quantification of acceleration as activity counts
+        in ActiGraph wearable,” Sci Rep, vol. 12, no. 1, Art. no. 1, Jul. 2022,
+        doi: 10.1038/s41598-022-16003-x.
+    """
+    logger.debug("Running activty count physical activity metric.")
+
+    epoch_length_nanoseconds = round(epoch_length * 1e9)
+
+    # input and output coefficients for the bandpass filter from [1]
+    input_coef = np.array(
+        [
+            -0.009341062898525,
+            -0.025470289659360,
+            -0.004235264826105,
+            0.044152415456420,
+            0.036493718347760,
+            -0.011893961934740,
+            -0.022917390623150,
+            -0.006788163862310,
+            0.000000000000000,
+        ],
+        dtype=np.float64,
+    )
+    output_coef = np.array(
+        [
+            1.00000000000000000000,
+            -3.63367395910957000000,
+            5.03689812757486000000,
+            -3.09612247819666000000,
+            0.50620507633883000000,
+            0.32421701566682000000,
+            -0.15685485875559000000,
+            0.01949130205890000000,
+            0.00000000000000000000,
+        ],
+        dtype=np.float64,
+    )
+
+    # scaling factor from [1]
+    scaling_factor = (3 / 4096) / (2.6 / 256) * 237.5
+
+    acceleration_30hz = computations.resample(acceleration, 1 / 30)
+
+    initial_conditions = signal.lfilter_zi(input_coef, output_coef).reshape((-1, 1))
+
+    acceleration_bpf, _ = signal.lfilter(
+        input_coef,
+        output_coef,
+        acceleration_30hz.measurements,
+        zi=np.repeat(
+            initial_conditions, acceleration_30hz.measurements.shape[1], axis=-1
+        )
+        * acceleration_30hz.measurements[0],
+        axis=0,
+    )
+
+    scaled_acceleration = acceleration_bpf * scaling_factor
+    threshold_acceleration = np.floor(np.minimum(np.abs(scaled_acceleration), 128))
+    threshold_acceleration[threshold_acceleration < 4] = 0
+
+    acceleration_10hz = computations.resample(
+        models.Measurement(
+            measurements=threshold_acceleration, time=acceleration_30hz.time
+        ),
+        1 / 10,
+    )
+    acceleration_10hz.measurements = np.floor(acceleration_10hz.measurements)
+
+    aggregator = pl.exclude(["time"]).drop_nans()
+    epoch_counts = (
+        acceleration_10hz.lazy_frame()
+        .group_by_dynamic("time", every=f"{epoch_length_nanoseconds}ns")
+        .agg(aggregator.sum())
+    ).collect()
+
+    ag_counts = epoch_counts.with_columns(
+        (pl.col("column_0") ** 2 + pl.col("column_1") ** 2 + pl.col("column_2") ** 2)
+        .sqrt()
+        .alias("magnitude")
+    )
+    ag_counts = ag_counts.drop(["column_0", "column_1", "column_2"])
+
+    return models.Measurement.from_data_frame(ag_counts)
 
 
 def detect_nonwear(

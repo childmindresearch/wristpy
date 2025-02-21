@@ -49,6 +49,25 @@ def test_orchestrator_different_epoch(
     assert isinstance(results.physical_activity_levels, models.Measurement)
 
 
+def test_orchestrator_none_epoch_ag_count(
+    tmp_path: pathlib.Path,
+    sample_data_gt3x: pathlib.Path,
+) -> None:
+    """Test using none default epoch."""
+    output_path = tmp_path / "good_file.csv"
+
+    with pytest.raises(
+        ValueError,
+        match="If using 'ag_count' or 'mad', epoch_length must be provided.",
+    ):
+        orchestrator._run_file(
+            input=sample_data_gt3x,
+            output=output_path,
+            activity_metric="ag_count",
+            epoch_length=None,
+        )
+
+
 def test_orchestrator_idle_sleep_mode_run(
     tmp_path: pathlib.Path,
     sample_data_gt3x_idle_sleep_mode: pathlib.Path,
