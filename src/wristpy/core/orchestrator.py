@@ -128,7 +128,9 @@ def run(
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given no down sampling is preformed.
+            to. If the activity metric is "enmo" and None is given, no down sampling is
+            performed, however an epoch_length of None is not supported for the other
+            activty metrics.
         activity_metric: The metric to be used for physical activity categorization.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files. Must be None when

@@ -21,7 +21,7 @@ def euclidean_norm_minus_one(
     the device would have no meaningful interpretation in this context and would be
     detrimental to the intended analysis.
 
-    The data can be downsampled to a temporal resolution of epoch_length seconds.
+    The data can be downsampled to a temporal resolution of `epoch_length` seconds.
 
     Args:
         acceleration: the three dimensional accelerometer data. A Measurement object,
@@ -52,7 +52,7 @@ def angle_relative_to_horizontal(
 ) -> models.Measurement:
     """Calculate the angle of the acceleration vector relative to the horizontal plane.
 
-     The data can be downsampled to a temporal resolution of epoch_length seconds.
+     The data can be downsampled to a temporal resolution of `epoch_length` seconds.
 
     Args:
         acceleration: the three dimensional accelerometer data. A Measurement object,
