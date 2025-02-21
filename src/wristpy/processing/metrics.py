@@ -337,7 +337,7 @@ def extrapolate_points(
             sampling_rate=sampling_rate,
             neighborhood_size=neighborhood_size,
         )
-        data_interpolated = _extrapolate_interpolate(
+        fitted_models_list = _extrapolate_interpolate(
             axis=axis,
             time=acceleration.time.to_numpy(),
             marker=marker,
@@ -455,7 +455,7 @@ def _extrapolate_edges(
 
     positive_left_end = np.where((marker_diff_left > confident) & (marker > 0))[0]
     positive_right_start = np.where((marker_diff_right < -confident) & (marker > 0))[0]
-    hills = _handle_edge_cases(
+    hills_df = _handle_edge_cases(
         marker=marker,
         left=positive_left_end,
         right=positive_right_start,
@@ -465,7 +465,7 @@ def _extrapolate_edges(
 
     negative_left_end = np.where((marker_diff_left < -confident) & (marker < 0))[0]
     negative_right_start = np.where((marker_diff_right > confident) & (marker < 0))[0]
-    valleys = _handle_edge_cases(
+    valleys_df = _handle_edge_cases(
         marker=marker,
         left=negative_left_end,
         right=negative_right_start,
@@ -473,7 +473,7 @@ def _extrapolate_edges(
         sign="valley",
     )
 
-    return pl.concat([hills, valleys], how="vertical")
+    return pl.concat([hills_df, valleys_df], how="vertical")
 
 
 def _handle_edge_cases(
