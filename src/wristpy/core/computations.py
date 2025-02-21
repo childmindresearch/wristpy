@@ -133,7 +133,7 @@ def resample(measurement: models.Measurement, delta_t: float) -> models.Measurem
     time_delta_median = (measurement.time[1:] - measurement.time[:-1]).median()
 
     n_nanoseconds_in_second = 1_000_000_000
-    current_delta_t = time_delta_median.total_seconds() * n_nanoseconds_in_second
+    current_delta_t = time_delta_median.total_seconds() * n_nanoseconds_in_second  # type: ignore[union-attr] #Guarded by Measurement validation for .time attribute
     requested_delta_t = round(delta_t * n_nanoseconds_in_second)
 
     measurement_df = (
