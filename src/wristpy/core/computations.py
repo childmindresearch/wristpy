@@ -130,10 +130,10 @@ def resample(measurement: models.Measurement, delta_t: float) -> models.Measurem
         msg = "delta_t must be positive."
         raise ValueError(msg)
 
-    all_delta_t = (measurement.time[1:] - measurement.time[:-1]).unique()
+    time_delta_median = (measurement.time[1:] - measurement.time[:-1]).median()
 
     n_nanoseconds_in_second = 1_000_000_000
-    current_delta_t = all_delta_t[0].total_seconds() * n_nanoseconds_in_second
+    current_delta_t = time_delta_median.total_seconds() * n_nanoseconds_in_second
     requested_delta_t = round(delta_t * n_nanoseconds_in_second)
 
     measurement_df = (
