@@ -61,7 +61,7 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         default="enmo",
         help="Pick which physical activity metric should be used. "
         "This will be used to determine physical activity categorization. "
-        "Can be 'enmo' or 'mad'.",
+        "Can be 'enmo', 'mad', or 'ag_count'.",
     )
 
     parser.add_argument(

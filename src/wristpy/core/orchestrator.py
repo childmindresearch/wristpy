@@ -128,9 +128,9 @@ def run(
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If the activity metric is "enmo" and None is given, no down sampling is
-            performed, however an epoch_length of None is not supported for the other
-            activty metrics.
+            to. If None is given, and `enmo` is the chosen physical activity metric,
+            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
+            ValueError will be raised.
         activity_metric: The metric to be used for physical activity categorization.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files. Must be None when
@@ -230,7 +230,9 @@ def _run_directory(
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given no down sampling is preformed.
+            to. If None is given, and `enmo` is the chosen physical activity metric,
+            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
+            ValueError will be raised.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files.
 
@@ -326,8 +328,8 @@ def _run_file(
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. If None is given, and `enmo` is the chosen physical activity metric,
-            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a chosen
-            epoch length of `None` will be forced to the default value of 5.0s.
+            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
+            ValueError will be raised.
         activity_metric: The metric to be used for physical activity categorization.
         verbosity: The logging level for the logger.
 
