@@ -115,12 +115,12 @@ def test_closest_point_fit() -> None:
 
     linear_transform = calibrator._closest_point_fit((unit_sphere * scale) + offset)
 
-    assert np.allclose(
-        linear_transform.scale, expected_scale, atol=1e-3
-    ), f"Scale is {linear_transform.scale} expected {expected_scale}"
-    assert np.allclose(
-        linear_transform.offset, expected_offset, atol=1e-3
-    ), f"Offset is {linear_transform.offset} expected {expected_offset})"
+    assert np.allclose(linear_transform.scale, expected_scale, atol=1e-3), (
+        f"Scale is {linear_transform.scale} expected {expected_scale}"
+    )
+    assert np.allclose(linear_transform.offset, expected_offset, atol=1e-3), (
+        f"Offset is {linear_transform.offset} expected {expected_offset})"
+    )
 
 
 def test_closest_point_fit_constrainedmin() -> None:
@@ -136,12 +136,12 @@ def test_closest_point_fit_constrainedmin() -> None:
 
     linear_transform = calibrator._closest_point_fit((unit_sphere * scale) + offset)
 
-    assert np.allclose(
-        linear_transform.scale, expected_scale, atol=1e-3
-    ), f"Scale is {linear_transform.scale} expected {expected_scale}"
-    assert np.allclose(
-        linear_transform.offset, expected_offset, atol=1e-3
-    ), f"Offset is {linear_transform.offset} expected {expected_offset})"
+    assert np.allclose(linear_transform.scale, expected_scale, atol=1e-3), (
+        f"Scale is {linear_transform.scale} expected {expected_scale}"
+    )
+    assert np.allclose(linear_transform.offset, expected_offset, atol=1e-3), (
+        f"Offset is {linear_transform.offset} expected {expected_offset})"
+    )
 
 
 def test_closest_point_fit_constrainmin_calibration_error() -> None:
@@ -201,12 +201,12 @@ def test_ggir_calibration_successful() -> None:
 
     linear_transform = calibrator._calibrate(dummy_measure)
 
-    assert np.allclose(
-        linear_transform.scale, expected_scale, atol=1e-3
-    ), f"Scale is {linear_transform.scale} expected {expected_scale}"
-    assert np.allclose(
-        linear_transform.offset, expected_offset, atol=1e-3
-    ), f"Offset is {linear_transform.offset} expected {expected_offset}"
+    assert np.allclose(linear_transform.scale, expected_scale, atol=1e-3), (
+        f"Scale is {linear_transform.scale} expected {expected_scale}"
+    )
+    assert np.allclose(linear_transform.offset, expected_offset, atol=1e-3), (
+        f"Offset is {linear_transform.offset} expected {expected_offset}"
+    )
 
 
 @pytest.mark.parametrize(
@@ -275,12 +275,12 @@ def test_run_ggircalibration() -> None:
 
     result = calibrator.run_calibration(dummy_measure)
 
-    assert isinstance(
-        result, models.Measurement
-    ), f"was expecting type models.Measurement, object is of type {type(result)}"
-    assert np.allclose(
-        result.measurements, expected_data.measurements, atol=1e-3
-    ), "Measurement data did not match"
+    assert isinstance(result, models.Measurement), (
+        f"was expecting type models.Measurement, object is of type {type(result)}"
+    )
+    assert np.allclose(result.measurements, expected_data.measurements, atol=1e-3), (
+        "Measurement data did not match"
+    )
     assert result.time.equals(expected_data.time), "Time series are not equal"
 
 
@@ -308,12 +308,12 @@ def test_run_constrainedmincalibration() -> None:
 
     result = calibrator.run_calibration(dummy_measure)
 
-    assert isinstance(
-        result, models.Measurement
-    ), f"was expecting type models.Measurement, object is of type {type(result)}"
-    assert np.allclose(
-        result.measurements, expected_data.measurements, atol=1e-3
-    ), "Measurement data did not match"
+    assert isinstance(result, models.Measurement), (
+        f"was expecting type models.Measurement, object is of type {type(result)}"
+    )
+    assert np.allclose(result.measurements, expected_data.measurements, atol=1e-3), (
+        "Measurement data did not match"
+    )
     assert result.time.equals(expected_data.time), "Time series are not equal"
 
 
@@ -341,10 +341,10 @@ def test_run_chunked_calibration() -> None:
 
     result = calibrator.run_calibration(dummy_measure)
 
-    assert isinstance(
-        result, models.Measurement
-    ), f"was expecting type models.Measurement, object is of type {type(result)}"
-    assert np.allclose(
-        result.measurements, expected_data.measurements, atol=1e-3
-    ), "Measurement data did not match"
+    assert isinstance(result, models.Measurement), (
+        f"was expecting type models.Measurement, object is of type {type(result)}"
+    )
+    assert np.allclose(result.measurements, expected_data.measurements, atol=1e-3), (
+        "Measurement data did not match"
+    )
     assert result.time.equals(expected_data.time), "Time series are not equal"
