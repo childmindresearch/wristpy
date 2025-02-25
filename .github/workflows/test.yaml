@@ -48,7 +48,7 @@ jobs:
           --verbose
       shell: bash
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         verbose: true
@@ -65,7 +65,7 @@ jobs:
         cache: poetry
     - name: Install dependencies
       run: |
-        poetry install
+        poetry install --only dev
     - name: Ruff format
       run: poetry run ruff format --check
     - name: Ruff check

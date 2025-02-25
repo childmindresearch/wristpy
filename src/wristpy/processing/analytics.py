@@ -386,28 +386,28 @@ def remove_nonwear_from_sleep(
 
 
 def compute_physical_activty_categories(
-    enmo_epoch1: models.Measurement,
+    activity_metric_epoch1: models.Measurement,
     thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
 ) -> models.Measurement:
-    """Compute the physical activity categories based on the ENMO data.
+    """Compute the physical activity categories based on the specific activity metric.
 
-    This function uses the enmo_epoch1 data (5s aggregated data) to compute three
-    physical activity levels: light, moderate, and vigorous.
+    This function uses the activity_metric_epoch1 data (5s aggregated data) to compute
+    four physical activity levels: inactive, light, moderate, and vigorous.
 
-    Default values are taken from the Hildebrand 2014 study, and is best suited for
-    children aged 7 - 11 years.
+    Default values are specifically for ENMO data, taken from the Hildebrand 2014 study,
+    and is best suited for children aged 7 - 11 years.
 
     Args:
-        enmo_epoch1: The enmo epoch1 data, as physical activity data should be computed
-            on aggregated data.
+        activity_metric_epoch1: The specific activity metric epoch1 data, as physical
+            activity data should be computed on aggregated data.
         thresholds: The threshold values for the physical activity categories.
-            The default values are
-                (light_threshold, moderate_threshold, vigorous_threshold).
+            The default values are:
+            (light_threshold, moderate_threshold, vigorous_threshold).
 
     Returns:
         A Measurement instance with the physical activity categories. Categories are
         Inactive, Light, Moderate, Vigorous. The temporal resolution is the same as
-        enmo_epoch1.
+        activity_metric_epoch1.
 
     Raises:
         ValueError: If the threshold values are not poisitive, unique and  in ascending
@@ -427,13 +427,16 @@ def compute_physical_activty_categories(
 
     activity_levels = np.select(
         [
-            enmo_epoch1.measurements <= thresholds[0],
-            (thresholds[0] < enmo_epoch1.measurements)
-            & (enmo_epoch1.measurements <= thresholds[1]),
-            (thresholds[1] < enmo_epoch1.measurements)
-            & (enmo_epoch1.measurements <= thresholds[2]),
-            thresholds[2] < enmo_epoch1.measurements,
+            activity_metric_epoch1.measurements <= thresholds[0],
+            (thresholds[0] < activity_metric_epoch1.measurements)
+            & (activity_metric_epoch1.measurements <= thresholds[1]),
+            (thresholds[1] < activity_metric_epoch1.measurements)
+            & (activity_metric_epoch1.measurements <= thresholds[2]),
+            thresholds[2] < activity_metric_epoch1.measurements,
         ],
         ["inactive", "light", "moderate", "vigorous"],
+        default="unknown",
     )
-    return models.Measurement(measurements=activity_levels, time=enmo_epoch1.time)
+    return models.Measurement(
+        measurements=activity_levels, time=activity_metric_epoch1.time
+    )

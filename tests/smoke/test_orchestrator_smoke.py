@@ -22,7 +22,7 @@ def test_orchestrator_happy_path(
 
     assert output_path.exists()
     assert isinstance(results, models.OrchestratorResults)
-    assert isinstance(results.enmo, models.Measurement)
+    assert isinstance(results.physical_activity_metric, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
     assert isinstance(results.nonwear_epoch, models.Measurement)
     assert isinstance(results.sleep_windows_epoch, models.Measurement)
@@ -42,7 +42,7 @@ def test_orchestrator_different_epoch(
 
     assert output_path.exists()
     assert isinstance(results, models.OrchestratorResults)
-    assert isinstance(results.enmo, models.Measurement)
+    assert isinstance(results.physical_activity_metric, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
     assert isinstance(results.nonwear_epoch, models.Measurement)
     assert isinstance(results.sleep_windows_epoch, models.Measurement)
@@ -60,7 +60,7 @@ def test_orchestrator_idle_sleep_mode_run(
 
     assert (tmp_path / "good_file.csv").exists()
     assert isinstance(results, models.OrchestratorResults)
-    assert isinstance(results.enmo, models.Measurement)
+    assert isinstance(results.physical_activity_metric, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
     assert isinstance(results.nonwear_epoch, models.Measurement)
     assert isinstance(results.sleep_windows_epoch, models.Measurement)

@@ -139,7 +139,7 @@ class WatchData(BaseModel):
 class OrchestratorResults(pydantic.BaseModel):
     """Dataclass containing results of orchestrator.run()."""
 
-    enmo: Measurement
+    physical_activity_metric: Measurement
     anglez: Measurement
     physical_activity_levels: Measurement
     nonwear_epoch: Measurement
@@ -158,7 +158,7 @@ class OrchestratorResults(pydantic.BaseModel):
         output.parent.mkdir(parents=True, exist_ok=True)
 
         results_dataframe = pl.DataFrame(
-            {"time": self.enmo.time}
+            {"time": self.physical_activity_metric.time}
             | {name: value.measurements for name, value in self}
         )
 
