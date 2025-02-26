@@ -363,14 +363,13 @@ def test_calibration_dispatcher_bad() -> None:
 
 def test_calibration_dispatcher_raises_error(mocker: pytest_mock.MockerFixture) -> None:
     """Test calibration dispatcher raises correct error."""
-    mock_calibrator = mocker.patch.object(calibration.CalibrationDispatcher, "run")
+    mock_measurement = unittest.mock.MagicMock(spec=models.Measurement)
+
+    instance = calibration.CalibrationDispatcher("ggir")
+    mock_calibrator = mocker.patch.object(instance._calibrator, "run_calibration")
     mock_calibrator.side_effect = exceptions.NoMotionError(
         "Zero non-motion epochs found."
     )
 
-    mock_measurement = unittest.mock.MagicMock(spec=models.Measurement)
-
     with pytest.raises(exceptions.NoMotionError, match="Zero non-motion epochs found."):
-        calibration.CalibrationDispatcher("ggir").run(
-            mock_measurement, return_input_on_error=False
-        )
+        instance.run(mock_measurement, return_input_on_error=False)
