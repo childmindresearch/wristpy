@@ -165,6 +165,142 @@ def detect_nonwear(
     )
 
 
+def combined_temp_accel_detect_nonwear(
+    acceleration: models.Measurement,
+    temperature: models.Measurement,
+    std_criteria: float = 0.013,
+    temperature_threshold: float = 26.0,
+) -> models.Measurement:
+    """This function uses the both temperature and acceleration data to detect non-wear.
+
+    The function implements the algorithm described in the Zhou 2014 paper. Briefly,
+    data is chunked into one minute windows. Each windows is classified as "wear" or
+    "non-wear", here denoted by 0 and 1, respectively.
+
+    Args:
+        acceleration: The Measurment instance that contains the calibrated acceleration.
+        temperature: The Measurment instance that contains the temperature data.
+        std_criteria: Threshold criteria for standard deviation.
+        temperature_threshold: The temperature threshold for non-wear detection.
+
+    Returns:
+        A new Measurment instance with the non-wear flag and corresponding timestamps.
+        The temporal resolutions is one minute.
+
+    References:
+        Zhou S, Hill RA, Morgan K, et alClassification of accelerometer wear and
+        non-wear events in seconds for monitoring free-living physical activityBMJ
+        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447
+    """
+    logger.debug("Combined temperature and accelereation non-wear detection algorithm.")
+
+    acceleration_grouped_by_window = _group_acceleration_data_by_time(acceleration, 60)
+    low_pass_temp = _pre_process_temperature(temperature, acceleration)
+
+    temperature_grouped_by_window = low_pass_temp.group_by_dynamic(
+        index_column="time", every="60s"
+    ).agg([pl.exclude(["time"])])
+
+    total_n_short_windows = len(acceleration_grouped_by_window)
+
+    nonwear_value_array = np.zeros(total_n_short_windows)
+
+    for window_n in range(total_n_short_windows):
+        mean_temp = temperature_grouped_by_window["temperature"][window_n].mean()
+        accel_value = (
+            acceleration_grouped_by_window[window_n]
+            .select(
+                pl.col("X", "Y", "Z").map_batches(
+                    lambda df: _compute_nonwear_value_per_axis(
+                        df,
+                        std_criteria,
+                    )
+                )
+            )
+            .sum_horizontal()
+            .to_numpy()
+        )
+        if mean_temp < temperature_threshold and (accel_value >= 2):
+            nonwear_value_array[window_n] = 1
+        elif window_n > 0 and mean_temp < temperature_threshold:
+            mean_temp_previous = temperature_grouped_by_window["temperature"][
+                window_n - 1
+            ].mean()
+            if mean_temp <= mean_temp_previous:
+                nonwear_value_array[window_n] = 1
+
+    return models.Measurement(
+        measurements=nonwear_value_array,
+        time=acceleration_grouped_by_window["time"],
+    )
+
+
+def implement_DETACH_nonwear(
+    acceleration: models.Measurement,
+    temperature: models.Measurement,
+    std_criteria: float = 0.013,
+) -> models.Measurement:
+    """This function implements the scikit DETACH algorithm for non-wear detection.
+
+    The nonwear array is downsampled to 60 second resolution.
+
+    Args:
+        acceleration: The Measurment instance that contains the calibrated acceleration.
+        temperature: The Measurment instance that contains the temperature data.
+        std_criteria: The temperature threshold for non-wear detection.
+
+    Returns:
+        A new Measurment instance with the non-wear flag and corresponding timestamps.
+        The temporal resolutions is one minute.
+
+    References:
+        A. Vert et al., “Detecting accelerometer non-wear periods using change
+        in acceleration combined with rate-of-change in temperature,” BMC Medical
+        Research Methodology, vol. 22, no. 1, p. 147, May 2022,
+        doi: 10.1186/s12874-022-01633-6.
+    """
+
+    def upsample_temperature(
+        temperature: np.ndarray, acceleration: np.ndarray
+    ) -> np.ndarray:
+        """Helper function to upsample the temperature to match acceleration data."""
+        x_temperature = np.linspace(0, 1, len(temperature))
+        x_acceleration = np.linspace(0, 1, len(acceleration))
+        interpolated_temp = interpolate.interp1d(x_temperature, temperature)
+        return interpolated_temp(x_acceleration)
+
+    def cleanup_DETACH_nonwear(nonwear: models.Measurement) -> models.Measurement:
+        """Helper function to downsample DETACH ouptut to 60s."""
+        nonwear_downsample = computations.moving_mean(nonwear, 60)
+
+        nonwear_downsample.measurements = np.where(
+            nonwear_downsample.measurements >= 0.5, 1, 0
+        )
+
+        return nonwear_downsample
+
+    logger.debug("Running scikit DETACH algorithm.")
+    time = acceleration.time.dt.timestamp(time_unit="ns").to_numpy()
+    upsample_temp = upsample_temperature(
+        temperature.measurements, acceleration.measurements
+    )
+
+    detach_class = wear_detection.DETACH(sd_thresh=std_criteria)
+    nonwear_array = np.ones(len(time), dtype=np.float32)
+    detach_wear = detach_class.predict(
+        time=time / 1e9, accel=acceleration.measurements, temperature=upsample_temp
+    )
+
+    for start, stop in detach_wear["wear"]:
+        nonwear_array[start:stop] = 0
+
+    non_wear_time = readers.unix_epoch_time_to_polars_datetime(time)
+
+    nonwear = models.Measurement(measurements=nonwear_array, time=non_wear_time)
+
+    return cleanup_DETACH_nonwear(nonwear)
+
+
 def _group_acceleration_data_by_time(
     acceleration: models.Measurement, window_length: int
 ) -> pl.DataFrame:
@@ -295,142 +431,6 @@ def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.
     nonwear_value_array[condition] = 2
 
     return nonwear_value_array
-
-
-def combined_temp_accel_detect_nonwear(
-    acceleration: models.Measurement,
-    temperature: models.Measurement,
-    std_criteria: float = 0.013,
-    temperature_threshold: float = 26.0,
-) -> models.Measurement:
-    """This function uses the both temperature and acceleration data to detect non-wear.
-
-    The function implements the algorithm described in the Zhou 2014 paper. Briefly,
-    data is chunked into one minute windows. Each windows is classified as "wear" or
-    "non-wear", here denoted by 0 and 1, respectively.
-
-    Args:
-        acceleration: The Measurment instance that contains the calibrated acceleration.
-        temperature: The Measurment instance that contains the temperature data.
-        std_criteria: Threshold criteria for standard deviation.
-        temperature_threshold: The temperature threshold for non-wear detection.
-
-    Returns:
-        A new Measurment instance with the non-wear flag and corresponding timestamps.
-        The temporal resolutions is one minute.
-
-    References:
-        Zhou S, Hill RA, Morgan K, et alClassification of accelerometer wear and
-        non-wear events in seconds for monitoring free-living physical activityBMJ
-        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447
-    """
-    logger.debug("Combined temperature and accelereation non-wear detection algorithm.")
-
-    acceleration_grouped_by_window = _group_acceleration_data_by_time(acceleration, 60)
-    low_pass_temp = _pre_process_temperature(temperature, acceleration)
-
-    temperature_grouped_by_window = low_pass_temp.group_by_dynamic(
-        index_column="time", every="60s"
-    ).agg([pl.exclude(["time"])])
-
-    total_n_short_windows = len(acceleration_grouped_by_window)
-
-    nonwear_value_array = np.zeros(total_n_short_windows)
-
-    for window_n in range(total_n_short_windows):
-        mean_temp = temperature_grouped_by_window["temperature"][window_n].mean()
-        accel_value = (
-            acceleration_grouped_by_window[window_n]
-            .select(
-                pl.col("X", "Y", "Z").map_batches(
-                    lambda df: _compute_nonwear_value_per_axis(
-                        df,
-                        std_criteria,
-                    )
-                )
-            )
-            .sum_horizontal()
-            .to_numpy()
-        )
-        if mean_temp < temperature_threshold and (accel_value >= 2):
-            nonwear_value_array[window_n] = 1
-        elif window_n > 0 and mean_temp < temperature_threshold:
-            mean_temp_previous = temperature_grouped_by_window["temperature"][
-                window_n - 1
-            ].mean()
-            if mean_temp <= mean_temp_previous:
-                nonwear_value_array[window_n] = 1
-
-    return models.Measurement(
-        measurements=nonwear_value_array,
-        time=acceleration_grouped_by_window["time"],
-    )
-
-
-def implement_DETACH_nonwear(
-    acceleration: models.Measurement,
-    temperature: models.Measurement,
-    std_criteria: float = 0.013,
-) -> models.Measurement:
-    """This function implements the scikit DETACH algorithm for non-wear detection.
-
-    The nonwear array is downsampled to 60 second resolution.
-
-    Args:
-        acceleration: The Measurment instance that contains the calibrated acceleration.
-        temperature: The Measurment instance that contains the temperature data.
-        std_criteria: The temperature threshold for non-wear detection.
-
-    Returns:
-        A new Measurment instance with the non-wear flag and corresponding timestamps.
-        The temporal resolutions is one minute to match CTA.
-
-    References:
-        A. Vert et al., “Detecting accelerometer non-wear periods using change
-        in acceleration combined with rate-of-change in temperature,” BMC Medical
-        Research Methodology, vol. 22, no. 1, p. 147, May 2022,
-        doi: 10.1186/s12874-022-01633-6.
-    """
-
-    def upsample_temperature(
-        temperature: np.ndarray, acceleration: np.ndarray
-    ) -> np.ndarray:
-        """Helper function to upsample the temperature to match acceleration data."""
-        x_temperature = np.linspace(0, 1, len(temperature))
-        x_acceleration = np.linspace(0, 1, len(acceleration))
-        interpolated_temp = interpolate.interp1d(x_temperature, temperature)
-        return interpolated_temp(x_acceleration)
-
-    def cleanup_DETACH_nonwear(nonwear: models.Measurement) -> models.Measurement:
-        """Helper function to downsample DETACH ouptut to 60s."""
-        nonwear_downsample = computations.moving_mean(nonwear, 60)
-
-        nonwear_downsample.measurements = np.where(
-            nonwear_downsample.measurements >= 0.5, 1, 0
-        )
-
-        return nonwear_downsample
-
-    logger.debug("Running scikit DETACH algorithm.")
-    time = acceleration.time.dt.timestamp(time_unit="ns").to_numpy()
-    upsample_temp = upsample_temperature(
-        temperature.measurements, acceleration.measurements
-    )
-
-    detach_class = wear_detection.DETACH(sd_thresh=std_criteria)
-    nonwear_array = np.ones(len(time), dtype=np.float32)
-    detach_wear = detach_class.predict(
-        time=time / 1e9, accel=acceleration.measurements, temperature=upsample_temp
-    )
-
-    for start, stop in detach_wear["wear"]:
-        nonwear_array[start:stop] = 0
-
-    non_wear_time = readers.unix_epoch_time_to_polars_datetime(time)
-
-    nonwear = models.Measurement(measurements=nonwear_array, time=non_wear_time)
-
-    return cleanup_DETACH_nonwear(nonwear)
 
 
 def _pre_process_temperature(
