@@ -1,6 +1,6 @@
 """Calculate base metrics, anglez and enmo."""
 
-from typing import Tuple, Literal
+from typing import List, Literal, Optional, Tuple
 
 import numpy as np
 import polars as pl
@@ -290,14 +290,14 @@ def interpolate_measure(
 def extrapolate_points(
     acceleration: models.Measurement,
     dynamic_range: Tuple[float, float] = (-8.0, 8.0),
-    noise: float = 0.3,
+    noise: float = 0.03,
     smoothing: float = 0.6,
     scale: float = 1,
-    target__probability: float = 0.95,
+    target_probability: float = 0.95,
     confident: float = 0.5,
     neighborhood_size: float = 0.05,
     sampling_rate: int = 100,
-) -> None:
+):
     """Identify maxed out values, and extrapolate points.
 
     Args:
@@ -309,43 +309,49 @@ def extrapolate_points(
         scale: theta value, scale parameter for gamma dist.
         target_probability = probability threshold for finding k(Shape) parameter.
         confident: Threshold for what constitutes a major jump or drop in value.
-        neighborhood_size = The size of the neighborhood around hills and valleys to be
-            used in extrapolation. Measured in seconds.
+        neighborhood_size: Duration of neighborhood in seconds. This parameter
+            determines how much data on each side of the maxed-out region is used
+            for fitting the local regression model. The parameter is used to calculate
+            the number of points to create in the oversampled data (n_over).
+            Default is 0.05, as optimized in the MIMS-unit paper.
         sampling_rate: The sampling rate in Hz. Assumed to take place after
             interpolation so it will typically be 100.
 
     Returns:
         Acceleration data with extrapolated points.
     """
+    time_numeric = acceleration.time.dt.epoch(time_unit="ns").to_numpy()
+    extrapolated_axes = []
     for axis in acceleration.measurements.T:
         marker = _find_markers(
             axis=axis,
             dynamic_range=dynamic_range,
             noise=noise,
             scale=scale,
-            target_probability=target__probability,
+            target_probability=target_probability,
         )
         neighbors = _extrapolate_neighbors(
             marker=marker, neighborhood_size=neighborhood_size, confident=confident
         )
         points = _extrapolate_fit(
             axis=axis,
-            time=acceleration.time.to_numpy(),
+            time_numeric=time_numeric,
             marker=marker,
             neighbors=neighbors,
             smoothing=smoothing,
             sampling_rate=sampling_rate,
             neighborhood_size=neighborhood_size,
         )
-        fitted_models_list = _extrapolate_interpolate(
-            axis=axis,
-            time=acceleration.time.to_numpy(),
-            marker=marker,
-            points=points,
-            sampling_rate=sampling_rate,
+        extrapolated_values = _extrapolate_interpolate(
+            axis=axis, time_numeric=time_numeric, marker=marker, points=points
         )
+        extrapolated_axes.append(extrapolated_values)
 
-    return None
+    extrapolated_acceleration = np.column_stack(extrapolated_axes)
+
+    return models.Measurement(
+        measurements=extrapolated_acceleration, time=acceleration.time
+    )
 
 
 def _find_markers(
@@ -370,10 +376,10 @@ def _find_markers(
     negative_idx = axis < 0
 
     marker[positive_idx] = stats.gamma.cdf(
-        axis[positive_idx] - positive_buffer_zone, shape=shape_k, scale=scale
+        axis[positive_idx] - positive_buffer_zone, a=shape_k, scale=scale
     )
     marker[negative_idx] = -stats.gamma.cdf(
-        -axis[negative_idx] + negative_buffer_zone, shape=shape_k, scale=scale
+        -axis[negative_idx] + negative_buffer_zone, a=shape_k, scale=scale
     )
 
     return marker
@@ -516,13 +522,36 @@ def _handle_edge_cases(
 
 def _extrapolate_fit(
     axis: np.ndarray,
-    time: np.ndarray,
+    time_numeric: np.ndarray,
     marker: np.ndarray,
     neighbors: pl.DataFrame,
     smoothing: float = 0.6,
     sampling_rate: int = 100,
     neighborhood_size: float = 0.05,
-):
+) -> List[Tuple[float, float]]:
+    """Extrapolate using points around maxed out regions, to find peak of the region.
+
+    Args:
+        axis: Original acceleration data along one axis.
+        time_numeric: Time series data given in epoch time (ns).
+        marker: Array indicating maxed-out regions.
+        neighbors: A polars DataFrame containing the start and end indicies for the
+            maxed out regions, as well as the neighborhoods to the left and right of
+            regions.
+        smoothing: Smoothing value for UniveriateSpline. Determines how closely the
+            spline adheres to the data points. Higher values will give a smoother
+            result. Default is 0.6 as optimized in the MIMS-unit paper.
+        sampling_rate: Sampling rate, default is 100Hz
+        neighborhood_size: Duration of neighborhood in seconds. This parameter
+            determines how much data on each side of the maxed-out region is used
+            for fitting the local regression model. The parameter is used to calculate
+            the number of points to create in the oversampled data (n_over).
+            Default is 0.05, as optimized in the MIMS-unit paper.
+
+    Returns:
+        A List of Tuples representing the peaks of maxed out regions as
+        (timestamp, value) pairs.
+    """
     extrapolate_points = []
 
     for row in neighbors.iter_rows(named=True):
@@ -531,7 +560,7 @@ def _extrapolate_fit(
 
         fitted_left = _fit_weighted(
             axis=axis,
-            time=time,
+            time_numeric=time_numeric,
             marker=marker,
             start=left_start,
             end=left_end,
@@ -541,7 +570,7 @@ def _extrapolate_fit(
         )
         fitted_right = _fit_weighted(
             axis=axis,
-            time=time,
+            time_numeric=time_numeric,
             marker=marker,
             start=right_start,
             end=right_end,
@@ -553,7 +582,7 @@ def _extrapolate_fit(
         if fitted_left is None or fitted_right is None:
             continue
 
-        middle_t = (time[left_end] + time[right_start]) / 2
+        middle_t = (time_numeric[left_end] + time_numeric[right_start]) / 2
 
         left_extrapolated = fitted_left(middle_t)
         right_extrapolated = fitted_right(middle_t)
@@ -569,20 +598,43 @@ def _extrapolate_fit(
 
 def _fit_weighted(
     axis: np.ndarray,
-    time: np.ndarray,
+    time_numeric: np.ndarray,
     marker: np.ndarray,
     start: int,
     end: int,
     smoothing: float = 0.6,
     sampling_rate: int = 100,
     neighborhood_size: float = 0.05,
-):
+) -> Optional[interpolate.UnivariateSpline]:
+    """Fit weighted spline regression model to a section of the data.
+
+    Args:
+        axis: Original acceleration data along one axis.
+        time_numeric: Time series data given in epoch time (ns).
+        marker: Array indicating maxed-out regions.
+        start: Index marking the beggining of the maxed out zone.
+        end: Index marking end of maxed out zone.
+        smoothing: Smoothing value for UniveriateSpline. Determines how closely the
+            spline adheres to the data points. Higher values will give a smoother
+            result. Default is 0.6 as optimized in the MIMS-unit paper.
+        sampling_rate: Sampling rate, default is 100Hz
+        neighborhood_size: Duration of neighborhood in seconds. This parameter
+            determines how much data on each side of the maxed-out region is used
+            for fitting the local regression model. The parameter is used to calculate
+            the number of points to create in the oversampled data (n_over).
+            Default is 0.05, as optimized in the MIMS-unit paper.
+
+    Returns:
+        A UnivariateSpline function fitted to the data segment with weights based on
+        the probability of not being maxed-out. Returns None if the input data is
+        insufficient or invalid (-1).
+    """
     n_over = int(sampling_rate * neighborhood_size)
 
     if start == -1 and end == -1:
         return None
 
-    sub_t = time[start : end + 1]
+    sub_t = time_numeric[start : end + 1]
     sub_value = axis[start : end + 1]
     weight = 1 - marker[start : end + 1]
 
@@ -602,9 +654,47 @@ def _fit_weighted(
 
 def _extrapolate_interpolate(
     axis: np.ndarray,
-    time: np.ndarray,
+    time_numeric: np.ndarray,
     marker: np.ndarray,
     points: list,
-    sampling_rate: int,
-):
-    pass
+    confident: float = 0.5,
+) -> np.ndarray:
+    """Interpolate the original signal with extrapolated points.
+
+    Args:
+        axis: Original acceleration data along one axis.
+        time_numeric: Time series data given in epoch time (ns).
+        marker: Array indicating maxed-out regions.
+        points: List of tuples with extrapolated points (t, value).
+        sampling_rate: Sampling rate, default is 100Hz.
+        confident: Threshold for maxed-out identification, default is 0.5 as optimized
+            in MIMs-unit paper.
+
+    Returns:
+        np.ndarray of axis data, with extrapolated values.
+    """
+    mark_it = np.abs(marker) < confident
+    length_t_mark = np.sum(mark_it)
+
+    if length_t_mark / len(marker) < 0.3:
+        t_values = time_numeric
+        values = axis
+    else:
+        t_values = time_numeric[mark_it]
+        values = axis[mark_it]
+
+        if points and len(points) > 0:
+            points_t = np.array([point[0] for point in points])
+            points_value = np.array([point[1] for point in points])
+
+            t_values = np.concatenate([t_values, points_t])
+            values = np.concatenate([values, points_value])
+
+            sort_idx = np.argsort(t_values)
+            t_values = t_values[sort_idx]
+            values = values[sort_idx]
+
+    interp_function = interpolate.CubicSpline(t_values, values, bc_type="natural")
+    interp_values = interp_function(time_numeric)
+
+    return interp_values
