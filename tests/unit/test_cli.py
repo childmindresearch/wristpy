@@ -151,7 +151,7 @@ def test_main_mad_default(
 def test_main_agcount_default(
     mocker: pytest_mock.MockerFixture, sample_data_gt3x: pathlib.Path
 ) -> None:
-    """Test that correct mad default thresholds are pulled."""
+    """Test that correct ag_count default thresholds are pulled."""
     mock_run = mocker.patch.object(orchestrator, "_run_file")
     default_thresholds = (100, 3000, 5200)
 

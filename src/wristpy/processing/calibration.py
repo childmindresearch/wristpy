@@ -636,6 +636,15 @@ class CalibrationDispatcher:
 
         Returns:
             A Measurement object that contains the calibrated acceleration data.
+
+        Raises:
+            CalibrationError: If the calibration process fails to converge or the final
+                error exceeds the `max_calibration_error` threshold.
+            SphereCriteriaError: If the sphere is not sufficiently populated, i.e. every
+                axis does not have at least 1 value both above and below  the + and
+                - value of min_acceleraiton.
+            NoMotionError: If no portions of data meet no motion criteria as defined by
+                no_motion_check.
         """
         try:
             return self._calibrator.run_calibration(acceleration)
