@@ -5,7 +5,7 @@ import math
 from collections.abc import Generator
 from dataclasses import dataclass
 from datetime import datetime
-from typing import cast
+from typing import Literal, Union, cast
 
 import numpy as np
 import polars as pl
@@ -600,3 +600,62 @@ def _extract_no_motion(
         )
 
     return no_motion_data
+
+
+class CalibrationDispatcher:
+    """Class used to select and implement appropriate calibrator."""
+
+    _calibrator: Union[GgirCalibration, ConstrainedMinimizationCalibration]
+
+    def __init__(self, name: Literal["ggir", "gradient"]) -> None:
+        """Initializes the calibrator to one of the predefined calibrators.
+
+        Args:
+            name: The name of the calibrator to use. Options are "ggir" or "gradient".
+
+        Raises:
+            ValueError: If an unknown calibrator is given
+        """
+        if name == "ggir":
+            self._calibrator = GgirCalibration()
+        elif name == "gradient":
+            self._calibrator = ConstrainedMinimizationCalibration()
+        else:
+            raise ValueError("Unknown calibrator.")
+
+    def run(
+        self, acceleration: models.Measurement, *, return_input_on_error: bool = False
+    ) -> models.Measurement:
+        """Runs calibration on acceleration data.
+
+        Args:
+            acceleration: the accelerometer data containing x,y,z axis
+                data and time stamps.
+            return_input_on_error: If true, will return the input acceleration data
+                if calibration fails. If false, will raise an exception.
+
+        Returns:
+            A Measurement object that contains the calibrated acceleration data.
+
+        Raises:
+            CalibrationError: If the calibration process fails to converge or the final
+                error exceeds the `max_calibration_error` threshold.
+            SphereCriteriaError: If the sphere is not sufficiently populated, i.e. every
+                axis does not have at least 1 value both above and below  the + and
+                - value of min_acceleraiton.
+            NoMotionError: If no portions of data meet no motion criteria as defined by
+                no_motion_check.
+        """
+        try:
+            return self._calibrator.run_calibration(acceleration)
+        except (
+            exceptions.CalibrationError,
+            exceptions.SphereCriteriaError,
+            exceptions.NoMotionError,
+        ) as exc_info:
+            if not return_input_on_error:
+                raise
+            logger.error(
+                "Calibration FAILED: %s. Proceeding without calibration.", exc_info
+            )
+            return acceleration
