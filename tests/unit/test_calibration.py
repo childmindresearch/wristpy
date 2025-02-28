@@ -1,6 +1,5 @@
 """test the calibration module."""
 
-import unittest.mock
 from datetime import datetime, timedelta
 from typing import Union
 
@@ -363,7 +362,7 @@ def test_calibration_dispatcher_bad() -> None:
 
 def test_calibration_dispatcher_raises_error(mocker: pytest_mock.MockerFixture) -> None:
     """Test calibration dispatcher raises correct error."""
-    mock_measurement = unittest.mock.MagicMock(spec=models.Measurement)
+    mock_measurement = mocker.MagicMock(spec=models.Measurement)
 
     instance = calibration.CalibrationDispatcher("ggir")
     mock_calibrator = mocker.patch.object(instance._calibrator, "run_calibration")
