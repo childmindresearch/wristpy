@@ -6,6 +6,7 @@ from typing import Union
 import numpy as np
 import polars as pl
 import pytest
+import pytest_mock
 
 from wristpy.core import exceptions, models
 from wristpy.processing import calibration
@@ -348,3 +349,28 @@ def test_run_chunked_calibration() -> None:
         result.measurements, expected_data.measurements, atol=1e-3
     ), "Measurement data did not match"
     assert result.time.equals(expected_data.time), "Time series are not equal"
+
+
+def test_calibration_dispatcher_bad() -> None:
+    """Test calibration dispatcher with bad calibrator."""
+    dummy_measure = create_dummy_measurement(sampling_rate=1, duration_hours=84)
+    bad_calibrator_name = "bad"
+
+    with pytest.raises(ValueError, match="Unknown calibrator."):
+        calibration.CalibrationDispatcher(bad_calibrator_name).run(dummy_measure)  # type: ignore[arg-type] # failing on purpose due to bad calibrator name
+
+
+def test_calibration_dispatcher_raises_error(mocker: pytest_mock.MockerFixture) -> None:
+    """Test calibration dispatcher raises correct error."""
+    calibrator_instance = calibration.CalibrationDispatcher("ggir")
+
+    mock_measurement = mocker.MagicMock(spec=models.Measurement)
+    mock_calibrator = mocker.patch.object(
+        calibrator_instance._calibrator, "run_calibration"
+    )
+    mock_calibrator.side_effect = exceptions.NoMotionError(
+        "Zero non-motion epochs found."
+    )
+
+    with pytest.raises(exceptions.NoMotionError, match="Zero non-motion epochs found."):
+        calibrator_instance.run(mock_measurement, return_input_on_error=False)

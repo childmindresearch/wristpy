@@ -9,7 +9,7 @@ from typing import Dict, List, Literal, Optional, Tuple, Union
 import numpy as np
 import polars as pl
 
-from wristpy.core import computations, config, exceptions, models
+from wristpy.core import config, exceptions, models
 from wristpy.io.readers import readers
 from wristpy.processing import (
     analytics,
@@ -103,8 +103,8 @@ def run(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[int, None] = 5,
-    activity_metric: Literal["enmo", "mad"] = "enmo",
+    epoch_length: Union[float, None] = 5,
+    activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
@@ -128,7 +128,9 @@ def run(
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given no down sampling is preformed.
+            to. If None is given, and `enmo` is the chosen physical activity metric,
+            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
+            ValueError will be raised.
         activity_metric: The metric to be used for physical activity categorization.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files. Must be None when
@@ -140,7 +142,7 @@ def run(
 
     Raises:
         ValueError: If the physical activity thresholds are not unique or not in
-        ascending order.
+            ascending order.
         ValueError: If processing a file and the output_filetype is not None
         ValueError: If output is None but output_filetype is not None.
 
@@ -148,6 +150,10 @@ def run(
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
         output from wrist- and hip-worn monitors. Medicine and Science in Sports and
         Exercise, 46(9), 1816-1824.
+        [2] Treuth MS, Schmitz K, Catellier DJ, McMurray RG, Murray DM, Almeida MJ,
+        Going S, Norman JE, Pate R. Defining accelerometer thresholds for activity
+        intensities in adolescent girls. Med Sci Sports Exerc. 2004 Jul;36(7):1259-66.
+        PMID: 15235335; PMCID: PMC2423321.
     """
     logger.setLevel(verbosity)
 
@@ -158,6 +164,8 @@ def run(
         thresholds = thresholds or (0.0563, 0.1916, 0.6958)
     elif activity_metric == "mad":
         thresholds = thresholds or (0.029, 0.338, 0.604)
+    elif activity_metric == "ag_count":
+        thresholds = thresholds or (100, 3000, 5200)
 
     if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):
         message = "Threshold values must be >=0, unique, and in ascending order."
@@ -201,7 +209,7 @@ def _run_directory(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[int, None] = 5,
+    epoch_length: Union[float, None] = 5,
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Dict[str, models.OrchestratorResults]:
@@ -222,7 +230,9 @@ def _run_directory(
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given no down sampling is preformed.
+            to. If None is given, and `enmo` is the chosen physical activity metric,
+            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
+            ValueError will be raised.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files.
 
@@ -296,8 +306,8 @@ def _run_file(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[int, None] = 5,
-    activity_metric: Literal["enmo", "mad"] = "enmo",
+    epoch_length: Union[float, None] = 5,
+    activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
@@ -313,11 +323,13 @@ def _run_file(
         output: Path to save data to. The path should end in the save file name in
             either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
-            given in that order. Values must be asscending, unique, and greater than 0.
+            given in that order. Values must be ascending, unique, and greater than 0.
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given no down sampling is preformed.
+            to. If None is given, and `enmo` is the chosen physical activity metric,
+            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
+            ValueError will be raised.
         activity_metric: The metric to be used for physical activity categorization.
         verbosity: The logging level for the logger.
 
@@ -334,9 +346,7 @@ def _run_file(
         BMC Sports Sci Med Rehabil 7, 18 (2015). https://doi.org/10.1186/s13102-015-0010-0.
     """
     logger.setLevel(verbosity)
-    input = pathlib.Path(input)
     if output is not None:
-        output = pathlib.Path(output)
         models.OrchestratorResults.validate_output(output=output)
 
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
@@ -349,34 +359,14 @@ def _run_file(
 
     watch_data = readers.read_watch_data(input)
 
-    calibrator_object: Union[
-        calibration.GgirCalibration, calibration.ConstrainedMinimizationCalibration
-    ]
     if calibrator is None:
         logger.debug("Running without calibration")
         calibrated_acceleration = watch_data.acceleration
     else:
-        if calibrator == "ggir":
-            calibrator_object = calibration.GgirCalibration()
-        elif calibrator == "gradient":
-            calibrator_object = calibration.ConstrainedMinimizationCalibration()
-        else:
-            raise ValueError(f"Invalid calibrator given:{calibrator}")
+        calibrated_acceleration = calibration.CalibrationDispatcher(calibrator).run(
+            watch_data.acceleration, return_input_on_error=True
+        )
 
-        logger.debug("Running calibration with calibrator: %s", calibrator)
-        try:
-            calibrated_acceleration = calibrator_object.run_calibration(
-                watch_data.acceleration
-            )
-        except (
-            exceptions.CalibrationError,
-            exceptions.SphereCriteriaError,
-            exceptions.NoMotionError,
-        ) as exc_info:
-            logger.error(
-                "Calibration FAILED: %s. Proceeding without calibration.", exc_info
-            )
-            calibrated_acceleration = watch_data.acceleration
     if watch_data.idle_sleep_mode_flag:
         logger.debug("Imputing idle sleep mode gaps.")
         calibrated_acceleration = (
@@ -384,24 +374,23 @@ def _run_file(
                 calibrated_acceleration
             )
         )
-    if activity_metric == "enmo":
-        activity_measurement = metrics.euclidean_norm_minus_one(calibrated_acceleration)
-    elif activity_metric == "mad":
-        activity_measurement = metrics.mean_amplitude_deviation(calibrated_acceleration)
-    anglez = metrics.angle_relative_to_horizontal(calibrated_acceleration)
+
+    anglez = metrics.angle_relative_to_horizontal(
+        calibrated_acceleration, epoch_length=epoch_length
+    )
+    activity_measurement = _compute_activity(
+        calibrated_acceleration, activity_metric, epoch_length
+    )
+
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
 
-    if epoch_length is not None:
-        activity_measurement = computations.moving_mean(
-            activity_measurement, epoch_length=epoch_length
-        )
-        anglez = computations.moving_mean(anglez, epoch_length=epoch_length)
     non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
     physical_activity_levels = analytics.compute_physical_activty_categories(
         activity_measurement,
         thresholds,
     )
+
     sleep_array = models.Measurement(
         measurements=format_sleep_data(
             sleep_windows=sleep_windows, reference_measure=activity_measurement
@@ -442,3 +431,39 @@ def _run_file(
             )
 
     return results
+
+
+def _compute_activity(
+    acceleration: models.Measurement,
+    activity_metric: Literal["ag_count", "mad", "enmo"],
+    epoch_length: Union[float, None],
+) -> models.Measurement:
+    """This is a helper function to organize the computation of the activity metric.
+
+    This function organizes the logic for computing the requested physical activity
+    metric at the desired temporal resolution.
+
+    Args:
+        acceleration: The acceleration data to compute the activity metric from.
+        activity_metric: The metric to be used for physical activity categorization.
+        epoch_length: The temporal resolution in seconds, the data will be down sampled
+            to.
+
+    Returns:
+        A Measurement object with the computed physical activity metric.
+
+    Raises:
+        ValueError: If the activity_metric is 'ag_count' or 'mad' and epoch_length is
+            None.
+    """
+    if activity_metric in ("ag_count", "mad") and epoch_length is None:
+        raise ValueError("If using 'ag_count' or 'mad', epoch_length must be provided.")
+
+    if activity_metric == "ag_count":
+        return metrics.actigraph_activity_counts(
+            acceleration,
+            epoch_length=epoch_length,  # type: ignore[arg-type] # Guarded by the ValueError statement above.
+        )
+    elif activity_metric == "mad":
+        return metrics.mean_amplitude_deviation(acceleration, epoch_length=epoch_length)  # type: ignore[arg-type] # Guarded by the ValueError statement above.
+    return metrics.euclidean_norm_minus_one(acceleration, epoch_length=epoch_length)
