@@ -3,6 +3,7 @@
 import math
 import pathlib
 from datetime import datetime, timedelta
+from typing import Union
 
 import numpy as np
 import polars as pl
@@ -30,6 +31,33 @@ def create_acceleration() -> pl.DataFrame:
         }
     )
     return acceleration_polars_df
+
+
+def create_clipped_sine_data(
+    cycles: int = 2, threshold: Union[float, None] = 0.95
+) -> np.ndarray:
+    """Fixture to create dummy sinusoidal data with clipped regions."""
+    num_samples = cycles * 100
+    x_values = np.linspace(0, 2 * np.pi * cycles, num_samples)
+    sine_data = np.sin(x_values)
+
+    if threshold is not None:
+        sine_data = np.clip(sine_data, -threshold, threshold)
+
+    return np.column_stack([sine_data, sine_data, sine_data])
+
+
+def create_sine_data_time_stamps(
+    duration_seconds: int = 2, sampling_rate: int = 100
+) -> pl.Series:
+    """Create timestamps for dummy sinusoidal data."""
+    num_samples = duration_seconds * sampling_rate
+    time_points = np.linspace(0, duration_seconds, num_samples)
+
+    return pl.Series(
+        "datetime",
+        np.datetime64("2024-02-19") + (time_points * 1e9).astype("timedelta64[ns]"),
+    )
 
 
 @pytest.mark.parametrize(
@@ -280,3 +308,34 @@ def test_interpolate_data(
         assert np.all(
             correlation > 0.99
         ), f"Axis:{axis} did not meet the threshold, current values: {correlation}"
+
+
+def test_extrapolate_points() -> None:
+    """Test the succesful running of extrapolate points."""
+    test_data = create_clipped_sine_data()
+    test_time = create_sine_data_time_stamps()
+    test_measure = models.Measurement(measurements=test_data, time=test_time)
+    ground_truth = create_clipped_sine_data(threshold=None)
+
+    result = metrics.extrapolate_points(
+        acceleration=test_measure, dynamic_range=(-0.95, 0.95)
+    )
+
+    assert np.allclose(result.measurements, ground_truth, rtol=3e-3)
+
+
+def test_find_marker() -> None:
+    """Test find markers by correctly identify likely maxed out points."""
+    postive_idx = [1, 2]
+    negative_idx = [7, 8]
+    dummy_maxed_out_data = np.zeros(10)
+    dummy_maxed_out_data[postive_idx] = 1
+    dummy_maxed_out_data[negative_idx] = -1
+    confident = 0.5
+
+    result = metrics._find_markers(
+        axis=dummy_maxed_out_data, dynamic_range=(-1, 1), noise=0.03
+    )
+
+    assert np.array_equal(np.where(result > confident)[0], postive_idx)
+    assert np.array_equal(np.where(result < -confident)[0], negative_idx)
