@@ -8,7 +8,6 @@ from scipy import interpolate, signal
 from skdh.preprocessing import wear_detection
 
 from wristpy.core import computations, config, models
-
 from wristpy.io.readers import readers
 
 logger = config.get_logger()
