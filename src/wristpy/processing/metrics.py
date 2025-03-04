@@ -297,23 +297,25 @@ def extrapolate_points(
     confident: float = 0.5,
     neighborhood_size: float = 0.05,
     sampling_rate: int = 100,
-):
+) -> models.Measurement:
     """Identify maxed out values, and extrapolate points.
 
     Args:
         acceleration: Acceleration data that has been interpolated to 100Hz.
-        dynamic_range: Dynamic range of device used.
-        noise: Device noise level
+        dynamic_range: Dynamic range of device used. This information can be gathered
+            device metadata.
+        noise: Device noise level.
         smoothing: Smoothing parameter for spline function. A value of 0 would fit the
             points linearly, a value of 1 would fit every point.
-        scale: theta value, scale parameter for gamma dist.
-        target_probability = probability threshold for finding k(Shape) parameter.
+        scale: Theta value, scale parameter for gamma dist.
+        target_probability: Threshold used in determing the shape parameter (k) of the
+            gamma distribution. Probability that a value 3 standard deviations from the
+            buffer zone is maxed-out.
         confident: Threshold for what constitutes a major jump or drop in value.
         neighborhood_size: Duration of neighborhood in seconds. This parameter
             determines how much data on each side of the maxed-out region is used
             for fitting the local regression model. The parameter is used to calculate
             the number of points to create in the oversampled data (n_over).
-            Default is 0.05, as optimized in the MIMS-unit paper.
         sampling_rate: The sampling rate in Hz. Assumed to take place after
             interpolation so it will typically be 100.
 
@@ -356,13 +358,27 @@ def extrapolate_points(
 
 def _find_markers(
     dynamic_range: Tuple[float, float],
-    noise: float,
     axis: np.ndarray,
     scale: float = 1.0,
+    noise: float = 0.03,
     target_probability: float = 0.95,
 ) -> np.ndarray:
-    """Find probability values are maxed out."""
+    """Find probability values are maxed out.
 
+    Args:
+        dynamic_range: Tuple of floats indicating the device's value range. This
+            information can be gathered from watch metadata.
+        noise: Typical noise value for device.
+        axis: Acceleration data along one axis.
+        scale: Scale value (theta) for gamma distribution. Typically set at 1.
+        target_probability: Threshold used in determing the shape parameter (k) of the
+            gamma distribution. Probability that a value 3 standard deviations from the
+            buffer zone is maxed-out.
+
+    Returns:
+        Array indicating the likelihood that corrisponding value in the axis data is
+        'maxed-out'.
+    """
     noise += 1e-5
     positive_buffer_zone = max(dynamic_range) - 5 * noise
     negative_buffer_zone = min(dynamic_range) + 5 * noise
@@ -390,7 +406,20 @@ def _brute_force_k(
     target_probability: float = 0.95,
     scale: float = 1.0,
 ) -> float:
-    """Find the shape value for gamma distribution."""
+    """Find the shape parameter(k) for the gamma distribution.
+
+    Args:
+        standard_deviation: The point at which to evaluate the gamma CDF,
+            should be 3 times the noise.
+        target_probability: Threshold used in determing the shape parameter (k) of the
+            gamma distribution. Probability that a value 3 standard deviations from the
+            buffer zone is maxed-out.
+        scale: Scale value (theta) for gamma distribution. Typically set at 1.
+
+    Returns:
+        The optimal shape parameter that makes the gamma CDF at the given standard
+        deviation ~equal to the target probability.
+    """
     k_values = np.arange(0.5, 0.001, -0.001)
     previous_probability = 1.0
     previous_k = 0
@@ -421,7 +450,27 @@ def _extrapolate_neighbors(
     neighborhood_size: float = 0.05,
     sampling_rate: int = 100,
     confident: float = 0.5,
-):
+) -> pl.DataFrame:
+    """Find neighborhoods around maxed-out regions for regression fitting.
+
+    Args:
+        marker: Array the same size as axis, containing values that mark the
+            probability that each sample is maxed-out. Values close to ±1 indicate
+            high likelihood that the value is near the limit of the dynamic range, with
+            the sign indicating if it's near the upper bound, or lower bound. Values
+            close to zero indicate low likelihood of being near range limit.
+        neighborhood_size: Duration of neighborhood in seconds to use around each
+            maxed-out region for regression fitting. Default is 0.05 (50ms).
+        sampling_rate: The sampling rate of the data in Hz. Default is 100Hz as data
+            should be interpolated to 100hz prior to this step.
+        confident: Threshold for what constitutes a significant change in marker values.
+
+    Returns:
+        DataFrame containing the indices of maxed-out regions (start, end) and
+        their expanded neighborhoods (left_neighborhood, right_neighborhood). A
+        value of -1 indicates a boundary case where the region extends to the
+        beginning or end of the data.
+    """
     n_neighbor = int(sampling_rate * neighborhood_size)
     edges_indicies = _extrapolate_edges(
         marker=marker, confident=confident, sampling_rate=sampling_rate
@@ -453,44 +502,77 @@ def _extrapolate_neighbors(
 
 def _extrapolate_edges(
     marker: np.ndarray, confident: float = 0.5, sampling_rate: int = 100
-):
+) -> pl.DataFrame:
+    """Extrapolate edges.
+
+    Args.
+        marker: Array the same size as axis, containing values that mark the
+            probability that each sample is maxed-out. Values close to ±1 indicate
+            high likelihood that the value is near the limit of the dynamic range, with
+            the sign indicating if it's near the upper bound, or lower bound. Values
+            close to zero indicate low likelihood of being near range limit.
+        confident: Threshold for what constitutes a significant change in marker values.
+        sampling_rate: Sampling rate of acceleration data, typically 100hz following
+            interpolation.
+
+    Returns:
+        DataFrame containing indicies for hills and valleys.
+    """
     marker_diff_left = np.concatenate(([0], np.diff(marker)))
     marker_diff_right = np.concatenate((np.diff(marker), [0]))
 
-    threshold_maxout = sampling_rate * 5
+    out_of_range_threshold = sampling_rate * 5
 
     positive_left_end = np.where((marker_diff_left > confident) & (marker > 0))[0]
     positive_right_start = np.where((marker_diff_right < -confident) & (marker > 0))[0]
-    hills_df = _handle_edge_cases(
+    hills_df = _align_edges(
         marker=marker,
         left=positive_left_end,
         right=positive_right_start,
-        threshold_maxout=threshold_maxout,
+        out_of_range_threshold=out_of_range_threshold,
         sign="hill",
     )
 
     negative_left_end = np.where((marker_diff_left < -confident) & (marker < 0))[0]
     negative_right_start = np.where((marker_diff_right > confident) & (marker < 0))[0]
-    valleys_df = _handle_edge_cases(
+    valleys_df = _align_edges(
         marker=marker,
         left=negative_left_end,
         right=negative_right_start,
-        threshold_maxout=threshold_maxout,
+        out_of_range_threshold=out_of_range_threshold,
         sign="valley",
     )
 
     return pl.concat([hills_df, valleys_df], how="vertical")
 
 
-def _handle_edge_cases(
+def _align_edges(
     marker: np.ndarray,
     left: np.ndarray,
     right: np.ndarray,
-    threshold_maxout: int,
+    out_of_range_threshold: int,
     sign: Literal["hill", "valley"],
-):
+) -> pl.DataFrame:
+    """Aligns left and right edges of maxed-out regions and handles edge cases.
+
+    Args:
+        marker: Array the same size as axis, containing values that mark the
+            probability that each sample is maxed-out. Values close to ±1 indicate
+            high likelihood that the value is near the limit of the dynamic range, with
+            the sign indicating if it's near the upper bound, or lower bound. Values
+            close to zero indicate low likelihood of being near range limit.
+        left: Indicies indicating the left edge of a potential maxed-out region.
+        right: Indicies indicating the right edge of a potential maxed-out region.
+        out_of_range_threshold: The number of samples that determines if an un matched
+            edge extends beyond the data range, or if the edge is spurious. Typically 5
+            seconds worth of data.
+        sign: Indicates if maxed out region is a hill or valley.
+
+    Returns:
+        A DataFrame with the left and right edges of each maxed-out region.
+    """
     if len(left) - len(right) == 1:
-        if len(marker) - left[-1] > threshold_maxout:
+        if len(marker) - left[-1] > out_of_range_threshold:
             right = np.concatenate((right, [-1]))
         else:
             if len(left) == 1:
@@ -499,7 +581,7 @@ def _handle_edge_cases(
                 left = left[:-1]
 
     elif len(left) - len(right) == -1:
-        if right[0] > threshold_maxout:
+        if right[0] > out_of_range_threshold:
             left = np.concatenate(([-1], left))
         else:
             if len(right) == 1:
@@ -534,23 +616,24 @@ def _extrapolate_fit(
     Args:
         axis: Original acceleration data along one axis.
         time_numeric: Time series data given in epoch time (ns).
-        marker: Array indicating maxed-out regions.
+        marker: Array the same size as axis, containing values that mark the
+            probability that each sample is maxed-out. Values close to ±1 indicate
+            high likelihood that the value is near the limit of the dynamic range, with
+            the sign indicating if it's near the upper bound, or lower bound. Values
+            close to zero indicate low likelihood of being near range limit.
         neighbors: A polars DataFrame containing the start and end indicies for the
             maxed out regions, as well as the neighborhoods to the left and right of
             regions.
         smoothing: Smoothing value for UniveriateSpline. Determines how closely the
             spline adheres to the data points. Higher values will give a smoother
-            result. Default is 0.6 as optimized in the MIMS-unit paper.
+            result.
         sampling_rate: Sampling rate, default is 100Hz
-        neighborhood_size: Duration of neighborhood in seconds. This parameter
-            determines how much data on each side of the maxed-out region is used
-            for fitting the local regression model. The parameter is used to calculate
-            the number of points to create in the oversampled data (n_over).
-            Default is 0.05, as optimized in the MIMS-unit paper.
+        neighborhood_size: Duration of neighborhood in seconds to use around each
+            maxed-out region for regression fitting. Default is 0.05 (50ms).
 
     Returns:
         A List of Tuples representing the peaks of maxed out regions as
-        (timestamp, value) pairs.
+        (timestamp, value) pairs. Times are givene in epoch time (ns).
     """
     extrapolate_points = []
 
@@ -611,18 +694,19 @@ def _fit_weighted(
     Args:
         axis: Original acceleration data along one axis.
         time_numeric: Time series data given in epoch time (ns).
-        marker: Array indicating maxed-out regions.
+        marker: Array the same size as axis, containing values that mark the
+            probability that each sample is maxed-out. Values close to ±1 indicate
+            high likelihood that the value is near the limit of the dynamic range, with
+            the sign indicating if it's near the upper bound, or lower bound. Values
+            close to zero indicate low likelihood of being near range limit.
         start: Index marking the beggining of the maxed out zone.
         end: Index marking end of maxed out zone.
         smoothing: Smoothing value for UniveriateSpline. Determines how closely the
             spline adheres to the data points. Higher values will give a smoother
             result. Default is 0.6 as optimized in the MIMS-unit paper.
         sampling_rate: Sampling rate, default is 100Hz
-        neighborhood_size: Duration of neighborhood in seconds. This parameter
-            determines how much data on each side of the maxed-out region is used
-            for fitting the local regression model. The parameter is used to calculate
-            the number of points to create in the oversampled data (n_over).
-            Default is 0.05, as optimized in the MIMS-unit paper.
+        neighborhood_size: Duration of neighborhood in seconds to use around each
+            maxed-out region for regression fitting. Default is 0.05 (50ms).
 
     Returns:
         A UnivariateSpline function fitted to the data segment with weights based on
@@ -664,11 +748,15 @@ def _extrapolate_interpolate(
     Args:
         axis: Original acceleration data along one axis.
         time_numeric: Time series data given in epoch time (ns).
-        marker: Array indicating maxed-out regions.
-        points: List of tuples with extrapolated points (t, value).
+        marker: Array the same size as axis, containing values that mark the
+            probability that each sample is maxed-out. Values close to ±1 indicate
+            high likelihood that the value is near the limit of the dynamic range, with
+            the sign indicating if it's near the upper bound, or lower bound. Values
+            close to zero indicate low likelihood of being near range limit.
+        points: List of tuples with extrapolated points (time, value). Times are given
+            in epoch time (ns).
         sampling_rate: Sampling rate, default is 100Hz.
-        confident: Threshold for maxed-out identification, default is 0.5 as optimized
-            in MIMs-unit paper.
+        confident: Threshold for maxed-out identification.
 
     Returns:
         np.ndarray of axis data, with extrapolated values.
