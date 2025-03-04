@@ -9,6 +9,8 @@ import numpy as np
 import polars as pl
 import pytest
 
+from scipy import stats
+
 from wristpy.core import models
 from wristpy.io.readers import readers
 from wristpy.processing import metrics
@@ -339,3 +341,88 @@ def test_find_marker() -> None:
 
     assert np.array_equal(np.where(result > confident)[0], postive_idx)
     assert np.array_equal(np.where(result < -confident)[0], negative_idx)
+
+
+def test_brute_force_k() -> None:
+    """Test brute foce method for finding shape parameter."""
+    standard_deviation = 0.09
+    target_probability = 0.95
+    scale = 1.0
+    k_max = 0.5
+    k_min = 0.01
+    k_step = -0.001
+
+    result = metrics._brute_force_k(
+        standard_deviation=standard_deviation,
+        target_probability=target_probability,
+        scale=scale,
+        k_max=k_max,
+        k_min=k_min,
+        k_step=k_step,
+    )
+    result_probability = stats.gamma.cdf(standard_deviation, a=result, scale=scale)
+
+    assert (
+        k_min < result < k_max
+    ), f"Expected shape value between {k_min} and {k_max}, got: {result}"
+    assert np.isclose(
+        target_probability, result_probability, rtol=1e-3
+    ), f"Expected target probability of: {target_probability}, got:{result_probability}"
+
+
+@pytest.mark.parametrize("maxed_out_value", [-0.9, 0.9])
+def test_extrapolate_neighbors(maxed_out_value: float) -> None:
+    """Test extrapolate neighbors."""
+    marker = np.zeros(10)
+    marker[3:6] = maxed_out_value
+    confident = 0.5
+    neighborhood_size = 0.1
+    sampling_rate = 10
+
+    result = metrics._extrapolate_neighbors(
+        marker=marker,
+        neighborhood_size=neighborhood_size,
+        confident=confident,
+        sampling_rate=sampling_rate,
+    )
+
+    assert result["start"][0] == 3
+    assert result["end"][0] == 5
+    assert result["left_neighborhood"][0] == 2
+    assert result["right_neighborhood"][0] == 6
+    assert len(result) == 1, f"Expected 1 region but got:{len(result)}"
+
+
+@pytest.mark.parametrize(
+    "start,end,left_neighbor, right_neighbor", [(-1, 2, -1, 3), (8, -1, 7, -1)]
+)
+def test_extrapolate_neighbors_out_of_range(
+    monkeypatch: pytest.MonkeyPatch,
+    start: int,
+    end: int,
+    left_neighbor: int,
+    right_neighbor: int,
+) -> None:
+    """Test extrapolate_neighbors correctly cases where regions are out of range."""
+    marker = np.zeros(10)
+    neighborhood_size = 0.1
+    sampling_rate = 10
+
+    mock_edges = pl.DataFrame({"start": start, "end": end})
+
+    monkeypatch.setattr(
+        metrics, "_extrapolate_edges", lambda *args, **kwargs: mock_edges
+    )
+
+    result = metrics._extrapolate_neighbors(
+        marker=marker,
+        neighborhood_size=neighborhood_size,
+        confident=0.5,
+        sampling_rate=sampling_rate,
+    )
+
+    assert len(result) == 1, f"Expected 1 region but got:{len(result)}"
+    assert result["start"][0] == start
+    assert result["end"][0] == end
+    assert result["left_neighborhood"][0] == left_neighbor
+    assert result["right_neighborhood"][0] == right_neighbor

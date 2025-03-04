@@ -403,6 +403,9 @@ def _find_markers(
 
 def _brute_force_k(
     standard_deviation: float,
+    k_max: float = 0.5,
+    k_min: float = 0.001,
+    k_step: float = -0.001,
     target_probability: float = 0.95,
     scale: float = 1.0,
 ) -> float:
@@ -411,6 +414,12 @@ def _brute_force_k(
     Args:
         standard_deviation: The point at which to evaluate the gamma CDF,
             should be 3 times the noise.
+        k_max: Maximum value for the shape parameter search range.
+            Default is 0.5.
+        k_min: Minimum value for the shape parameter search range.
+            Default is 0.001.
+        k_step: Step size for the shape parameter search. Negative value
+            means searching from k_max down to k_min. Default is -0.001.
         target_probability: Threshold used in determing the shape parameter (k) of the
             gamma distribution. Probability that a value 3 standard deviations from the
             buffer zone is maxed-out.
@@ -420,7 +429,7 @@ def _brute_force_k(
         The optimal shape parameter that makes the gamma CDF at the given standard
         deviation ~equal to the target probability.
     """
-    k_values = np.arange(0.5, 0.001, -0.001)
+    k_values = np.arange(k_max, k_min, k_step)
     previous_probability = 1.0
     previous_k = 0
     result = 0
@@ -599,6 +608,7 @@ def _align_edges(
         right = right[1:]
 
     maxed_out_areas = pl.DataFrame({"start": left, "end": right})
+
     return maxed_out_areas
 
 
