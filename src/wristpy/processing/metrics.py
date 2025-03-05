@@ -577,40 +577,27 @@ def _align_edges(
         A DataFrame with the left and right edges of each maxed-out region.
 
     Raises:
-        ValueError: If more than 1 extra edge.
+        ValueError: If the length of right or left is greater than 1.
     """
     if len(left) - len(right) == 1:
         if marker_length - left[-1] > out_of_range_threshold:
-            print("Path 1 ran")
             print(left)
 
             right = np.concatenate((right, [-1]))
             print(right)
         else:
-            print("Path 2 ran")
             if len(left) == 1:
-                print("Path 3 ran")
                 left = np.array([])
             else:
-                print("Path 4 ran")
                 left = left[:-1]
     elif len(left) - len(right) == -1:
-        print(f"Left:{left}")
-        print(f"Right:{right}")
-        print("Path 5 ran")
         if right[0] > out_of_range_threshold:
-            print("Path 6 ran")
             left = np.concatenate(([-1], left))
         else:
-            print("Path 7 ran")
             if len(right) == 1:
-                print("Path 8 ran")
                 right = np.array([])
-                print("Path 9 ran")
-                print(f"Left:{left}")
-                print(f"Right:{right}")
+
             else:
-                print("Path 10 ran")
                 right = right[1:]
 
     if np.abs(len(left) - len(right)) >= 2:
@@ -623,8 +610,6 @@ def _align_edges(
         left = left[:-1]
         right = right[1:]
 
-    print(f"Left:{left}")
-    print(f"Right:{right}")
     maxed_out_areas = pl.DataFrame({"start": left, "end": right})
 
     return maxed_out_areas
