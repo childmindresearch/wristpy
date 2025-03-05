@@ -305,9 +305,9 @@ def extrapolate_points(
         dynamic_range: Dynamic range of device used. This information can be gathered
             device metadata.
         noise: Device noise level.
-        smoothing: Smoothing parameter for spline function. A value of 0 would fit the
-            points linearly, a value of 1 would fit every point.
-        scale: Theta value, scale parameter for gamma dist.
+        smoothing: Smoothing parameter for spline function. A value of 0 fits the data
+            exactly, higher values will fit the data more smoothly.
+        scale: Theta value, scale parameter for gamma distribution.
         target_probability: Threshold used in determing the shape parameter (k) of the
             gamma distribution. Probability that a value 3 standard deviations from the
             buffer zone is maxed-out.
@@ -481,12 +481,12 @@ def _extrapolate_neighbors(
         beginning or end of the data.
     """
     n_neighbor = int(sampling_rate * neighborhood_size)
-    edges_indicies = _extrapolate_edges(
+    edges_indices = _extrapolate_edges(
         marker=marker, confident=confident, sampling_rate=sampling_rate
     )
     marker_length = len(marker)
 
-    expanded = edges_indicies.with_columns(
+    expanded = edges_indices.with_columns(
         [
             (pl.col("start") - n_neighbor).alias("left_neighborhood"),
             (pl.col("end") + n_neighbor).alias("right_neighborhood"),
@@ -525,7 +525,7 @@ def _extrapolate_edges(
             interpolation.
 
     Returns:
-        DataFrame containing indicies for hills and valleys.
+        DataFrame containing indices for hills and valleys.
     """
     marker_diff_left = np.concatenate(([0], np.diff(marker)))
     marker_diff_right = np.concatenate((np.diff(marker), [0]))
@@ -535,7 +535,7 @@ def _extrapolate_edges(
     positive_left_end = np.where((marker_diff_left > confident) & (marker > 0))[0]
     positive_right_start = np.where((marker_diff_right < -confident) & (marker > 0))[0]
     hills_df = _align_edges(
-        marker=marker,
+        marker_length=len(marker),
         left=positive_left_end,
         right=positive_right_start,
         out_of_range_threshold=out_of_range_threshold,
@@ -545,7 +545,7 @@ def _extrapolate_edges(
     negative_left_end = np.where((marker_diff_left < -confident) & (marker < 0))[0]
     negative_right_start = np.where((marker_diff_right > confident) & (marker < 0))[0]
     valleys_df = _align_edges(
-        marker=marker,
+        marker_length=len(marker),
         left=negative_left_end,
         right=negative_right_start,
         out_of_range_threshold=out_of_range_threshold,
@@ -556,7 +556,7 @@ def _extrapolate_edges(
 
 
 def _align_edges(
-    marker: np.ndarray,
+    marker_length: int,
     left: np.ndarray,
     right: np.ndarray,
     out_of_range_threshold: int,
@@ -565,13 +565,9 @@ def _align_edges(
     """Aligns left and right edges of maxed-out regions and handles edge cases.
 
     Args:
-        marker: Array the same size as axis, containing values that mark the
-            probability that each sample is maxed-out. Values close to ±1 indicate
-            high likelihood that the value is near the limit of the dynamic range, with
-            the sign indicating if it's near the upper bound, or lower bound. Values
-            close to zero indicate low likelihood of being near range limit.
-        left: Indicies indicating the left edge of a potential maxed-out region.
-        right: Indicies indicating the right edge of a potential maxed-out region.
+        marker_length: Length of marker array.
+        left: indices indicating the left edge of a potential maxed-out region.
+        right: indices indicating the right edge of a potential maxed-out region.
         out_of_range_threshold: The number of samples that determines if an un matched
             edge extends beyond the data range, or if the edge is spurious. Typically 5
             seconds worth of data.
@@ -579,34 +575,56 @@ def _align_edges(
 
     Returns:
         A DataFrame with the left and right edges of each maxed-out region.
+
+    Raises:
+        ValueError: If more than 1 extra edge.
     """
     if len(left) - len(right) == 1:
-        if len(marker) - left[-1] > out_of_range_threshold:
+        if marker_length - left[-1] > out_of_range_threshold:
+            print("Path 1 ran")
+            print(left)
+
             right = np.concatenate((right, [-1]))
+            print(right)
         else:
+            print("Path 2 ran")
             if len(left) == 1:
+                print("Path 3 ran")
                 left = np.array([])
             else:
+                print("Path 4 ran")
                 left = left[:-1]
-
     elif len(left) - len(right) == -1:
+        print(f"Left:{left}")
+        print(f"Right:{right}")
+        print("Path 5 ran")
         if right[0] > out_of_range_threshold:
+            print("Path 6 ran")
             left = np.concatenate(([-1], left))
         else:
+            print("Path 7 ran")
             if len(right) == 1:
+                print("Path 8 ran")
                 right = np.array([])
+                print("Path 9 ran")
+                print(f"Left:{left}")
+                print(f"Right:{right}")
             else:
+                print("Path 10 ran")
                 right = right[1:]
 
-    if np.abs(len(left) - len(right)) > 2:
+    if np.abs(len(left) - len(right)) >= 2:
         raise ValueError(
             f"Mismatch in {sign} edges. # left: {len(left)}, # right: {len(right)}"
         )
 
-    if np.any((right - left) < 0) and (len(right) > 1):
+    valid_indices = (left != -1) & (right != -1)
+    if np.any((right[valid_indices] - left[valid_indices]) < 0) and (len(right) > 1):
         left = left[:-1]
         right = right[1:]
 
+    print(f"Left:{left}")
+    print(f"Right:{right}")
     maxed_out_areas = pl.DataFrame({"start": left, "end": right})
 
     return maxed_out_areas
@@ -631,7 +649,7 @@ def _extrapolate_fit(
             high likelihood that the value is near the limit of the dynamic range, with
             the sign indicating if it's near the upper bound, or lower bound. Values
             close to zero indicate low likelihood of being near range limit.
-        neighbors: A polars DataFrame containing the start and end indicies for the
+        neighbors: A polars DataFrame containing the start and end indices for the
             maxed out regions, as well as the neighborhoods to the left and right of
             regions.
         smoothing: Smoothing value for UniveriateSpline. Determines how closely the
@@ -725,7 +743,7 @@ def _fit_weighted(
     """
     n_over = int(sampling_rate * neighborhood_size)
 
-    if start == -1 and end == -1:
+    if start < 0 or end < 0:
         return None
 
     sub_t = time_numeric[start : end + 1]
@@ -733,6 +751,9 @@ def _fit_weighted(
     weight = 1 - marker[start : end + 1]
 
     if len(sub_t) < 2:
+        return None
+
+    if n_over < 4:
         return None
 
     over_t = np.linspace(sub_t[0], sub_t[-1], n_over)
@@ -771,28 +792,28 @@ def _extrapolate_interpolate(
     Returns:
         np.ndarray of axis data, with extrapolated values.
     """
-    mark_it = np.abs(marker) < confident
-    length_t_mark = np.sum(mark_it)
+    non_maxed_out_mask = np.abs(marker) < confident
+    num_non_maxed = np.sum(non_maxed_out_mask)
 
-    if length_t_mark / len(marker) < 0.3:
-        t_values = time_numeric
+    if num_non_maxed / len(marker) < 0.3:
+        times = time_numeric
         values = axis
     else:
-        t_values = time_numeric[mark_it]
-        values = axis[mark_it]
+        times = time_numeric[non_maxed_out_mask]
+        values = axis[non_maxed_out_mask]
 
         if points and len(points) > 0:
-            points_t = np.array([point[0] for point in points])
+            points_time = np.array([point[0] for point in points])
             points_value = np.array([point[1] for point in points])
 
-            t_values = np.concatenate([t_values, points_t])
+            times = np.concatenate([times, points_time])
             values = np.concatenate([values, points_value])
 
-            sort_idx = np.argsort(t_values)
-            t_values = t_values[sort_idx]
+            sort_idx = np.argsort(times)
+            times = times[sort_idx]
             values = values[sort_idx]
 
-    interp_function = interpolate.CubicSpline(t_values, values, bc_type="natural")
+    interp_function = interpolate.CubicSpline(times, values, bc_type="natural")
     interp_values = interp_function(time_numeric)
 
     return interp_values
