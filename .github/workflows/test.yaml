@@ -59,7 +59,7 @@ jobs:
         cache: poetry
     - name: Install dependencies
       run: |
-        poetry install
+        poetry install --only dev
     - name: Ruff format
       run: poetry run ruff format --check
     - name: Ruff check
