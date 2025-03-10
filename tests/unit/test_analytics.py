@@ -39,9 +39,9 @@ def test_fill_false_blocks(
 
     result = sleep_detection._fill_false_blocks(sleep_idx_array, gap_block)
 
-    assert np.array_equal(
-        result, expected_result
-    ), f"Expected {expected_result}, but got {result}"
+    assert np.array_equal(result, expected_result), (
+        f"Expected {expected_result}, but got {result}"
+    )
 
 
 def test_compute_abs_diff_mean_anglez(
@@ -58,9 +58,9 @@ def test_compute_abs_diff_mean_anglez(
 
     result = sleep_detection._compute_abs_diff_mean_anglez(sleep_detection.anglez)
 
-    assert np.array_equal(
-        result.measurements, expected_result
-    ), f"Expected {expected_result}, but got {result.measurements}"
+    assert np.array_equal(result.measurements, expected_result), (
+        f"Expected {expected_result}, but got {result.measurements}"
+    )
     assert np.array_equal(len(result.time), expected_length)
 
 
@@ -161,12 +161,12 @@ def test_spt_window(sleep_detection: analytics.GgirSleepDetection) -> None:
 
     result = sleep_detection._spt_window(sleep_detection.anglez)
 
-    assert np.array_equal(
-        result.measurements, expected_result
-    ), f"Expected {expected_result}, but got {result.measurements}"
-    assert np.array_equal(
-        len(result.time), expected_length
-    ), f"Expected {expected_length}, but got {len(result.time)}"
+    assert np.array_equal(result.measurements, expected_result), (
+        f"Expected {expected_result}, but got {result.measurements}"
+    )
+    assert np.array_equal(len(result.time), expected_length), (
+        f"Expected {expected_length}, but got {len(result.time)}"
+    )
 
 
 def test_spt_window_null(sleep_detection: analytics.GgirSleepDetection) -> None:
@@ -176,12 +176,12 @@ def test_spt_window_null(sleep_detection: analytics.GgirSleepDetection) -> None:
 
     result = sleep_detection._spt_window(sleep_detection.anglez)
 
-    assert np.array_equal(
-        result.measurements, expected_result
-    ), f"Expected {expected_result}, but got {result.measurements}"
-    assert np.array_equal(
-        len(result.time), expected_length
-    ), f"Expected {expected_length}, but got {len(result.time)}"
+    assert np.array_equal(result.measurements, expected_result), (
+        f"Expected {expected_result}, but got {result.measurements}"
+    )
+    assert np.array_equal(len(result.time), expected_length), (
+        f"Expected {expected_length}, but got {len(result.time)}"
+    )
 
 
 def test_calculate_sib_periods(sleep_detection: analytics.GgirSleepDetection) -> None:
@@ -191,12 +191,12 @@ def test_calculate_sib_periods(sleep_detection: analytics.GgirSleepDetection) ->
 
     result = sleep_detection._calculate_sib_periods(sleep_detection.anglez, 10)
 
-    assert np.array_equal(
-        result.measurements, expected_result
-    ), f"Expected {expected_result}, but got {result.measurements}"
-    assert (
-        len(result.measurements) == expected_length
-    ), f"Expected {expected_length}, but got {len(result.measurements)}"
+    assert np.array_equal(result.measurements, expected_result), (
+        f"Expected {expected_result}, but got {result.measurements}"
+    )
+    assert len(result.measurements) == expected_length, (
+        f"Expected {expected_length}, but got {len(result.measurements)}"
+    )
 
 
 def test_find_onset_wakeup_times(sleep_detection: analytics.GgirSleepDetection) -> None:
