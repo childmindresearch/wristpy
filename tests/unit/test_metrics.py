@@ -349,7 +349,7 @@ def test_brute_force_k() -> None:
     scale = 1.0
     k_max = 0.5
     k_min = 0.01
-    k_step = -0.001
+    k_step = 0.001
 
     result = metrics._brute_force_k(
         standard_deviation=standard_deviation,
