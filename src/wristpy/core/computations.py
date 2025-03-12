@@ -192,10 +192,11 @@ def majority_vote_non_wear(
         nonwear_cta: The nonwear algorithm output from the CTA algorithm.
         nonwear_detach: The nonwear algorithm output from the detach algorithm.
         temporal_resolution: The temporal resolution of the output, in seconds.
-            Defaults to 5.0.
+            Defaults to 60.0.
 
     Returns:
-        A new Measurement instance at a new temporal resolution.
+        A new Measurement instance with the combined nonwear detection,
+        at a new temporal resolution.
     """
     min_start_time = min(
         [nonwear_ggir.time[0], nonwear_cta.time[0], nonwear_detach.time[0]]
@@ -223,6 +224,47 @@ def majority_vote_non_wear(
             + nonwear_detach.measurements
         )
         >= 2,
+        1,
+        0,
+    )
+
+    return models.Measurement(measurements=nonwear_value, time=nonwear_ggir.time)
+
+
+def combined_ggir_detach_nonwear(
+    nonwear_ggir: models.Measurement,
+    nonwear_detach: models.Measurement,
+    temporal_resolution: float = 60.0,
+) -> models.Measurement:
+    """This function combines the GGIR and DETACH nonwear detection outputs.
+
+    The two algorithms are resampled to the same sampling rate, and when both
+    algorithms agree on nonwear, the new nonwear outputs is set to 1.
+
+    This assumes the nonwear measurements have the same ending time stamp.
+
+    Args:
+        nonwear_ggir: The nonwear algorithm output from the GGIR algorithm.
+        nonwear_detach: The nonwear algorithm output from the DETACH algorithm.
+        temporal_resolution: The temporal resolution of the output, in seconds.
+            Defaults to 60.0.
+
+    Returns:
+        A new Measurement instance at a new temporal resolution.
+    """
+    min_start_time = min([nonwear_ggir.time[0], nonwear_detach.time[0]])
+    max_end_time = max([nonwear_ggir.time[-1], nonwear_detach.time[-1]])
+
+    nonwear_ggir = _time_fix(nonwear_ggir, max_end_time, min_start_time)
+    nonwear_detach = _time_fix(nonwear_detach, max_end_time, min_start_time)
+
+    nonwear_ggir = resample(nonwear_ggir, temporal_resolution)
+    nonwear_detach = resample(nonwear_detach, temporal_resolution)
+
+    nonwear_ggir.measurements = np.where(nonwear_ggir.measurements >= 0.5, 1, 0)
+
+    nonwear_value = np.where(
+        (nonwear_ggir.measurements + nonwear_detach.measurements) == 2,
         1,
         0,
     )
