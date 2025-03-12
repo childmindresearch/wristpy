@@ -42,7 +42,7 @@ def create_dummy_measurement(
             measurements=data, time=pl.Series(time_data).alias("time")
         )
     else:
-        data = np.random.randn(n_samples, 3) - 0.5
+        data = np.random.randn(n_samples, 3) - 0.5  # type: ignore[assignment] #covered by else statement
         norms = np.linalg.norm(data)
         unit_sphere = data / norms
         return models.Measurement(
