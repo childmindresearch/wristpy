@@ -332,14 +332,14 @@ def test_find_marker() -> None:
     dummy_maxed_out_data = np.zeros(10)
     dummy_maxed_out_data[postive_idx] = 1
     dummy_maxed_out_data[negative_idx] = -1
-    confident = 0.5
+    confidence_threshold = 0.5
 
     result = metrics._find_markers(
         axis=dummy_maxed_out_data, dynamic_range=(-1, 1), noise=0.03
     )
 
-    assert np.array_equal(np.where(result > confident)[0], postive_idx)
-    assert np.array_equal(np.where(result < -confident)[0], negative_idx)
+    assert np.array_equal(np.where(result > confidence_threshold)[0], postive_idx)
+    assert np.array_equal(np.where(result < -confidence_threshold)[0], negative_idx)
 
 
 def test_brute_force_k() -> None:
@@ -374,14 +374,14 @@ def test_extrapolate_neighbors(maxed_out_value: float) -> None:
     """Test extrapolate neighbors."""
     marker = np.zeros(10)
     marker[3:6] = maxed_out_value
-    confident = 0.5
+    confidence_threshold = 0.5
     neighborhood_size = 0.1
     sampling_rate = 10
 
     result = metrics._extrapolate_neighbors(
         marker=marker,
         neighborhood_size=neighborhood_size,
-        confident=confident,
+        confidence_threshold=confidence_threshold,
         sampling_rate=sampling_rate,
     )
 
@@ -416,7 +416,7 @@ def test_extrapolate_neighbors_out_of_range(
     result = metrics._extrapolate_neighbors(
         marker=marker,
         neighborhood_size=neighborhood_size,
-        confident=0.5,
+        confidence_threshold=0.5,
         sampling_rate=sampling_rate,
     )
 
@@ -432,11 +432,11 @@ def test_extrapolate_edges() -> None:
     marker = np.zeros(10)
     marker[2:5] = 0.9
     marker[6:9] = -0.8
-    confident = 0.5
+    confidence_threshold = 0.5
     sampling_rate = 10
 
     result = metrics._extrapolate_edges(
-        marker, confident=confident, sampling_rate=sampling_rate
+        marker, confidence_threshold=confidence_threshold, sampling_rate=sampling_rate
     )
     result_sorted = result.sort("start")
 
@@ -713,7 +713,7 @@ def test_extrapolate_interpolate(marker: np.ndarray) -> None:
         time_numeric=time_numeric,
         marker=marker,
         points=points,
-        confident=0.5,
+        confidence_threshold=0.5,
     )
 
     assert np.allclose(interpolated, axis)

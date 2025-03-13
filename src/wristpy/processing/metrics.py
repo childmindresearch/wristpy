@@ -4,7 +4,7 @@ from typing import List, Literal, Optional, Tuple
 
 import numpy as np
 import polars as pl
-from scipy import interpolate, stats
+from scipy import interpolate, signal, stats
 
 from wristpy.core import config, models
 
@@ -294,7 +294,7 @@ def extrapolate_points(
     smoothing: float = 0.6,
     scale: float = 1,
     target_probability: float = 0.95,
-    confident: float = 0.5,
+    confidence_threshold: float = 0.5,
     neighborhood_size: float = 0.05,
     sampling_rate: int = 100,
 ) -> models.Measurement:
@@ -311,7 +311,8 @@ def extrapolate_points(
         target_probability: Threshold used in determining the shape parameter (k) of the
             gamma distribution. Probability that a value 3 standard deviations from the
             buffer zone is maxed-out.
-        confident: Threshold for what constitutes a major jump or drop in value.
+        confidence_threshold: Threshold for what constitutes a major jump or drop in
+            value.
         neighborhood_size: Duration of neighborhood in seconds. This parameter
             determines how much data on each side of the maxed-out region is used
             for fitting the local regression model. The parameter is used to calculate
@@ -339,7 +340,7 @@ def extrapolate_points(
         )
         neighbors = _extrapolate_neighbors(
             marker=marker,
-            confident=confident,
+            confidence_threshold=confidence_threshold,
             neighborhood_size=neighborhood_size,
             sampling_rate=sampling_rate,
         )
@@ -357,7 +358,7 @@ def extrapolate_points(
             time_numeric=time_numeric,
             marker=marker,
             points=points,
-            confident=confident,
+            confidence_threshold=confidence_threshold,
         )
         extrapolated_axes.append(extrapolated_values)
 
@@ -391,11 +392,10 @@ def _find_markers(
         Array indicating the likelihood that corresponding value in the axis data is
         'maxed-out'.
     """
-    noise += 1e-5
-    positive_buffer_zone = max(dynamic_range) - 5 * noise
-    negative_buffer_zone = min(dynamic_range) + 5 * noise
+    positive_buffer_zone = max(dynamic_range) - 5 * (noise + 1e-5)
+    negative_buffer_zone = min(dynamic_range) + 5 * (noise + 1e-5)
     shape_k = _brute_force_k(
-        standard_deviation=3 * noise,
+        standard_deviation=3 * (noise + 1e-5),
         scale=scale,
         target_probability=target_probability,
     )
@@ -424,14 +424,13 @@ def _brute_force_k(
     """Find the shape parameter(k) for the gamma distribution.
 
     Args:
-        standard_deviation: The point at which to evaluate the gamma CDF,
-            should be 3 times the noise.
+        standard_deviation: The point at which to evaluate the gamma cumulative
+            distribution function, should be 3 times the noise.
         k_max: Maximum value for the shape parameter search range.
             Default is 0.5.
         k_min: Minimum value for the shape parameter search range.
             Default is 0.001.
-        k_step: Step size for the shape parameter search. Negative value
-            means searching from k_max down to k_min. Default is -0.001.
+        k_step: Step size for the shape parameter search.
         scale: Scale value (theta) for gamma distribution. Typically set at 1.
         target_probability: Threshold used in determining the shape parameter (k) of the
             gamma distribution. Probability that a value 3 standard deviations from the
@@ -440,7 +439,7 @@ def _brute_force_k(
 
     Returns:
         The optimal shape parameter that makes the gamma CDF at the given standard
-        deviation ~equal to the target probability.
+        deviation approximately equal to the target probability.
     """
     k_values = np.arange(k_max, k_min, -k_step)
     previous_probability = 1.0
@@ -469,19 +468,20 @@ def _brute_force_k(
 
 def _extrapolate_neighbors(
     marker: np.ndarray,
-    confident: float = 0.5,
+    confidence_threshold: float = 0.5,
     neighborhood_size: float = 0.05,
     sampling_rate: int = 100,
 ) -> pl.DataFrame:
     """Find neighborhoods around maxed-out regions for regression fitting.
 
     Args:
-        marker: Array the same size as axis, containing values that mark the
-            probability that each sample is maxed-out. Values close to ±1 indicate
-            high likelihood that the value is near the limit of the dynamic range, with
-            the sign indicating if it's near the upper bound, or lower bound. Values
-            close to zero indicate low likelihood of being near range limit.
-        confident: Threshold for what constitutes a significant change in marker values.
+        marker: Array containing values that mark the probability that each sample is
+            maxed-out. Values close to ±1 indicate high likelihood that the value is
+            near the limit of the dynamic range, with the sign indicating if it's near
+            the upper bound, or lower bound. Values close to zero indicate low
+            likelihood of being near range limit.
+        confidence_threshold: Threshold for what constitutes a significant change in
+            marker values.
         neighborhood_size: Duration of neighborhood in seconds to use around each
             maxed-out region for regression fitting. Default is 0.05 (50ms).
         sampling_rate: The sampling rate of the data in Hz. Default is 100Hz as data
@@ -495,7 +495,9 @@ def _extrapolate_neighbors(
     """
     n_neighbor = int(sampling_rate * neighborhood_size)
     edges_indices = _extrapolate_edges(
-        marker=marker, confident=confident, sampling_rate=sampling_rate
+        marker=marker,
+        confidence_threshold=confidence_threshold,
+        sampling_rate=sampling_rate,
     )
     marker_length = len(marker)
 
@@ -523,17 +525,18 @@ def _extrapolate_neighbors(
 
 
 def _extrapolate_edges(
-    marker: np.ndarray, confident: float = 0.5, sampling_rate: int = 100
+    marker: np.ndarray, confidence_threshold: float = 0.5, sampling_rate: int = 100
 ) -> pl.DataFrame:
     """Find edges of maxed out regions and identify them as hills(+) or valleys (-).
 
     Args:
-        marker: Array the same size as axis, containing values that mark the
+        marker: Array containing values that mark the
             probability that each sample is maxed-out. Values close to ±1 indicate
             high likelihood that the value is near the limit of the dynamic range, with
             the sign indicating if it's near the upper bound, or lower bound. Values
             close to zero indicate low likelihood of being near range limit.
-        confident: Threshold for what constitutes a significant change in marker values.
+        confidence_threshold: Threshold for what constitutes a significant change in
+            marker values.
         sampling_rate: Sampling rate of acceleration data, typically 100hz following
             interpolation.
 
@@ -545,8 +548,12 @@ def _extrapolate_edges(
 
     out_of_range_threshold = sampling_rate * 5
 
-    positive_left_end = np.where((marker_diff_left > confident) & (marker > 0))[0]
-    positive_right_start = np.where((marker_diff_right < -confident) & (marker > 0))[0]
+    positive_left_end = np.where(
+        (marker_diff_left > confidence_threshold) & (marker > 0)
+    )[0]
+    positive_right_start = np.where(
+        (marker_diff_right < -confidence_threshold) & (marker > 0)
+    )[0]
     hills_df = _align_edges(
         marker_length=len(marker),
         left=positive_left_end,
@@ -555,8 +562,12 @@ def _extrapolate_edges(
         sign="hill",
     )
 
-    negative_left_end = np.where((marker_diff_left < -confident) & (marker < 0))[0]
-    negative_right_start = np.where((marker_diff_right > confident) & (marker < 0))[0]
+    negative_left_end = np.where(
+        (marker_diff_left < -confidence_threshold) & (marker < 0)
+    )[0]
+    negative_right_start = np.where(
+        (marker_diff_right > confidence_threshold) & (marker < 0)
+    )[0]
     valleys_df = _align_edges(
         marker_length=len(marker),
         left=negative_left_end,
@@ -739,7 +750,8 @@ def _fit_weighted(
         insufficient or invalid (-1).
     """
     n_over = int(sampling_rate * neighborhood_size)
-
+    if n_over < 4:
+        return None
     if start < 0 or end < 0:
         return None
 
@@ -748,9 +760,6 @@ def _fit_weighted(
     weight = 1 - marker[start : end + 1]
 
     if len(sub_t) < 2:
-        return None
-
-    if n_over < 4:
         return None
 
     over_t = np.linspace(sub_t[0], sub_t[-1], n_over)
@@ -769,7 +778,7 @@ def _extrapolate_interpolate(
     time_numeric: np.ndarray,
     marker: np.ndarray,
     points: list,
-    confident: float = 0.5,
+    confidence_threshold: float = 0.5,
 ) -> np.ndarray:
     """Interpolate the original signal with extrapolated points.
 
@@ -783,12 +792,12 @@ def _extrapolate_interpolate(
             close to zero indicate low likelihood of being near range limit.
         points: List of tuples with extrapolated points (time, value). Times are given
             in epoch time (ns).
-        confident: Threshold for maxed-out identification.
+        confidence_threshold: Threshold for maxed-out identification.
 
     Returns:
         np.ndarray of axis data, with extrapolated values.
     """
-    non_maxed_out_mask = np.abs(marker) < confident
+    non_maxed_out_mask = np.abs(marker) < confidence_threshold
     num_non_maxed = np.sum(non_maxed_out_mask)
 
     if num_non_maxed / len(marker) < 0.3:
