@@ -9,7 +9,7 @@ from typing import Dict, List, Literal, Optional, Tuple, Union
 import numpy as np
 import polars as pl
 
-from wristpy.core import config, exceptions, models
+from wristpy.core import computations, config, exceptions, models
 from wristpy.io.readers import readers
 from wristpy.processing import (
     analytics,
@@ -308,6 +308,9 @@ def _run_file(
     ] = "gradient",
     epoch_length: Union[float, None] = 5,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
+    nonwear_algorithm: Literal[
+        "ggir", "cta", "detach", "majority_vote", "ggir_detach"
+    ] = "ggir",
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
@@ -331,6 +334,7 @@ def _run_file(
             no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
             ValueError will be raised.
         activity_metric: The metric to be used for physical activity categorization.
+        nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
 
     Returns:
@@ -384,11 +388,43 @@ def _run_file(
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
+    if watch_data.temperature is not None:
+        if nonwear_algorithm == "ggir":
+            non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
+        elif nonwear_algorithm == "cta":
+            non_wear_array = metrics.combined_temp_accel_detect_nonwear(
+                acceleration=calibrated_acceleration, temperature=watch_data.temperature
+            )
+        elif nonwear_algorithm == "detach":
+            non_wear_array = metrics.implement_DETACH_nonwear(
+                acceleration=calibrated_acceleration, temperature=watch_data.temperature
+            )
+        elif nonwear_algorithm == "majority_vote":
+            ggir_nonwear = metrics.detect_nonwear(calibrated_acceleration)
+            cta_nonwear = metrics.combined_temp_accel_detect_nonwear(
+                acceleration=calibrated_acceleration, temperature=watch_data.temperature
+            )
+            detach_nonwear = metrics.implement_DETACH_nonwear(
+                acceleration=calibrated_acceleration, temperature=watch_data.temperature
+            )
+            non_wear_array = computations.majority_vote_non_wear(
+                nonwear_ggir=ggir_nonwear,
+                nonwear_cta=cta_nonwear,
+                nonwear_detach=detach_nonwear,
+            )
+        elif nonwear_algorithm == "ggir_detach":
+            ggir_nonwear = metrics.detect_nonwear(calibrated_acceleration)
+            detach_nonwear = metrics.implement_DETACH_nonwear(
+                acceleration=calibrated_acceleration, temperature=watch_data.temperature
+            )
+            non_wear_array = computations.combined_ggir_detach_nonwear(
+                nonwear_ggir=ggir_nonwear, nonwear_detach=detach_nonwear
+            )
+    else:
+        non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
 
-    non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
     physical_activity_levels = analytics.compute_physical_activty_categories(
-        activity_measurement,
-        thresholds,
+        activity_measurement, thresholds
     )
 
     sleep_array = models.Measurement(

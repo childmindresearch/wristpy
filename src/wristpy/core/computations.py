@@ -274,17 +274,29 @@ def combined_ggir_detach_nonwear(
 
 def _time_fix(
     nonwear: models.Measurement,
-    max_end_time: datetime.datetime,
-    min_start_time: datetime.datetime,
+    end_time: datetime.datetime,
+    start_time: datetime.datetime,
 ) -> models.Measurement:
-    """Helper function to fix the time of the nonwear measurements."""
-    if nonwear.time[0] > min_start_time:
+    """Helper function to fix the time of the nonwear measurements.
+
+    This function appends start/end points to the nonwear measurements based on
+    previously computed reference start and end points.
+
+    Args:
+        nonwear: The nonwear measurement to adjust start/end time points.
+        end_time: The maximum end time of the nonwear measurements.
+        start_time: The minimum start time of the nonwear measurements.
+
+    Returns:
+        The nonwear measurement with the time fixed.
+    """
+    if nonwear.time[0] > start_time:
         nonwear.time = pl.concat(
-            [pl.Series([min_start_time], dtype=pl.Datetime("ns")), nonwear.time]
+            [pl.Series([start_time], dtype=pl.Datetime("ns")), nonwear.time]
         )
         nonwear.measurements = np.append(nonwear.measurements[0], nonwear.measurements)
 
-    if nonwear.time[-1] < max_end_time:
-        nonwear.time.append(pl.Series([max_end_time], dtype=pl.Datetime("ns")))
+    if nonwear.time[-1] < end_time:
+        nonwear.time.append(pl.Series([end_time], dtype=pl.Datetime("ns")))
         nonwear.measurements = np.append(nonwear.measurements, nonwear.measurements[-1])
     return nonwear
