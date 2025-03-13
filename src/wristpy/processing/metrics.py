@@ -530,11 +530,11 @@ def _extrapolate_edges(
     """Find edges of maxed out regions and identify them as hills(+) or valleys (-).
 
     Args:
-        marker: Array containing values that mark the
-            probability that each sample is maxed-out. Values close to ±1 indicate
-            high likelihood that the value is near the limit of the dynamic range, with
-            the sign indicating if it's near the upper bound, or lower bound. Values
-            close to zero indicate low likelihood of being near range limit.
+        marker: Array containing values that mark the probability that each sample is
+            maxed-out. Values close to ±1 indicate high likelihood that the value is
+            near the limit of the dynamic range, with the sign indicating if it's near
+            the upper bound, or lower bound. Values close to zero indicate low
+            likelihood of being near range limit.
         confidence_threshold: Threshold for what constitutes a significant change in
             marker values.
         sampling_rate: Sampling rate of acceleration data, typically 100hz following
