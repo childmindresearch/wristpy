@@ -4,7 +4,7 @@ from typing import List, Literal, Optional, Tuple
 
 import numpy as np
 import polars as pl
-from scipy import interpolate, signal, stats
+from scipy import interpolate, stats
 
 from wristpy.core import config, models
 
