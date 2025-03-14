@@ -25,7 +25,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install poetry
-        poetry install --with docs
+        poetry install --only dev --with docs
     - name: Build docs
       run: |
         poetry run pdoc src/wristpy -o docs_build -t docs/pdoc-theme --docformat google
