@@ -6,7 +6,7 @@ permissions:
 on:
   push:
     branches:
-      - '**'
+    - '**'
 
 jobs:
   build-and-publish-docs:
