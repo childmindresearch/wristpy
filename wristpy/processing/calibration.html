@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 15.0.0"/>
+    <meta name="generator" content="pdoc 15.0.1"/>
     <title>wristpy.processing.calibration API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -114,6 +114,18 @@
                 </ul>
 
             </li>
+            <li>
+                    <a class="class" href="#CalibrationDispatcher">CalibrationDispatcher</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#CalibrationDispatcher.__init__">CalibrationDispatcher</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#CalibrationDispatcher.run">run</a>
+                        </li>
+                </ul>
+
+            </li>
     </ul>
 
 
@@ -139,26 +151,26 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&quot;&quot;&quot;Calibrate accelerometer data.&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span> <span class="nn">abc</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span> <span class="nn">math</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Generator</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">cast</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">optimize</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span> <span class="k">as</span> <span class="n">sklearn_metrics</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn</span><span class="w"> </span><span class="kn">import</span> <span class="n">linear_model</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn</span><span class="w"> </span><span class="kn">import</span> <span class="n">metrics</span> <span class="k">as</span> <span class="n">sklearn_metrics</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="kn">from</span> <span class="nn">wristpy.core</span> <span class="kn">import</span> <span class="n">computations</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">exceptions</span><span class="p">,</span> <span class="n">models</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">wristpy.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">computations</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">exceptions</span><span class="p">,</span> <span class="n">models</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="n">logger</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="nd">@dataclass</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="k">class</span> <span class="nc">LinearTransformation</span><span class="p">:</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="k">class</span><span class="w"> </span><span class="nc">LinearTransformation</span><span class="p">:</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Data class that contains scale and offset values for calibration.</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>
 </span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="sd">    Attributes:</span>
@@ -172,16 +184,16 @@
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>    <span class="n">offset</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="k">class</span> <span class="nc">AbstractCalibrator</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="k">class</span><span class="w"> </span><span class="nc">AbstractCalibrator</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class defining the interface for the different calibration methods.&quot;&quot;&quot;</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization function for the calibrator.&quot;&quot;&quot;</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>        <span class="k">pass</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>    <span class="k">def</span> <span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The calibration method must contain a run_calibration function.</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">        The function must take the acceleration measurement object as input and return</span>
@@ -190,7 +202,7 @@
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>        <span class="k">pass</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="k">class</span> <span class="nc">GgirCalibration</span><span class="p">(</span><span class="n">AbstractCalibrator</span><span class="p">):</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="k">class</span><span class="w"> </span><span class="nc">GgirCalibration</span><span class="p">(</span><span class="n">AbstractCalibrator</span><span class="p">):</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Implements the GGIR calibration on accelerometer data.</span>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">    This class implements methods for autocalibrating accelerometer data using either</span>
@@ -211,7 +223,7 @@
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
 </span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="n">chunked</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>        <span class="n">min_acceleration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
@@ -263,7 +275,7 @@
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">error_tolerance</span> <span class="o">=</span> <span class="n">error_tolerance</span>
 </span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">max_calibration_error</span> <span class="o">=</span> <span class="n">max_calibration_error</span>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="k">def</span> <span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data based on settings.</span>
 </span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
 </span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="sd">        If the chunked arguement is set to true, it will run calibration on an initial</span>
@@ -319,7 +331,7 @@
 </span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a>            <span class="n">measurements</span><span class="o">=</span><span class="n">calibrated_acceleration</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">acceleration</span><span class="o">.</span><span class="n">time</span>
 </span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>        <span class="p">)</span>
 </span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a>
-</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a>    <span class="k">def</span> <span class="nf">_chunked_calibration</span><span class="p">(</span>
+</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_chunked_calibration</span><span class="p">(</span>
 </span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span>
 </span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
 </span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Chunks the data into subsets, to calibrate on smaller sections of data.</span>
@@ -355,7 +367,7 @@
 </span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a>            <span class="s2">&quot;After all chunks of data used calibration has failed.&quot;</span>
 </span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a>        <span class="p">)</span>
 </span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a>
-</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a>    <span class="k">def</span> <span class="nf">_get_chunk</span><span class="p">(</span>
+</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_get_chunk</span><span class="p">(</span>
 </span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span>
 </span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
 </span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Takes a subset of acceleration data to be used for calibration.</span>
@@ -387,7 +399,7 @@
 </span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>                <span class="n">time</span><span class="o">=</span><span class="n">acceleration</span><span class="o">.</span><span class="n">time</span><span class="p">[:</span><span class="n">idx</span><span class="p">],</span>
 </span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a>            <span class="p">)</span>
 </span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a>
-</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>    <span class="k">def</span> <span class="nf">_calibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
+</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_calibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
 </span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Calibrates data and returns scale and offset values.</span>
 </span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a>
 </span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a><span class="sd">        The acceleration data is processed by the _extract_no_motion function, which</span>
@@ -450,7 +462,7 @@
 </span><span id="L-311"><a href="#L-311"><span class="linenos">311</span></a>        <span class="p">)</span>
 </span><span id="L-312"><a href="#L-312"><span class="linenos">312</span></a>        <span class="k">return</span> <span class="n">linear_transformation</span>
 </span><span id="L-313"><a href="#L-313"><span class="linenos">313</span></a>
-</span><span id="L-314"><a href="#L-314"><span class="linenos">314</span></a>    <span class="k">def</span> <span class="nf">_closest_point_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_motion_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
+</span><span id="L-314"><a href="#L-314"><span class="linenos">314</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_closest_point_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_motion_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
 </span><span id="L-315"><a href="#L-315"><span class="linenos">315</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies closest point fit to no motion data to calibrated accelerometer data.</span>
 </span><span id="L-316"><a href="#L-316"><span class="linenos">316</span></a>
 </span><span id="L-317"><a href="#L-317"><span class="linenos">317</span></a><span class="sd">        This method implements an iterative algorithm that finds the optimal scale and</span>
@@ -532,7 +544,7 @@
 </span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>        <span class="k">return</span> <span class="n">LinearTransformation</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">)</span>
 </span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a>
 </span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>    <span class="k">def</span> <span class="nf">_get_sampling_rate</span><span class="p">(</span><span class="n">timestamps</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_get_sampling_rate</span><span class="p">(</span><span class="n">timestamps</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 </span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the sampling rate.</span>
 </span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a>
 </span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a><span class="sd">        Args:</span>
@@ -551,7 +563,7 @@
 </span><span id="L-412"><a href="#L-412"><span class="linenos">412</span></a>        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">sampling_rate</span><span class="p">)</span>
 </span><span id="L-413"><a href="#L-413"><span class="linenos">413</span></a>
 </span><span id="L-414"><a href="#L-414"><span class="linenos">414</span></a>
-</span><span id="L-415"><a href="#L-415"><span class="linenos">415</span></a><span class="k">class</span> <span class="nc">ConstrainedMinimizationCalibration</span><span class="p">(</span><span class="n">AbstractCalibrator</span><span class="p">):</span>
+</span><span id="L-415"><a href="#L-415"><span class="linenos">415</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ConstrainedMinimizationCalibration</span><span class="p">(</span><span class="n">AbstractCalibrator</span><span class="p">):</span>
 </span><span id="L-416"><a href="#L-416"><span class="linenos">416</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calibrates accelerometer data using the default wristpy method.</span>
 </span><span id="L-417"><a href="#L-417"><span class="linenos">417</span></a>
 </span><span id="L-418"><a href="#L-418"><span class="linenos">418</span></a><span class="sd">    This is a modification of the method proposed by Van Hees et al. (2014), in which we</span>
@@ -565,7 +577,7 @@
 </span><span id="L-426"><a href="#L-426"><span class="linenos">426</span></a><span class="sd">        no_motion_threshold: Minimum standard deviation for no-motion detection.</span>
 </span><span id="L-427"><a href="#L-427"><span class="linenos">427</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-428"><a href="#L-428"><span class="linenos">428</span></a>
-</span><span id="L-429"><a href="#L-429"><span class="linenos">429</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span id="L-429"><a href="#L-429"><span class="linenos">429</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="L-430"><a href="#L-430"><span class="linenos">430</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a>        <span class="n">no_motion_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.013</span><span class="p">,</span>
 </span><span id="L-432"><a href="#L-432"><span class="linenos">432</span></a>        <span class="n">max_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
@@ -588,7 +600,7 @@
 </span><span id="L-449"><a href="#L-449"><span class="linenos">449</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span> <span class="o">=</span> <span class="n">max_iterations</span>
 </span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">max_calibration_error</span> <span class="o">=</span> <span class="n">max_calibration_error</span>
 </span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a>
-</span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a>    <span class="k">def</span> <span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data.</span>
 </span><span id="L-454"><a href="#L-454"><span class="linenos">454</span></a>
 </span><span id="L-455"><a href="#L-455"><span class="linenos">455</span></a><span class="sd">        Args:</span>
@@ -623,7 +635,7 @@
 </span><span id="L-484"><a href="#L-484"><span class="linenos">484</span></a>            <span class="n">measurements</span><span class="o">=</span><span class="n">calibrated_acceleration</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">acceleration</span><span class="o">.</span><span class="n">time</span>
 </span><span id="L-485"><a href="#L-485"><span class="linenos">485</span></a>        <span class="p">)</span>
 </span><span id="L-486"><a href="#L-486"><span class="linenos">486</span></a>
-</span><span id="L-487"><a href="#L-487"><span class="linenos">487</span></a>    <span class="k">def</span> <span class="nf">_closest_point_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_motion_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
+</span><span id="L-487"><a href="#L-487"><span class="linenos">487</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_closest_point_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_motion_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
 </span><span id="L-488"><a href="#L-488"><span class="linenos">488</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Find linear transformation parameters that minimzes distance to unit sphere.</span>
 </span><span id="L-489"><a href="#L-489"><span class="linenos">489</span></a>
 </span><span id="L-490"><a href="#L-490"><span class="linenos">490</span></a><span class="sd">        This function implements the scipy optimize.minimze function to find the</span>
@@ -649,7 +661,7 @@
 </span><span id="L-510"><a href="#L-510"><span class="linenos">510</span></a>        <span class="n">start_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </span><span id="L-511"><a href="#L-511"><span class="linenos">511</span></a>        <span class="n">start_offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </span><span id="L-512"><a href="#L-512"><span class="linenos">512</span></a>
-</span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a>        <span class="k">def</span> <span class="nf">get_distance_to_unit_sphere</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">get_distance_to_unit_sphere</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a>            <span class="n">scale</span> <span class="o">=</span> <span class="n">params</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
 </span><span id="L-515"><a href="#L-515"><span class="linenos">515</span></a>            <span class="n">offset</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
 </span><span id="L-516"><a href="#L-516"><span class="linenos">516</span></a>            <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">no_motion_data</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
@@ -692,7 +704,7 @@
 </span><span id="L-553"><a href="#L-553"><span class="linenos">553</span></a>        <span class="k">return</span> <span class="n">LinearTransformation</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">optimal_scale</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">optimal_offset</span><span class="p">)</span>
 </span><span id="L-554"><a href="#L-554"><span class="linenos">554</span></a>
 </span><span id="L-555"><a href="#L-555"><span class="linenos">555</span></a>
-</span><span id="L-556"><a href="#L-556"><span class="linenos">556</span></a><span class="k">def</span> <span class="nf">_extract_no_motion</span><span class="p">(</span>
+</span><span id="L-556"><a href="#L-556"><span class="linenos">556</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_extract_no_motion</span><span class="p">(</span>
 </span><span id="L-557"><a href="#L-557"><span class="linenos">557</span></a>    <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">no_motion_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.013</span>
 </span><span id="L-558"><a href="#L-558"><span class="linenos">558</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 </span><span id="L-559"><a href="#L-559"><span class="linenos">559</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Identifies areas of stillness using standard deviation and mean.</span>
@@ -739,6 +751,65 @@
 </span><span id="L-600"><a href="#L-600"><span class="linenos">600</span></a>        <span class="p">)</span>
 </span><span id="L-601"><a href="#L-601"><span class="linenos">601</span></a>
 </span><span id="L-602"><a href="#L-602"><span class="linenos">602</span></a>    <span class="k">return</span> <span class="n">no_motion_data</span>
+</span><span id="L-603"><a href="#L-603"><span class="linenos">603</span></a>
+</span><span id="L-604"><a href="#L-604"><span class="linenos">604</span></a>
+</span><span id="L-605"><a href="#L-605"><span class="linenos">605</span></a><span class="k">class</span><span class="w"> </span><span class="nc">CalibrationDispatcher</span><span class="p">:</span>
+</span><span id="L-606"><a href="#L-606"><span class="linenos">606</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Class used to select and implement appropriate calibrator.&quot;&quot;&quot;</span>
+</span><span id="L-607"><a href="#L-607"><span class="linenos">607</span></a>
+</span><span id="L-608"><a href="#L-608"><span class="linenos">608</span></a>    <span class="n">_calibrator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GgirCalibration</span><span class="p">,</span> <span class="n">ConstrainedMinimizationCalibration</span><span class="p">]</span>
+</span><span id="L-609"><a href="#L-609"><span class="linenos">609</span></a>
+</span><span id="L-610"><a href="#L-610"><span class="linenos">610</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;gradient&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-611"><a href="#L-611"><span class="linenos">611</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the calibrator to one of the predefined calibrators.</span>
+</span><span id="L-612"><a href="#L-612"><span class="linenos">612</span></a>
+</span><span id="L-613"><a href="#L-613"><span class="linenos">613</span></a><span class="sd">        Args:</span>
+</span><span id="L-614"><a href="#L-614"><span class="linenos">614</span></a><span class="sd">            name: The name of the calibrator to use. Options are &quot;ggir&quot; or &quot;gradient&quot;.</span>
+</span><span id="L-615"><a href="#L-615"><span class="linenos">615</span></a>
+</span><span id="L-616"><a href="#L-616"><span class="linenos">616</span></a><span class="sd">        Raises:</span>
+</span><span id="L-617"><a href="#L-617"><span class="linenos">617</span></a><span class="sd">            ValueError: If an unknown calibrator is given</span>
+</span><span id="L-618"><a href="#L-618"><span class="linenos">618</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-619"><a href="#L-619"><span class="linenos">619</span></a>        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;ggir&quot;</span><span class="p">:</span>
+</span><span id="L-620"><a href="#L-620"><span class="linenos">620</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_calibrator</span> <span class="o">=</span> <span class="n">GgirCalibration</span><span class="p">()</span>
+</span><span id="L-621"><a href="#L-621"><span class="linenos">621</span></a>        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;gradient&quot;</span><span class="p">:</span>
+</span><span id="L-622"><a href="#L-622"><span class="linenos">622</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_calibrator</span> <span class="o">=</span> <span class="n">ConstrainedMinimizationCalibration</span><span class="p">()</span>
+</span><span id="L-623"><a href="#L-623"><span class="linenos">623</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-624"><a href="#L-624"><span class="linenos">624</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown calibrator.&quot;</span><span class="p">)</span>
+</span><span id="L-625"><a href="#L-625"><span class="linenos">625</span></a>
+</span><span id="L-626"><a href="#L-626"><span class="linenos">626</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
+</span><span id="L-627"><a href="#L-627"><span class="linenos">627</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_input_on_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="L-628"><a href="#L-628"><span class="linenos">628</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="L-629"><a href="#L-629"><span class="linenos">629</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data.</span>
+</span><span id="L-630"><a href="#L-630"><span class="linenos">630</span></a>
+</span><span id="L-631"><a href="#L-631"><span class="linenos">631</span></a><span class="sd">        Args:</span>
+</span><span id="L-632"><a href="#L-632"><span class="linenos">632</span></a><span class="sd">            acceleration: the accelerometer data containing x,y,z axis</span>
+</span><span id="L-633"><a href="#L-633"><span class="linenos">633</span></a><span class="sd">                data and time stamps.</span>
+</span><span id="L-634"><a href="#L-634"><span class="linenos">634</span></a><span class="sd">            return_input_on_error: If true, will return the input acceleration data</span>
+</span><span id="L-635"><a href="#L-635"><span class="linenos">635</span></a><span class="sd">                if calibration fails. If false, will raise an exception.</span>
+</span><span id="L-636"><a href="#L-636"><span class="linenos">636</span></a>
+</span><span id="L-637"><a href="#L-637"><span class="linenos">637</span></a><span class="sd">        Returns:</span>
+</span><span id="L-638"><a href="#L-638"><span class="linenos">638</span></a><span class="sd">            A Measurement object that contains the calibrated acceleration data.</span>
+</span><span id="L-639"><a href="#L-639"><span class="linenos">639</span></a>
+</span><span id="L-640"><a href="#L-640"><span class="linenos">640</span></a><span class="sd">        Raises:</span>
+</span><span id="L-641"><a href="#L-641"><span class="linenos">641</span></a><span class="sd">            CalibrationError: If the calibration process fails to converge or the final</span>
+</span><span id="L-642"><a href="#L-642"><span class="linenos">642</span></a><span class="sd">                error exceeds the `max_calibration_error` threshold.</span>
+</span><span id="L-643"><a href="#L-643"><span class="linenos">643</span></a><span class="sd">            SphereCriteriaError: If the sphere is not sufficiently populated, i.e. every</span>
+</span><span id="L-644"><a href="#L-644"><span class="linenos">644</span></a><span class="sd">                axis does not have at least 1 value both above and below  the + and</span>
+</span><span id="L-645"><a href="#L-645"><span class="linenos">645</span></a><span class="sd">                - value of min_acceleraiton.</span>
+</span><span id="L-646"><a href="#L-646"><span class="linenos">646</span></a><span class="sd">            NoMotionError: If no portions of data meet no motion criteria as defined by</span>
+</span><span id="L-647"><a href="#L-647"><span class="linenos">647</span></a><span class="sd">                no_motion_check.</span>
+</span><span id="L-648"><a href="#L-648"><span class="linenos">648</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-649"><a href="#L-649"><span class="linenos">649</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="L-650"><a href="#L-650"><span class="linenos">650</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calibrator</span><span class="o">.</span><span class="n">run_calibration</span><span class="p">(</span><span class="n">acceleration</span><span class="p">)</span>
+</span><span id="L-651"><a href="#L-651"><span class="linenos">651</span></a>        <span class="k">except</span> <span class="p">(</span>
+</span><span id="L-652"><a href="#L-652"><span class="linenos">652</span></a>            <span class="n">exceptions</span><span class="o">.</span><span class="n">CalibrationError</span><span class="p">,</span>
+</span><span id="L-653"><a href="#L-653"><span class="linenos">653</span></a>            <span class="n">exceptions</span><span class="o">.</span><span class="n">SphereCriteriaError</span><span class="p">,</span>
+</span><span id="L-654"><a href="#L-654"><span class="linenos">654</span></a>            <span class="n">exceptions</span><span class="o">.</span><span class="n">NoMotionError</span><span class="p">,</span>
+</span><span id="L-655"><a href="#L-655"><span class="linenos">655</span></a>        <span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
+</span><span id="L-656"><a href="#L-656"><span class="linenos">656</span></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">return_input_on_error</span><span class="p">:</span>
+</span><span id="L-657"><a href="#L-657"><span class="linenos">657</span></a>                <span class="k">raise</span>
+</span><span id="L-658"><a href="#L-658"><span class="linenos">658</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+</span><span id="L-659"><a href="#L-659"><span class="linenos">659</span></a>                <span class="s2">&quot;Calibration FAILED: </span><span class="si">%s</span><span class="s2">. Proceeding without calibration.&quot;</span><span class="p">,</span> <span class="n">exc_info</span>
+</span><span id="L-660"><a href="#L-660"><span class="linenos">660</span></a>            <span class="p">)</span>
+</span><span id="L-661"><a href="#L-661"><span class="linenos">661</span></a>            <span class="k">return</span> <span class="n">acceleration</span>
 </span></pre></div>
 
 
@@ -768,7 +839,7 @@
     </div>
     <a class="headerlink" href="#LinearTransformation"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="LinearTransformation-22"><a href="#LinearTransformation-22"><span class="linenos">22</span></a><span class="nd">@dataclass</span>
-</span><span id="LinearTransformation-23"><a href="#LinearTransformation-23"><span class="linenos">23</span></a><span class="k">class</span> <span class="nc">LinearTransformation</span><span class="p">:</span>
+</span><span id="LinearTransformation-23"><a href="#LinearTransformation-23"><span class="linenos">23</span></a><span class="k">class</span><span class="w"> </span><span class="nc">LinearTransformation</span><span class="p">:</span>
 </span><span id="LinearTransformation-24"><a href="#LinearTransformation-24"><span class="linenos">24</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Data class that contains scale and offset values for calibration.</span>
 </span><span id="LinearTransformation-25"><a href="#LinearTransformation-25"><span class="linenos">25</span></a>
 </span><span id="LinearTransformation-26"><a href="#LinearTransformation-26"><span class="linenos">26</span></a><span class="sd">    Attributes:</span>
@@ -842,16 +913,16 @@ calibration. Each element corresponds to the offset value for each axis.</li>
 
     </div>
     <a class="headerlink" href="#AbstractCalibrator"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractCalibrator-37"><a href="#AbstractCalibrator-37"><span class="linenos">37</span></a><span class="k">class</span> <span class="nc">AbstractCalibrator</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractCalibrator-37"><a href="#AbstractCalibrator-37"><span class="linenos">37</span></a><span class="k">class</span><span class="w"> </span><span class="nc">AbstractCalibrator</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 </span><span id="AbstractCalibrator-38"><a href="#AbstractCalibrator-38"><span class="linenos">38</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class defining the interface for the different calibration methods.&quot;&quot;&quot;</span>
 </span><span id="AbstractCalibrator-39"><a href="#AbstractCalibrator-39"><span class="linenos">39</span></a>
 </span><span id="AbstractCalibrator-40"><a href="#AbstractCalibrator-40"><span class="linenos">40</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-</span><span id="AbstractCalibrator-41"><a href="#AbstractCalibrator-41"><span class="linenos">41</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="AbstractCalibrator-41"><a href="#AbstractCalibrator-41"><span class="linenos">41</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="AbstractCalibrator-42"><a href="#AbstractCalibrator-42"><span class="linenos">42</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization function for the calibrator.&quot;&quot;&quot;</span>
 </span><span id="AbstractCalibrator-43"><a href="#AbstractCalibrator-43"><span class="linenos">43</span></a>        <span class="k">pass</span>
 </span><span id="AbstractCalibrator-44"><a href="#AbstractCalibrator-44"><span class="linenos">44</span></a>
 </span><span id="AbstractCalibrator-45"><a href="#AbstractCalibrator-45"><span class="linenos">45</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-</span><span id="AbstractCalibrator-46"><a href="#AbstractCalibrator-46"><span class="linenos">46</span></a>    <span class="k">def</span> <span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="AbstractCalibrator-46"><a href="#AbstractCalibrator-46"><span class="linenos">46</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="AbstractCalibrator-47"><a href="#AbstractCalibrator-47"><span class="linenos">47</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The calibration method must contain a run_calibration function.</span>
 </span><span id="AbstractCalibrator-48"><a href="#AbstractCalibrator-48"><span class="linenos">48</span></a>
 </span><span id="AbstractCalibrator-49"><a href="#AbstractCalibrator-49"><span class="linenos">49</span></a><span class="sd">        The function must take the acceleration measurement object as input and return</span>
@@ -877,7 +948,7 @@ calibration. Each element corresponds to the offset value for each axis.</li>
     </div>
     <a class="headerlink" href="#AbstractCalibrator.__init__"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractCalibrator.__init__-40"><a href="#AbstractCalibrator.__init__-40"><span class="linenos">40</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-</span><span id="AbstractCalibrator.__init__-41"><a href="#AbstractCalibrator.__init__-41"><span class="linenos">41</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="AbstractCalibrator.__init__-41"><a href="#AbstractCalibrator.__init__-41"><span class="linenos">41</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="AbstractCalibrator.__init__-42"><a href="#AbstractCalibrator.__init__-42"><span class="linenos">42</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization function for the calibrator.&quot;&quot;&quot;</span>
 </span><span id="AbstractCalibrator.__init__-43"><a href="#AbstractCalibrator.__init__-43"><span class="linenos">43</span></a>        <span class="k">pass</span>
 </span></pre></div>
@@ -901,7 +972,7 @@ calibration. Each element corresponds to the offset value for each axis.</li>
     </div>
     <a class="headerlink" href="#AbstractCalibrator.run_calibration"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractCalibrator.run_calibration-45"><a href="#AbstractCalibrator.run_calibration-45"><span class="linenos">45</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-</span><span id="AbstractCalibrator.run_calibration-46"><a href="#AbstractCalibrator.run_calibration-46"><span class="linenos">46</span></a>    <span class="k">def</span> <span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="AbstractCalibrator.run_calibration-46"><a href="#AbstractCalibrator.run_calibration-46"><span class="linenos">46</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="AbstractCalibrator.run_calibration-47"><a href="#AbstractCalibrator.run_calibration-47"><span class="linenos">47</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The calibration method must contain a run_calibration function.</span>
 </span><span id="AbstractCalibrator.run_calibration-48"><a href="#AbstractCalibrator.run_calibration-48"><span class="linenos">48</span></a>
 </span><span id="AbstractCalibrator.run_calibration-49"><a href="#AbstractCalibrator.run_calibration-49"><span class="linenos">49</span></a><span class="sd">        The function must take the acceleration measurement object as input and return</span>
@@ -931,7 +1002,7 @@ a measurement object that contains the calibrated acceleration data.</p>
 
     </div>
     <a class="headerlink" href="#GgirCalibration"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="GgirCalibration-55"><a href="#GgirCalibration-55"><span class="linenos"> 55</span></a><span class="k">class</span> <span class="nc">GgirCalibration</span><span class="p">(</span><span class="n">AbstractCalibrator</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="GgirCalibration-55"><a href="#GgirCalibration-55"><span class="linenos"> 55</span></a><span class="k">class</span><span class="w"> </span><span class="nc">GgirCalibration</span><span class="p">(</span><span class="n">AbstractCalibrator</span><span class="p">):</span>
 </span><span id="GgirCalibration-56"><a href="#GgirCalibration-56"><span class="linenos"> 56</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Implements the GGIR calibration on accelerometer data.</span>
 </span><span id="GgirCalibration-57"><a href="#GgirCalibration-57"><span class="linenos"> 57</span></a>
 </span><span id="GgirCalibration-58"><a href="#GgirCalibration-58"><span class="linenos"> 58</span></a><span class="sd">    This class implements methods for autocalibrating accelerometer data using either</span>
@@ -952,7 +1023,7 @@ a measurement object that contains the calibrated acceleration data.</p>
 </span><span id="GgirCalibration-73"><a href="#GgirCalibration-73"><span class="linenos"> 73</span></a>
 </span><span id="GgirCalibration-74"><a href="#GgirCalibration-74"><span class="linenos"> 74</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="GgirCalibration-75"><a href="#GgirCalibration-75"><span class="linenos"> 75</span></a>
-</span><span id="GgirCalibration-76"><a href="#GgirCalibration-76"><span class="linenos"> 76</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span id="GgirCalibration-76"><a href="#GgirCalibration-76"><span class="linenos"> 76</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="GgirCalibration-77"><a href="#GgirCalibration-77"><span class="linenos"> 77</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="GgirCalibration-78"><a href="#GgirCalibration-78"><span class="linenos"> 78</span></a>        <span class="n">chunked</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="GgirCalibration-79"><a href="#GgirCalibration-79"><span class="linenos"> 79</span></a>        <span class="n">min_acceleration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
@@ -1004,7 +1075,7 @@ a measurement object that contains the calibrated acceleration data.</p>
 </span><span id="GgirCalibration-125"><a href="#GgirCalibration-125"><span class="linenos">125</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">error_tolerance</span> <span class="o">=</span> <span class="n">error_tolerance</span>
 </span><span id="GgirCalibration-126"><a href="#GgirCalibration-126"><span class="linenos">126</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">max_calibration_error</span> <span class="o">=</span> <span class="n">max_calibration_error</span>
 </span><span id="GgirCalibration-127"><a href="#GgirCalibration-127"><span class="linenos">127</span></a>
-</span><span id="GgirCalibration-128"><a href="#GgirCalibration-128"><span class="linenos">128</span></a>    <span class="k">def</span> <span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="GgirCalibration-128"><a href="#GgirCalibration-128"><span class="linenos">128</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="GgirCalibration-129"><a href="#GgirCalibration-129"><span class="linenos">129</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data based on settings.</span>
 </span><span id="GgirCalibration-130"><a href="#GgirCalibration-130"><span class="linenos">130</span></a>
 </span><span id="GgirCalibration-131"><a href="#GgirCalibration-131"><span class="linenos">131</span></a><span class="sd">        If the chunked arguement is set to true, it will run calibration on an initial</span>
@@ -1060,7 +1131,7 @@ a measurement object that contains the calibrated acceleration data.</p>
 </span><span id="GgirCalibration-181"><a href="#GgirCalibration-181"><span class="linenos">181</span></a>            <span class="n">measurements</span><span class="o">=</span><span class="n">calibrated_acceleration</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">acceleration</span><span class="o">.</span><span class="n">time</span>
 </span><span id="GgirCalibration-182"><a href="#GgirCalibration-182"><span class="linenos">182</span></a>        <span class="p">)</span>
 </span><span id="GgirCalibration-183"><a href="#GgirCalibration-183"><span class="linenos">183</span></a>
-</span><span id="GgirCalibration-184"><a href="#GgirCalibration-184"><span class="linenos">184</span></a>    <span class="k">def</span> <span class="nf">_chunked_calibration</span><span class="p">(</span>
+</span><span id="GgirCalibration-184"><a href="#GgirCalibration-184"><span class="linenos">184</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_chunked_calibration</span><span class="p">(</span>
 </span><span id="GgirCalibration-185"><a href="#GgirCalibration-185"><span class="linenos">185</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span>
 </span><span id="GgirCalibration-186"><a href="#GgirCalibration-186"><span class="linenos">186</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
 </span><span id="GgirCalibration-187"><a href="#GgirCalibration-187"><span class="linenos">187</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Chunks the data into subsets, to calibrate on smaller sections of data.</span>
@@ -1096,7 +1167,7 @@ a measurement object that contains the calibrated acceleration data.</p>
 </span><span id="GgirCalibration-217"><a href="#GgirCalibration-217"><span class="linenos">217</span></a>            <span class="s2">&quot;After all chunks of data used calibration has failed.&quot;</span>
 </span><span id="GgirCalibration-218"><a href="#GgirCalibration-218"><span class="linenos">218</span></a>        <span class="p">)</span>
 </span><span id="GgirCalibration-219"><a href="#GgirCalibration-219"><span class="linenos">219</span></a>
-</span><span id="GgirCalibration-220"><a href="#GgirCalibration-220"><span class="linenos">220</span></a>    <span class="k">def</span> <span class="nf">_get_chunk</span><span class="p">(</span>
+</span><span id="GgirCalibration-220"><a href="#GgirCalibration-220"><span class="linenos">220</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_get_chunk</span><span class="p">(</span>
 </span><span id="GgirCalibration-221"><a href="#GgirCalibration-221"><span class="linenos">221</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span>
 </span><span id="GgirCalibration-222"><a href="#GgirCalibration-222"><span class="linenos">222</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
 </span><span id="GgirCalibration-223"><a href="#GgirCalibration-223"><span class="linenos">223</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Takes a subset of acceleration data to be used for calibration.</span>
@@ -1128,7 +1199,7 @@ a measurement object that contains the calibrated acceleration data.</p>
 </span><span id="GgirCalibration-249"><a href="#GgirCalibration-249"><span class="linenos">249</span></a>                <span class="n">time</span><span class="o">=</span><span class="n">acceleration</span><span class="o">.</span><span class="n">time</span><span class="p">[:</span><span class="n">idx</span><span class="p">],</span>
 </span><span id="GgirCalibration-250"><a href="#GgirCalibration-250"><span class="linenos">250</span></a>            <span class="p">)</span>
 </span><span id="GgirCalibration-251"><a href="#GgirCalibration-251"><span class="linenos">251</span></a>
-</span><span id="GgirCalibration-252"><a href="#GgirCalibration-252"><span class="linenos">252</span></a>    <span class="k">def</span> <span class="nf">_calibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
+</span><span id="GgirCalibration-252"><a href="#GgirCalibration-252"><span class="linenos">252</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_calibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
 </span><span id="GgirCalibration-253"><a href="#GgirCalibration-253"><span class="linenos">253</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Calibrates data and returns scale and offset values.</span>
 </span><span id="GgirCalibration-254"><a href="#GgirCalibration-254"><span class="linenos">254</span></a>
 </span><span id="GgirCalibration-255"><a href="#GgirCalibration-255"><span class="linenos">255</span></a><span class="sd">        The acceleration data is processed by the _extract_no_motion function, which</span>
@@ -1191,7 +1262,7 @@ a measurement object that contains the calibrated acceleration data.</p>
 </span><span id="GgirCalibration-312"><a href="#GgirCalibration-312"><span class="linenos">312</span></a>        <span class="p">)</span>
 </span><span id="GgirCalibration-313"><a href="#GgirCalibration-313"><span class="linenos">313</span></a>        <span class="k">return</span> <span class="n">linear_transformation</span>
 </span><span id="GgirCalibration-314"><a href="#GgirCalibration-314"><span class="linenos">314</span></a>
-</span><span id="GgirCalibration-315"><a href="#GgirCalibration-315"><span class="linenos">315</span></a>    <span class="k">def</span> <span class="nf">_closest_point_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_motion_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
+</span><span id="GgirCalibration-315"><a href="#GgirCalibration-315"><span class="linenos">315</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_closest_point_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_motion_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
 </span><span id="GgirCalibration-316"><a href="#GgirCalibration-316"><span class="linenos">316</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies closest point fit to no motion data to calibrated accelerometer data.</span>
 </span><span id="GgirCalibration-317"><a href="#GgirCalibration-317"><span class="linenos">317</span></a>
 </span><span id="GgirCalibration-318"><a href="#GgirCalibration-318"><span class="linenos">318</span></a><span class="sd">        This method implements an iterative algorithm that finds the optimal scale and</span>
@@ -1273,7 +1344,7 @@ a measurement object that contains the calibrated acceleration data.</p>
 </span><span id="GgirCalibration-394"><a href="#GgirCalibration-394"><span class="linenos">394</span></a>        <span class="k">return</span> <span class="n">LinearTransformation</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">)</span>
 </span><span id="GgirCalibration-395"><a href="#GgirCalibration-395"><span class="linenos">395</span></a>
 </span><span id="GgirCalibration-396"><a href="#GgirCalibration-396"><span class="linenos">396</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="GgirCalibration-397"><a href="#GgirCalibration-397"><span class="linenos">397</span></a>    <span class="k">def</span> <span class="nf">_get_sampling_rate</span><span class="p">(</span><span class="n">timestamps</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="GgirCalibration-397"><a href="#GgirCalibration-397"><span class="linenos">397</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_get_sampling_rate</span><span class="p">(</span><span class="n">timestamps</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 </span><span id="GgirCalibration-398"><a href="#GgirCalibration-398"><span class="linenos">398</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the sampling rate.</span>
 </span><span id="GgirCalibration-399"><a href="#GgirCalibration-399"><span class="linenos">399</span></a>
 </span><span id="GgirCalibration-400"><a href="#GgirCalibration-400"><span class="linenos">400</span></a><span class="sd">        Args:</span>
@@ -1325,7 +1396,7 @@ calibrate on entire dataset.</li>
 
     </div>
     <a class="headerlink" href="#GgirCalibration.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="GgirCalibration.__init__-76"><a href="#GgirCalibration.__init__-76"><span class="linenos"> 76</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="GgirCalibration.__init__-76"><a href="#GgirCalibration.__init__-76"><span class="linenos"> 76</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="GgirCalibration.__init__-77"><a href="#GgirCalibration.__init__-77"><span class="linenos"> 77</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="GgirCalibration.__init__-78"><a href="#GgirCalibration.__init__-78"><span class="linenos"> 78</span></a>        <span class="n">chunked</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="GgirCalibration.__init__-79"><a href="#GgirCalibration.__init__-79"><span class="linenos"> 79</span></a>        <span class="n">min_acceleration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
@@ -1510,7 +1581,7 @@ cannot reach this threshold it will error.</li>
 
     </div>
     <a class="headerlink" href="#GgirCalibration.run_calibration"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="GgirCalibration.run_calibration-128"><a href="#GgirCalibration.run_calibration-128"><span class="linenos">128</span></a>    <span class="k">def</span> <span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="GgirCalibration.run_calibration-128"><a href="#GgirCalibration.run_calibration-128"><span class="linenos">128</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="GgirCalibration.run_calibration-129"><a href="#GgirCalibration.run_calibration-129"><span class="linenos">129</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data based on settings.</span>
 </span><span id="GgirCalibration.run_calibration-130"><a href="#GgirCalibration.run_calibration-130"><span class="linenos">130</span></a>
 </span><span id="GgirCalibration.run_calibration-131"><a href="#GgirCalibration.run_calibration-131"><span class="linenos">131</span></a><span class="sd">        If the chunked arguement is set to true, it will run calibration on an initial</span>
@@ -1622,7 +1693,7 @@ axis does not have at least 1 value both above and below  the + and
 
     </div>
     <a class="headerlink" href="#ConstrainedMinimizationCalibration"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ConstrainedMinimizationCalibration-416"><a href="#ConstrainedMinimizationCalibration-416"><span class="linenos">416</span></a><span class="k">class</span> <span class="nc">ConstrainedMinimizationCalibration</span><span class="p">(</span><span class="n">AbstractCalibrator</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ConstrainedMinimizationCalibration-416"><a href="#ConstrainedMinimizationCalibration-416"><span class="linenos">416</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ConstrainedMinimizationCalibration</span><span class="p">(</span><span class="n">AbstractCalibrator</span><span class="p">):</span>
 </span><span id="ConstrainedMinimizationCalibration-417"><a href="#ConstrainedMinimizationCalibration-417"><span class="linenos">417</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calibrates accelerometer data using the default wristpy method.</span>
 </span><span id="ConstrainedMinimizationCalibration-418"><a href="#ConstrainedMinimizationCalibration-418"><span class="linenos">418</span></a>
 </span><span id="ConstrainedMinimizationCalibration-419"><a href="#ConstrainedMinimizationCalibration-419"><span class="linenos">419</span></a><span class="sd">    This is a modification of the method proposed by Van Hees et al. (2014), in which we</span>
@@ -1636,7 +1707,7 @@ axis does not have at least 1 value both above and below  the + and
 </span><span id="ConstrainedMinimizationCalibration-427"><a href="#ConstrainedMinimizationCalibration-427"><span class="linenos">427</span></a><span class="sd">        no_motion_threshold: Minimum standard deviation for no-motion detection.</span>
 </span><span id="ConstrainedMinimizationCalibration-428"><a href="#ConstrainedMinimizationCalibration-428"><span class="linenos">428</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="ConstrainedMinimizationCalibration-429"><a href="#ConstrainedMinimizationCalibration-429"><span class="linenos">429</span></a>
-</span><span id="ConstrainedMinimizationCalibration-430"><a href="#ConstrainedMinimizationCalibration-430"><span class="linenos">430</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span id="ConstrainedMinimizationCalibration-430"><a href="#ConstrainedMinimizationCalibration-430"><span class="linenos">430</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="ConstrainedMinimizationCalibration-431"><a href="#ConstrainedMinimizationCalibration-431"><span class="linenos">431</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="ConstrainedMinimizationCalibration-432"><a href="#ConstrainedMinimizationCalibration-432"><span class="linenos">432</span></a>        <span class="n">no_motion_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.013</span><span class="p">,</span>
 </span><span id="ConstrainedMinimizationCalibration-433"><a href="#ConstrainedMinimizationCalibration-433"><span class="linenos">433</span></a>        <span class="n">max_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
@@ -1659,7 +1730,7 @@ axis does not have at least 1 value both above and below  the + and
 </span><span id="ConstrainedMinimizationCalibration-450"><a href="#ConstrainedMinimizationCalibration-450"><span class="linenos">450</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span> <span class="o">=</span> <span class="n">max_iterations</span>
 </span><span id="ConstrainedMinimizationCalibration-451"><a href="#ConstrainedMinimizationCalibration-451"><span class="linenos">451</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">max_calibration_error</span> <span class="o">=</span> <span class="n">max_calibration_error</span>
 </span><span id="ConstrainedMinimizationCalibration-452"><a href="#ConstrainedMinimizationCalibration-452"><span class="linenos">452</span></a>
-</span><span id="ConstrainedMinimizationCalibration-453"><a href="#ConstrainedMinimizationCalibration-453"><span class="linenos">453</span></a>    <span class="k">def</span> <span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="ConstrainedMinimizationCalibration-453"><a href="#ConstrainedMinimizationCalibration-453"><span class="linenos">453</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="ConstrainedMinimizationCalibration-454"><a href="#ConstrainedMinimizationCalibration-454"><span class="linenos">454</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data.</span>
 </span><span id="ConstrainedMinimizationCalibration-455"><a href="#ConstrainedMinimizationCalibration-455"><span class="linenos">455</span></a>
 </span><span id="ConstrainedMinimizationCalibration-456"><a href="#ConstrainedMinimizationCalibration-456"><span class="linenos">456</span></a><span class="sd">        Args:</span>
@@ -1694,7 +1765,7 @@ axis does not have at least 1 value both above and below  the + and
 </span><span id="ConstrainedMinimizationCalibration-485"><a href="#ConstrainedMinimizationCalibration-485"><span class="linenos">485</span></a>            <span class="n">measurements</span><span class="o">=</span><span class="n">calibrated_acceleration</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">acceleration</span><span class="o">.</span><span class="n">time</span>
 </span><span id="ConstrainedMinimizationCalibration-486"><a href="#ConstrainedMinimizationCalibration-486"><span class="linenos">486</span></a>        <span class="p">)</span>
 </span><span id="ConstrainedMinimizationCalibration-487"><a href="#ConstrainedMinimizationCalibration-487"><span class="linenos">487</span></a>
-</span><span id="ConstrainedMinimizationCalibration-488"><a href="#ConstrainedMinimizationCalibration-488"><span class="linenos">488</span></a>    <span class="k">def</span> <span class="nf">_closest_point_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_motion_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
+</span><span id="ConstrainedMinimizationCalibration-488"><a href="#ConstrainedMinimizationCalibration-488"><span class="linenos">488</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_closest_point_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_motion_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
 </span><span id="ConstrainedMinimizationCalibration-489"><a href="#ConstrainedMinimizationCalibration-489"><span class="linenos">489</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Find linear transformation parameters that minimzes distance to unit sphere.</span>
 </span><span id="ConstrainedMinimizationCalibration-490"><a href="#ConstrainedMinimizationCalibration-490"><span class="linenos">490</span></a>
 </span><span id="ConstrainedMinimizationCalibration-491"><a href="#ConstrainedMinimizationCalibration-491"><span class="linenos">491</span></a><span class="sd">        This function implements the scipy optimize.minimze function to find the</span>
@@ -1720,7 +1791,7 @@ axis does not have at least 1 value both above and below  the + and
 </span><span id="ConstrainedMinimizationCalibration-511"><a href="#ConstrainedMinimizationCalibration-511"><span class="linenos">511</span></a>        <span class="n">start_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </span><span id="ConstrainedMinimizationCalibration-512"><a href="#ConstrainedMinimizationCalibration-512"><span class="linenos">512</span></a>        <span class="n">start_offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </span><span id="ConstrainedMinimizationCalibration-513"><a href="#ConstrainedMinimizationCalibration-513"><span class="linenos">513</span></a>
-</span><span id="ConstrainedMinimizationCalibration-514"><a href="#ConstrainedMinimizationCalibration-514"><span class="linenos">514</span></a>        <span class="k">def</span> <span class="nf">get_distance_to_unit_sphere</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="ConstrainedMinimizationCalibration-514"><a href="#ConstrainedMinimizationCalibration-514"><span class="linenos">514</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">get_distance_to_unit_sphere</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="ConstrainedMinimizationCalibration-515"><a href="#ConstrainedMinimizationCalibration-515"><span class="linenos">515</span></a>            <span class="n">scale</span> <span class="o">=</span> <span class="n">params</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
 </span><span id="ConstrainedMinimizationCalibration-516"><a href="#ConstrainedMinimizationCalibration-516"><span class="linenos">516</span></a>            <span class="n">offset</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
 </span><span id="ConstrainedMinimizationCalibration-517"><a href="#ConstrainedMinimizationCalibration-517"><span class="linenos">517</span></a>            <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">no_motion_data</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
@@ -1791,7 +1862,7 @@ no_motion_data and the unit sphere.</p>
 
     </div>
     <a class="headerlink" href="#ConstrainedMinimizationCalibration.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ConstrainedMinimizationCalibration.__init__-430"><a href="#ConstrainedMinimizationCalibration.__init__-430"><span class="linenos">430</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ConstrainedMinimizationCalibration.__init__-430"><a href="#ConstrainedMinimizationCalibration.__init__-430"><span class="linenos">430</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="ConstrainedMinimizationCalibration.__init__-431"><a href="#ConstrainedMinimizationCalibration.__init__-431"><span class="linenos">431</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="ConstrainedMinimizationCalibration.__init__-432"><a href="#ConstrainedMinimizationCalibration.__init__-432"><span class="linenos">432</span></a>        <span class="n">no_motion_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.013</span><span class="p">,</span>
 </span><span id="ConstrainedMinimizationCalibration.__init__-433"><a href="#ConstrainedMinimizationCalibration.__init__-433"><span class="linenos">433</span></a>        <span class="n">max_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
@@ -1882,7 +1953,7 @@ cannot reach this threshold it will error.</li>
 
     </div>
     <a class="headerlink" href="#ConstrainedMinimizationCalibration.run_calibration"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ConstrainedMinimizationCalibration.run_calibration-453"><a href="#ConstrainedMinimizationCalibration.run_calibration-453"><span class="linenos">453</span></a>    <span class="k">def</span> <span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ConstrainedMinimizationCalibration.run_calibration-453"><a href="#ConstrainedMinimizationCalibration.run_calibration-453"><span class="linenos">453</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="ConstrainedMinimizationCalibration.run_calibration-454"><a href="#ConstrainedMinimizationCalibration.run_calibration-454"><span class="linenos">454</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data.</span>
 </span><span id="ConstrainedMinimizationCalibration.run_calibration-455"><a href="#ConstrainedMinimizationCalibration.run_calibration-455"><span class="linenos">455</span></a>
 </span><span id="ConstrainedMinimizationCalibration.run_calibration-456"><a href="#ConstrainedMinimizationCalibration.run_calibration-456"><span class="linenos">456</span></a><span class="sd">        Args:</span>
@@ -1939,6 +2010,211 @@ data and time stamps.</li>
 <ul>
 <li><strong>CalibrationError:</strong>  If the calibration process fails to converge or the final
 error exceeds the <code><a href="#ConstrainedMinimizationCalibration.max_calibration_error">max_calibration_error</a></code> threshold.</li>
+</ul>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="CalibrationDispatcher">
+                            <input id="CalibrationDispatcher-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">CalibrationDispatcher</span>:
+
+                <label class="view-source-button" for="CalibrationDispatcher-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#CalibrationDispatcher"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CalibrationDispatcher-606"><a href="#CalibrationDispatcher-606"><span class="linenos">606</span></a><span class="k">class</span><span class="w"> </span><span class="nc">CalibrationDispatcher</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher-607"><a href="#CalibrationDispatcher-607"><span class="linenos">607</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Class used to select and implement appropriate calibrator.&quot;&quot;&quot;</span>
+</span><span id="CalibrationDispatcher-608"><a href="#CalibrationDispatcher-608"><span class="linenos">608</span></a>
+</span><span id="CalibrationDispatcher-609"><a href="#CalibrationDispatcher-609"><span class="linenos">609</span></a>    <span class="n">_calibrator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GgirCalibration</span><span class="p">,</span> <span class="n">ConstrainedMinimizationCalibration</span><span class="p">]</span>
+</span><span id="CalibrationDispatcher-610"><a href="#CalibrationDispatcher-610"><span class="linenos">610</span></a>
+</span><span id="CalibrationDispatcher-611"><a href="#CalibrationDispatcher-611"><span class="linenos">611</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;gradient&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher-612"><a href="#CalibrationDispatcher-612"><span class="linenos">612</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the calibrator to one of the predefined calibrators.</span>
+</span><span id="CalibrationDispatcher-613"><a href="#CalibrationDispatcher-613"><span class="linenos">613</span></a>
+</span><span id="CalibrationDispatcher-614"><a href="#CalibrationDispatcher-614"><span class="linenos">614</span></a><span class="sd">        Args:</span>
+</span><span id="CalibrationDispatcher-615"><a href="#CalibrationDispatcher-615"><span class="linenos">615</span></a><span class="sd">            name: The name of the calibrator to use. Options are &quot;ggir&quot; or &quot;gradient&quot;.</span>
+</span><span id="CalibrationDispatcher-616"><a href="#CalibrationDispatcher-616"><span class="linenos">616</span></a>
+</span><span id="CalibrationDispatcher-617"><a href="#CalibrationDispatcher-617"><span class="linenos">617</span></a><span class="sd">        Raises:</span>
+</span><span id="CalibrationDispatcher-618"><a href="#CalibrationDispatcher-618"><span class="linenos">618</span></a><span class="sd">            ValueError: If an unknown calibrator is given</span>
+</span><span id="CalibrationDispatcher-619"><a href="#CalibrationDispatcher-619"><span class="linenos">619</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="CalibrationDispatcher-620"><a href="#CalibrationDispatcher-620"><span class="linenos">620</span></a>        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;ggir&quot;</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher-621"><a href="#CalibrationDispatcher-621"><span class="linenos">621</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_calibrator</span> <span class="o">=</span> <span class="n">GgirCalibration</span><span class="p">()</span>
+</span><span id="CalibrationDispatcher-622"><a href="#CalibrationDispatcher-622"><span class="linenos">622</span></a>        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;gradient&quot;</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher-623"><a href="#CalibrationDispatcher-623"><span class="linenos">623</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_calibrator</span> <span class="o">=</span> <span class="n">ConstrainedMinimizationCalibration</span><span class="p">()</span>
+</span><span id="CalibrationDispatcher-624"><a href="#CalibrationDispatcher-624"><span class="linenos">624</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher-625"><a href="#CalibrationDispatcher-625"><span class="linenos">625</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown calibrator.&quot;</span><span class="p">)</span>
+</span><span id="CalibrationDispatcher-626"><a href="#CalibrationDispatcher-626"><span class="linenos">626</span></a>
+</span><span id="CalibrationDispatcher-627"><a href="#CalibrationDispatcher-627"><span class="linenos">627</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
+</span><span id="CalibrationDispatcher-628"><a href="#CalibrationDispatcher-628"><span class="linenos">628</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_input_on_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="CalibrationDispatcher-629"><a href="#CalibrationDispatcher-629"><span class="linenos">629</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher-630"><a href="#CalibrationDispatcher-630"><span class="linenos">630</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data.</span>
+</span><span id="CalibrationDispatcher-631"><a href="#CalibrationDispatcher-631"><span class="linenos">631</span></a>
+</span><span id="CalibrationDispatcher-632"><a href="#CalibrationDispatcher-632"><span class="linenos">632</span></a><span class="sd">        Args:</span>
+</span><span id="CalibrationDispatcher-633"><a href="#CalibrationDispatcher-633"><span class="linenos">633</span></a><span class="sd">            acceleration: the accelerometer data containing x,y,z axis</span>
+</span><span id="CalibrationDispatcher-634"><a href="#CalibrationDispatcher-634"><span class="linenos">634</span></a><span class="sd">                data and time stamps.</span>
+</span><span id="CalibrationDispatcher-635"><a href="#CalibrationDispatcher-635"><span class="linenos">635</span></a><span class="sd">            return_input_on_error: If true, will return the input acceleration data</span>
+</span><span id="CalibrationDispatcher-636"><a href="#CalibrationDispatcher-636"><span class="linenos">636</span></a><span class="sd">                if calibration fails. If false, will raise an exception.</span>
+</span><span id="CalibrationDispatcher-637"><a href="#CalibrationDispatcher-637"><span class="linenos">637</span></a>
+</span><span id="CalibrationDispatcher-638"><a href="#CalibrationDispatcher-638"><span class="linenos">638</span></a><span class="sd">        Returns:</span>
+</span><span id="CalibrationDispatcher-639"><a href="#CalibrationDispatcher-639"><span class="linenos">639</span></a><span class="sd">            A Measurement object that contains the calibrated acceleration data.</span>
+</span><span id="CalibrationDispatcher-640"><a href="#CalibrationDispatcher-640"><span class="linenos">640</span></a>
+</span><span id="CalibrationDispatcher-641"><a href="#CalibrationDispatcher-641"><span class="linenos">641</span></a><span class="sd">        Raises:</span>
+</span><span id="CalibrationDispatcher-642"><a href="#CalibrationDispatcher-642"><span class="linenos">642</span></a><span class="sd">            CalibrationError: If the calibration process fails to converge or the final</span>
+</span><span id="CalibrationDispatcher-643"><a href="#CalibrationDispatcher-643"><span class="linenos">643</span></a><span class="sd">                error exceeds the `max_calibration_error` threshold.</span>
+</span><span id="CalibrationDispatcher-644"><a href="#CalibrationDispatcher-644"><span class="linenos">644</span></a><span class="sd">            SphereCriteriaError: If the sphere is not sufficiently populated, i.e. every</span>
+</span><span id="CalibrationDispatcher-645"><a href="#CalibrationDispatcher-645"><span class="linenos">645</span></a><span class="sd">                axis does not have at least 1 value both above and below  the + and</span>
+</span><span id="CalibrationDispatcher-646"><a href="#CalibrationDispatcher-646"><span class="linenos">646</span></a><span class="sd">                - value of min_acceleraiton.</span>
+</span><span id="CalibrationDispatcher-647"><a href="#CalibrationDispatcher-647"><span class="linenos">647</span></a><span class="sd">            NoMotionError: If no portions of data meet no motion criteria as defined by</span>
+</span><span id="CalibrationDispatcher-648"><a href="#CalibrationDispatcher-648"><span class="linenos">648</span></a><span class="sd">                no_motion_check.</span>
+</span><span id="CalibrationDispatcher-649"><a href="#CalibrationDispatcher-649"><span class="linenos">649</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="CalibrationDispatcher-650"><a href="#CalibrationDispatcher-650"><span class="linenos">650</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher-651"><a href="#CalibrationDispatcher-651"><span class="linenos">651</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calibrator</span><span class="o">.</span><span class="n">run_calibration</span><span class="p">(</span><span class="n">acceleration</span><span class="p">)</span>
+</span><span id="CalibrationDispatcher-652"><a href="#CalibrationDispatcher-652"><span class="linenos">652</span></a>        <span class="k">except</span> <span class="p">(</span>
+</span><span id="CalibrationDispatcher-653"><a href="#CalibrationDispatcher-653"><span class="linenos">653</span></a>            <span class="n">exceptions</span><span class="o">.</span><span class="n">CalibrationError</span><span class="p">,</span>
+</span><span id="CalibrationDispatcher-654"><a href="#CalibrationDispatcher-654"><span class="linenos">654</span></a>            <span class="n">exceptions</span><span class="o">.</span><span class="n">SphereCriteriaError</span><span class="p">,</span>
+</span><span id="CalibrationDispatcher-655"><a href="#CalibrationDispatcher-655"><span class="linenos">655</span></a>            <span class="n">exceptions</span><span class="o">.</span><span class="n">NoMotionError</span><span class="p">,</span>
+</span><span id="CalibrationDispatcher-656"><a href="#CalibrationDispatcher-656"><span class="linenos">656</span></a>        <span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher-657"><a href="#CalibrationDispatcher-657"><span class="linenos">657</span></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">return_input_on_error</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher-658"><a href="#CalibrationDispatcher-658"><span class="linenos">658</span></a>                <span class="k">raise</span>
+</span><span id="CalibrationDispatcher-659"><a href="#CalibrationDispatcher-659"><span class="linenos">659</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+</span><span id="CalibrationDispatcher-660"><a href="#CalibrationDispatcher-660"><span class="linenos">660</span></a>                <span class="s2">&quot;Calibration FAILED: </span><span class="si">%s</span><span class="s2">. Proceeding without calibration.&quot;</span><span class="p">,</span> <span class="n">exc_info</span>
+</span><span id="CalibrationDispatcher-661"><a href="#CalibrationDispatcher-661"><span class="linenos">661</span></a>            <span class="p">)</span>
+</span><span id="CalibrationDispatcher-662"><a href="#CalibrationDispatcher-662"><span class="linenos">662</span></a>            <span class="k">return</span> <span class="n">acceleration</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Class used to select and implement appropriate calibrator.</p>
+</div>
+
+
+                            <div id="CalibrationDispatcher.__init__" class="classattr">
+                                        <input id="CalibrationDispatcher.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">CalibrationDispatcher</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;ggir&#39;</span><span class="p">,</span> <span class="s1">&#39;gradient&#39;</span><span class="p">]</span></span>)</span>
+
+                <label class="view-source-button" for="CalibrationDispatcher.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#CalibrationDispatcher.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CalibrationDispatcher.__init__-611"><a href="#CalibrationDispatcher.__init__-611"><span class="linenos">611</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;gradient&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher.__init__-612"><a href="#CalibrationDispatcher.__init__-612"><span class="linenos">612</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the calibrator to one of the predefined calibrators.</span>
+</span><span id="CalibrationDispatcher.__init__-613"><a href="#CalibrationDispatcher.__init__-613"><span class="linenos">613</span></a>
+</span><span id="CalibrationDispatcher.__init__-614"><a href="#CalibrationDispatcher.__init__-614"><span class="linenos">614</span></a><span class="sd">        Args:</span>
+</span><span id="CalibrationDispatcher.__init__-615"><a href="#CalibrationDispatcher.__init__-615"><span class="linenos">615</span></a><span class="sd">            name: The name of the calibrator to use. Options are &quot;ggir&quot; or &quot;gradient&quot;.</span>
+</span><span id="CalibrationDispatcher.__init__-616"><a href="#CalibrationDispatcher.__init__-616"><span class="linenos">616</span></a>
+</span><span id="CalibrationDispatcher.__init__-617"><a href="#CalibrationDispatcher.__init__-617"><span class="linenos">617</span></a><span class="sd">        Raises:</span>
+</span><span id="CalibrationDispatcher.__init__-618"><a href="#CalibrationDispatcher.__init__-618"><span class="linenos">618</span></a><span class="sd">            ValueError: If an unknown calibrator is given</span>
+</span><span id="CalibrationDispatcher.__init__-619"><a href="#CalibrationDispatcher.__init__-619"><span class="linenos">619</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="CalibrationDispatcher.__init__-620"><a href="#CalibrationDispatcher.__init__-620"><span class="linenos">620</span></a>        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;ggir&quot;</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher.__init__-621"><a href="#CalibrationDispatcher.__init__-621"><span class="linenos">621</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_calibrator</span> <span class="o">=</span> <span class="n">GgirCalibration</span><span class="p">()</span>
+</span><span id="CalibrationDispatcher.__init__-622"><a href="#CalibrationDispatcher.__init__-622"><span class="linenos">622</span></a>        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;gradient&quot;</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher.__init__-623"><a href="#CalibrationDispatcher.__init__-623"><span class="linenos">623</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_calibrator</span> <span class="o">=</span> <span class="n">ConstrainedMinimizationCalibration</span><span class="p">()</span>
+</span><span id="CalibrationDispatcher.__init__-624"><a href="#CalibrationDispatcher.__init__-624"><span class="linenos">624</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher.__init__-625"><a href="#CalibrationDispatcher.__init__-625"><span class="linenos">625</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown calibrator.&quot;</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initializes the calibrator to one of the predefined calibrators.</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>name:</strong>  The name of the calibrator to use. Options are "ggir" or "gradient".</li>
+</ul>
+
+<h6 id="raises">Raises:</h6>
+
+<ul>
+<li><strong>ValueError:</strong>  If an unknown calibrator is given</li>
+</ul>
+</div>
+
+
+                            </div>
+                            <div id="CalibrationDispatcher.run" class="classattr">
+                                        <input id="CalibrationDispatcher.run-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">run</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">acceleration</span><span class="p">:</span> <span class="n"><a href="../core/models.html#Measurement">wristpy.core.models.Measurement</a></span>,</span><span class="param">	<span class="o">*</span>,</span><span class="param">	<span class="n">return_input_on_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="n"><a href="../core/models.html#Measurement">wristpy.core.models.Measurement</a></span>:</span></span>
+
+                <label class="view-source-button" for="CalibrationDispatcher.run-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#CalibrationDispatcher.run"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CalibrationDispatcher.run-627"><a href="#CalibrationDispatcher.run-627"><span class="linenos">627</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
+</span><span id="CalibrationDispatcher.run-628"><a href="#CalibrationDispatcher.run-628"><span class="linenos">628</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_input_on_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="CalibrationDispatcher.run-629"><a href="#CalibrationDispatcher.run-629"><span class="linenos">629</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher.run-630"><a href="#CalibrationDispatcher.run-630"><span class="linenos">630</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data.</span>
+</span><span id="CalibrationDispatcher.run-631"><a href="#CalibrationDispatcher.run-631"><span class="linenos">631</span></a>
+</span><span id="CalibrationDispatcher.run-632"><a href="#CalibrationDispatcher.run-632"><span class="linenos">632</span></a><span class="sd">        Args:</span>
+</span><span id="CalibrationDispatcher.run-633"><a href="#CalibrationDispatcher.run-633"><span class="linenos">633</span></a><span class="sd">            acceleration: the accelerometer data containing x,y,z axis</span>
+</span><span id="CalibrationDispatcher.run-634"><a href="#CalibrationDispatcher.run-634"><span class="linenos">634</span></a><span class="sd">                data and time stamps.</span>
+</span><span id="CalibrationDispatcher.run-635"><a href="#CalibrationDispatcher.run-635"><span class="linenos">635</span></a><span class="sd">            return_input_on_error: If true, will return the input acceleration data</span>
+</span><span id="CalibrationDispatcher.run-636"><a href="#CalibrationDispatcher.run-636"><span class="linenos">636</span></a><span class="sd">                if calibration fails. If false, will raise an exception.</span>
+</span><span id="CalibrationDispatcher.run-637"><a href="#CalibrationDispatcher.run-637"><span class="linenos">637</span></a>
+</span><span id="CalibrationDispatcher.run-638"><a href="#CalibrationDispatcher.run-638"><span class="linenos">638</span></a><span class="sd">        Returns:</span>
+</span><span id="CalibrationDispatcher.run-639"><a href="#CalibrationDispatcher.run-639"><span class="linenos">639</span></a><span class="sd">            A Measurement object that contains the calibrated acceleration data.</span>
+</span><span id="CalibrationDispatcher.run-640"><a href="#CalibrationDispatcher.run-640"><span class="linenos">640</span></a>
+</span><span id="CalibrationDispatcher.run-641"><a href="#CalibrationDispatcher.run-641"><span class="linenos">641</span></a><span class="sd">        Raises:</span>
+</span><span id="CalibrationDispatcher.run-642"><a href="#CalibrationDispatcher.run-642"><span class="linenos">642</span></a><span class="sd">            CalibrationError: If the calibration process fails to converge or the final</span>
+</span><span id="CalibrationDispatcher.run-643"><a href="#CalibrationDispatcher.run-643"><span class="linenos">643</span></a><span class="sd">                error exceeds the `max_calibration_error` threshold.</span>
+</span><span id="CalibrationDispatcher.run-644"><a href="#CalibrationDispatcher.run-644"><span class="linenos">644</span></a><span class="sd">            SphereCriteriaError: If the sphere is not sufficiently populated, i.e. every</span>
+</span><span id="CalibrationDispatcher.run-645"><a href="#CalibrationDispatcher.run-645"><span class="linenos">645</span></a><span class="sd">                axis does not have at least 1 value both above and below  the + and</span>
+</span><span id="CalibrationDispatcher.run-646"><a href="#CalibrationDispatcher.run-646"><span class="linenos">646</span></a><span class="sd">                - value of min_acceleraiton.</span>
+</span><span id="CalibrationDispatcher.run-647"><a href="#CalibrationDispatcher.run-647"><span class="linenos">647</span></a><span class="sd">            NoMotionError: If no portions of data meet no motion criteria as defined by</span>
+</span><span id="CalibrationDispatcher.run-648"><a href="#CalibrationDispatcher.run-648"><span class="linenos">648</span></a><span class="sd">                no_motion_check.</span>
+</span><span id="CalibrationDispatcher.run-649"><a href="#CalibrationDispatcher.run-649"><span class="linenos">649</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="CalibrationDispatcher.run-650"><a href="#CalibrationDispatcher.run-650"><span class="linenos">650</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher.run-651"><a href="#CalibrationDispatcher.run-651"><span class="linenos">651</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calibrator</span><span class="o">.</span><span class="n">run_calibration</span><span class="p">(</span><span class="n">acceleration</span><span class="p">)</span>
+</span><span id="CalibrationDispatcher.run-652"><a href="#CalibrationDispatcher.run-652"><span class="linenos">652</span></a>        <span class="k">except</span> <span class="p">(</span>
+</span><span id="CalibrationDispatcher.run-653"><a href="#CalibrationDispatcher.run-653"><span class="linenos">653</span></a>            <span class="n">exceptions</span><span class="o">.</span><span class="n">CalibrationError</span><span class="p">,</span>
+</span><span id="CalibrationDispatcher.run-654"><a href="#CalibrationDispatcher.run-654"><span class="linenos">654</span></a>            <span class="n">exceptions</span><span class="o">.</span><span class="n">SphereCriteriaError</span><span class="p">,</span>
+</span><span id="CalibrationDispatcher.run-655"><a href="#CalibrationDispatcher.run-655"><span class="linenos">655</span></a>            <span class="n">exceptions</span><span class="o">.</span><span class="n">NoMotionError</span><span class="p">,</span>
+</span><span id="CalibrationDispatcher.run-656"><a href="#CalibrationDispatcher.run-656"><span class="linenos">656</span></a>        <span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher.run-657"><a href="#CalibrationDispatcher.run-657"><span class="linenos">657</span></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">return_input_on_error</span><span class="p">:</span>
+</span><span id="CalibrationDispatcher.run-658"><a href="#CalibrationDispatcher.run-658"><span class="linenos">658</span></a>                <span class="k">raise</span>
+</span><span id="CalibrationDispatcher.run-659"><a href="#CalibrationDispatcher.run-659"><span class="linenos">659</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+</span><span id="CalibrationDispatcher.run-660"><a href="#CalibrationDispatcher.run-660"><span class="linenos">660</span></a>                <span class="s2">&quot;Calibration FAILED: </span><span class="si">%s</span><span class="s2">. Proceeding without calibration.&quot;</span><span class="p">,</span> <span class="n">exc_info</span>
+</span><span id="CalibrationDispatcher.run-661"><a href="#CalibrationDispatcher.run-661"><span class="linenos">661</span></a>            <span class="p">)</span>
+</span><span id="CalibrationDispatcher.run-662"><a href="#CalibrationDispatcher.run-662"><span class="linenos">662</span></a>            <span class="k">return</span> <span class="n">acceleration</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Runs calibration on acceleration data.</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>acceleration:</strong>  the accelerometer data containing x,y,z axis
+data and time stamps.</li>
+<li><strong>return_input_on_error:</strong>  If true, will return the input acceleration data
+if calibration fails. If false, will raise an exception.</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>A Measurement object that contains the calibrated acceleration data.</p>
+</blockquote>
+
+<h6 id="raises">Raises:</h6>
+
+<ul>
+<li><strong>CalibrationError:</strong>  If the calibration process fails to converge or the final
+error exceeds the <code>max_calibration_error</code> threshold.</li>
+<li><strong>SphereCriteriaError:</strong>  If the sphere is not sufficiently populated, i.e. every
+axis does not have at least 1 value both above and below  the + and
+<ul>
+<li>value of min_acceleraiton.</li>
+</ul></li>
+<li><strong>NoMotionError:</strong>  If no portions of data meet no motion criteria as defined by
+no_motion_check.</li>
 </ul>
 </div>
 

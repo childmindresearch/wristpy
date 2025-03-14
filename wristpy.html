@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 15.0.0"/>
+    <meta name="generator" content="pdoc 15.0.1"/>
     <title>wristpy API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -157,7 +157,7 @@ wristpy    </h1>
 <h4 id="running-single-files">Running single files:</h4>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">orchestrator</span>
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/core.html">wristpy.core</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">orchestrator</span>
 
 <span class="c1"># Define input file path and output location</span>
 <span class="c1"># Support for saving as .csv and .parquet</span>
@@ -183,7 +183,7 @@ wristpy    </h1>
 <h4 id="running-entire-directories">Running entire directories:</h4>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">orchestrator</span>
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/core.html">wristpy.core</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">orchestrator</span>
 
 <span class="c1"># Define input file path and output location</span>
 
@@ -250,7 +250,7 @@ we will cover the following topics through a few examples:</p>
 <p>The <code>orchestrator</code> module of wristpy contains the default processor that will run the entire wristpy processing pipeline. This can be called as simply as:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">orchestrator</span>
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/core.html">wristpy.core</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">orchestrator</span>
 
 <span class="n">results</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
    <span class="nb">input</span> <span class="o">=</span> <span class="s1">&#39;/path/to/your/file.gt3x&#39;</span><span class="p">,</span>
@@ -264,7 +264,7 @@ we will cover the following topics through a few examples:</p>
 <p>The orchestrator can also process entire directories. The call to the orchestrator remains largely the same but now output is expected to be a directory and the desired filetype for the saved files <strong>must</strong> be specified:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">orchestrator</span>
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/core.html">wristpy.core</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">orchestrator</span>
 
 <span class="n">results</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
     <span class="nb">input</span> <span class="o">=</span> <span class="s1">&#39;/path/to/input/dir&#39;</span><span class="p">,</span>
@@ -279,7 +279,7 @@ we will cover the following topics through a few examples:</p>
 <p>Plot the ENMO across the entire data set:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">enmo</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">enmo</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -289,7 +289,7 @@ we will cover the following topics through a few examples:</p>
 <p>Plot the sleep windows with normalized angle-z data:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">anglez</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">anglez</span><span class="o">.</span><span class="n">measurements</span><span class="o">/</span><span class="mi">90</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">sleep_windows_epoch</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">sleep_windows_epoch</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
@@ -303,8 +303,8 @@ we will cover the following topics through a few examples:</p>
 <p>We can also view and process these outputs from the saved <code>.csv</code> output file:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="n">output_results</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;path/to/save/file_name.csv&#39;</span><span class="p">,</span> <span class="n">try_parse_dates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">phys_activity</span> <span class="o">=</span> <span class="n">output_results</span><span class="p">[</span><span class="s1">&#39;physical_activity_levels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">Categorical</span><span class="p">)</span><span class="o">.</span><span class="n">to_physical</span><span class="p">()</span>
 
@@ -343,7 +343,7 @@ Inactivity percent: 86.47099146257868
 <p>The built in <code>readers</code> module can be used to load all the sensor and metadata from one of the support wrist-watches (<code>.gt3x</code> or <code>.bin</code>), the reader will automatically select the appropriate loading methodology.</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span> <span class="kn">import</span> <span class="n">readers</span>
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">readers</span>
 
 <span class="n">watch_data</span> <span class="o">=</span> <span class="n">readers</span><span class="o">.</span><span class="n">read_watch_data</span><span class="p">(</span><span class="s1">&#39;/path/to/geneactive/file.bin&#39;</span><span class="p">)</span>
 </code></pre>
@@ -368,9 +368,9 @@ Inactivity percent: 86.47099146257868
 <p>In this example we will expand on the skills learned in <code>Example 2</code>: we will load the sensor data, calibrate, and then calculate the ENMO and angle-z data in 5s windows (epoch 1 data).</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span> <span class="kn">import</span> <span class="n">readers</span>
-<span class="kn">from</span> <span class="nn"><a href="wristpy/processing.html">wristpy.processing</a></span> <span class="kn">import</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">metrics</span>
-<span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">computations</span>
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">readers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/processing.html">wristpy.processing</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">metrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/core.html">wristpy.core</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">computations</span>
 
 <span class="n">watch_data</span> <span class="o">=</span> <span class="n">readers</span><span class="o">.</span><span class="n">read_watch_data</span><span class="p">(</span><span class="s1">&#39;/path/to/geneactive/file.bin&#39;</span><span class="p">)</span>
 
@@ -412,8 +412,8 @@ Inactivity percent: 86.47099146257868
 <p>In this example we will build on <code>Example 3</code> by also solving for the non-wear periods, as follows:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span> <span class="kn">import</span> <span class="n">readers</span>
-<span class="kn">from</span> <span class="nn"><a href="wristpy/processing.html">wristpy.processing</a></span> <span class="kn">import</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">metrics</span>
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">readers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/processing.html">wristpy.processing</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">metrics</span>
 
 
 <span class="n">watch_data</span> <span class="o">=</span> <span class="n">readers</span><span class="o">.</span><span class="n">read_watch_data</span><span class="p">(</span><span class="s1">&#39;/path/to/geneactive/file.bin&#39;</span><span class="p">)</span>
@@ -428,7 +428,7 @@ Inactivity percent: 86.47099146257868
 <p>We can then visualize the non-wear periods, in comparison to movement (ENMO at the epoch1 level):</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/core.html">wristpy.core</a></span> <span class="kn">import</span> <span class="n">computations</span>
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/core.html">wristpy.core</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">computations</span>
 
 <span class="n">enmo</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">euclidean_norm_minus_one</span><span class="p">(</span><span class="n">calibrated_data</span><span class="p">)</span>
 <span class="n">enmo_epoch1</span> <span class="o">=</span> <span class="n">computations</span><span class="o">.</span><span class="n">moving_mean</span><span class="p">(</span><span class="n">enmo</span><span class="p">)</span>
@@ -448,8 +448,8 @@ Inactivity percent: 86.47099146257868
 <p>The following script will obtain the sleep window pairs (onset,wakeup):</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span> <span class="kn">import</span> <span class="n">readers</span>
-<span class="kn">from</span> <span class="nn"><a href="wristpy/processing.html">wristpy.processing</a></span> <span class="kn">import</span> <span class="n">analytics</span><span class="p">,</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">metrics</span>
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">readers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/processing.html">wristpy.processing</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">analytics</span><span class="p">,</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">metrics</span>
 
 
 <span class="n">watch_data</span> <span class="o">=</span> <span class="n">readers</span><span class="o">.</span><span class="n">read_watch_data</span><span class="p">(</span><span class="s1">&#39;/path/to/geneactive/file.bin&#39;</span><span class="p">)</span>
@@ -465,7 +465,7 @@ Inactivity percent: 86.47099146257868
 <p>We can then visualize the sleep periods in comparison to the angle-z data and the non-wear periods, where sleep periods are visualized by a horizontal blue line, and non-wear periods are visualized with a green trace and the angle-z data with the semi-transparent red trace:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 
@@ -495,7 +495,7 @@ Inactivity percent: 86.47099146257868
 <p>And these can be visualized and compared to angle-z and the non-wear periods as previously:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 

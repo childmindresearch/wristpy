@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 15.0.0"/>
+    <meta name="generator" content="pdoc 15.0.1"/>
     <title>wristpy.core.computations API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -39,6 +39,9 @@
             <li>
                     <a class="function" href="#moving_median">moving_median</a>
             </li>
+            <li>
+                    <a class="function" href="#resample">resample</a>
+            </li>
     </ul>
 
 
@@ -64,16 +67,16 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&quot;&quot;&quot;This module will contain functions to compute statistics on the sensor data.&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span> <span class="nn">wristpy.core</span> <span class="kn">import</span> <span class="n">models</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">wristpy.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="k">def</span> <span class="nf">_moving</span><span class="p">(</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_moving</span><span class="p">(</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>    <span class="n">measurement</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>    <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>    <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>    <span class="n">aggregation</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">],</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>    <span class="n">centered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -121,55 +124,118 @@
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="k">return</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="o">.</span><span class="n">from_data_frame</span><span class="p">(</span><span class="n">aggregated_df</span><span class="o">.</span><span class="n">collect</span><span class="p">())</span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
 </span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="k">def</span> <span class="nf">moving_mean</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the moving mean of the sensor data in array.</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">    Args:</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the mean of</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">        epoch_length: The length, in seconds, of the window.</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">    Returns:</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">        The moving mean of the array in a new Measurement instance.</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">    Raises:</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">        ValueError: If the epoch length is not an integer or is less than 1.</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">)</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="k">def</span> <span class="nf">moving_std</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the moving standard deviation (std) of the sensor data in array.</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">    Args:</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the std of</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">        epoch_length: The length, in seconds, of the window.</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="k">def</span><span class="w"> </span><span class="nf">moving_mean</span><span class="p">(</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the moving mean of the sensor data in array.</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">    Args:</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the mean of</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">        epoch_length: The length, in seconds, of the window.</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">    Returns:</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">        The moving mean of the array in a new Measurement instance.</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">    Raises:</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">        ValueError: If the epoch length is not an integer or is less than 1.</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="k">def</span><span class="w"> </span><span class="nf">moving_std</span><span class="p">(</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>    <span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the moving standard deviation (std) of the sensor data in array.</span>
 </span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">    Returns:</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">        The moving std of the array in a new Measurement instance.</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">    Raises:</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">        ValueError: If the epoch length is less than 1.</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">)</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="k">def</span> <span class="nf">moving_median</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Applies moving median to acceleration data.</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">    Args:</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the std of</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">        epoch_length: The length, in seconds, of the window.</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">    Returns:</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">        The moving std of the array in a new Measurement instance.</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">    Raises:</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">        ValueError: If the epoch length is less than 1.</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">)</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">    Step size for the window is hard-coded to 1 sample.</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    Args:</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the median</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">            of.</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">        epoch_length: Size of the moving median window. Window is centered.</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">            Measured in seconds.</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">    Returns:</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">        Measurement object with rolling median applied to the measurement data. The</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">        measurements data will retain it&#39;s shape, and the time data will be returned</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="sd">        unaltered.</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">centered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="k">def</span><span class="w"> </span><span class="nf">moving_median</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Applies moving median to acceleration data.</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">    Step size for the window is hard-coded to 1 sample.</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">    Args:</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the median</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">            of.</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">        epoch_length: Size of the moving median window. Window is centered.</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">            Measured in seconds.</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="sd">    Returns:</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="sd">        Measurement object with rolling median applied to the measurement data. The</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="sd">        measurements data will retain it&#39;s shape, and the time data will be returned</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="sd">        unaltered.</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">centered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="k">def</span><span class="w"> </span><span class="nf">resample</span><span class="p">(</span><span class="n">measurement</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">delta_t</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resamples a measurement to a different timescale.</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">    Args:</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">        measurement: The measurement to resample.</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="sd">        delta_t: The new time step, in seconds. This will be rounded to the nearest</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">            nanosecond.</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">    Returns:</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="sd">        The resampled measurement.</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">    Raises:</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="sd">        ValueError: Raised for zero or negative delta_t.</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>    <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;delta_t must be positive.&quot;</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>    <span class="n">time_delta_median</span> <span class="o">=</span> <span class="p">(</span><span class="n">measurement</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">measurement</span><span class="o">.</span><span class="n">time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>    <span class="n">n_nanoseconds_in_second</span> <span class="o">=</span> <span class="mi">1_000_000_000</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>    <span class="n">current_delta_t</span> <span class="o">=</span> <span class="n">time_delta_median</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">*</span> <span class="n">n_nanoseconds_in_second</span>  <span class="c1"># type: ignore[union-attr] #Guarded by Measurement validation for .time attribute</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>    <span class="n">requested_delta_t</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">delta_t</span> <span class="o">*</span> <span class="n">n_nanoseconds_in_second</span><span class="p">)</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>    <span class="n">measurement_df</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>        <span class="n">pl</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">measurement</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>        <span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">measurement</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>        <span class="o">.</span><span class="n">set_sorted</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>    <span class="p">)</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>    <span class="k">if</span> <span class="n">current_delta_t</span> <span class="o">&gt;=</span> <span class="n">requested_delta_t</span><span class="p">:</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>        <span class="n">resampled_df</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>            <span class="p">(</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>                <span class="n">measurement_df</span><span class="o">.</span><span class="n">group_by_dynamic</span><span class="p">(</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>                    <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">every</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">requested_delta_t</span><span class="si">}</span><span class="s2">ns&quot;</span><span class="p">,</span> <span class="n">start_by</span><span class="o">=</span><span class="s2">&quot;datapoint&quot;</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>                <span class="p">)</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>            <span class="p">)</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>            <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>            <span class="o">.</span><span class="n">upsample</span><span class="p">(</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>                <span class="n">time_column</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">every</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">requested_delta_t</span><span class="si">}</span><span class="s2">ns&quot;</span><span class="p">,</span> <span class="n">maintain_order</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>            <span class="p">)</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>            <span class="o">.</span><span class="n">interpolate</span><span class="p">()</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>            <span class="o">.</span><span class="n">fill_null</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;forward&quot;</span><span class="p">)</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>        <span class="p">)</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>        <span class="n">resampled_df</span> <span class="o">=</span> <span class="n">measurement_df</span><span class="o">.</span><span class="n">group_by_dynamic</span><span class="p">(</span>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>            <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">every</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">requested_delta_t</span><span class="si">}</span><span class="s2">ns&quot;</span><span class="p">,</span> <span class="n">start_by</span><span class="o">=</span><span class="s2">&quot;datapoint&quot;</span>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>        <span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>    <span class="n">new_measurement</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>        <span class="n">resampled_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">resampled_df</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>    <span class="p">)</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>    <span class="k">return</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>        <span class="n">measurements</span><span class="o">=</span><span class="n">new_measurement</span><span class="p">,</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>        <span class="n">time</span><span class="o">=</span><span class="n">resampled_df</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>    <span class="p">)</span>
 </span></pre></div>
 
 
@@ -179,26 +245,28 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">moving_mean</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">array</span><span class="p">:</span> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>,</span><span class="param">	<span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span></span><span class="return-annotation">) -> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>:</span></span>
+        <span class="name">moving_mean</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">array</span><span class="p">:</span> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>,</span><span class="param">	<span class="n">epoch_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span></span><span class="return-annotation">) -> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>:</span></span>
 
                 <label class="view-source-button" for="moving_mean-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#moving_mean"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="moving_mean-61"><a href="#moving_mean-61"><span class="linenos">61</span></a><span class="k">def</span> <span class="nf">moving_mean</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
-</span><span id="moving_mean-62"><a href="#moving_mean-62"><span class="linenos">62</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the moving mean of the sensor data in array.</span>
-</span><span id="moving_mean-63"><a href="#moving_mean-63"><span class="linenos">63</span></a>
-</span><span id="moving_mean-64"><a href="#moving_mean-64"><span class="linenos">64</span></a><span class="sd">    Args:</span>
-</span><span id="moving_mean-65"><a href="#moving_mean-65"><span class="linenos">65</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the mean of</span>
-</span><span id="moving_mean-66"><a href="#moving_mean-66"><span class="linenos">66</span></a><span class="sd">        epoch_length: The length, in seconds, of the window.</span>
-</span><span id="moving_mean-67"><a href="#moving_mean-67"><span class="linenos">67</span></a>
-</span><span id="moving_mean-68"><a href="#moving_mean-68"><span class="linenos">68</span></a><span class="sd">    Returns:</span>
-</span><span id="moving_mean-69"><a href="#moving_mean-69"><span class="linenos">69</span></a><span class="sd">        The moving mean of the array in a new Measurement instance.</span>
-</span><span id="moving_mean-70"><a href="#moving_mean-70"><span class="linenos">70</span></a>
-</span><span id="moving_mean-71"><a href="#moving_mean-71"><span class="linenos">71</span></a><span class="sd">    Raises:</span>
-</span><span id="moving_mean-72"><a href="#moving_mean-72"><span class="linenos">72</span></a><span class="sd">        ValueError: If the epoch length is not an integer or is less than 1.</span>
-</span><span id="moving_mean-73"><a href="#moving_mean-73"><span class="linenos">73</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="moving_mean-74"><a href="#moving_mean-74"><span class="linenos">74</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="moving_mean-61"><a href="#moving_mean-61"><span class="linenos">61</span></a><span class="k">def</span><span class="w"> </span><span class="nf">moving_mean</span><span class="p">(</span>
+</span><span id="moving_mean-62"><a href="#moving_mean-62"><span class="linenos">62</span></a>    <span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span>
+</span><span id="moving_mean-63"><a href="#moving_mean-63"><span class="linenos">63</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="moving_mean-64"><a href="#moving_mean-64"><span class="linenos">64</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the moving mean of the sensor data in array.</span>
+</span><span id="moving_mean-65"><a href="#moving_mean-65"><span class="linenos">65</span></a>
+</span><span id="moving_mean-66"><a href="#moving_mean-66"><span class="linenos">66</span></a><span class="sd">    Args:</span>
+</span><span id="moving_mean-67"><a href="#moving_mean-67"><span class="linenos">67</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the mean of</span>
+</span><span id="moving_mean-68"><a href="#moving_mean-68"><span class="linenos">68</span></a><span class="sd">        epoch_length: The length, in seconds, of the window.</span>
+</span><span id="moving_mean-69"><a href="#moving_mean-69"><span class="linenos">69</span></a>
+</span><span id="moving_mean-70"><a href="#moving_mean-70"><span class="linenos">70</span></a><span class="sd">    Returns:</span>
+</span><span id="moving_mean-71"><a href="#moving_mean-71"><span class="linenos">71</span></a><span class="sd">        The moving mean of the array in a new Measurement instance.</span>
+</span><span id="moving_mean-72"><a href="#moving_mean-72"><span class="linenos">72</span></a>
+</span><span id="moving_mean-73"><a href="#moving_mean-73"><span class="linenos">73</span></a><span class="sd">    Raises:</span>
+</span><span id="moving_mean-74"><a href="#moving_mean-74"><span class="linenos">74</span></a><span class="sd">        ValueError: If the epoch length is not an integer or is less than 1.</span>
+</span><span id="moving_mean-75"><a href="#moving_mean-75"><span class="linenos">75</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="moving_mean-76"><a href="#moving_mean-76"><span class="linenos">76</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -231,26 +299,28 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">moving_std</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">array</span><span class="p">:</span> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>,</span><span class="param">	<span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span></span><span class="return-annotation">) -> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>:</span></span>
+        <span class="name">moving_std</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">array</span><span class="p">:</span> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>,</span><span class="param">	<span class="n">epoch_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span></span><span class="return-annotation">) -> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>:</span></span>
 
                 <label class="view-source-button" for="moving_std-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#moving_std"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="moving_std-77"><a href="#moving_std-77"><span class="linenos">77</span></a><span class="k">def</span> <span class="nf">moving_std</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
-</span><span id="moving_std-78"><a href="#moving_std-78"><span class="linenos">78</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the moving standard deviation (std) of the sensor data in array.</span>
-</span><span id="moving_std-79"><a href="#moving_std-79"><span class="linenos">79</span></a>
-</span><span id="moving_std-80"><a href="#moving_std-80"><span class="linenos">80</span></a><span class="sd">    Args:</span>
-</span><span id="moving_std-81"><a href="#moving_std-81"><span class="linenos">81</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the std of</span>
-</span><span id="moving_std-82"><a href="#moving_std-82"><span class="linenos">82</span></a><span class="sd">        epoch_length: The length, in seconds, of the window.</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="moving_std-79"><a href="#moving_std-79"><span class="linenos">79</span></a><span class="k">def</span><span class="w"> </span><span class="nf">moving_std</span><span class="p">(</span>
+</span><span id="moving_std-80"><a href="#moving_std-80"><span class="linenos">80</span></a>    <span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span>
+</span><span id="moving_std-81"><a href="#moving_std-81"><span class="linenos">81</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="moving_std-82"><a href="#moving_std-82"><span class="linenos">82</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the moving standard deviation (std) of the sensor data in array.</span>
 </span><span id="moving_std-83"><a href="#moving_std-83"><span class="linenos">83</span></a>
-</span><span id="moving_std-84"><a href="#moving_std-84"><span class="linenos">84</span></a><span class="sd">    Returns:</span>
-</span><span id="moving_std-85"><a href="#moving_std-85"><span class="linenos">85</span></a><span class="sd">        The moving std of the array in a new Measurement instance.</span>
-</span><span id="moving_std-86"><a href="#moving_std-86"><span class="linenos">86</span></a>
-</span><span id="moving_std-87"><a href="#moving_std-87"><span class="linenos">87</span></a><span class="sd">    Raises:</span>
-</span><span id="moving_std-88"><a href="#moving_std-88"><span class="linenos">88</span></a><span class="sd">        ValueError: If the epoch length is less than 1.</span>
-</span><span id="moving_std-89"><a href="#moving_std-89"><span class="linenos">89</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="moving_std-90"><a href="#moving_std-90"><span class="linenos">90</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">)</span>
+</span><span id="moving_std-84"><a href="#moving_std-84"><span class="linenos">84</span></a><span class="sd">    Args:</span>
+</span><span id="moving_std-85"><a href="#moving_std-85"><span class="linenos">85</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the std of</span>
+</span><span id="moving_std-86"><a href="#moving_std-86"><span class="linenos">86</span></a><span class="sd">        epoch_length: The length, in seconds, of the window.</span>
+</span><span id="moving_std-87"><a href="#moving_std-87"><span class="linenos">87</span></a>
+</span><span id="moving_std-88"><a href="#moving_std-88"><span class="linenos">88</span></a><span class="sd">    Returns:</span>
+</span><span id="moving_std-89"><a href="#moving_std-89"><span class="linenos">89</span></a><span class="sd">        The moving std of the array in a new Measurement instance.</span>
+</span><span id="moving_std-90"><a href="#moving_std-90"><span class="linenos">90</span></a>
+</span><span id="moving_std-91"><a href="#moving_std-91"><span class="linenos">91</span></a><span class="sd">    Raises:</span>
+</span><span id="moving_std-92"><a href="#moving_std-92"><span class="linenos">92</span></a><span class="sd">        ValueError: If the epoch length is less than 1.</span>
+</span><span id="moving_std-93"><a href="#moving_std-93"><span class="linenos">93</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="moving_std-94"><a href="#moving_std-94"><span class="linenos">94</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -283,29 +353,29 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">moving_median</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">array</span><span class="p">:</span> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>,</span><span class="param">	<span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span></span><span class="return-annotation">) -> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>:</span></span>
+        <span class="name">moving_median</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">array</span><span class="p">:</span> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>,</span><span class="param">	<span class="n">epoch_length</span><span class="p">:</span> <span class="nb">float</span></span><span class="return-annotation">) -> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>:</span></span>
 
                 <label class="view-source-button" for="moving_median-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#moving_median"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="moving_median-93"><a href="#moving_median-93"><span class="linenos"> 93</span></a><span class="k">def</span> <span class="nf">moving_median</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
-</span><span id="moving_median-94"><a href="#moving_median-94"><span class="linenos"> 94</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Applies moving median to acceleration data.</span>
-</span><span id="moving_median-95"><a href="#moving_median-95"><span class="linenos"> 95</span></a>
-</span><span id="moving_median-96"><a href="#moving_median-96"><span class="linenos"> 96</span></a><span class="sd">    Step size for the window is hard-coded to 1 sample.</span>
-</span><span id="moving_median-97"><a href="#moving_median-97"><span class="linenos"> 97</span></a>
-</span><span id="moving_median-98"><a href="#moving_median-98"><span class="linenos"> 98</span></a><span class="sd">    Args:</span>
-</span><span id="moving_median-99"><a href="#moving_median-99"><span class="linenos"> 99</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the median</span>
-</span><span id="moving_median-100"><a href="#moving_median-100"><span class="linenos">100</span></a><span class="sd">            of.</span>
-</span><span id="moving_median-101"><a href="#moving_median-101"><span class="linenos">101</span></a><span class="sd">        epoch_length: Size of the moving median window. Window is centered.</span>
-</span><span id="moving_median-102"><a href="#moving_median-102"><span class="linenos">102</span></a><span class="sd">            Measured in seconds.</span>
-</span><span id="moving_median-103"><a href="#moving_median-103"><span class="linenos">103</span></a>
-</span><span id="moving_median-104"><a href="#moving_median-104"><span class="linenos">104</span></a><span class="sd">    Returns:</span>
-</span><span id="moving_median-105"><a href="#moving_median-105"><span class="linenos">105</span></a><span class="sd">        Measurement object with rolling median applied to the measurement data. The</span>
-</span><span id="moving_median-106"><a href="#moving_median-106"><span class="linenos">106</span></a><span class="sd">        measurements data will retain it&#39;s shape, and the time data will be returned</span>
-</span><span id="moving_median-107"><a href="#moving_median-107"><span class="linenos">107</span></a><span class="sd">        unaltered.</span>
-</span><span id="moving_median-108"><a href="#moving_median-108"><span class="linenos">108</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="moving_median-109"><a href="#moving_median-109"><span class="linenos">109</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">centered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="moving_median-97"><a href="#moving_median-97"><span class="linenos"> 97</span></a><span class="k">def</span><span class="w"> </span><span class="nf">moving_median</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="moving_median-98"><a href="#moving_median-98"><span class="linenos"> 98</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Applies moving median to acceleration data.</span>
+</span><span id="moving_median-99"><a href="#moving_median-99"><span class="linenos"> 99</span></a>
+</span><span id="moving_median-100"><a href="#moving_median-100"><span class="linenos">100</span></a><span class="sd">    Step size for the window is hard-coded to 1 sample.</span>
+</span><span id="moving_median-101"><a href="#moving_median-101"><span class="linenos">101</span></a>
+</span><span id="moving_median-102"><a href="#moving_median-102"><span class="linenos">102</span></a><span class="sd">    Args:</span>
+</span><span id="moving_median-103"><a href="#moving_median-103"><span class="linenos">103</span></a><span class="sd">        array: The Measurement object with the sensor data we want to take the median</span>
+</span><span id="moving_median-104"><a href="#moving_median-104"><span class="linenos">104</span></a><span class="sd">            of.</span>
+</span><span id="moving_median-105"><a href="#moving_median-105"><span class="linenos">105</span></a><span class="sd">        epoch_length: Size of the moving median window. Window is centered.</span>
+</span><span id="moving_median-106"><a href="#moving_median-106"><span class="linenos">106</span></a><span class="sd">            Measured in seconds.</span>
+</span><span id="moving_median-107"><a href="#moving_median-107"><span class="linenos">107</span></a>
+</span><span id="moving_median-108"><a href="#moving_median-108"><span class="linenos">108</span></a><span class="sd">    Returns:</span>
+</span><span id="moving_median-109"><a href="#moving_median-109"><span class="linenos">109</span></a><span class="sd">        Measurement object with rolling median applied to the measurement data. The</span>
+</span><span id="moving_median-110"><a href="#moving_median-110"><span class="linenos">110</span></a><span class="sd">        measurements data will retain it&#39;s shape, and the time data will be returned</span>
+</span><span id="moving_median-111"><a href="#moving_median-111"><span class="linenos">111</span></a><span class="sd">        unaltered.</span>
+</span><span id="moving_median-112"><a href="#moving_median-112"><span class="linenos">112</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="moving_median-113"><a href="#moving_median-113"><span class="linenos">113</span></a>    <span class="k">return</span> <span class="n">_moving</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">epoch_length</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">centered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -329,6 +399,102 @@ Measured in seconds.</li>
   measurements data will retain it's shape, and the time data will be returned
   unaltered.</p>
 </blockquote>
+</div>
+
+
+                </section>
+                <section id="resample">
+                            <input id="resample-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">resample</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">measurement</span><span class="p">:</span> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>,</span><span class="param">	<span class="n">delta_t</span><span class="p">:</span> <span class="nb">float</span></span><span class="return-annotation">) -> <span class="n"><a href="models.html#Measurement">wristpy.core.models.Measurement</a></span>:</span></span>
+
+                <label class="view-source-button" for="resample-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#resample"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="resample-116"><a href="#resample-116"><span class="linenos">116</span></a><span class="k">def</span><span class="w"> </span><span class="nf">resample</span><span class="p">(</span><span class="n">measurement</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">delta_t</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="resample-117"><a href="#resample-117"><span class="linenos">117</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resamples a measurement to a different timescale.</span>
+</span><span id="resample-118"><a href="#resample-118"><span class="linenos">118</span></a>
+</span><span id="resample-119"><a href="#resample-119"><span class="linenos">119</span></a><span class="sd">    Args:</span>
+</span><span id="resample-120"><a href="#resample-120"><span class="linenos">120</span></a><span class="sd">        measurement: The measurement to resample.</span>
+</span><span id="resample-121"><a href="#resample-121"><span class="linenos">121</span></a><span class="sd">        delta_t: The new time step, in seconds. This will be rounded to the nearest</span>
+</span><span id="resample-122"><a href="#resample-122"><span class="linenos">122</span></a><span class="sd">            nanosecond.</span>
+</span><span id="resample-123"><a href="#resample-123"><span class="linenos">123</span></a>
+</span><span id="resample-124"><a href="#resample-124"><span class="linenos">124</span></a><span class="sd">    Returns:</span>
+</span><span id="resample-125"><a href="#resample-125"><span class="linenos">125</span></a><span class="sd">        The resampled measurement.</span>
+</span><span id="resample-126"><a href="#resample-126"><span class="linenos">126</span></a>
+</span><span id="resample-127"><a href="#resample-127"><span class="linenos">127</span></a><span class="sd">    Raises:</span>
+</span><span id="resample-128"><a href="#resample-128"><span class="linenos">128</span></a><span class="sd">        ValueError: Raised for zero or negative delta_t.</span>
+</span><span id="resample-129"><a href="#resample-129"><span class="linenos">129</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="resample-130"><a href="#resample-130"><span class="linenos">130</span></a>    <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="resample-131"><a href="#resample-131"><span class="linenos">131</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;delta_t must be positive.&quot;</span>
+</span><span id="resample-132"><a href="#resample-132"><span class="linenos">132</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="resample-133"><a href="#resample-133"><span class="linenos">133</span></a>
+</span><span id="resample-134"><a href="#resample-134"><span class="linenos">134</span></a>    <span class="n">time_delta_median</span> <span class="o">=</span> <span class="p">(</span><span class="n">measurement</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">measurement</span><span class="o">.</span><span class="n">time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>
+</span><span id="resample-135"><a href="#resample-135"><span class="linenos">135</span></a>
+</span><span id="resample-136"><a href="#resample-136"><span class="linenos">136</span></a>    <span class="n">n_nanoseconds_in_second</span> <span class="o">=</span> <span class="mi">1_000_000_000</span>
+</span><span id="resample-137"><a href="#resample-137"><span class="linenos">137</span></a>    <span class="n">current_delta_t</span> <span class="o">=</span> <span class="n">time_delta_median</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">*</span> <span class="n">n_nanoseconds_in_second</span>  <span class="c1"># type: ignore[union-attr] #Guarded by Measurement validation for .time attribute</span>
+</span><span id="resample-138"><a href="#resample-138"><span class="linenos">138</span></a>    <span class="n">requested_delta_t</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">delta_t</span> <span class="o">*</span> <span class="n">n_nanoseconds_in_second</span><span class="p">)</span>
+</span><span id="resample-139"><a href="#resample-139"><span class="linenos">139</span></a>
+</span><span id="resample-140"><a href="#resample-140"><span class="linenos">140</span></a>    <span class="n">measurement_df</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="resample-141"><a href="#resample-141"><span class="linenos">141</span></a>        <span class="n">pl</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">measurement</span><span class="o">.</span><span class="n">measurements</span><span class="p">)</span>
+</span><span id="resample-142"><a href="#resample-142"><span class="linenos">142</span></a>        <span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">measurement</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+</span><span id="resample-143"><a href="#resample-143"><span class="linenos">143</span></a>        <span class="o">.</span><span class="n">set_sorted</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+</span><span id="resample-144"><a href="#resample-144"><span class="linenos">144</span></a>    <span class="p">)</span>
+</span><span id="resample-145"><a href="#resample-145"><span class="linenos">145</span></a>
+</span><span id="resample-146"><a href="#resample-146"><span class="linenos">146</span></a>    <span class="k">if</span> <span class="n">current_delta_t</span> <span class="o">&gt;=</span> <span class="n">requested_delta_t</span><span class="p">:</span>
+</span><span id="resample-147"><a href="#resample-147"><span class="linenos">147</span></a>        <span class="n">resampled_df</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="resample-148"><a href="#resample-148"><span class="linenos">148</span></a>            <span class="p">(</span>
+</span><span id="resample-149"><a href="#resample-149"><span class="linenos">149</span></a>                <span class="n">measurement_df</span><span class="o">.</span><span class="n">group_by_dynamic</span><span class="p">(</span>
+</span><span id="resample-150"><a href="#resample-150"><span class="linenos">150</span></a>                    <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">every</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">requested_delta_t</span><span class="si">}</span><span class="s2">ns&quot;</span><span class="p">,</span> <span class="n">start_by</span><span class="o">=</span><span class="s2">&quot;datapoint&quot;</span>
+</span><span id="resample-151"><a href="#resample-151"><span class="linenos">151</span></a>                <span class="p">)</span>
+</span><span id="resample-152"><a href="#resample-152"><span class="linenos">152</span></a>            <span class="p">)</span>
+</span><span id="resample-153"><a href="#resample-153"><span class="linenos">153</span></a>            <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</span><span id="resample-154"><a href="#resample-154"><span class="linenos">154</span></a>            <span class="o">.</span><span class="n">upsample</span><span class="p">(</span>
+</span><span id="resample-155"><a href="#resample-155"><span class="linenos">155</span></a>                <span class="n">time_column</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">every</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">requested_delta_t</span><span class="si">}</span><span class="s2">ns&quot;</span><span class="p">,</span> <span class="n">maintain_order</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="resample-156"><a href="#resample-156"><span class="linenos">156</span></a>            <span class="p">)</span>
+</span><span id="resample-157"><a href="#resample-157"><span class="linenos">157</span></a>            <span class="o">.</span><span class="n">interpolate</span><span class="p">()</span>
+</span><span id="resample-158"><a href="#resample-158"><span class="linenos">158</span></a>            <span class="o">.</span><span class="n">fill_null</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;forward&quot;</span><span class="p">)</span>
+</span><span id="resample-159"><a href="#resample-159"><span class="linenos">159</span></a>        <span class="p">)</span>
+</span><span id="resample-160"><a href="#resample-160"><span class="linenos">160</span></a>
+</span><span id="resample-161"><a href="#resample-161"><span class="linenos">161</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="resample-162"><a href="#resample-162"><span class="linenos">162</span></a>        <span class="n">resampled_df</span> <span class="o">=</span> <span class="n">measurement_df</span><span class="o">.</span><span class="n">group_by_dynamic</span><span class="p">(</span>
+</span><span id="resample-163"><a href="#resample-163"><span class="linenos">163</span></a>            <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">every</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">requested_delta_t</span><span class="si">}</span><span class="s2">ns&quot;</span><span class="p">,</span> <span class="n">start_by</span><span class="o">=</span><span class="s2">&quot;datapoint&quot;</span>
+</span><span id="resample-164"><a href="#resample-164"><span class="linenos">164</span></a>        <span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</span><span id="resample-165"><a href="#resample-165"><span class="linenos">165</span></a>
+</span><span id="resample-166"><a href="#resample-166"><span class="linenos">166</span></a>    <span class="n">new_measurement</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="resample-167"><a href="#resample-167"><span class="linenos">167</span></a>        <span class="n">resampled_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">resampled_df</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+</span><span id="resample-168"><a href="#resample-168"><span class="linenos">168</span></a>    <span class="p">)</span>
+</span><span id="resample-169"><a href="#resample-169"><span class="linenos">169</span></a>    <span class="k">return</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span>
+</span><span id="resample-170"><a href="#resample-170"><span class="linenos">170</span></a>        <span class="n">measurements</span><span class="o">=</span><span class="n">new_measurement</span><span class="p">,</span>
+</span><span id="resample-171"><a href="#resample-171"><span class="linenos">171</span></a>        <span class="n">time</span><span class="o">=</span><span class="n">resampled_df</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span>
+</span><span id="resample-172"><a href="#resample-172"><span class="linenos">172</span></a>    <span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Resamples a measurement to a different timescale.</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>measurement:</strong>  The measurement to resample.</li>
+<li><strong>delta_t:</strong>  The new time step, in seconds. This will be rounded to the nearest
+nanosecond.</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>The resampled measurement.</p>
+</blockquote>
+
+<h6 id="raises">Raises:</h6>
+
+<ul>
+<li><strong>ValueError:</strong>  Raised for zero or negative delta_t.</li>
+</ul>
 </div>
 
 
