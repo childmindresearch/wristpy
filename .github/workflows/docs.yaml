@@ -9,7 +9,7 @@ on:
     types:
     - completed
     branches:
-    - main
+    - bugfix/issue-174/docsyaml
 
 jobs:
   build-and-publish-docs:
