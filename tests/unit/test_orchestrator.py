@@ -144,6 +144,24 @@ def test_run_single_file_agcount_default(
     assert isinstance(results, models.OrchestratorResults)
 
 
+@pytest.mark.parametrize(
+    "nonwear_algorithm", ["ggir", "cta", "detach", "majority", "ggir_detach"]
+)
+def test_run_single_file_nonwear_options(
+    sample_data_bin: pathlib.Path, tmp_path: pathlib.Path, nonwear_algorithm: str
+) -> None:
+    """Testing running a single file."""
+    output_file_path = tmp_path / "file_name.csv"
+    results = orchestrator.run(
+        input=sample_data_bin,
+        output=output_file_path,
+        nonwear_algorithm=nonwear_algorithm,
+    )
+
+    assert output_file_path.exists()
+    assert isinstance(results, models.OrchestratorResults)
+
+
 def test_run_single_file_mad_epoch_none(
     sample_data_bin: pathlib.Path,
     tmp_path: pathlib.Path,

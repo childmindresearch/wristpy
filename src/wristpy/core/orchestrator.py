@@ -105,6 +105,9 @@ def run(
     ] = "gradient",
     epoch_length: Union[float, None] = 5,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
+    nonwear_algorithm: Literal[
+        "ggir", "cta", "detach", "majority_vote", "ggir_detach"
+    ] = "ggir",
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
@@ -132,6 +135,7 @@ def run(
             no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
             ValueError will be raised.
         activity_metric: The metric to be used for physical activity categorization.
+        nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files. Must be None when
             processing files, must be a valid file type when processing directories.
@@ -188,6 +192,7 @@ def run(
             epoch_length=epoch_length,
             activity_metric=activity_metric,
             verbosity=verbosity,
+            nonwear_algorithm=nonwear_algorithm,
         )
 
     return _run_directory(
@@ -198,6 +203,7 @@ def run(
         epoch_length=epoch_length,
         verbosity=verbosity,
         output_filetype=output_filetype,
+        nonwear_algorithm=nonwear_algorithm,
     )
 
 
@@ -210,6 +216,9 @@ def _run_directory(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[float, None] = 5,
+    nonwear_algorithm: Literal[
+        "ggir", "cta", "detach", "majority_vote", "ggir_detach"
+    ] = "ggir",
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Dict[str, models.OrchestratorResults]:
@@ -233,6 +242,7 @@ def _run_directory(
             to. If None is given, and `enmo` is the chosen physical activity metric,
             no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
             ValueError will be raised.
+        nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files.
 
@@ -291,6 +301,7 @@ def _run_directory(
                 calibrator=calibrator,
                 epoch_length=epoch_length,
                 verbosity=verbosity,
+                nonwear_algorithm=nonwear_algorithm,
             )
         except Exception as e:
             logger.error("Did not run file: %s, Error: %s", file, e)
@@ -388,6 +399,7 @@ def _run_file(
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
+
     if watch_data.temperature is not None:
         if nonwear_algorithm == "ggir":
             non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
