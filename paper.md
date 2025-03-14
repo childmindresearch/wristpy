@@ -18,18 +18,18 @@ authors:
   - name: John Vito d'Antonio-Bertagnolli
     affiliation: 1
   - name: Stan Colcombe
-    affiliation: "1, 2"
+    affiliation: "2, 3"
   - name: Alexandre Franco
-    affiliation: "1, 3"
+    affiliation: "1, 2, 3"
   - name: Gregory Kiar
     affiliation: 1
 
 affiliations:
   - name: Child Mind Institute, New York, USA
     index: 1
-  - name: NKI or something
+  - name:  Center for Biomedical Imaging and Neuromodulation, Nathan Kline Institute, Orangeburg, NY, USA 
     index: 2
-  - name: Third option
+  - name: Department of Psychiatry, NYU Grossman School of Medicine, New York, NY, USA 
     index: 3
 date: 14 March 2025
 bibliography: paper.bib
