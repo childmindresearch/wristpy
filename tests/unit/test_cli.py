@@ -222,7 +222,7 @@ def test_main_with_bad_epoch(
     """Test cli with invalid epoch length."""
     with pytest.raises(
         ValueError,
-        match="Value for epoch_length is:-5." "Please enter an integer >= 0.",
+        match="Value for epoch_length is:-5.Please enter an integer >= 0.",
     ):
         cli.main([str(sample_data_gt3x), "-e", "-5"])
 
