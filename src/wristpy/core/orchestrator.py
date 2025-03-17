@@ -432,8 +432,24 @@ def _run_file(
             non_wear_array = computations.combined_ggir_detach_nonwear(
                 nonwear_ggir=ggir_nonwear, nonwear_detach=detach_nonwear
             )
+        nonwear_epoch = models.Measurement(
+            measurements=format_nonwear_data(
+                nonwear_data=non_wear_array,
+                reference_measure=activity_measurement,
+                original_temporal_resolution=60,
+            ),
+            time=activity_measurement.time,
+        )
     else:
         non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
+        nonwear_epoch = models.Measurement(
+            measurements=format_nonwear_data(
+                nonwear_data=non_wear_array,
+                reference_measure=activity_measurement,
+                original_temporal_resolution=900,
+            ),
+            time=activity_measurement.time,
+        )
 
     physical_activity_levels = analytics.compute_physical_activty_categories(
         activity_measurement, thresholds
@@ -442,14 +458,6 @@ def _run_file(
     sleep_array = models.Measurement(
         measurements=format_sleep_data(
             sleep_windows=sleep_windows, reference_measure=activity_measurement
-        ),
-        time=activity_measurement.time,
-    )
-    nonwear_epoch = models.Measurement(
-        measurements=format_nonwear_data(
-            nonwear_data=non_wear_array,
-            reference_measure=activity_measurement,
-            original_temporal_resolution=900,
         ),
         time=activity_measurement.time,
     )

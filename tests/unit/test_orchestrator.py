@@ -145,7 +145,7 @@ def test_run_single_file_agcount_default(
 
 
 @pytest.mark.parametrize(
-    "nonwear_algorithm", ["ggir", "cta", "detach", "majority", "ggir_detach"]
+    "nonwear_algorithm", ["ggir", "cta", "detach", "majority_vote", "ggir_detach"]
 )
 def test_run_single_file_nonwear_options(
     sample_data_bin: pathlib.Path,
