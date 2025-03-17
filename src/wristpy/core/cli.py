@@ -74,6 +74,16 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "-nw",
+        "--nonwear_algorithm",
+        type=lambda s: s.lower(),
+        choices=["ggir", "cta", "detach", "majority_vote", "ggir_detach"],
+        default="ggir",
+        help="Pick which nonwear detection algorithm to use. "
+        "Can be 'ggir', 'cta', 'detach', 'majority_vote', or 'ggir_detach'.",
+    )
+
+    parser.add_argument(
         "-e",
         "--epoch_length",
         default=5,
@@ -142,6 +152,7 @@ def main(
         if arguments.thresholds is None
         else cast(Tuple[float, float, float], tuple(arguments.thresholds)),
         epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
+        nonwear_algorithm=arguments.nonwear_algorithm,
         verbosity=log_level,
         output_filetype=arguments.output_filetype,
     )

@@ -3,7 +3,7 @@
 import datetime
 import pathlib
 import re
-from typing import Optional
+from typing import Literal, Optional
 
 import numpy as np
 import polars as pl
@@ -148,7 +148,9 @@ def test_run_single_file_agcount_default(
     "nonwear_algorithm", ["ggir", "cta", "detach", "majority", "ggir_detach"]
 )
 def test_run_single_file_nonwear_options(
-    sample_data_bin: pathlib.Path, tmp_path: pathlib.Path, nonwear_algorithm: str
+    sample_data_bin: pathlib.Path,
+    tmp_path: pathlib.Path,
+    nonwear_algorithm: Literal["ggir", "cta", "detach", "majority_vote", "ggir_detach"],
 ) -> None:
     """Testing running a single file."""
     output_file_path = tmp_path / "file_name.csv"
