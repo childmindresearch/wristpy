@@ -319,7 +319,8 @@ def _run_file(
     or enter None to proceed without calibration.
 
     Args:
-        input: Path to the input file to be read. Currently, this supports .bin and .gt3x
+        input: Path to the input file to be read. Currently, this supports .bin and
+            .gt3x
         output: Path to save data to. The path should end in the save file name in
             either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,

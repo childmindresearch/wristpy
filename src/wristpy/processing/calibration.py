@@ -127,15 +127,15 @@ class GgirCalibration(AbstractCalibrator):
     def run_calibration(self, acceleration: models.Measurement) -> models.Measurement:
         """Runs calibration on acceleration data based on settings.
 
-        If the chunked arguement is set to true, it will run calibration on an initial
+        If the chunked argument is set to true, it will run calibration on an initial
         chunk of the data the size of which is set to min_calibration_hours. If it fails
         to calibrate based on this subset, it will add 12-hour chunks to the subset
-        until calibration succeeds, or fails on the entire dataset. Otherwise, if chunked
-        is false (default) calibration will be conducted on the whole of the dataset.
-        Calibration is successful when scale and offset values, that sufficiently
-        minimize error when applied to the data, are found. The scale and offset values
-        are then applied to every data point in the dataset which is then returned as
-        calibrated models.Measurement object.
+        until calibration succeeds, or fails on the entire dataset. Otherwise, if
+        chunked is false (default) calibration will be conducted on the whole of the
+        dataset. Calibration is successful when scale and offset values, that
+        sufficiently minimize error when applied to the data, are found. The scale and
+        offset values are then applied to every data point in the dataset which is
+        then returned as calibrated models.Measurement object.
 
         Args:
             acceleration: the accelerometer data containing x,y,z axis
