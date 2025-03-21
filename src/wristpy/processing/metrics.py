@@ -4,7 +4,7 @@ from typing import List, Literal, Optional, Tuple
 
 import numpy as np
 import polars as pl
-from scipy import interpolate, stats
+from scipy import interpolate, signal, stats
 
 from wristpy.core import config, models
 
@@ -443,8 +443,8 @@ def _brute_force_k(
     """
     k_values = np.arange(k_max, k_min, -k_step)
     previous_probability = 1.0
-    previous_k = 0
-    result = 0
+    previous_k = 0.0
+    result = 0.0
 
     for k in k_values:
         current_probability = stats.gamma.cdf(standard_deviation, a=k, scale=scale)
@@ -459,7 +459,8 @@ def _brute_force_k(
                 result = k
             else:
                 result = previous_k
-            return result
+            return float(result)
+
         previous_probability = current_probability
         previous_k = k
 
@@ -822,3 +823,35 @@ def _extrapolate_interpolate(
     interp_values = interp_function(time_numeric)
 
     return interp_values
+
+
+def butterworth_filter(
+    acceleration: models.Measurement,
+    sampling_rate: int = 100,
+    cutoffs: tuple = (0.2, 5.0),
+    order: int = 4,
+) -> models.Measurement:
+    """Apply butterworth IIR filter to acceleration data.
+
+    Implements third portion of MIMS algorithm following interpolate, and extrapolation.
+
+    Args:
+        acceleration: Acceleration data to be filtered.
+        sampling_rate: Sampling rate of acceleration data in Hz.
+        cutoffs: Cutoff values for bandpass filter.
+        order: Order of the butterworth filter, defaults to 4th order.
+
+    Returns:
+        Acceleration Measurement of filtered data.
+    """
+    normalized_cutoffs = [cutoff / (sampling_rate * 0.5) for cutoff in cutoffs]
+    b, a = signal.butter(N=order, Wn=normalized_cutoffs, btype="bandpass")
+
+    filtered_data = []
+    for axis in acceleration.measurements.T:
+        filtered_axis = signal.filtfilt(b=b, a=a, x=axis)
+        filtered_data.append(filtered_axis)
+
+    return models.Measurement(
+        measurements=np.column_stack(filtered_data), time=acceleration.time
+    )
