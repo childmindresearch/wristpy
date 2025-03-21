@@ -18,7 +18,7 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
             will take the args from `sys.argv`.
 
     Returns:
-        Namespace object with all of the input arguments and default values.
+        Namespace object with all the input arguments and default values.
     """
     parser = argparse.ArgumentParser(
         description="Run the main Wristpy pipeline.",

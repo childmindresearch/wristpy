@@ -24,8 +24,8 @@ def euclidean_norm_minus_one(
     The data can be downsampled to a temporal resolution of `epoch_length` seconds.
 
     Args:
-        acceleration: the three dimensional accelerometer data. A Measurement object,
-        it will have two attributes. 1) measurements, containing the three dimensional
+        acceleration: the three-dimensional accelerometer data. A Measurement object,
+        it will have two attributes. 1) measurements, containing the three-dimensional
         accelerometer data in an np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
         epoch_length: The temporal resolution of the downsampled enmo, in seconds.
@@ -55,9 +55,9 @@ def angle_relative_to_horizontal(
      The data can be downsampled to a temporal resolution of `epoch_length` seconds.
 
     Args:
-        acceleration: the three dimensional accelerometer data. A Measurement object,
-        it will have two attributes. 1) measurements, containing the three dimensional
-        accelerometer data in an np.array and 2) time, a pl.Series containing
+        acceleration: the three-dimensional accelerometer data. A Measurement object,
+        it will have two attributes. 1) measurements, containing the three-dimensional
+        accelerometer data in a np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
         epoch_length: The temporal resolution of the downsampled anglez, in seconds.
             Defaults to `None`, which means no downsampling.
@@ -394,7 +394,7 @@ def _compute_nonwear_value_per_axis(
 
 
 def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.ndarray:
-    """Helper function to cleanup isolated ones in nonwear value array.
+    """Helper function to clean up isolated ones in nonwear value array.
 
     This function finds isolated ones in the nonwear value array and
     sets them to 2 if they are surrounded by values > 1.

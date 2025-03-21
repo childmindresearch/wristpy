@@ -119,8 +119,8 @@ def run(
 
 
     Args:
-        input: Path to the input file or directory of files to be read. Currently
-            supports .bin and .gt3x
+        input: Path to the input file or directory of files to be read. Currently,
+            this supports .bin and .gt3x
         output: Path to directory data will be saved to. If processing a single file the
             path should end in the save file name in either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
@@ -222,8 +222,8 @@ def _run_directory(
 
 
     Args:
-        input: Path to the input directory of files to be read. Currently
-            supports .bin and .gt3x
+        input: Path to the input directory of files to be read. Currently,
+            this supports .bin and .gt3x
         output: Path to directory data will be saved to.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
             given in that order. Values must be asscending, unique, and greater than 0.
@@ -319,7 +319,8 @@ def _run_file(
     or enter None to proceed without calibration.
 
     Args:
-        input: Path to the input file to be read. Currently supports .bin and .gt3x
+        input: Path to the input file to be read. Currently, this supports .bin and
+            .gt3x
         output: Path to save data to. The path should end in the save file name in
             either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
