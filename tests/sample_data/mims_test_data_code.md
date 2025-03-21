@@ -12,7 +12,8 @@ The MIMS algorithm consists of 5 main steps:
 * Aggregation
 * Truncation
 
-Each major step has associated test data that was used to validate the wristpy implementation.
+Each major step has associated test data that was used to validate the wristpy implementation. Test data was gathered using an actigraph device model: wGT3XBT which has a dynamic range of
+±8
 
 ### 1. Interpolation Test data
 
