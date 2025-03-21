@@ -9,7 +9,7 @@ from typing import Dict, List, Literal, Optional, Tuple, Union
 import numpy as np
 import polars as pl
 
-from wristpy.core import computations, config, exceptions, models
+from wristpy.core import config, exceptions, models
 from wristpy.io.readers import readers
 from wristpy.processing import (
     analytics,
