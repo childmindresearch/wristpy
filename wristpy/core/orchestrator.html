@@ -189,8 +189,8 @@
 </span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
 </span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
 </span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">    Args:</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="sd">        input: Path to the input file or directory of files to be read. Currently</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">            supports .bin and .gt3x</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="sd">        input: Path to the input file or directory of files to be read. Currently,</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">            this supports .bin and .gt3x</span>
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="sd">        output: Path to directory data will be saved to. If processing a single file the</span>
 </span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">            path should end in the save file name in either .csv or .parquet formats.</span>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">        thresholds: The cut points for the light, moderate, and vigorous thresholds,</span>
@@ -292,8 +292,8 @@
 </span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a>
 </span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>
 </span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a><span class="sd">    Args:</span>
-</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a><span class="sd">        input: Path to the input directory of files to be read. Currently</span>
-</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a><span class="sd">            supports .bin and .gt3x</span>
+</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a><span class="sd">        input: Path to the input directory of files to be read. Currently,</span>
+</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a><span class="sd">            this supports .bin and .gt3x</span>
 </span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a><span class="sd">        output: Path to directory data will be saved to.</span>
 </span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a><span class="sd">        thresholds: The cut points for the light, moderate, and vigorous thresholds,</span>
 </span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a><span class="sd">            given in that order. Values must be asscending, unique, and greater than 0.</span>
@@ -389,154 +389,155 @@
 </span><span id="L-319"><a href="#L-319"><span class="linenos">319</span></a><span class="sd">    or enter None to proceed without calibration.</span>
 </span><span id="L-320"><a href="#L-320"><span class="linenos">320</span></a>
 </span><span id="L-321"><a href="#L-321"><span class="linenos">321</span></a><span class="sd">    Args:</span>
-</span><span id="L-322"><a href="#L-322"><span class="linenos">322</span></a><span class="sd">        input: Path to the input file to be read. Currently supports .bin and .gt3x</span>
-</span><span id="L-323"><a href="#L-323"><span class="linenos">323</span></a><span class="sd">        output: Path to save data to. The path should end in the save file name in</span>
-</span><span id="L-324"><a href="#L-324"><span class="linenos">324</span></a><span class="sd">            either .csv or .parquet formats.</span>
-</span><span id="L-325"><a href="#L-325"><span class="linenos">325</span></a><span class="sd">        thresholds: The cut points for the light, moderate, and vigorous thresholds,</span>
-</span><span id="L-326"><a href="#L-326"><span class="linenos">326</span></a><span class="sd">            given in that order. Values must be ascending, unique, and greater than 0.</span>
-</span><span id="L-327"><a href="#L-327"><span class="linenos">327</span></a><span class="sd">            Default values are optimized for subjects ages 7-11 [1].</span>
-</span><span id="L-328"><a href="#L-328"><span class="linenos">328</span></a><span class="sd">        calibrator: The calibrator to be used on the input data.</span>
-</span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a><span class="sd">        epoch_length: The temporal resolution in seconds, the data will be down sampled</span>
-</span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a><span class="sd">            to. If None is given, and `enmo` is the chosen physical activity metric,</span>
-</span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a><span class="sd">            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a</span>
-</span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a><span class="sd">            ValueError will be raised.</span>
-</span><span id="L-333"><a href="#L-333"><span class="linenos">333</span></a><span class="sd">        activity_metric: The metric to be used for physical activity categorization.</span>
-</span><span id="L-334"><a href="#L-334"><span class="linenos">334</span></a><span class="sd">        verbosity: The logging level for the logger.</span>
-</span><span id="L-335"><a href="#L-335"><span class="linenos">335</span></a>
-</span><span id="L-336"><a href="#L-336"><span class="linenos">336</span></a><span class="sd">    Returns:</span>
-</span><span id="L-337"><a href="#L-337"><span class="linenos">337</span></a><span class="sd">        All calculated data in a save ready format as a OrchestratorResults object.</span>
-</span><span id="L-338"><a href="#L-338"><span class="linenos">338</span></a>
-</span><span id="L-339"><a href="#L-339"><span class="linenos">339</span></a><span class="sd">    References:</span>
-</span><span id="L-340"><a href="#L-340"><span class="linenos">340</span></a><span class="sd">        [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer</span>
-</span><span id="L-341"><a href="#L-341"><span class="linenos">341</span></a><span class="sd">        output from wrist- and hip-worn monitors. Medicine and Science in Sports and</span>
-</span><span id="L-342"><a href="#L-342"><span class="linenos">342</span></a><span class="sd">        Exercise, 46(9), 1816-1824.</span>
-</span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a><span class="sd">        [2] Aittasalo, M., Vähä-Ypyä, H., Vasankari, T. et al. Mean amplitude deviation</span>
-</span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a><span class="sd">        calculated from raw acceleration data: a novel method for classifying the</span>
-</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a><span class="sd">        intensity of adolescents&#39; physical activity irrespective of accelerometer brand.</span>
-</span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a><span class="sd">        BMC Sports Sci Med Rehabil 7, 18 (2015). https://doi.org/10.1186/s13102-015-0010-0.</span>
-</span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">verbosity</span><span class="p">)</span>
-</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a>    <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a>        <span class="n">models</span><span class="o">.</span><span class="n">OrchestratorResults</span><span class="o">.</span><span class="n">validate_output</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
-</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a>
-</span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a>    <span class="k">if</span> <span class="n">calibrator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">calibrator</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;gradient&quot;</span><span class="p">]:</span>
-</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a>            <span class="sa">f</span><span class="s2">&quot;Invalid calibrator: </span><span class="si">{</span><span class="n">calibrator</span><span class="si">}</span><span class="s2">. Choose: &#39;ggir&#39;, &#39;gradient&#39;. &quot;</span>
-</span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a>            <span class="s2">&quot;Enter None if no calibration is desired.&quot;</span>
-</span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a>        <span class="p">)</span>
-</span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-</span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a>
-</span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a>    <span class="n">watch_data</span> <span class="o">=</span> <span class="n">readers</span><span class="o">.</span><span class="n">read_watch_data</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-</span><span id="L-361"><a href="#L-361"><span class="linenos">361</span></a>
-</span><span id="L-362"><a href="#L-362"><span class="linenos">362</span></a>    <span class="k">if</span> <span class="n">calibrator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-363"><a href="#L-363"><span class="linenos">363</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running without calibration&quot;</span><span class="p">)</span>
-</span><span id="L-364"><a href="#L-364"><span class="linenos">364</span></a>        <span class="n">calibrated_acceleration</span> <span class="o">=</span> <span class="n">watch_data</span><span class="o">.</span><span class="n">acceleration</span>
-</span><span id="L-365"><a href="#L-365"><span class="linenos">365</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-366"><a href="#L-366"><span class="linenos">366</span></a>        <span class="n">calibrated_acceleration</span> <span class="o">=</span> <span class="n">calibration</span><span class="o">.</span><span class="n">CalibrationDispatcher</span><span class="p">(</span><span class="n">calibrator</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span id="L-367"><a href="#L-367"><span class="linenos">367</span></a>            <span class="n">watch_data</span><span class="o">.</span><span class="n">acceleration</span><span class="p">,</span> <span class="n">return_input_on_error</span><span class="o">=</span><span class="kc">True</span>
-</span><span id="L-368"><a href="#L-368"><span class="linenos">368</span></a>        <span class="p">)</span>
-</span><span id="L-369"><a href="#L-369"><span class="linenos">369</span></a>
-</span><span id="L-370"><a href="#L-370"><span class="linenos">370</span></a>    <span class="k">if</span> <span class="n">watch_data</span><span class="o">.</span><span class="n">idle_sleep_mode_flag</span><span class="p">:</span>
-</span><span id="L-371"><a href="#L-371"><span class="linenos">371</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Imputing idle sleep mode gaps.&quot;</span><span class="p">)</span>
-</span><span id="L-372"><a href="#L-372"><span class="linenos">372</span></a>        <span class="n">calibrated_acceleration</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="L-373"><a href="#L-373"><span class="linenos">373</span></a>            <span class="n">idle_sleep_mode_imputation</span><span class="o">.</span><span class="n">impute_idle_sleep_mode_gaps</span><span class="p">(</span>
-</span><span id="L-374"><a href="#L-374"><span class="linenos">374</span></a>                <span class="n">calibrated_acceleration</span>
-</span><span id="L-375"><a href="#L-375"><span class="linenos">375</span></a>            <span class="p">)</span>
-</span><span id="L-376"><a href="#L-376"><span class="linenos">376</span></a>        <span class="p">)</span>
-</span><span id="L-377"><a href="#L-377"><span class="linenos">377</span></a>
-</span><span id="L-378"><a href="#L-378"><span class="linenos">378</span></a>    <span class="n">anglez</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">angle_relative_to_horizontal</span><span class="p">(</span>
-</span><span id="L-379"><a href="#L-379"><span class="linenos">379</span></a>        <span class="n">calibrated_acceleration</span><span class="p">,</span> <span class="n">epoch_length</span><span class="o">=</span><span class="n">epoch_length</span>
-</span><span id="L-380"><a href="#L-380"><span class="linenos">380</span></a>    <span class="p">)</span>
-</span><span id="L-381"><a href="#L-381"><span class="linenos">381</span></a>    <span class="n">activity_measurement</span> <span class="o">=</span> <span class="n">_compute_activity</span><span class="p">(</span>
-</span><span id="L-382"><a href="#L-382"><span class="linenos">382</span></a>        <span class="n">calibrated_acceleration</span><span class="p">,</span> <span class="n">activity_metric</span><span class="p">,</span> <span class="n">epoch_length</span>
-</span><span id="L-383"><a href="#L-383"><span class="linenos">383</span></a>    <span class="p">)</span>
-</span><span id="L-384"><a href="#L-384"><span class="linenos">384</span></a>
-</span><span id="L-385"><a href="#L-385"><span class="linenos">385</span></a>    <span class="n">sleep_detector</span> <span class="o">=</span> <span class="n">analytics</span><span class="o">.</span><span class="n">GgirSleepDetection</span><span class="p">(</span><span class="n">anglez</span><span class="p">)</span>
-</span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a>    <span class="n">sleep_windows</span> <span class="o">=</span> <span class="n">sleep_detector</span><span class="o">.</span><span class="n">run_sleep_detection</span><span class="p">()</span>
-</span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a>
-</span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a>    <span class="n">non_wear_array</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">detect_nonwear</span><span class="p">(</span><span class="n">calibrated_acceleration</span><span class="p">)</span>
-</span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a>    <span class="n">physical_activity_levels</span> <span class="o">=</span> <span class="n">analytics</span><span class="o">.</span><span class="n">compute_physical_activty_categories</span><span class="p">(</span>
-</span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a>        <span class="n">activity_measurement</span><span class="p">,</span>
-</span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a>        <span class="n">thresholds</span><span class="p">,</span>
-</span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a>    <span class="p">)</span>
-</span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>
-</span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a>    <span class="n">sleep_array</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span>
-</span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a>        <span class="n">measurements</span><span class="o">=</span><span class="n">format_sleep_data</span><span class="p">(</span>
-</span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>            <span class="n">sleep_windows</span><span class="o">=</span><span class="n">sleep_windows</span><span class="p">,</span> <span class="n">reference_measure</span><span class="o">=</span><span class="n">activity_measurement</span>
-</span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a>        <span class="p">),</span>
-</span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a>        <span class="n">time</span><span class="o">=</span><span class="n">activity_measurement</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-</span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a>    <span class="p">)</span>
-</span><span id="L-400"><a href="#L-400"><span class="linenos">400</span></a>    <span class="n">nonwear_epoch</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span>
-</span><span id="L-401"><a href="#L-401"><span class="linenos">401</span></a>        <span class="n">measurements</span><span class="o">=</span><span class="n">format_nonwear_data</span><span class="p">(</span>
-</span><span id="L-402"><a href="#L-402"><span class="linenos">402</span></a>            <span class="n">nonwear_data</span><span class="o">=</span><span class="n">non_wear_array</span><span class="p">,</span>
-</span><span id="L-403"><a href="#L-403"><span class="linenos">403</span></a>            <span class="n">reference_measure</span><span class="o">=</span><span class="n">activity_measurement</span><span class="p">,</span>
-</span><span id="L-404"><a href="#L-404"><span class="linenos">404</span></a>            <span class="n">original_temporal_resolution</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span>
-</span><span id="L-405"><a href="#L-405"><span class="linenos">405</span></a>        <span class="p">),</span>
-</span><span id="L-406"><a href="#L-406"><span class="linenos">406</span></a>        <span class="n">time</span><span class="o">=</span><span class="n">activity_measurement</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-</span><span id="L-407"><a href="#L-407"><span class="linenos">407</span></a>    <span class="p">)</span>
-</span><span id="L-408"><a href="#L-408"><span class="linenos">408</span></a>
-</span><span id="L-409"><a href="#L-409"><span class="linenos">409</span></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">OrchestratorResults</span><span class="p">(</span>
-</span><span id="L-410"><a href="#L-410"><span class="linenos">410</span></a>        <span class="n">physical_activity_metric</span><span class="o">=</span><span class="n">activity_measurement</span><span class="p">,</span>
-</span><span id="L-411"><a href="#L-411"><span class="linenos">411</span></a>        <span class="n">anglez</span><span class="o">=</span><span class="n">anglez</span><span class="p">,</span>
-</span><span id="L-412"><a href="#L-412"><span class="linenos">412</span></a>        <span class="n">physical_activity_levels</span><span class="o">=</span><span class="n">physical_activity_levels</span><span class="p">,</span>
-</span><span id="L-413"><a href="#L-413"><span class="linenos">413</span></a>        <span class="n">sleep_windows_epoch</span><span class="o">=</span><span class="n">sleep_array</span><span class="p">,</span>
-</span><span id="L-414"><a href="#L-414"><span class="linenos">414</span></a>        <span class="n">nonwear_epoch</span><span class="o">=</span><span class="n">nonwear_epoch</span><span class="p">,</span>
-</span><span id="L-415"><a href="#L-415"><span class="linenos">415</span></a>    <span class="p">)</span>
-</span><span id="L-416"><a href="#L-416"><span class="linenos">416</span></a>    <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-417"><a href="#L-417"><span class="linenos">417</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="L-418"><a href="#L-418"><span class="linenos">418</span></a>            <span class="n">results</span><span class="o">.</span><span class="n">save_results</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
-</span><span id="L-419"><a href="#L-419"><span class="linenos">419</span></a>        <span class="k">except</span> <span class="p">(</span>
-</span><span id="L-420"><a href="#L-420"><span class="linenos">420</span></a>            <span class="n">exceptions</span><span class="o">.</span><span class="n">InvalidFileTypeError</span><span class="p">,</span>
-</span><span id="L-421"><a href="#L-421"><span class="linenos">421</span></a>            <span class="ne">PermissionError</span><span class="p">,</span>
-</span><span id="L-422"><a href="#L-422"><span class="linenos">422</span></a>            <span class="ne">FileExistsError</span><span class="p">,</span>
-</span><span id="L-423"><a href="#L-423"><span class="linenos">423</span></a>        <span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
-</span><span id="L-424"><a href="#L-424"><span class="linenos">424</span></a>            <span class="c1"># Allowed to pass to recover in Jupyter Notebook scenarios.</span>
-</span><span id="L-425"><a href="#L-425"><span class="linenos">425</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-</span><span id="L-426"><a href="#L-426"><span class="linenos">426</span></a>                <span class="p">(</span>
-</span><span id="L-427"><a href="#L-427"><span class="linenos">427</span></a>                    <span class="sa">f</span><span class="s2">&quot;Could not save output due to: </span><span class="si">{</span><span class="n">exc_info</span><span class="si">}</span><span class="s2">. Call save_results &quot;</span>
-</span><span id="L-428"><a href="#L-428"><span class="linenos">428</span></a>                    <span class="s2">&quot; on the output object with a correct filename to save these &quot;</span>
-</span><span id="L-429"><a href="#L-429"><span class="linenos">429</span></a>                    <span class="s2">&quot;results.&quot;</span>
-</span><span id="L-430"><a href="#L-430"><span class="linenos">430</span></a>                <span class="p">)</span>
-</span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a>            <span class="p">)</span>
-</span><span id="L-432"><a href="#L-432"><span class="linenos">432</span></a>
-</span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a>    <span class="k">return</span> <span class="n">results</span>
-</span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a>
+</span><span id="L-322"><a href="#L-322"><span class="linenos">322</span></a><span class="sd">        input: Path to the input file to be read. Currently, this supports .bin and</span>
+</span><span id="L-323"><a href="#L-323"><span class="linenos">323</span></a><span class="sd">            .gt3x</span>
+</span><span id="L-324"><a href="#L-324"><span class="linenos">324</span></a><span class="sd">        output: Path to save data to. The path should end in the save file name in</span>
+</span><span id="L-325"><a href="#L-325"><span class="linenos">325</span></a><span class="sd">            either .csv or .parquet formats.</span>
+</span><span id="L-326"><a href="#L-326"><span class="linenos">326</span></a><span class="sd">        thresholds: The cut points for the light, moderate, and vigorous thresholds,</span>
+</span><span id="L-327"><a href="#L-327"><span class="linenos">327</span></a><span class="sd">            given in that order. Values must be ascending, unique, and greater than 0.</span>
+</span><span id="L-328"><a href="#L-328"><span class="linenos">328</span></a><span class="sd">            Default values are optimized for subjects ages 7-11 [1].</span>
+</span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a><span class="sd">        calibrator: The calibrator to be used on the input data.</span>
+</span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a><span class="sd">        epoch_length: The temporal resolution in seconds, the data will be down sampled</span>
+</span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a><span class="sd">            to. If None is given, and `enmo` is the chosen physical activity metric,</span>
+</span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a><span class="sd">            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a</span>
+</span><span id="L-333"><a href="#L-333"><span class="linenos">333</span></a><span class="sd">            ValueError will be raised.</span>
+</span><span id="L-334"><a href="#L-334"><span class="linenos">334</span></a><span class="sd">        activity_metric: The metric to be used for physical activity categorization.</span>
+</span><span id="L-335"><a href="#L-335"><span class="linenos">335</span></a><span class="sd">        verbosity: The logging level for the logger.</span>
+</span><span id="L-336"><a href="#L-336"><span class="linenos">336</span></a>
+</span><span id="L-337"><a href="#L-337"><span class="linenos">337</span></a><span class="sd">    Returns:</span>
+</span><span id="L-338"><a href="#L-338"><span class="linenos">338</span></a><span class="sd">        All calculated data in a save ready format as a OrchestratorResults object.</span>
+</span><span id="L-339"><a href="#L-339"><span class="linenos">339</span></a>
+</span><span id="L-340"><a href="#L-340"><span class="linenos">340</span></a><span class="sd">    References:</span>
+</span><span id="L-341"><a href="#L-341"><span class="linenos">341</span></a><span class="sd">        [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer</span>
+</span><span id="L-342"><a href="#L-342"><span class="linenos">342</span></a><span class="sd">        output from wrist- and hip-worn monitors. Medicine and Science in Sports and</span>
+</span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a><span class="sd">        Exercise, 46(9), 1816-1824.</span>
+</span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a><span class="sd">        [2] Aittasalo, M., Vähä-Ypyä, H., Vasankari, T. et al. Mean amplitude deviation</span>
+</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a><span class="sd">        calculated from raw acceleration data: a novel method for classifying the</span>
+</span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a><span class="sd">        intensity of adolescents&#39; physical activity irrespective of accelerometer brand.</span>
+</span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a><span class="sd">        BMC Sports Sci Med Rehabil 7, 18 (2015). https://doi.org/10.1186/s13102-015-0010-0.</span>
+</span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">verbosity</span><span class="p">)</span>
+</span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a>    <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a>        <span class="n">models</span><span class="o">.</span><span class="n">OrchestratorResults</span><span class="o">.</span><span class="n">validate_output</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
+</span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a>
+</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a>    <span class="k">if</span> <span class="n">calibrator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">calibrator</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;gradient&quot;</span><span class="p">]:</span>
+</span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a>            <span class="sa">f</span><span class="s2">&quot;Invalid calibrator: </span><span class="si">{</span><span class="n">calibrator</span><span class="si">}</span><span class="s2">. Choose: &#39;ggir&#39;, &#39;gradient&#39;. &quot;</span>
+</span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a>            <span class="s2">&quot;Enter None if no calibration is desired.&quot;</span>
+</span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a>        <span class="p">)</span>
+</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a>
+</span><span id="L-361"><a href="#L-361"><span class="linenos">361</span></a>    <span class="n">watch_data</span> <span class="o">=</span> <span class="n">readers</span><span class="o">.</span><span class="n">read_watch_data</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+</span><span id="L-362"><a href="#L-362"><span class="linenos">362</span></a>
+</span><span id="L-363"><a href="#L-363"><span class="linenos">363</span></a>    <span class="k">if</span> <span class="n">calibrator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-364"><a href="#L-364"><span class="linenos">364</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running without calibration&quot;</span><span class="p">)</span>
+</span><span id="L-365"><a href="#L-365"><span class="linenos">365</span></a>        <span class="n">calibrated_acceleration</span> <span class="o">=</span> <span class="n">watch_data</span><span class="o">.</span><span class="n">acceleration</span>
+</span><span id="L-366"><a href="#L-366"><span class="linenos">366</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-367"><a href="#L-367"><span class="linenos">367</span></a>        <span class="n">calibrated_acceleration</span> <span class="o">=</span> <span class="n">calibration</span><span class="o">.</span><span class="n">CalibrationDispatcher</span><span class="p">(</span><span class="n">calibrator</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="L-368"><a href="#L-368"><span class="linenos">368</span></a>            <span class="n">watch_data</span><span class="o">.</span><span class="n">acceleration</span><span class="p">,</span> <span class="n">return_input_on_error</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="L-369"><a href="#L-369"><span class="linenos">369</span></a>        <span class="p">)</span>
+</span><span id="L-370"><a href="#L-370"><span class="linenos">370</span></a>
+</span><span id="L-371"><a href="#L-371"><span class="linenos">371</span></a>    <span class="k">if</span> <span class="n">watch_data</span><span class="o">.</span><span class="n">idle_sleep_mode_flag</span><span class="p">:</span>
+</span><span id="L-372"><a href="#L-372"><span class="linenos">372</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Imputing idle sleep mode gaps.&quot;</span><span class="p">)</span>
+</span><span id="L-373"><a href="#L-373"><span class="linenos">373</span></a>        <span class="n">calibrated_acceleration</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="L-374"><a href="#L-374"><span class="linenos">374</span></a>            <span class="n">idle_sleep_mode_imputation</span><span class="o">.</span><span class="n">impute_idle_sleep_mode_gaps</span><span class="p">(</span>
+</span><span id="L-375"><a href="#L-375"><span class="linenos">375</span></a>                <span class="n">calibrated_acceleration</span>
+</span><span id="L-376"><a href="#L-376"><span class="linenos">376</span></a>            <span class="p">)</span>
+</span><span id="L-377"><a href="#L-377"><span class="linenos">377</span></a>        <span class="p">)</span>
+</span><span id="L-378"><a href="#L-378"><span class="linenos">378</span></a>
+</span><span id="L-379"><a href="#L-379"><span class="linenos">379</span></a>    <span class="n">anglez</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">angle_relative_to_horizontal</span><span class="p">(</span>
+</span><span id="L-380"><a href="#L-380"><span class="linenos">380</span></a>        <span class="n">calibrated_acceleration</span><span class="p">,</span> <span class="n">epoch_length</span><span class="o">=</span><span class="n">epoch_length</span>
+</span><span id="L-381"><a href="#L-381"><span class="linenos">381</span></a>    <span class="p">)</span>
+</span><span id="L-382"><a href="#L-382"><span class="linenos">382</span></a>    <span class="n">activity_measurement</span> <span class="o">=</span> <span class="n">_compute_activity</span><span class="p">(</span>
+</span><span id="L-383"><a href="#L-383"><span class="linenos">383</span></a>        <span class="n">calibrated_acceleration</span><span class="p">,</span> <span class="n">activity_metric</span><span class="p">,</span> <span class="n">epoch_length</span>
+</span><span id="L-384"><a href="#L-384"><span class="linenos">384</span></a>    <span class="p">)</span>
+</span><span id="L-385"><a href="#L-385"><span class="linenos">385</span></a>
+</span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a>    <span class="n">sleep_detector</span> <span class="o">=</span> <span class="n">analytics</span><span class="o">.</span><span class="n">GgirSleepDetection</span><span class="p">(</span><span class="n">anglez</span><span class="p">)</span>
+</span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a>    <span class="n">sleep_windows</span> <span class="o">=</span> <span class="n">sleep_detector</span><span class="o">.</span><span class="n">run_sleep_detection</span><span class="p">()</span>
+</span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a>
+</span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a>    <span class="n">non_wear_array</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">detect_nonwear</span><span class="p">(</span><span class="n">calibrated_acceleration</span><span class="p">)</span>
+</span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a>    <span class="n">physical_activity_levels</span> <span class="o">=</span> <span class="n">analytics</span><span class="o">.</span><span class="n">compute_physical_activty_categories</span><span class="p">(</span>
+</span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a>        <span class="n">activity_measurement</span><span class="p">,</span>
+</span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a>        <span class="n">thresholds</span><span class="p">,</span>
+</span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>    <span class="p">)</span>
+</span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a>
+</span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a>    <span class="n">sleep_array</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span>
+</span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>        <span class="n">measurements</span><span class="o">=</span><span class="n">format_sleep_data</span><span class="p">(</span>
+</span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a>            <span class="n">sleep_windows</span><span class="o">=</span><span class="n">sleep_windows</span><span class="p">,</span> <span class="n">reference_measure</span><span class="o">=</span><span class="n">activity_measurement</span>
+</span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a>        <span class="p">),</span>
+</span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a>        <span class="n">time</span><span class="o">=</span><span class="n">activity_measurement</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+</span><span id="L-400"><a href="#L-400"><span class="linenos">400</span></a>    <span class="p">)</span>
+</span><span id="L-401"><a href="#L-401"><span class="linenos">401</span></a>    <span class="n">nonwear_epoch</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span>
+</span><span id="L-402"><a href="#L-402"><span class="linenos">402</span></a>        <span class="n">measurements</span><span class="o">=</span><span class="n">format_nonwear_data</span><span class="p">(</span>
+</span><span id="L-403"><a href="#L-403"><span class="linenos">403</span></a>            <span class="n">nonwear_data</span><span class="o">=</span><span class="n">non_wear_array</span><span class="p">,</span>
+</span><span id="L-404"><a href="#L-404"><span class="linenos">404</span></a>            <span class="n">reference_measure</span><span class="o">=</span><span class="n">activity_measurement</span><span class="p">,</span>
+</span><span id="L-405"><a href="#L-405"><span class="linenos">405</span></a>            <span class="n">original_temporal_resolution</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span>
+</span><span id="L-406"><a href="#L-406"><span class="linenos">406</span></a>        <span class="p">),</span>
+</span><span id="L-407"><a href="#L-407"><span class="linenos">407</span></a>        <span class="n">time</span><span class="o">=</span><span class="n">activity_measurement</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+</span><span id="L-408"><a href="#L-408"><span class="linenos">408</span></a>    <span class="p">)</span>
+</span><span id="L-409"><a href="#L-409"><span class="linenos">409</span></a>
+</span><span id="L-410"><a href="#L-410"><span class="linenos">410</span></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">OrchestratorResults</span><span class="p">(</span>
+</span><span id="L-411"><a href="#L-411"><span class="linenos">411</span></a>        <span class="n">physical_activity_metric</span><span class="o">=</span><span class="n">activity_measurement</span><span class="p">,</span>
+</span><span id="L-412"><a href="#L-412"><span class="linenos">412</span></a>        <span class="n">anglez</span><span class="o">=</span><span class="n">anglez</span><span class="p">,</span>
+</span><span id="L-413"><a href="#L-413"><span class="linenos">413</span></a>        <span class="n">physical_activity_levels</span><span class="o">=</span><span class="n">physical_activity_levels</span><span class="p">,</span>
+</span><span id="L-414"><a href="#L-414"><span class="linenos">414</span></a>        <span class="n">sleep_windows_epoch</span><span class="o">=</span><span class="n">sleep_array</span><span class="p">,</span>
+</span><span id="L-415"><a href="#L-415"><span class="linenos">415</span></a>        <span class="n">nonwear_epoch</span><span class="o">=</span><span class="n">nonwear_epoch</span><span class="p">,</span>
+</span><span id="L-416"><a href="#L-416"><span class="linenos">416</span></a>    <span class="p">)</span>
+</span><span id="L-417"><a href="#L-417"><span class="linenos">417</span></a>    <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-418"><a href="#L-418"><span class="linenos">418</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="L-419"><a href="#L-419"><span class="linenos">419</span></a>            <span class="n">results</span><span class="o">.</span><span class="n">save_results</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
+</span><span id="L-420"><a href="#L-420"><span class="linenos">420</span></a>        <span class="k">except</span> <span class="p">(</span>
+</span><span id="L-421"><a href="#L-421"><span class="linenos">421</span></a>            <span class="n">exceptions</span><span class="o">.</span><span class="n">InvalidFileTypeError</span><span class="p">,</span>
+</span><span id="L-422"><a href="#L-422"><span class="linenos">422</span></a>            <span class="ne">PermissionError</span><span class="p">,</span>
+</span><span id="L-423"><a href="#L-423"><span class="linenos">423</span></a>            <span class="ne">FileExistsError</span><span class="p">,</span>
+</span><span id="L-424"><a href="#L-424"><span class="linenos">424</span></a>        <span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
+</span><span id="L-425"><a href="#L-425"><span class="linenos">425</span></a>            <span class="c1"># Allowed to pass to recover in Jupyter Notebook scenarios.</span>
+</span><span id="L-426"><a href="#L-426"><span class="linenos">426</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+</span><span id="L-427"><a href="#L-427"><span class="linenos">427</span></a>                <span class="p">(</span>
+</span><span id="L-428"><a href="#L-428"><span class="linenos">428</span></a>                    <span class="sa">f</span><span class="s2">&quot;Could not save output due to: </span><span class="si">{</span><span class="n">exc_info</span><span class="si">}</span><span class="s2">. Call save_results &quot;</span>
+</span><span id="L-429"><a href="#L-429"><span class="linenos">429</span></a>                    <span class="s2">&quot; on the output object with a correct filename to save these &quot;</span>
+</span><span id="L-430"><a href="#L-430"><span class="linenos">430</span></a>                    <span class="s2">&quot;results.&quot;</span>
+</span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a>                <span class="p">)</span>
+</span><span id="L-432"><a href="#L-432"><span class="linenos">432</span></a>            <span class="p">)</span>
+</span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a>
+</span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a>    <span class="k">return</span> <span class="n">results</span>
 </span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a>
-</span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_compute_activity</span><span class="p">(</span>
-</span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a>    <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span>
-</span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a>    <span class="n">activity_metric</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ag_count&quot;</span><span class="p">,</span> <span class="s2">&quot;mad&quot;</span><span class="p">,</span> <span class="s2">&quot;enmo&quot;</span><span class="p">],</span>
-</span><span id="L-439"><a href="#L-439"><span class="linenos">439</span></a>    <span class="n">epoch_length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-</span><span id="L-440"><a href="#L-440"><span class="linenos">440</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
-</span><span id="L-441"><a href="#L-441"><span class="linenos">441</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;This is a helper function to organize the computation of the activity metric.</span>
-</span><span id="L-442"><a href="#L-442"><span class="linenos">442</span></a>
-</span><span id="L-443"><a href="#L-443"><span class="linenos">443</span></a><span class="sd">    This function organizes the logic for computing the requested physical activity</span>
-</span><span id="L-444"><a href="#L-444"><span class="linenos">444</span></a><span class="sd">    metric at the desired temporal resolution.</span>
-</span><span id="L-445"><a href="#L-445"><span class="linenos">445</span></a>
-</span><span id="L-446"><a href="#L-446"><span class="linenos">446</span></a><span class="sd">    Args:</span>
-</span><span id="L-447"><a href="#L-447"><span class="linenos">447</span></a><span class="sd">        acceleration: The acceleration data to compute the activity metric from.</span>
-</span><span id="L-448"><a href="#L-448"><span class="linenos">448</span></a><span class="sd">        activity_metric: The metric to be used for physical activity categorization.</span>
-</span><span id="L-449"><a href="#L-449"><span class="linenos">449</span></a><span class="sd">        epoch_length: The temporal resolution in seconds, the data will be down sampled</span>
-</span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a><span class="sd">            to.</span>
-</span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a>
-</span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a><span class="sd">    Returns:</span>
-</span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a><span class="sd">        A Measurement object with the computed physical activity metric.</span>
-</span><span id="L-454"><a href="#L-454"><span class="linenos">454</span></a>
-</span><span id="L-455"><a href="#L-455"><span class="linenos">455</span></a><span class="sd">    Raises:</span>
-</span><span id="L-456"><a href="#L-456"><span class="linenos">456</span></a><span class="sd">        ValueError: If the activity_metric is &#39;ag_count&#39; or &#39;mad&#39; and epoch_length is</span>
-</span><span id="L-457"><a href="#L-457"><span class="linenos">457</span></a><span class="sd">            None.</span>
-</span><span id="L-458"><a href="#L-458"><span class="linenos">458</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-459"><a href="#L-459"><span class="linenos">459</span></a>    <span class="k">if</span> <span class="n">activity_metric</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;ag_count&quot;</span><span class="p">,</span> <span class="s2">&quot;mad&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">epoch_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-460"><a href="#L-460"><span class="linenos">460</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;If using &#39;ag_count&#39; or &#39;mad&#39;, epoch_length must be provided.&quot;</span><span class="p">)</span>
-</span><span id="L-461"><a href="#L-461"><span class="linenos">461</span></a>
-</span><span id="L-462"><a href="#L-462"><span class="linenos">462</span></a>    <span class="k">if</span> <span class="n">activity_metric</span> <span class="o">==</span> <span class="s2">&quot;ag_count&quot;</span><span class="p">:</span>
-</span><span id="L-463"><a href="#L-463"><span class="linenos">463</span></a>        <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">actigraph_activity_counts</span><span class="p">(</span>
-</span><span id="L-464"><a href="#L-464"><span class="linenos">464</span></a>            <span class="n">acceleration</span><span class="p">,</span>
-</span><span id="L-465"><a href="#L-465"><span class="linenos">465</span></a>            <span class="n">epoch_length</span><span class="o">=</span><span class="n">epoch_length</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type] # Guarded by the ValueError statement above.</span>
-</span><span id="L-466"><a href="#L-466"><span class="linenos">466</span></a>        <span class="p">)</span>
-</span><span id="L-467"><a href="#L-467"><span class="linenos">467</span></a>    <span class="k">elif</span> <span class="n">activity_metric</span> <span class="o">==</span> <span class="s2">&quot;mad&quot;</span><span class="p">:</span>
-</span><span id="L-468"><a href="#L-468"><span class="linenos">468</span></a>        <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">mean_amplitude_deviation</span><span class="p">(</span><span class="n">acceleration</span><span class="p">,</span> <span class="n">epoch_length</span><span class="o">=</span><span class="n">epoch_length</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # Guarded by the ValueError statement above.</span>
-</span><span id="L-469"><a href="#L-469"><span class="linenos">469</span></a>    <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">euclidean_norm_minus_one</span><span class="p">(</span><span class="n">acceleration</span><span class="p">,</span> <span class="n">epoch_length</span><span class="o">=</span><span class="n">epoch_length</span><span class="p">)</span>
+</span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a>
+</span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_compute_activity</span><span class="p">(</span>
+</span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a>    <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span>
+</span><span id="L-439"><a href="#L-439"><span class="linenos">439</span></a>    <span class="n">activity_metric</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ag_count&quot;</span><span class="p">,</span> <span class="s2">&quot;mad&quot;</span><span class="p">,</span> <span class="s2">&quot;enmo&quot;</span><span class="p">],</span>
+</span><span id="L-440"><a href="#L-440"><span class="linenos">440</span></a>    <span class="n">epoch_length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+</span><span id="L-441"><a href="#L-441"><span class="linenos">441</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+</span><span id="L-442"><a href="#L-442"><span class="linenos">442</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;This is a helper function to organize the computation of the activity metric.</span>
+</span><span id="L-443"><a href="#L-443"><span class="linenos">443</span></a>
+</span><span id="L-444"><a href="#L-444"><span class="linenos">444</span></a><span class="sd">    This function organizes the logic for computing the requested physical activity</span>
+</span><span id="L-445"><a href="#L-445"><span class="linenos">445</span></a><span class="sd">    metric at the desired temporal resolution.</span>
+</span><span id="L-446"><a href="#L-446"><span class="linenos">446</span></a>
+</span><span id="L-447"><a href="#L-447"><span class="linenos">447</span></a><span class="sd">    Args:</span>
+</span><span id="L-448"><a href="#L-448"><span class="linenos">448</span></a><span class="sd">        acceleration: The acceleration data to compute the activity metric from.</span>
+</span><span id="L-449"><a href="#L-449"><span class="linenos">449</span></a><span class="sd">        activity_metric: The metric to be used for physical activity categorization.</span>
+</span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a><span class="sd">        epoch_length: The temporal resolution in seconds, the data will be down sampled</span>
+</span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a><span class="sd">            to.</span>
+</span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a>
+</span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a><span class="sd">    Returns:</span>
+</span><span id="L-454"><a href="#L-454"><span class="linenos">454</span></a><span class="sd">        A Measurement object with the computed physical activity metric.</span>
+</span><span id="L-455"><a href="#L-455"><span class="linenos">455</span></a>
+</span><span id="L-456"><a href="#L-456"><span class="linenos">456</span></a><span class="sd">    Raises:</span>
+</span><span id="L-457"><a href="#L-457"><span class="linenos">457</span></a><span class="sd">        ValueError: If the activity_metric is &#39;ag_count&#39; or &#39;mad&#39; and epoch_length is</span>
+</span><span id="L-458"><a href="#L-458"><span class="linenos">458</span></a><span class="sd">            None.</span>
+</span><span id="L-459"><a href="#L-459"><span class="linenos">459</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-460"><a href="#L-460"><span class="linenos">460</span></a>    <span class="k">if</span> <span class="n">activity_metric</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;ag_count&quot;</span><span class="p">,</span> <span class="s2">&quot;mad&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">epoch_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-461"><a href="#L-461"><span class="linenos">461</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;If using &#39;ag_count&#39; or &#39;mad&#39;, epoch_length must be provided.&quot;</span><span class="p">)</span>
+</span><span id="L-462"><a href="#L-462"><span class="linenos">462</span></a>
+</span><span id="L-463"><a href="#L-463"><span class="linenos">463</span></a>    <span class="k">if</span> <span class="n">activity_metric</span> <span class="o">==</span> <span class="s2">&quot;ag_count&quot;</span><span class="p">:</span>
+</span><span id="L-464"><a href="#L-464"><span class="linenos">464</span></a>        <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">actigraph_activity_counts</span><span class="p">(</span>
+</span><span id="L-465"><a href="#L-465"><span class="linenos">465</span></a>            <span class="n">acceleration</span><span class="p">,</span>
+</span><span id="L-466"><a href="#L-466"><span class="linenos">466</span></a>            <span class="n">epoch_length</span><span class="o">=</span><span class="n">epoch_length</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type] # Guarded by the ValueError statement above.</span>
+</span><span id="L-467"><a href="#L-467"><span class="linenos">467</span></a>        <span class="p">)</span>
+</span><span id="L-468"><a href="#L-468"><span class="linenos">468</span></a>    <span class="k">elif</span> <span class="n">activity_metric</span> <span class="o">==</span> <span class="s2">&quot;mad&quot;</span><span class="p">:</span>
+</span><span id="L-469"><a href="#L-469"><span class="linenos">469</span></a>        <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">mean_amplitude_deviation</span><span class="p">(</span><span class="n">acceleration</span><span class="p">,</span> <span class="n">epoch_length</span><span class="o">=</span><span class="n">epoch_length</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type] # Guarded by the ValueError statement above.</span>
+</span><span id="L-470"><a href="#L-470"><span class="linenos">470</span></a>    <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">euclidean_norm_minus_one</span><span class="p">(</span><span class="n">acceleration</span><span class="p">,</span> <span class="n">epoch_length</span><span class="o">=</span><span class="n">epoch_length</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -744,8 +745,8 @@ nonwear_data.</li>
 </span><span id="run-120"><a href="#run-120"><span class="linenos">120</span></a>
 </span><span id="run-121"><a href="#run-121"><span class="linenos">121</span></a>
 </span><span id="run-122"><a href="#run-122"><span class="linenos">122</span></a><span class="sd">    Args:</span>
-</span><span id="run-123"><a href="#run-123"><span class="linenos">123</span></a><span class="sd">        input: Path to the input file or directory of files to be read. Currently</span>
-</span><span id="run-124"><a href="#run-124"><span class="linenos">124</span></a><span class="sd">            supports .bin and .gt3x</span>
+</span><span id="run-123"><a href="#run-123"><span class="linenos">123</span></a><span class="sd">        input: Path to the input file or directory of files to be read. Currently,</span>
+</span><span id="run-124"><a href="#run-124"><span class="linenos">124</span></a><span class="sd">            this supports .bin and .gt3x</span>
 </span><span id="run-125"><a href="#run-125"><span class="linenos">125</span></a><span class="sd">        output: Path to directory data will be saved to. If processing a single file the</span>
 </span><span id="run-126"><a href="#run-126"><span class="linenos">126</span></a><span class="sd">            path should end in the save file name in either .csv or .parquet formats.</span>
 </span><span id="run-127"><a href="#run-127"><span class="linenos">127</span></a><span class="sd">        thresholds: The cut points for the light, moderate, and vigorous thresholds,</span>
@@ -839,8 +840,8 @@ processing.</p>
 <h6 id="arguments">Arguments:</h6>
 
 <ul>
-<li><strong>input:</strong>  Path to the input file or directory of files to be read. Currently
-supports .bin and .gt3x</li>
+<li><strong>input:</strong>  Path to the input file or directory of files to be read. Currently,
+this supports .bin and .gt3x</li>
 <li><strong>output:</strong>  Path to directory data will be saved to. If processing a single file the
 path should end in the save file name in either .csv or .parquet formats.</li>
 <li><strong>thresholds:</strong>  The cut points for the light, moderate, and vigorous thresholds,

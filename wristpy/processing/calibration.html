@@ -278,15 +278,15 @@
 </span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data based on settings.</span>
 </span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="sd">        If the chunked arguement is set to true, it will run calibration on an initial</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="sd">        If the chunked argument is set to true, it will run calibration on an initial</span>
 </span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a><span class="sd">        chunk of the data the size of which is set to min_calibration_hours. If it fails</span>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="sd">        to calibrate based on this subset, it will add 12 hour chunks to the subset</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="sd">        until calibration succeeds, or fails on the entire dataset. Otherwise if chunked</span>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="sd">        is false (default) calibration will be conducted on the whole of the dataset.</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="sd">        Calibration is successful when scale and offset values, that sufficiently</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a><span class="sd">        minimize error when applied to the data, are found. The scale and offset values</span>
-</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a><span class="sd">        are then applied to every data point in the dataset which is then returned as</span>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a><span class="sd">        calibrated models.Measurement object.</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="sd">        to calibrate based on this subset, it will add 12-hour chunks to the subset</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="sd">        until calibration succeeds, or fails on the entire dataset. Otherwise, if</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="sd">        chunked is false (default) calibration will be conducted on the whole of the</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="sd">        dataset. Calibration is successful when scale and offset values, that</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a><span class="sd">        sufficiently minimize error when applied to the data, are found. The scale and</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a><span class="sd">        offset values are then applied to every data point in the dataset which is</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a><span class="sd">        then returned as calibrated models.Measurement object.</span>
 </span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>
 </span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a><span class="sd">        Args:</span>
 </span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="sd">            acceleration: the accelerometer data containing x,y,z axis</span>
@@ -644,7 +644,7 @@
 </span><span id="L-493"><a href="#L-493"><span class="linenos">493</span></a><span class="sd">        from the unit sphere (where the unit sphere represents the ideal data points</span>
 </span><span id="L-494"><a href="#L-494"><span class="linenos">494</span></a><span class="sd">        under 1g acceleartion due to Earth&#39;s gravity). The initial guess for the</span>
 </span><span id="L-495"><a href="#L-495"><span class="linenos">495</span></a><span class="sd">        scale and offset are chosen as 1/0, we provide constrained bounds for the</span>
-</span><span id="L-496"><a href="#L-496"><span class="linenos">496</span></a><span class="sd">        scale and offset parameters to avoid the the case where the scale can be</span>
+</span><span id="L-496"><a href="#L-496"><span class="linenos">496</span></a><span class="sd">        scale and offset parameters to avoid the case where the scale can be</span>
 </span><span id="L-497"><a href="#L-497"><span class="linenos">497</span></a><span class="sd">        set to 0 and offset to 1/sqrt(3) (exact unit sphere).</span>
 </span><span id="L-498"><a href="#L-498"><span class="linenos">498</span></a>
 </span><span id="L-499"><a href="#L-499"><span class="linenos">499</span></a><span class="sd">        Args:</span>
@@ -724,7 +724,7 @@
 </span><span id="L-573"><a href="#L-573"><span class="linenos">573</span></a><span class="sd">            used to find periods of no motion.</span>
 </span><span id="L-574"><a href="#L-574"><span class="linenos">574</span></a>
 </span><span id="L-575"><a href="#L-575"><span class="linenos">575</span></a><span class="sd">    Returns:</span>
-</span><span id="L-576"><a href="#L-576"><span class="linenos">576</span></a><span class="sd">        an ndarray containing the accelerometer data determined to have no motion.</span>
+</span><span id="L-576"><a href="#L-576"><span class="linenos">576</span></a><span class="sd">        An ndarray containing the accelerometer data determined to have no motion.</span>
 </span><span id="L-577"><a href="#L-577"><span class="linenos">577</span></a>
 </span><span id="L-578"><a href="#L-578"><span class="linenos">578</span></a><span class="sd">    Raises:</span>
 </span><span id="L-579"><a href="#L-579"><span class="linenos">579</span></a><span class="sd">        NoMotionError: If no portions of data meet no motion criteria as defined by</span>
@@ -1078,15 +1078,15 @@ a measurement object that contains the calibrated acceleration data.</p>
 </span><span id="GgirCalibration-128"><a href="#GgirCalibration-128"><span class="linenos">128</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="GgirCalibration-129"><a href="#GgirCalibration-129"><span class="linenos">129</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data based on settings.</span>
 </span><span id="GgirCalibration-130"><a href="#GgirCalibration-130"><span class="linenos">130</span></a>
-</span><span id="GgirCalibration-131"><a href="#GgirCalibration-131"><span class="linenos">131</span></a><span class="sd">        If the chunked arguement is set to true, it will run calibration on an initial</span>
+</span><span id="GgirCalibration-131"><a href="#GgirCalibration-131"><span class="linenos">131</span></a><span class="sd">        If the chunked argument is set to true, it will run calibration on an initial</span>
 </span><span id="GgirCalibration-132"><a href="#GgirCalibration-132"><span class="linenos">132</span></a><span class="sd">        chunk of the data the size of which is set to min_calibration_hours. If it fails</span>
-</span><span id="GgirCalibration-133"><a href="#GgirCalibration-133"><span class="linenos">133</span></a><span class="sd">        to calibrate based on this subset, it will add 12 hour chunks to the subset</span>
-</span><span id="GgirCalibration-134"><a href="#GgirCalibration-134"><span class="linenos">134</span></a><span class="sd">        until calibration succeeds, or fails on the entire dataset. Otherwise if chunked</span>
-</span><span id="GgirCalibration-135"><a href="#GgirCalibration-135"><span class="linenos">135</span></a><span class="sd">        is false (default) calibration will be conducted on the whole of the dataset.</span>
-</span><span id="GgirCalibration-136"><a href="#GgirCalibration-136"><span class="linenos">136</span></a><span class="sd">        Calibration is successful when scale and offset values, that sufficiently</span>
-</span><span id="GgirCalibration-137"><a href="#GgirCalibration-137"><span class="linenos">137</span></a><span class="sd">        minimize error when applied to the data, are found. The scale and offset values</span>
-</span><span id="GgirCalibration-138"><a href="#GgirCalibration-138"><span class="linenos">138</span></a><span class="sd">        are then applied to every data point in the dataset which is then returned as</span>
-</span><span id="GgirCalibration-139"><a href="#GgirCalibration-139"><span class="linenos">139</span></a><span class="sd">        calibrated models.Measurement object.</span>
+</span><span id="GgirCalibration-133"><a href="#GgirCalibration-133"><span class="linenos">133</span></a><span class="sd">        to calibrate based on this subset, it will add 12-hour chunks to the subset</span>
+</span><span id="GgirCalibration-134"><a href="#GgirCalibration-134"><span class="linenos">134</span></a><span class="sd">        until calibration succeeds, or fails on the entire dataset. Otherwise, if</span>
+</span><span id="GgirCalibration-135"><a href="#GgirCalibration-135"><span class="linenos">135</span></a><span class="sd">        chunked is false (default) calibration will be conducted on the whole of the</span>
+</span><span id="GgirCalibration-136"><a href="#GgirCalibration-136"><span class="linenos">136</span></a><span class="sd">        dataset. Calibration is successful when scale and offset values, that</span>
+</span><span id="GgirCalibration-137"><a href="#GgirCalibration-137"><span class="linenos">137</span></a><span class="sd">        sufficiently minimize error when applied to the data, are found. The scale and</span>
+</span><span id="GgirCalibration-138"><a href="#GgirCalibration-138"><span class="linenos">138</span></a><span class="sd">        offset values are then applied to every data point in the dataset which is</span>
+</span><span id="GgirCalibration-139"><a href="#GgirCalibration-139"><span class="linenos">139</span></a><span class="sd">        then returned as calibrated models.Measurement object.</span>
 </span><span id="GgirCalibration-140"><a href="#GgirCalibration-140"><span class="linenos">140</span></a>
 </span><span id="GgirCalibration-141"><a href="#GgirCalibration-141"><span class="linenos">141</span></a><span class="sd">        Args:</span>
 </span><span id="GgirCalibration-142"><a href="#GgirCalibration-142"><span class="linenos">142</span></a><span class="sd">            acceleration: the accelerometer data containing x,y,z axis</span>
@@ -1584,15 +1584,15 @@ cannot reach this threshold it will error.</li>
             <div class="pdoc-code codehilite"><pre><span></span><span id="GgirCalibration.run_calibration-128"><a href="#GgirCalibration.run_calibration-128"><span class="linenos">128</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
 </span><span id="GgirCalibration.run_calibration-129"><a href="#GgirCalibration.run_calibration-129"><span class="linenos">129</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs calibration on acceleration data based on settings.</span>
 </span><span id="GgirCalibration.run_calibration-130"><a href="#GgirCalibration.run_calibration-130"><span class="linenos">130</span></a>
-</span><span id="GgirCalibration.run_calibration-131"><a href="#GgirCalibration.run_calibration-131"><span class="linenos">131</span></a><span class="sd">        If the chunked arguement is set to true, it will run calibration on an initial</span>
+</span><span id="GgirCalibration.run_calibration-131"><a href="#GgirCalibration.run_calibration-131"><span class="linenos">131</span></a><span class="sd">        If the chunked argument is set to true, it will run calibration on an initial</span>
 </span><span id="GgirCalibration.run_calibration-132"><a href="#GgirCalibration.run_calibration-132"><span class="linenos">132</span></a><span class="sd">        chunk of the data the size of which is set to min_calibration_hours. If it fails</span>
-</span><span id="GgirCalibration.run_calibration-133"><a href="#GgirCalibration.run_calibration-133"><span class="linenos">133</span></a><span class="sd">        to calibrate based on this subset, it will add 12 hour chunks to the subset</span>
-</span><span id="GgirCalibration.run_calibration-134"><a href="#GgirCalibration.run_calibration-134"><span class="linenos">134</span></a><span class="sd">        until calibration succeeds, or fails on the entire dataset. Otherwise if chunked</span>
-</span><span id="GgirCalibration.run_calibration-135"><a href="#GgirCalibration.run_calibration-135"><span class="linenos">135</span></a><span class="sd">        is false (default) calibration will be conducted on the whole of the dataset.</span>
-</span><span id="GgirCalibration.run_calibration-136"><a href="#GgirCalibration.run_calibration-136"><span class="linenos">136</span></a><span class="sd">        Calibration is successful when scale and offset values, that sufficiently</span>
-</span><span id="GgirCalibration.run_calibration-137"><a href="#GgirCalibration.run_calibration-137"><span class="linenos">137</span></a><span class="sd">        minimize error when applied to the data, are found. The scale and offset values</span>
-</span><span id="GgirCalibration.run_calibration-138"><a href="#GgirCalibration.run_calibration-138"><span class="linenos">138</span></a><span class="sd">        are then applied to every data point in the dataset which is then returned as</span>
-</span><span id="GgirCalibration.run_calibration-139"><a href="#GgirCalibration.run_calibration-139"><span class="linenos">139</span></a><span class="sd">        calibrated models.Measurement object.</span>
+</span><span id="GgirCalibration.run_calibration-133"><a href="#GgirCalibration.run_calibration-133"><span class="linenos">133</span></a><span class="sd">        to calibrate based on this subset, it will add 12-hour chunks to the subset</span>
+</span><span id="GgirCalibration.run_calibration-134"><a href="#GgirCalibration.run_calibration-134"><span class="linenos">134</span></a><span class="sd">        until calibration succeeds, or fails on the entire dataset. Otherwise, if</span>
+</span><span id="GgirCalibration.run_calibration-135"><a href="#GgirCalibration.run_calibration-135"><span class="linenos">135</span></a><span class="sd">        chunked is false (default) calibration will be conducted on the whole of the</span>
+</span><span id="GgirCalibration.run_calibration-136"><a href="#GgirCalibration.run_calibration-136"><span class="linenos">136</span></a><span class="sd">        dataset. Calibration is successful when scale and offset values, that</span>
+</span><span id="GgirCalibration.run_calibration-137"><a href="#GgirCalibration.run_calibration-137"><span class="linenos">137</span></a><span class="sd">        sufficiently minimize error when applied to the data, are found. The scale and</span>
+</span><span id="GgirCalibration.run_calibration-138"><a href="#GgirCalibration.run_calibration-138"><span class="linenos">138</span></a><span class="sd">        offset values are then applied to every data point in the dataset which is</span>
+</span><span id="GgirCalibration.run_calibration-139"><a href="#GgirCalibration.run_calibration-139"><span class="linenos">139</span></a><span class="sd">        then returned as calibrated models.Measurement object.</span>
 </span><span id="GgirCalibration.run_calibration-140"><a href="#GgirCalibration.run_calibration-140"><span class="linenos">140</span></a>
 </span><span id="GgirCalibration.run_calibration-141"><a href="#GgirCalibration.run_calibration-141"><span class="linenos">141</span></a><span class="sd">        Args:</span>
 </span><span id="GgirCalibration.run_calibration-142"><a href="#GgirCalibration.run_calibration-142"><span class="linenos">142</span></a><span class="sd">            acceleration: the accelerometer data containing x,y,z axis</span>
@@ -1641,15 +1641,15 @@ cannot reach this threshold it will error.</li>
 
             <div class="docstring"><p>Runs calibration on acceleration data based on settings.</p>
 
-<p>If the chunked arguement is set to true, it will run calibration on an initial
+<p>If the chunked argument is set to true, it will run calibration on an initial
 chunk of the data the size of which is set to min_calibration_hours. If it fails
-to calibrate based on this subset, it will add 12 hour chunks to the subset
-until calibration succeeds, or fails on the entire dataset. Otherwise if chunked
-is false (default) calibration will be conducted on the whole of the dataset.
-Calibration is successful when scale and offset values, that sufficiently
-minimize error when applied to the data, are found. The scale and offset values
-are then applied to every data point in the dataset which is then returned as
-calibrated models.Measurement object.</p>
+to calibrate based on this subset, it will add 12-hour chunks to the subset
+until calibration succeeds, or fails on the entire dataset. Otherwise, if
+chunked is false (default) calibration will be conducted on the whole of the
+dataset. Calibration is successful when scale and offset values, that
+sufficiently minimize error when applied to the data, are found. The scale and
+offset values are then applied to every data point in the dataset which is
+then returned as calibrated models.Measurement object.</p>
 
 <h6 id="arguments">Arguments:</h6>
 
@@ -1774,7 +1774,7 @@ axis does not have at least 1 value both above and below  the + and
 </span><span id="ConstrainedMinimizationCalibration-494"><a href="#ConstrainedMinimizationCalibration-494"><span class="linenos">494</span></a><span class="sd">        from the unit sphere (where the unit sphere represents the ideal data points</span>
 </span><span id="ConstrainedMinimizationCalibration-495"><a href="#ConstrainedMinimizationCalibration-495"><span class="linenos">495</span></a><span class="sd">        under 1g acceleartion due to Earth&#39;s gravity). The initial guess for the</span>
 </span><span id="ConstrainedMinimizationCalibration-496"><a href="#ConstrainedMinimizationCalibration-496"><span class="linenos">496</span></a><span class="sd">        scale and offset are chosen as 1/0, we provide constrained bounds for the</span>
-</span><span id="ConstrainedMinimizationCalibration-497"><a href="#ConstrainedMinimizationCalibration-497"><span class="linenos">497</span></a><span class="sd">        scale and offset parameters to avoid the the case where the scale can be</span>
+</span><span id="ConstrainedMinimizationCalibration-497"><a href="#ConstrainedMinimizationCalibration-497"><span class="linenos">497</span></a><span class="sd">        scale and offset parameters to avoid the case where the scale can be</span>
 </span><span id="ConstrainedMinimizationCalibration-498"><a href="#ConstrainedMinimizationCalibration-498"><span class="linenos">498</span></a><span class="sd">        set to 0 and offset to 1/sqrt(3) (exact unit sphere).</span>
 </span><span id="ConstrainedMinimizationCalibration-499"><a href="#ConstrainedMinimizationCalibration-499"><span class="linenos">499</span></a>
 </span><span id="ConstrainedMinimizationCalibration-500"><a href="#ConstrainedMinimizationCalibration-500"><span class="linenos">500</span></a><span class="sd">        Args:</span>

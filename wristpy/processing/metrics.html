@@ -97,8 +97,8 @@
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">    The data can be downsampled to a temporal resolution of `epoch_length` seconds.</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="sd">    Args:</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="sd">        acceleration: the three dimensional accelerometer data. A Measurement object,</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="sd">        it will have two attributes. 1) measurements, containing the three dimensional</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="sd">        acceleration: the three-dimensional accelerometer data. A Measurement object,</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="sd">        it will have two attributes. 1) measurements, containing the three-dimensional</span>
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="sd">        accelerometer data in an np.array and 2) time, a pl.Series containing</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="sd">        datetime.datetime objects.</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="sd">        epoch_length: The temporal resolution of the downsampled enmo, in seconds.</span>
@@ -128,9 +128,9 @@
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="sd">     The data can be downsampled to a temporal resolution of `epoch_length` seconds.</span>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">    Args:</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">        acceleration: the three dimensional accelerometer data. A Measurement object,</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">        it will have two attributes. 1) measurements, containing the three dimensional</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">        accelerometer data in an np.array and 2) time, a pl.Series containing</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">        acceleration: the three-dimensional accelerometer data. A Measurement object,</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">        it will have two attributes. 1) measurements, containing the three-dimensional</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">        accelerometer data in a np.array and 2) time, a pl.Series containing</span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">        datetime.datetime objects.</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">        epoch_length: The temporal resolution of the downsampled anglez, in seconds.</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">            Defaults to `None`, which means no downsampling.</span>
@@ -467,7 +467,7 @@
 </span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a>
 </span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a>
 </span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_cleanup_isolated_ones_nonwear_value</span><span class="p">(</span><span class="n">nonwear_value_array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-</span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to cleanup isolated ones in nonwear value array.</span>
+</span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to clean up isolated ones in nonwear value array.</span>
 </span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a>
 </span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a><span class="sd">    This function finds isolated ones in the nonwear value array and</span>
 </span><span id="L-400"><a href="#L-400"><span class="linenos">400</span></a><span class="sd">    sets them to 2 if they are surrounded by values &gt; 1.</span>
@@ -531,8 +531,8 @@
 </span><span id="euclidean_norm_minus_one-25"><a href="#euclidean_norm_minus_one-25"><span class="linenos">25</span></a><span class="sd">    The data can be downsampled to a temporal resolution of `epoch_length` seconds.</span>
 </span><span id="euclidean_norm_minus_one-26"><a href="#euclidean_norm_minus_one-26"><span class="linenos">26</span></a>
 </span><span id="euclidean_norm_minus_one-27"><a href="#euclidean_norm_minus_one-27"><span class="linenos">27</span></a><span class="sd">    Args:</span>
-</span><span id="euclidean_norm_minus_one-28"><a href="#euclidean_norm_minus_one-28"><span class="linenos">28</span></a><span class="sd">        acceleration: the three dimensional accelerometer data. A Measurement object,</span>
-</span><span id="euclidean_norm_minus_one-29"><a href="#euclidean_norm_minus_one-29"><span class="linenos">29</span></a><span class="sd">        it will have two attributes. 1) measurements, containing the three dimensional</span>
+</span><span id="euclidean_norm_minus_one-28"><a href="#euclidean_norm_minus_one-28"><span class="linenos">28</span></a><span class="sd">        acceleration: the three-dimensional accelerometer data. A Measurement object,</span>
+</span><span id="euclidean_norm_minus_one-29"><a href="#euclidean_norm_minus_one-29"><span class="linenos">29</span></a><span class="sd">        it will have two attributes. 1) measurements, containing the three-dimensional</span>
 </span><span id="euclidean_norm_minus_one-30"><a href="#euclidean_norm_minus_one-30"><span class="linenos">30</span></a><span class="sd">        accelerometer data in an np.array and 2) time, a pl.Series containing</span>
 </span><span id="euclidean_norm_minus_one-31"><a href="#euclidean_norm_minus_one-31"><span class="linenos">31</span></a><span class="sd">        datetime.datetime objects.</span>
 </span><span id="euclidean_norm_minus_one-32"><a href="#euclidean_norm_minus_one-32"><span class="linenos">32</span></a><span class="sd">        epoch_length: The temporal resolution of the downsampled enmo, in seconds.</span>
@@ -567,8 +567,8 @@ detrimental to the intended analysis.</p>
 <h6 id="arguments">Arguments:</h6>
 
 <ul>
-<li><strong>acceleration:</strong>  the three dimensional accelerometer data. A Measurement object,</li>
-<li>it will have two attributes. 1) measurements, containing the three dimensional</li>
+<li><strong>acceleration:</strong>  the three-dimensional accelerometer data. A Measurement object,</li>
+<li>it will have two attributes. 1) measurements, containing the three-dimensional</li>
 <li>accelerometer data in an np.array and 2) time, a pl.Series containing</li>
 <li>datetime.datetime objects.</li>
 <li><strong>epoch_length:</strong>  The temporal resolution of the downsampled enmo, in seconds.
@@ -604,9 +604,9 @@ Defaults to <code>None</code>, which means no downsampling.</li>
 </span><span id="angle_relative_to_horizontal-56"><a href="#angle_relative_to_horizontal-56"><span class="linenos">56</span></a><span class="sd">     The data can be downsampled to a temporal resolution of `epoch_length` seconds.</span>
 </span><span id="angle_relative_to_horizontal-57"><a href="#angle_relative_to_horizontal-57"><span class="linenos">57</span></a>
 </span><span id="angle_relative_to_horizontal-58"><a href="#angle_relative_to_horizontal-58"><span class="linenos">58</span></a><span class="sd">    Args:</span>
-</span><span id="angle_relative_to_horizontal-59"><a href="#angle_relative_to_horizontal-59"><span class="linenos">59</span></a><span class="sd">        acceleration: the three dimensional accelerometer data. A Measurement object,</span>
-</span><span id="angle_relative_to_horizontal-60"><a href="#angle_relative_to_horizontal-60"><span class="linenos">60</span></a><span class="sd">        it will have two attributes. 1) measurements, containing the three dimensional</span>
-</span><span id="angle_relative_to_horizontal-61"><a href="#angle_relative_to_horizontal-61"><span class="linenos">61</span></a><span class="sd">        accelerometer data in an np.array and 2) time, a pl.Series containing</span>
+</span><span id="angle_relative_to_horizontal-59"><a href="#angle_relative_to_horizontal-59"><span class="linenos">59</span></a><span class="sd">        acceleration: the three-dimensional accelerometer data. A Measurement object,</span>
+</span><span id="angle_relative_to_horizontal-60"><a href="#angle_relative_to_horizontal-60"><span class="linenos">60</span></a><span class="sd">        it will have two attributes. 1) measurements, containing the three-dimensional</span>
+</span><span id="angle_relative_to_horizontal-61"><a href="#angle_relative_to_horizontal-61"><span class="linenos">61</span></a><span class="sd">        accelerometer data in a np.array and 2) time, a pl.Series containing</span>
 </span><span id="angle_relative_to_horizontal-62"><a href="#angle_relative_to_horizontal-62"><span class="linenos">62</span></a><span class="sd">        datetime.datetime objects.</span>
 </span><span id="angle_relative_to_horizontal-63"><a href="#angle_relative_to_horizontal-63"><span class="linenos">63</span></a><span class="sd">        epoch_length: The temporal resolution of the downsampled anglez, in seconds.</span>
 </span><span id="angle_relative_to_horizontal-64"><a href="#angle_relative_to_horizontal-64"><span class="linenos">64</span></a><span class="sd">            Defaults to `None`, which means no downsampling.</span>
@@ -638,9 +638,9 @@ Defaults to <code>None</code>, which means no downsampling.</li>
 <h6 id="arguments">Arguments:</h6>
 
 <ul>
-<li><strong>acceleration:</strong>  the three dimensional accelerometer data. A Measurement object,</li>
-<li>it will have two attributes. 1) measurements, containing the three dimensional</li>
-<li>accelerometer data in an np.array and 2) time, a pl.Series containing</li>
+<li><strong>acceleration:</strong>  the three-dimensional accelerometer data. A Measurement object,</li>
+<li>it will have two attributes. 1) measurements, containing the three-dimensional</li>
+<li>accelerometer data in a np.array and 2) time, a pl.Series containing</li>
 <li>datetime.datetime objects.</li>
 <li><strong>epoch_length:</strong>  The temporal resolution of the downsampled anglez, in seconds.
 Defaults to <code>None</code>, which means no downsampling.</li>

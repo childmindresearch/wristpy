@@ -119,7 +119,7 @@ wristpy    </h1>
 <li><strong>Data loading</strong>: sensor data is loaded using <a href="https://github.com/childmindresearch/actfast"><code>actfast</code></a>, and a <code>WatchData</code> object is created to store all sensor data</li>
 <li><strong>Data calibration</strong>: A post-manufacturer calibration step can be applied, to ensure that the acceleration sensor is measuring 1<em>g</em> force during periods of no motion. There are three possible options: <code>None</code>, <code>gradient</code>, <code>ggir</code>.</li>
 <li><strong><em>Data imputation</em></strong> In the special case when dealing with the Actigraph <code>idle_sleep_mode == enabled</code>, the gaps in acceleration are filled in after calibration, to avoid biasing the calibration phase.</li>
-<li><strong>Metrics Calculation</strong>: Calculates various metrics on the calibrated data, namely ENMO (euclidean norm , minus one) and angle-Z (angle of acceleration relative to the <em>x-y</em> axis).</li>
+<li><strong>Metrics Calculation</strong>: Calculates various metrics on the calibrated data, namely ENMO (Euclidean norm , minus one) and angle-Z (angle of acceleration relative to the <em>x-y</em> axis).</li>
 <li><strong>Non-wear detection</strong>: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide <code>wear</code> or <code>not wear</code>.</li>
 <li><strong>Sleep Detection</strong>: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.</li>
 <li><strong>Physical activity levels</strong>: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.</li>
@@ -340,7 +340,7 @@ Inactivity percent: 86.47099146257868
 
 <p>In this example we will go over the built-in functions to directly read the raw accelerometer and light data, and how to quickly visualize this information.</p>
 
-<p>The built in <code>readers</code> module can be used to load all the sensor and metadata from one of the support wrist-watches (<code>.gt3x</code> or <code>.bin</code>), the reader will automatically select the appropriate loading methodology.</p>
+<p>The built in <code>readers</code> module can be used to load all the sensor and metadata from one of the support wristwatches (<code>.gt3x</code> or <code>.bin</code>), the reader will automatically select the appropriate loading methodology.</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/io/readers.html">wristpy.io.readers</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">readers</span>
