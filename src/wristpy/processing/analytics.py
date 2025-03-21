@@ -150,7 +150,7 @@ class GgirSleepDetection(AbstractSleepDetector):
         """Find the sustained inactivity bouts.
 
         This function finds the absolute difference of the anglez data over 5s windows.
-        We then find the 5-minute windows where all of the differences are below a
+        We then find the 5-minute windows where all the differences are below a
         threshold (defaults to 5 degrees).
 
         Args:

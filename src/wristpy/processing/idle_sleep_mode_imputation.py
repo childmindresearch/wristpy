@@ -14,9 +14,9 @@ def impute_idle_sleep_mode_gaps(acceleration: models.Measurement) -> models.Meas
     based on the first 100 samples timestamps, with (0, 0, -1).
 
     In cases when the sampling rate leads to unevenly spaced samples within one second,
-    eg. 30Hz sampling rate has samples spaced at 33333333ns and 33333343ns within one
+    e.g. 30Hz sampling rate has samples spaced at 33333333ns and 33333343ns within one
     second, the entire data set will be resampled at the highest effective sampling rate
-    that allows for for linearly spaced samples within one second,
+    that allows for linearly spaced samples within one second,
     to nanosecond precision.
 
     Args:
