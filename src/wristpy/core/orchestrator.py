@@ -16,6 +16,7 @@ from wristpy.processing import (
     calibration,
     idle_sleep_mode_imputation,
     metrics,
+    nonwear_utils,
 )
 
 logger = config.get_logger()
@@ -419,7 +420,7 @@ def _run_file(
             detach_nonwear = metrics.implement_DETACH_nonwear(
                 acceleration=calibrated_acceleration, temperature=watch_data.temperature
             )
-            non_wear_array = computations.majority_vote_non_wear(
+            non_wear_array = nonwear_utils.majority_vote_non_wear(
                 nonwear_ggir=ggir_nonwear,
                 nonwear_cta=cta_nonwear,
                 nonwear_detach=detach_nonwear,
@@ -429,7 +430,7 @@ def _run_file(
             detach_nonwear = metrics.implement_DETACH_nonwear(
                 acceleration=calibrated_acceleration, temperature=watch_data.temperature
             )
-            non_wear_array = computations.combined_ggir_detach_nonwear(
+            non_wear_array = nonwear_utils.combined_ggir_detach_nonwear(
                 nonwear_ggir=ggir_nonwear, nonwear_detach=detach_nonwear
             )
         nonwear_epoch = models.Measurement(
