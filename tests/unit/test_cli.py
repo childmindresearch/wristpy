@@ -103,6 +103,7 @@ def test_main_default(
         calibrator=None,
         activity_metric="enmo",
         epoch_length=5,
+        nonwear_algorithm="ggir",
         verbosity=logging.WARNING,
         output_filetype=None,
     )
@@ -124,6 +125,7 @@ def test_main_enmo_default(
         calibrator=None,
         activity_metric="enmo",
         epoch_length=5,
+        nonwear_algorithm="ggir",
         verbosity=logging.WARNING,
     )
 
@@ -143,6 +145,7 @@ def test_main_mad_default(
         thresholds=default_thresholds,
         calibrator=None,
         activity_metric="mad",
+        nonwear_algorithm="ggir",
         epoch_length=5,
         verbosity=logging.WARNING,
     )
@@ -163,6 +166,7 @@ def test_main_agcount_default(
         thresholds=default_thresholds,
         calibrator=None,
         activity_metric="ag_count",
+        nonwear_algorithm="ggir",
         epoch_length=5,
         verbosity=logging.WARNING,
     )
@@ -190,6 +194,8 @@ def test_main_with_options(
             "0",
             "-a",
             "mad",
+            "-nw",
+            "cta",
         ]
     )
 
@@ -199,6 +205,7 @@ def test_main_with_options(
         thresholds=(0.1, 1.0, 1.5),
         calibrator="gradient",
         activity_metric="mad",
+        nonwear_algorithm="cta",
         epoch_length=None,
         verbosity=logging.WARNING,
         output_filetype=None,

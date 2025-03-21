@@ -16,6 +16,7 @@ from wristpy.processing import (
     calibration,
     idle_sleep_mode_imputation,
     metrics,
+    nonwear_utils,
 )
 
 logger = config.get_logger()
@@ -105,6 +106,9 @@ def run(
     ] = "gradient",
     epoch_length: Union[float, None] = 5,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
+    nonwear_algorithm: Literal[
+        "ggir", "cta", "detach", "majority_vote", "ggir_detach"
+    ] = "ggir",
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
@@ -132,6 +136,7 @@ def run(
             no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
             ValueError will be raised.
         activity_metric: The metric to be used for physical activity categorization.
+        nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files. Must be None when
             processing files, must be a valid file type when processing directories.
@@ -188,6 +193,7 @@ def run(
             epoch_length=epoch_length,
             activity_metric=activity_metric,
             verbosity=verbosity,
+            nonwear_algorithm=nonwear_algorithm,
         )
 
     return _run_directory(
@@ -198,6 +204,7 @@ def run(
         epoch_length=epoch_length,
         verbosity=verbosity,
         output_filetype=output_filetype,
+        nonwear_algorithm=nonwear_algorithm,
     )
 
 
@@ -210,6 +217,9 @@ def _run_directory(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[float, None] = 5,
+    nonwear_algorithm: Literal[
+        "ggir", "cta", "detach", "majority_vote", "ggir_detach"
+    ] = "ggir",
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Dict[str, models.OrchestratorResults]:
@@ -233,6 +243,7 @@ def _run_directory(
             to. If None is given, and `enmo` is the chosen physical activity metric,
             no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
             ValueError will be raised.
+        nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files.
 
@@ -291,6 +302,7 @@ def _run_directory(
                 calibrator=calibrator,
                 epoch_length=epoch_length,
                 verbosity=verbosity,
+                nonwear_algorithm=nonwear_algorithm,
             )
         except Exception as e:
             logger.error("Did not run file: %s, Error: %s", file, e)
@@ -308,6 +320,9 @@ def _run_file(
     ] = "gradient",
     epoch_length: Union[float, None] = 5,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
+    nonwear_algorithm: Literal[
+        "ggir", "cta", "detach", "majority_vote", "ggir_detach"
+    ] = "ggir",
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
@@ -332,6 +347,7 @@ def _run_file(
             no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
             ValueError will be raised.
         activity_metric: The metric to be used for physical activity categorization.
+        nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
 
     Returns:
@@ -386,23 +402,64 @@ def _run_file(
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
 
-    non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
+    if watch_data.temperature is not None:
+        if nonwear_algorithm == "ggir":
+            non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
+        elif nonwear_algorithm == "cta":
+            non_wear_array = metrics.combined_temp_accel_detect_nonwear(
+                acceleration=calibrated_acceleration, temperature=watch_data.temperature
+            )
+        elif nonwear_algorithm == "detach":
+            non_wear_array = metrics.implement_DETACH_nonwear(
+                acceleration=calibrated_acceleration, temperature=watch_data.temperature
+            )
+        elif nonwear_algorithm == "majority_vote":
+            ggir_nonwear = metrics.detect_nonwear(calibrated_acceleration)
+            cta_nonwear = metrics.combined_temp_accel_detect_nonwear(
+                acceleration=calibrated_acceleration, temperature=watch_data.temperature
+            )
+            detach_nonwear = metrics.implement_DETACH_nonwear(
+                acceleration=calibrated_acceleration, temperature=watch_data.temperature
+            )
+            non_wear_array = nonwear_utils.majority_vote_non_wear(
+                nonwear_ggir=ggir_nonwear,
+                nonwear_cta=cta_nonwear,
+                nonwear_detach=detach_nonwear,
+            )
+        elif nonwear_algorithm == "ggir_detach":
+            ggir_nonwear = metrics.detect_nonwear(calibrated_acceleration)
+            detach_nonwear = metrics.implement_DETACH_nonwear(
+                acceleration=calibrated_acceleration, temperature=watch_data.temperature
+            )
+            non_wear_array = nonwear_utils.combined_ggir_detach_nonwear(
+                nonwear_ggir=ggir_nonwear, nonwear_detach=detach_nonwear
+            )
+        nonwear_epoch = models.Measurement(
+            measurements=format_nonwear_data(
+                nonwear_data=non_wear_array,
+                reference_measure=activity_measurement,
+                original_temporal_resolution=60,
+            ),
+            time=activity_measurement.time,
+        )
+    else:
+        non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
+        nonwear_epoch = models.Measurement(
+            measurements=format_nonwear_data(
+                nonwear_data=non_wear_array,
+                reference_measure=activity_measurement,
+                original_temporal_resolution=900,
+            ),
+            time=activity_measurement.time,
+        )
+
     physical_activity_levels = analytics.compute_physical_activty_categories(
-        activity_measurement,
-        thresholds,
+        activity_measurement, thresholds
     )
 
     sleep_array = models.Measurement(
         measurements=format_sleep_data(
             sleep_windows=sleep_windows, reference_measure=activity_measurement
-        ),
-        time=activity_measurement.time,
-    )
-    nonwear_epoch = models.Measurement(
-        measurements=format_nonwear_data(
-            nonwear_data=non_wear_array,
-            reference_measure=activity_measurement,
-            original_temporal_resolution=900,
         ),
         time=activity_measurement.time,
     )

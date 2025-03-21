@@ -3,7 +3,7 @@
 import datetime
 import pathlib
 import re
-from typing import Optional
+from typing import Literal, Optional
 
 import numpy as np
 import polars as pl
@@ -138,6 +138,26 @@ def test_run_single_file_agcount_default(
     output_file_path = tmp_path / "file_name.csv"
     results = orchestrator.run(
         input=sample_data_bin, output=output_file_path, activity_metric="ag_count"
+    )
+
+    assert output_file_path.exists()
+    assert isinstance(results, models.OrchestratorResults)
+
+
+@pytest.mark.parametrize(
+    "nonwear_algorithm", ["ggir", "cta", "detach", "majority_vote", "ggir_detach"]
+)
+def test_run_single_file_nonwear_options(
+    sample_data_bin: pathlib.Path,
+    tmp_path: pathlib.Path,
+    nonwear_algorithm: Literal["ggir", "cta", "detach", "majority_vote", "ggir_detach"],
+) -> None:
+    """Testing running a single file."""
+    output_file_path = tmp_path / "file_name.csv"
+    results = orchestrator.run(
+        input=sample_data_bin,
+        output=output_file_path,
+        nonwear_algorithm=nonwear_algorithm,
     )
 
     assert output_file_path.exists()
