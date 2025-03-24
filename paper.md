@@ -18,8 +18,6 @@ authors:
     affiliation: 1
   - name: John Vito d'Antonio-Bertagnolli
     affiliation: 1
-  - name: Stan Colcombe
-    affiliation: "2, 3"
   - name: Alexandre Franco
     affiliation: "1, 2, 3"
   - name: Gregory Kiar
