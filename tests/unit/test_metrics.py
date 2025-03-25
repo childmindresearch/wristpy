@@ -396,7 +396,7 @@ def test_DETACH_non_wear() -> None:
 
     expected_time_length = round(num_samples / 600)
 
-    non_wear_array = metrics.implement_DETACH_nonwear(
+    non_wear_array = metrics.detach_nonwear(
         acceleration, temperature, std_criteria=0.013
     )
 

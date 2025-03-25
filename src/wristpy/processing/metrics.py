@@ -332,7 +332,7 @@ def combined_temp_accel_detect_nonwear(
 
     for window_n in range(total_n_short_windows):
         mean_temp = temperature_grouped_by_window["temperature"][window_n].mean()
-        accel_value = (
+        axis_nonwear_value = (
             acceleration_grouped_by_window[window_n]
             .select(
                 pl.col("X", "Y", "Z").map_batches(
@@ -345,7 +345,7 @@ def combined_temp_accel_detect_nonwear(
             .sum_horizontal()
             .to_numpy()
         )
-        if mean_temp < temperature_threshold and (accel_value >= 2):
+        if mean_temp < temperature_threshold and (axis_nonwear_value >= 2):
             nonwear_value_array[window_n] = 1
         elif window_n > 0 and mean_temp < temperature_threshold:
             mean_temp_previous = temperature_grouped_by_window["temperature"][
@@ -360,7 +360,7 @@ def combined_temp_accel_detect_nonwear(
     )
 
 
-def implement_DETACH_nonwear(
+def detach_nonwear(
     acceleration: models.Measurement,
     temperature: models.Measurement,
     std_criteria: float = 0.013,
@@ -372,7 +372,7 @@ def implement_DETACH_nonwear(
     Args:
         acceleration: The Measurment instance that contains the calibrated acceleration.
         temperature: The Measurment instance that contains the temperature data.
-        std_criteria: The temperature threshold for non-wear detection.
+        std_criteria: The acceleration STD threshold for non-wear detection.
 
     Returns:
         A new Measurment instance with the non-wear flag and corresponding timestamps.
@@ -391,8 +391,8 @@ def implement_DETACH_nonwear(
         """Helper function to upsample the temperature to match acceleration data."""
         x_temperature = np.linspace(0, 1, len(temperature))
         x_acceleration = np.linspace(0, 1, len(acceleration))
-        interpolated_temp = interpolate.interp1d(x_temperature, temperature)
-        return interpolated_temp(x_acceleration)
+        temperature_interpolator = interpolate.interp1d(x_temperature, temperature)
+        return temperature_interpolator(x_acceleration)
 
     def cleanup_DETACH_nonwear(nonwear: models.Measurement) -> models.Measurement:
         """Helper function to downsample DETACH ouptut to 60s."""
@@ -563,10 +563,10 @@ def _pre_process_temperature(
 ) -> pl.DataFrame:
     """Pre-process temperature data for non-wear detection.
 
-    This function ensures that the temperature and acceleration Measurements end
-    at the same time (due to the inherent sampling rate differences on the device),
-    upsamples the temperature data to 1 second intervals and then low-pass filters
-    the data by applying a 2 minute rolling mean.
+    This function is used specificall for the CTA, it ensures that the temperature
+    and acceleration Measurements end at the same time (due to the inherent sampling
+    rate differences on the device), upsamples the temperature data to 1 second
+    intervals and then low-pass filters the data by applying a 2 minute rolling mean.
 
     Args:
         temperature: The Measurment instance that contains the temperature data.
@@ -574,6 +574,9 @@ def _pre_process_temperature(
 
     Returns:
         A polars DataFrame with the pre-processed temperature data.
+
+    Raises:
+        ValueError: If the acceleration data ends before the temperature data.
     """
     temperature_polars_df = pl.DataFrame(
         {
@@ -592,6 +595,8 @@ def _pre_process_temperature(
         )
 
         temperature_polars_df = temperature_polars_df.vstack(new_row)
+    elif temperature.time[-1] > acceleration.time[-1]:
+        raise ValueError("Temperature data ends before acceleration data.")
 
     temperature_polars_df = temperature_polars_df.with_columns(
         pl.col("time").set_sorted()

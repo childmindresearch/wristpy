@@ -352,6 +352,11 @@ def _run_file(
     Returns:
         All calculated data in a save ready format as a OrchestratorResults object.
 
+    Raises:
+        ValueError: If an invalid Calibrator is chosen
+        ValueError: If the detach or CTA algorithms are requested without
+            temperature information.
+
     References:
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
         output from wrist- and hip-worn monitors. Medicine and Science in Sports and
@@ -374,6 +379,11 @@ def _run_file(
         raise ValueError(msg)
 
     watch_data = readers.read_watch_data(input)
+
+    if watch_data.temperature is None and nonwear_algorithm in ("cta", "detach"):
+        msg = "Temperature data is required for CTA and DETACH nonwear algorithms."
+        logger.error(msg)
+        raise ValueError(msg)
 
     if calibrator is None:
         logger.debug("Running without calibration")
@@ -409,7 +419,7 @@ def _run_file(
                 acceleration=calibrated_acceleration, temperature=watch_data.temperature
             )
         elif nonwear_algorithm == "detach":
-            non_wear_array = metrics.implement_DETACH_nonwear(
+            non_wear_array = metrics.detach_nonwear(
                 acceleration=calibrated_acceleration, temperature=watch_data.temperature
             )
         elif nonwear_algorithm == "majority_vote":
@@ -417,21 +427,21 @@ def _run_file(
             cta_nonwear = metrics.combined_temp_accel_detect_nonwear(
                 acceleration=calibrated_acceleration, temperature=watch_data.temperature
             )
-            detach_nonwear = metrics.implement_DETACH_nonwear(
+            detach_nonwear = metrics.detach_nonwear(
                 acceleration=calibrated_acceleration, temperature=watch_data.temperature
             )
             non_wear_array = nonwear_utils.majority_vote_non_wear(
-                nonwear_ggir=ggir_nonwear,
-                nonwear_cta=cta_nonwear,
-                nonwear_detach=detach_nonwear,
+                ggir_nonwear,
+                cta_nonwear,
+                detach_nonwear,
             )
         elif nonwear_algorithm == "ggir_detach":
             ggir_nonwear = metrics.detect_nonwear(calibrated_acceleration)
-            detach_nonwear = metrics.implement_DETACH_nonwear(
+            detach_nonwear = metrics.detach_nonwear(
                 acceleration=calibrated_acceleration, temperature=watch_data.temperature
             )
-            non_wear_array = nonwear_utils.combined_ggir_detach_nonwear(
-                nonwear_ggir=ggir_nonwear, nonwear_detach=detach_nonwear
+            non_wear_array = nonwear_utils.majority_vote_non_wear(
+                ggir_nonwear, detach_nonwear
             )
         nonwear_epoch = models.Measurement(
             measurements=format_nonwear_data(

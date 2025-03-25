@@ -32,37 +32,33 @@ def test_nonwear_majority_vote() -> None:
     )
 
     nonwear = nonwear_utils.majority_vote_non_wear(
-        nonwear_cta=nonwear1,
-        nonwear_detach=nonwear2,
-        nonwear_ggir=nonwear3,
+        nonwear1,
+        nonwear2,
+        nonwear3,
         temporal_resolution=5,
     )
 
     assert np.all(nonwear.measurements == 1)
 
 
-def test_nonwear_combined_ggir_detach() -> None:
+def test_nonwear_majority_vote_even() -> None:
     """Tests the majority vote function for nonwear."""
     time1 = [
         datetime(1990, 1, 1, 1, 1) + timedelta(seconds=60 * idx) for idx in range(900)
-    ]
-    time2 = [
-        datetime(1990, 1, 1, 1, 1, 10) + timedelta(seconds=100 * idx)
-        for idx in range(11)
     ]
     nonwear1 = models.Measurement(
         measurements=np.ones(len(time1)),
         time=pl.Series("time", time1, dtype=pl.Datetime("ns")),
     )
     nonwear2 = models.Measurement(
-        measurements=np.ones(len(time2)),
-        time=pl.Series("time", time2, dtype=pl.Datetime("ns")),
+        measurements=np.zeros(len(time1)),
+        time=pl.Series("time", time1, dtype=pl.Datetime("ns")),
     )
 
-    nonwear = nonwear_utils.combined_ggir_detach_nonwear(
-        nonwear_ggir=nonwear2,
-        nonwear_detach=nonwear1,
+    nonwear = nonwear_utils.majority_vote_non_wear(
+        nonwear1,
+        nonwear2,
         temporal_resolution=5,
     )
 
-    assert np.all(nonwear.measurements == 1)
+    assert np.all(nonwear.measurements == 0)

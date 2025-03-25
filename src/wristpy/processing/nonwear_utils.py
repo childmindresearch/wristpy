@@ -9,23 +9,19 @@ from wristpy.core import computations, models
 
 
 def majority_vote_non_wear(
-    nonwear_ggir: models.Measurement,
-    nonwear_cta: models.Measurement,
-    nonwear_detach: models.Measurement,
+    *nonwear_measurements: models.Measurement,
     temporal_resolution: float = 60.0,
 ) -> models.Measurement:
-    """This function applies a majority vote on the three possible nonwear outputs.
+    """This function applies a majority vote on any number of nonwear Measurements.
 
-    The three algorithms are resampled to the same sampling rate, and a majority vote
-    is taken at each time point to determine the new nonwear time.
-
-
-    This assumes the nonwear measurements have the same ending time stamp.
+    The _time_fix function is used to ensure that all nonwear Measurements have the
+    same start and endpoints. Then each nonwear Measurement is resampled to the same
+    temporal_resoltion. A majority vote is taken at each time point to determine the
+    new nonwear Measurement.
+    In case of an even number of inputs, the majority is rounded up.
 
     Args:
-        nonwear_ggir: The nonwear algorithm output from the GGIR algorithm.
-        nonwear_cta: The nonwear algorithm output from the CTA algorithm.
-        nonwear_detach: The nonwear algorithm output from the detach algorithm.
+        *nonwear_measurements: Variable number of nonwear algorithm outputs.
         temporal_resolution: The temporal resolution of the output, in seconds.
             Defaults to 60.0.
 
@@ -33,78 +29,33 @@ def majority_vote_non_wear(
         A new Measurement instance with the combined nonwear detection,
         at a new temporal resolution.
     """
-    min_start_time = min(
-        [nonwear_ggir.time[0], nonwear_cta.time[0], nonwear_detach.time[0]]
-    )
+    num_measurements = len(nonwear_measurements)
+    if num_measurements % 2 == 0:
+        majority_threshold = num_measurements // 2 + 1
+    else:
+        majority_threshold = int(np.ceil(num_measurements / 2))
 
-    max_end_time = max(
-        [nonwear_ggir.time[-1], nonwear_cta.time[-1], nonwear_detach.time[-1]]
-    )
+    min_start_time = min(measurement.time[0] for measurement in nonwear_measurements)
+    max_end_time = max(measurement.time[-1] for measurement in nonwear_measurements)
 
-    nonwear_ggir = _time_fix(nonwear_ggir, max_end_time, min_start_time)
-    nonwear_cta = _time_fix(nonwear_cta, max_end_time, min_start_time)
-    nonwear_detach = _time_fix(nonwear_detach, max_end_time, min_start_time)
-
-    nonwear_ggir = computations.resample(nonwear_ggir, temporal_resolution)
-    nonwear_cta = computations.resample(nonwear_cta, temporal_resolution)
-    nonwear_detach = computations.resample(nonwear_detach, temporal_resolution)
-
-    nonwear_ggir.measurements = np.where(nonwear_ggir.measurements >= 0.5, 1, 0)
-    nonwear_cta.measurements = np.where(nonwear_cta.measurements >= 0.5, 1, 0)
-
-    nonwear_value = np.where(
-        (
-            nonwear_ggir.measurements
-            + nonwear_cta.measurements
-            + nonwear_detach.measurements
+    measurement_sum = None
+    for measurement in nonwear_measurements:
+        time_adjust_measurement = _time_fix(measurement, max_end_time, min_start_time)
+        resampled_measurement = computations.resample(
+            time_adjust_measurement, temporal_resolution
         )
-        >= 2,
-        1,
-        0,
-    )
 
-    return models.Measurement(measurements=nonwear_value, time=nonwear_ggir.time)
+        binary_nonwear = np.where(resampled_measurement.measurements >= 0.5, 1, 0)
 
+        if measurement_sum is None:
+            measurement_sum = binary_nonwear
+            reference_time = resampled_measurement.time
+        else:
+            measurement_sum += binary_nonwear
 
-def combined_ggir_detach_nonwear(
-    nonwear_ggir: models.Measurement,
-    nonwear_detach: models.Measurement,
-    temporal_resolution: float = 60.0,
-) -> models.Measurement:
-    """This function combines the GGIR and DETACH nonwear detection outputs.
+    nonwear_value = np.where(measurement_sum >= majority_threshold, 1, 0)  # type: ignore[operator] #measurement_sum is never None type
 
-    The two algorithms are resampled to the same sampling rate, and when both
-    algorithms agree on nonwear, the new nonwear outputs is set to 1.
-
-    This assumes the nonwear measurements have the same ending time stamp.
-
-    Args:
-        nonwear_ggir: The nonwear algorithm output from the GGIR algorithm.
-        nonwear_detach: The nonwear algorithm output from the DETACH algorithm.
-        temporal_resolution: The temporal resolution of the output, in seconds.
-            Defaults to 60.0.
-
-    Returns:
-        A new Measurement instance at a new temporal resolution.
-    """
-    min_start_time = min([nonwear_ggir.time[0], nonwear_detach.time[0]])
-    max_end_time = max([nonwear_ggir.time[-1], nonwear_detach.time[-1]])
-
-    nonwear_ggir = _time_fix(nonwear_ggir, max_end_time, min_start_time)
-    nonwear_detach = _time_fix(nonwear_detach, max_end_time, min_start_time)
-
-    nonwear_ggir = computations.resample(nonwear_ggir, temporal_resolution)
-    nonwear_detach = computations.resample(nonwear_detach, temporal_resolution)
-
-    nonwear_ggir.measurements = np.where(nonwear_ggir.measurements >= 0.5, 1, 0)
-
-    nonwear_value = np.where(
-        (nonwear_ggir.measurements + nonwear_detach.measurements) == 2,
-        1,
-        0,
-    )
-
-    return models.Measurement(measurements=nonwear_value, time=nonwear_ggir.time)
+    return models.Measurement(measurements=nonwear_value, time=reference_time)
 
 
 def _time_fix(

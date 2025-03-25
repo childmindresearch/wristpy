@@ -93,6 +93,15 @@ def test_bad_calibrator(sample_data_gt3x: pathlib.Path) -> None:
         orchestrator._run_file(input=sample_data_gt3x, calibrator="Ggir")  # type: ignore[arg-type]
 
 
+def test_bad_nonwear(sample_data_gt3x: pathlib.Path) -> None:
+    """Test run when invalid calibrator given."""
+    with pytest.raises(
+        ValueError,
+        match="Temperature data is required for CTA and DETACH nonwear algorithms.",
+    ):
+        orchestrator._run_file(input=sample_data_gt3x, nonwear_algorithm="detach")
+
+
 @pytest.mark.parametrize(
     "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
 )
