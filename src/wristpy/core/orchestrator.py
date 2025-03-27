@@ -106,9 +106,7 @@ def run(
     ] = "gradient",
     epoch_length: Union[float, None] = 5,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
-    nonwear_algorithm: Literal[
-        "ggir", "cta", "detach", "majority_vote", "ggir_detach"
-    ] = "ggir",
+    nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
@@ -217,9 +215,7 @@ def _run_directory(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: Union[float, None] = 5,
-    nonwear_algorithm: Literal[
-        "ggir", "cta", "detach", "majority_vote", "ggir_detach"
-    ] = "ggir",
+    nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Dict[str, models.OrchestratorResults]:
@@ -320,7 +316,7 @@ def _run_file(
     ] = "gradient",
     epoch_length: Union[float, None] = 5,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
-    nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = "ggir",
+    nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
@@ -379,7 +375,9 @@ def _run_file(
 
     watch_data = readers.read_watch_data(input)
 
-    if watch_data.temperature is None and nonwear_algorithm in ("cta", "detach"):
+    if watch_data.temperature is None and any(
+        algo in ["cta", "detach"] for algo in nonwear_algorithm
+    ):
         msg = "Temperature data is required for CTA and DETACH nonwear algorithms."
         logger.error(msg)
         raise ValueError(msg)
@@ -411,37 +409,11 @@ def _run_file(
     sleep_windows = sleep_detector.run_sleep_detection()
 
     if watch_data.temperature is not None:
-        if nonwear_algorithm == "ggir":
-            non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
-        elif nonwear_algorithm == "cta":
-            non_wear_array = metrics.combined_temp_accel_detect_nonwear(
-                acceleration=calibrated_acceleration, temperature=watch_data.temperature
-            )
-        elif nonwear_algorithm == "detach":
-            non_wear_array = metrics.detach_nonwear(
-                acceleration=calibrated_acceleration, temperature=watch_data.temperature
-            )
-        elif nonwear_algorithm == "majority_vote":
-            ggir_nonwear = metrics.detect_nonwear(calibrated_acceleration)
-            cta_nonwear = metrics.combined_temp_accel_detect_nonwear(
-                acceleration=calibrated_acceleration, temperature=watch_data.temperature
-            )
-            detach_nonwear = metrics.detach_nonwear(
-                acceleration=calibrated_acceleration, temperature=watch_data.temperature
-            )
-            non_wear_array = nonwear_utils.majority_vote_non_wear(
-                ggir_nonwear,
-                cta_nonwear,
-                detach_nonwear,
-            )
-        elif nonwear_algorithm == "ggir_detach":
-            ggir_nonwear = metrics.detect_nonwear(calibrated_acceleration)
-            detach_nonwear = metrics.detach_nonwear(
-                acceleration=calibrated_acceleration, temperature=watch_data.temperature
-            )
-            non_wear_array = nonwear_utils.majority_vote_non_wear(
-                ggir_nonwear, detach_nonwear
-            )
+        non_wear_array = nonwear_utils.get_nonwear_measurements(
+            calibrated_acceleration=calibrated_acceleration,
+            temperature=watch_data.temperature,
+            algorithms=nonwear_algorithm,
+        )
         nonwear_epoch = models.Measurement(
             measurements=format_nonwear_data(
                 nonwear_data=non_wear_array,

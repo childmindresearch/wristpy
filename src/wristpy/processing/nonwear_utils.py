@@ -23,7 +23,7 @@ def majority_vote_non_wear(
     In case of an even number of inputs, the majority is rounded up.
 
     Args:
-        nonwear_measurements: A sequence (ex. List, Tuple, ...) of nonwear Measurement objects.
+        nonwear_measurements: A sequence (ex. List, Tuple, ...) of Measurement objects.
         temporal_resolution: The temporal resolution of the output, in seconds.
             Defaults to 60.0.
 
@@ -130,6 +130,6 @@ def get_nonwear_measurements(
         results.append(algorithm_functions[algorithm]())
 
     if len(results) > 1:
-        return majority_vote_non_wear(*results)
+        return majority_vote_non_wear(results)
     else:
         return results[0]

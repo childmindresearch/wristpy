@@ -69,3 +69,58 @@ def test_nonwear_majority_vote_empty() -> None:
             nonwear_measurements=[],
             temporal_resolution=5,
         )
+
+
+def test_nonwear_dispatcher_default() -> None:
+    """Tests the nonwear dispatcher function."""
+    num_samples = int(1e5)
+    time_list = [
+        datetime(2024, 5, 2) + timedelta(milliseconds=100 * i)
+        for i in range(num_samples)
+    ]
+    time = pl.Series("time", time_list, dtype=pl.Datetime("ns"))
+    acceleration = models.Measurement(measurements=np.ones((num_samples, 3)), time=time)
+    temperature = models.Measurement(
+        measurements=np.random.randint(low=22, high=32, size=num_samples), time=time
+    )
+
+    nonwear_array = nonwear_utils.get_nonwear_measurements(acceleration, temperature)
+
+    assert isinstance(nonwear_array, models.Measurement)
+
+
+def test_nonwear_dispatcher_multiple() -> None:
+    """Tests nonwear dispatcher with multiple nonwear alogirhtms requested."""
+    num_samples = int(1e5)
+    time_list = [
+        datetime(2024, 5, 2) + timedelta(milliseconds=100 * i)
+        for i in range(num_samples)
+    ]
+    time = pl.Series("time", time_list, dtype=pl.Datetime("ns"))
+    acceleration = models.Measurement(measurements=np.ones((num_samples, 3)), time=time)
+    temperature = models.Measurement(
+        measurements=np.random.randint(low=22, high=32, size=num_samples), time=time
+    )
+
+    nonwear_array = nonwear_utils.get_nonwear_measurements(
+        acceleration, temperature, ["cta", "detach", "ggir"]
+    )
+
+    assert isinstance(nonwear_array, models.Measurement)
+
+
+def test_nonwear_dispatcher_unknown_algo() -> None:
+    """Tests nonwear dispatcher with incorrect algorithm."""
+    num_samples = int(1e5)
+    time_list = [
+        datetime(2024, 5, 2) + timedelta(milliseconds=100 * i)
+        for i in range(num_samples)
+    ]
+    time = pl.Series("time", time_list, dtype=pl.Datetime("ns"))
+    acceleration = models.Measurement(measurements=np.ones((num_samples, 3)), time=time)
+    temperature = models.Measurement(
+        measurements=np.random.randint(low=22, high=32, size=num_samples), time=time
+    )
+
+    with pytest.raises(ValueError):
+        nonwear_utils.get_nonwear_measurements(acceleration, temperature, ["unknown"])  # type: ignore [list-item] #Violating Literal to raise ValueError

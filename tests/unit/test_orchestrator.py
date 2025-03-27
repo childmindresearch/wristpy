@@ -3,7 +3,7 @@
 import datetime
 import pathlib
 import re
-from typing import Literal, Optional
+from typing import Literal, Optional, Sequence
 
 import numpy as np
 import polars as pl
@@ -99,7 +99,7 @@ def test_bad_nonwear(sample_data_gt3x: pathlib.Path) -> None:
         ValueError,
         match="Temperature data is required for CTA and DETACH nonwear algorithms.",
     ):
-        orchestrator._run_file(input=sample_data_gt3x, nonwear_algorithm="detach")
+        orchestrator._run_file(input=sample_data_gt3x, nonwear_algorithm=["detach"])
 
 
 @pytest.mark.parametrize(
@@ -153,13 +153,11 @@ def test_run_single_file_agcount_default(
     assert isinstance(results, models.OrchestratorResults)
 
 
-@pytest.mark.parametrize(
-    "nonwear_algorithm", ["ggir", "cta", "detach", "majority_vote", "ggir_detach"]
-)
+@pytest.mark.parametrize("nonwear_algorithm", [["detach"], ["cta", "ggir"]])
 def test_run_single_file_nonwear_options(
     sample_data_bin: pathlib.Path,
     tmp_path: pathlib.Path,
-    nonwear_algorithm: Literal["ggir", "cta", "detach", "majority_vote", "ggir_detach"],
+    nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]],
 ) -> None:
     """Testing running a single file."""
     output_file_path = tmp_path / "file_name.csv"
