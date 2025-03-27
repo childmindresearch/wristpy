@@ -4,7 +4,7 @@ import datetime
 import itertools
 import logging
 import pathlib
-from typing import Dict, List, Literal, Optional, Tuple, Union
+from typing import Dict, List, Literal, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import polars as pl
@@ -320,9 +320,7 @@ def _run_file(
     ] = "gradient",
     epoch_length: Union[float, None] = 5,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
-    nonwear_algorithm: Literal[
-        "ggir", "cta", "detach", "majority_vote", "ggir_detach"
-    ] = "ggir",
+    nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = "ggir",
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
@@ -346,7 +344,8 @@ def _run_file(
             no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
             ValueError will be raised.
         activity_metric: The metric to be used for physical activity categorization.
-        nonwear_algorithm: The algorithm to be used for nonwear detection.
+        nonwear_algorithm: The algorithm to be used for nonwear detection. A sequence of
+            algorithms can be provided. If so, a majority vote will be taken.
         verbosity: The logging level for the logger.
 
     Returns:

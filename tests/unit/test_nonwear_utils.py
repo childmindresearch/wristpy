@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import polars as pl
+import pytest
 
 from wristpy.core import models
 from wristpy.processing import nonwear_utils
@@ -32,9 +33,7 @@ def test_nonwear_majority_vote() -> None:
     )
 
     nonwear = nonwear_utils.majority_vote_non_wear(
-        nonwear1,
-        nonwear2,
-        nonwear3,
+        [nonwear1, nonwear2, nonwear3],
         temporal_resolution=5,
     )
 
@@ -42,7 +41,7 @@ def test_nonwear_majority_vote() -> None:
 
 
 def test_nonwear_majority_vote_even() -> None:
-    """Tests the majority vote function for nonwear."""
+    """Tests the majority vote function for nonwear, with even input."""
     time1 = [
         datetime(1990, 1, 1, 1, 1) + timedelta(seconds=60 * idx) for idx in range(900)
     ]
@@ -56,9 +55,17 @@ def test_nonwear_majority_vote_even() -> None:
     )
 
     nonwear = nonwear_utils.majority_vote_non_wear(
-        nonwear1,
-        nonwear2,
+        [nonwear1, nonwear2],
         temporal_resolution=5,
     )
 
     assert np.all(nonwear.measurements == 0)
+
+
+def test_nonwear_majority_vote_empty() -> None:
+    """Tests the majority vote function for nonwear when no inputs provided."""
+    with pytest.raises(ValueError):
+        nonwear_utils.majority_vote_non_wear(
+            nonwear_measurements=[],
+            temporal_resolution=5,
+        )
