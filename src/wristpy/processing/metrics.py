@@ -298,7 +298,7 @@ def combined_temp_accel_detect_nonwear(
 ) -> models.Measurement:
     """This function uses the both temperature and acceleration data to detect non-wear.
 
-    The function implements the algorithm described in the Zhou 2014 paper. Briefly,
+    The function implements the algorithm described in the Zhou 2015 paper. Briefly,
     data is chunked into one minute windows. Each windows is classified as "wear" or
     "non-wear", here denoted by 0 and 1, respectively.
 
