@@ -108,7 +108,7 @@ def get_nonwear_measurements(
     Args:
         calibrated_acceleration: The calibrated acceleration data
         temperature: Temperature data if available
-        algorithms: One or more algorithm names to use
+        non_wear_algorithms: One or more algorithm names to use
 
     Returns:
         A non-wear Measurement object.

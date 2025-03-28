@@ -412,7 +412,7 @@ def _run_file(
         non_wear_array = nonwear_utils.get_nonwear_measurements(
             calibrated_acceleration=calibrated_acceleration,
             temperature=watch_data.temperature,
-            algorithms=nonwear_algorithm,
+            non_wear_algorithms=nonwear_algorithm,
         )
         nonwear_epoch = models.Measurement(
             measurements=format_nonwear_data(
