@@ -98,9 +98,12 @@ def _time_fix(
 def get_nonwear_measurements(
     calibrated_acceleration: models.Measurement,
     temperature: models.Measurement,
-    algorithms: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
+    non_wear_algorithms: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
 ) -> models.Measurement:
-    """Get non-wear measurements using specified algorithm(s).
+    """Non-wear measurement dispatcher.
+
+    This function chooses which non-wear detection algorithm(s) to use based on the
+    provided sequence of valid algorithm names.
 
     Args:
         calibrated_acceleration: The calibrated acceleration data
@@ -113,7 +116,7 @@ def get_nonwear_measurements(
     Raises:
         ValueError: If an unknown algorithm is specified.
     """
-    algorithm_functions: Dict[str, Callable] = {
+    non_wear_algorithm_functions: Dict[str, Callable] = {
         "ggir": lambda: metrics.detect_nonwear(calibrated_acceleration),
         "cta": lambda: metrics.combined_temp_accel_detect_nonwear(
             acceleration=calibrated_acceleration, temperature=temperature
@@ -124,10 +127,10 @@ def get_nonwear_measurements(
     }
 
     results = []
-    for algorithm in algorithms:
-        if algorithm not in algorithm_functions:
+    for algorithm in non_wear_algorithms:
+        if algorithm not in non_wear_algorithm_functions:
             raise ValueError(f"Unknown algorithm: {algorithm}")
-        results.append(algorithm_functions[algorithm]())
+        results.append(non_wear_algorithm_functions[algorithm]())
 
     if len(results) > 1:
         return majority_vote_non_wear(results)
