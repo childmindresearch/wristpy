@@ -1,15 +1,13 @@
 """Python based runner."""
 
-import datetime
 import itertools
 import logging
 import pathlib
 from typing import Dict, List, Literal, Optional, Sequence, Tuple, Union
 
 import numpy as np
-import polars as pl
 
-from wristpy.core import computations, config, exceptions, models
+from wristpy.core import config, exceptions, models
 from wristpy.io.readers import readers
 from wristpy.processing import (
     analytics,
