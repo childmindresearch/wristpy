@@ -9,7 +9,7 @@ from typing import Dict, List, Literal, Optional, Sequence, Tuple, Union
 import numpy as np
 import polars as pl
 
-from wristpy.core import config, exceptions, models
+from wristpy.core import computations, config, exceptions, models
 from wristpy.io.readers import readers
 from wristpy.processing import (
     analytics,
@@ -47,53 +47,6 @@ def format_sleep_data(
         sleep_array[sleep_mask] = 1
 
     return sleep_array
-
-
-def format_nonwear_data(
-    nonwear_data: models.Measurement,
-    reference_measure: models.Measurement,
-    original_temporal_resolution: float,
-) -> np.ndarray:
-    """Formats nonwear data to match the temporal resolution of the other measures.
-
-    The detect_nonweaer algorithm outputs non-wear values in 15-minute windows, where
-    each timestamp represents the beginning of the window. This structure does not align
-    well with the polars upsample function, which treats the last timestamp as the end
-    of the time series. As a result, using the upsample function would cut off the
-    final window. To avoid this, we manually map the non-wear data to the reference
-    measure's resolution.
-
-    Args:
-        nonwear_data: The nonwear array to be upsampled.
-        reference_measure: The measurement we match the non_wear data's temporal
-            resolution to.
-        original_temporal_resolution: The original temporal resolution of the
-            nonwear_data.
-
-    Returns:
-        1-D np.ndarray with 1 indicating a nonwear timepoint. Will match the
-            length of the reference measure.
-    """
-    logger.debug("Upsampling nonwear data.")
-    nonwear_df = pl.DataFrame(
-        {
-            "nonwear": nonwear_data.measurements.astype(np.int64),
-            "time": nonwear_data.time,
-        }
-    ).set_sorted("time")
-
-    nonwear_array = np.zeros(len(reference_measure.time), dtype=bool)
-
-    for row in nonwear_df.iter_rows(named=True):
-        nonwear_value = row["nonwear"]
-        time = row["time"]
-        nonwear_mask = (reference_measure.time >= time) & (
-            reference_measure.time
-            <= time + datetime.timedelta(seconds=original_temporal_resolution)
-        )
-        nonwear_array[nonwear_mask] = nonwear_value
-
-    return nonwear_array
 
 
 def run(
@@ -375,13 +328,6 @@ def _run_file(
 
     watch_data = readers.read_watch_data(input)
 
-    if watch_data.temperature is None and any(
-        algo in ["cta", "detach"] for algo in nonwear_algorithm
-    ):
-        msg = "Temperature data is required for CTA and DETACH nonwear algorithms."
-        logger.error(msg)
-        raise ValueError(msg)
-
     if calibrator is None:
         logger.debug("Running without calibration")
         calibrated_acceleration = watch_data.acceleration
@@ -408,31 +354,16 @@ def _run_file(
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
 
-    if watch_data.temperature is not None:
-        non_wear_array = nonwear_utils.get_nonwear_measurements(
-            calibrated_acceleration=calibrated_acceleration,
-            temperature=watch_data.temperature,
-            non_wear_algorithms=nonwear_algorithm,
-        )
-        nonwear_epoch = models.Measurement(
-            measurements=format_nonwear_data(
-                nonwear_data=non_wear_array,
-                reference_measure=activity_measurement,
-                original_temporal_resolution=60,
-            ),
-            time=activity_measurement.time,
-        )
-    else:
-        non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
-        nonwear_epoch = models.Measurement(
-            measurements=format_nonwear_data(
-                nonwear_data=non_wear_array,
-                reference_measure=activity_measurement,
-                original_temporal_resolution=900,
-            ),
-            time=activity_measurement.time,
-        )
-
+    nonwear_array = nonwear_utils.get_nonwear_measurements(
+        calibrated_acceleration=calibrated_acceleration,
+        temperature=watch_data.temperature,
+        non_wear_algorithms=nonwear_algorithm,
+    )
+    nonwear_epoch = nonwear_utils.nonwear_array_cleanup(
+        nonwear_array=nonwear_array,
+        reference_measurement=activity_measurement,
+        epoch_length=epoch_length,
+    )
     physical_activity_levels = analytics.compute_physical_activty_categories(
         activity_measurement, thresholds
     )

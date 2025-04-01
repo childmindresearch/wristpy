@@ -32,7 +32,7 @@ def test_nonwear_majority_vote() -> None:
         time=pl.Series("time", time3, dtype=pl.Datetime("ns")),
     )
 
-    nonwear = nonwear_utils.majority_vote_non_wear(
+    nonwear = nonwear_utils._majority_vote_non_wear(
         [nonwear1, nonwear2, nonwear3],
         temporal_resolution=5,
     )
@@ -54,7 +54,7 @@ def test_nonwear_majority_vote_even() -> None:
         time=pl.Series("time", time1, dtype=pl.Datetime("ns")),
     )
 
-    nonwear = nonwear_utils.majority_vote_non_wear(
+    nonwear = nonwear_utils._majority_vote_non_wear(
         [nonwear1, nonwear2],
         temporal_resolution=5,
     )
@@ -65,7 +65,7 @@ def test_nonwear_majority_vote_even() -> None:
 def test_nonwear_majority_vote_empty() -> None:
     """Tests the majority vote function for nonwear when no inputs provided."""
     with pytest.raises(ValueError):
-        nonwear_utils.majority_vote_non_wear(
+        nonwear_utils._majority_vote_non_wear(
             nonwear_measurements=[],
             temporal_resolution=5,
         )
@@ -124,3 +124,19 @@ def test_nonwear_dispatcher_unknown_algo() -> None:
 
     with pytest.raises(ValueError):
         nonwear_utils.get_nonwear_measurements(acceleration, temperature, ["unknown"])  # type: ignore [list-item] #Violating Literal to raise ValueError
+
+
+def test_nonwear_dispatcher_missing_temperature() -> None:
+    """Tests nonwear dispatcher with missing temperature."""
+    num_samples = int(1e5)
+    time_list = [
+        datetime(2024, 5, 2) + timedelta(milliseconds=100 * i)
+        for i in range(num_samples)
+    ]
+    time = pl.Series("time", time_list, dtype=pl.Datetime("ns"))
+    acceleration = models.Measurement(measurements=np.ones((num_samples, 3)), time=time)
+
+    with pytest.raises(ValueError):
+        nonwear_utils.get_nonwear_measurements(
+            acceleration, non_wear_algorithms=["cta"]
+        )

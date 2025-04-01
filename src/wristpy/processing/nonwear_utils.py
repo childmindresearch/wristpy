@@ -1,7 +1,7 @@
 """This module contains helper functions for aggregated nonwear detection outputs."""
 
 import datetime
-from typing import Callable, Dict, Literal, Sequence
+from typing import Literal, Sequence, Union
 
 import numpy as np
 import polars as pl
@@ -10,7 +10,7 @@ from wristpy.core import computations, models
 from wristpy.processing import metrics
 
 
-def majority_vote_non_wear(
+def _majority_vote_non_wear(
     nonwear_measurements: Sequence[models.Measurement],
     temporal_resolution: float = 60.0,
 ) -> models.Measurement:
@@ -18,9 +18,10 @@ def majority_vote_non_wear(
 
     The _time_fix function is used to ensure that all nonwear Measurements have the
     same start and endpoints. Then each nonwear Measurement is resampled to the same
-    temporal_resoltion. A majority vote is taken at each time point to determine the
+    temporal_resolution. A majority vote is taken at each time point to determine the
     new nonwear Measurement.
     In case of an even number of inputs, the majority is rounded up.
+    If only one nonwear Measurement is provided, it is returned as is.
 
     Args:
         nonwear_measurements: A sequence (ex. List, Tuple, ...) of Measurement objects.
@@ -38,6 +39,9 @@ def majority_vote_non_wear(
 
     if num_measurements == 0:
         raise ValueError("At least one nonwear measurement is required.")
+
+    if num_measurements == 1:
+        return nonwear_measurements[0]
 
     majority_threshold = num_measurements / 2
 
@@ -97,7 +101,7 @@ def _time_fix(
 
 def get_nonwear_measurements(
     calibrated_acceleration: models.Measurement,
-    temperature: models.Measurement,
+    temperature: models.Measurement | None = None,
     non_wear_algorithms: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
 ) -> models.Measurement:
     """Non-wear measurement dispatcher.
@@ -108,31 +112,100 @@ def get_nonwear_measurements(
     Args:
         calibrated_acceleration: The calibrated acceleration data
         temperature: Temperature data if available
-        non_wear_algorithms: One or more algorithm names to use
+        non_wear_algorithms: One or more algorithm names to use.
+
 
     Returns:
         A non-wear Measurement object.
 
     Raises:
-        ValueError: If an unknown algorithm is specified.
+        ValueError:
+            If the CTA or DETACH algorith is requested without temperature data.
+            If an unknown algorithm is specified.
+
     """
-    non_wear_algorithm_functions: Dict[str, Callable] = {
+    temp_dependent_algorithm = {"cta", "detach"}
+    if (
+        any(algorithm in temp_dependent_algorithm for algorithm in non_wear_algorithms)
+        and temperature is None
+    ):
+        raise ValueError(
+            "Temperature data is required for the CTA and DETACH nonwear algorithms."
+        )
+
+    non_wear_algorithm_functions = {
         "ggir": lambda: metrics.detect_nonwear(calibrated_acceleration),
         "cta": lambda: metrics.combined_temp_accel_detect_nonwear(
-            acceleration=calibrated_acceleration, temperature=temperature
+            acceleration=calibrated_acceleration,
+            temperature=temperature,  # type: ignore[arg-type] #protected by if statement
         ),
         "detach": lambda: metrics.detach_nonwear(
-            acceleration=calibrated_acceleration, temperature=temperature
+            acceleration=calibrated_acceleration,
+            temperature=temperature,  # type: ignore[arg-type] #protected by if statement
         ),
     }
 
-    results = []
-    for algorithm in non_wear_algorithms:
-        if algorithm not in non_wear_algorithm_functions:
-            raise ValueError(f"Unknown algorithm: {algorithm}")
-        results.append(non_wear_algorithm_functions[algorithm]())
+    if any(
+        algorithm not in non_wear_algorithm_functions
+        for algorithm in non_wear_algorithms
+    ):
+        raise ValueError("An unknown algorithm was specified.")
+
+    results = [
+        non_wear_algorithm_functions[algorithm]() for algorithm in non_wear_algorithms
+    ]
 
     if len(results) > 1:
-        return majority_vote_non_wear(results)
-    else:
-        return results[0]
+        return _majority_vote_non_wear(results)
+    return results[0]
+
+
+def nonwear_array_cleanup(
+    nonwear_array: models.Measurement,
+    reference_measurement: models.Measurement,
+    epoch_length: Union[None, float] = 5.0,
+) -> models.Measurement:
+    """This function is used to match the nonwear array to a reference Measurement.
+
+    This function ensures that the nonwear array and reference Measurement times
+    are synced up. This is accomplished by first resampling the nonwear array to
+    the specified temporal resolution.
+    It also ensures that the nonwear array is a binary array, where 1 indicates
+    nonwear and 0 indicates wear.
+    It then truncates the nonwear array to match the reference Measurement time points.
+
+    Args:
+        nonwear_array: The nonwear array to clean up.
+        reference_measurement: The reference measurement to use for resampling.
+        epoch_length: The temporal resolution of the output, in seconds.
+            Defaults to 5.0.
+
+    Returns:
+        A new Measurement instance with the cleaned up nonwear detection.
+    """
+    if epoch_length is None:
+        time_delta_median = (
+            reference_measurement.time[1:] - reference_measurement.time[:-1]
+        ).median()
+        epoch_length = time_delta_median.total_seconds()  # type: ignore[union-attr] #Guarded by Measurement validation for .time attribute
+    time_fix_nonwear = _time_fix(
+        nonwear_array, reference_measurement.time[-1], reference_measurement.time[0]
+    )
+    resampled_nonwear = computations.resample(time_fix_nonwear, epoch_length)
+    binary_nonwear = np.where(resampled_nonwear.measurements >= 0.5, 1, 0)
+
+    ref_df = pl.DataFrame({"time": reference_measurement.time})
+
+    nonwear_df = pl.DataFrame(
+        {
+            "time": resampled_nonwear.time,
+            "idx": pl.arange(0, len(resampled_nonwear.time), eager=True),
+        }
+    )
+
+    joined = ref_df.join(nonwear_df, on="time", how="inner")
+
+    matched_indices = joined["idx"].to_numpy()
+    matched_values = binary_nonwear[matched_indices]
+
+    return models.Measurement(measurements=matched_values, time=joined["time"])
