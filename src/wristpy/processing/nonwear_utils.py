@@ -1,7 +1,7 @@
 """This module contains helper functions for aggregated nonwear detection outputs."""
 
 import datetime
-from typing import Literal, Sequence, Union
+from typing import Literal, Sequence
 
 import numpy as np
 import polars as pl
