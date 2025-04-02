@@ -191,7 +191,7 @@ def test_main_with_options(
             "-t",
             "0.1, 1.0, 1.5",
             "-e",
-            "0",
+            "3",
             "-a",
             "mad",
             "-nw",
@@ -206,7 +206,7 @@ def test_main_with_options(
         calibrator="gradient",
         activity_metric="mad",
         nonwear_algorithm=["cta", "ggir"],
-        epoch_length=None,
+        epoch_length=3,
         verbosity=logging.WARNING,
         output_filetype=None,
     )

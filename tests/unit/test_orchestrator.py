@@ -150,25 +150,6 @@ def test_run_single_file_nonwear_options(
     assert isinstance(results, models.OrchestratorResults)
 
 
-def test_run_single_file_mad_epoch_none(
-    sample_data_bin: pathlib.Path,
-    tmp_path: pathlib.Path,
-) -> None:
-    """Testing running a single file."""
-    output_file_path = tmp_path / "file_name.csv"
-
-    with pytest.raises(
-        ValueError,
-        match="If using 'ag_count' or 'mad', epoch_length must be provided.",
-    ):
-        orchestrator.run(
-            input=sample_data_bin,
-            output=output_file_path,
-            activity_metric="mad",
-            epoch_length=None,
-        )
-
-
 def test_run_single_file_bad_output_filetype(
     sample_data_gt3x: pathlib.Path,
     tmp_path: pathlib.Path,

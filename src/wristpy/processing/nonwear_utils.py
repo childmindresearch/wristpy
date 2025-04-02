@@ -163,7 +163,7 @@ def get_nonwear_measurements(
 def nonwear_array_cleanup(
     nonwear_array: models.Measurement,
     reference_measurement: models.Measurement,
-    epoch_length: Union[None, float] = 5.0,
+    epoch_length: float = 5.0,
 ) -> models.Measurement:
     """This function is used to match the nonwear array to a reference Measurement.
 
@@ -183,11 +183,6 @@ def nonwear_array_cleanup(
     Returns:
         A new Measurement instance with the cleaned up nonwear detection.
     """
-    if epoch_length is None:
-        time_delta_median = (
-            reference_measurement.time[1:] - reference_measurement.time[:-1]
-        ).median()
-        epoch_length = time_delta_median.total_seconds()  # type: ignore[union-attr] #Guarded by Measurement validation for .time attribute
     time_fix_nonwear = _time_fix(
         nonwear_array, reference_measurement.time[-1], reference_measurement.time[0]
     )

@@ -89,8 +89,8 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
         "--epoch_length",
         default=5,
         type=int,
-        help="Specify the sampling rate in seconds for all metrics. To skip resampling,"
-        " enter 0.",
+        help="Specify the sampling rate in seconds for all metrics."
+        "Must be greater than 0.",
     )
 
     parser.add_argument(
@@ -152,7 +152,7 @@ def main(
         thresholds=None
         if arguments.thresholds is None
         else cast(Tuple[float, float, float], tuple(arguments.thresholds)),
-        epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
+        epoch_length=arguments.epoch_length,
         nonwear_algorithm=arguments.nonwear_algorithm,
         verbosity=log_level,
         output_filetype=arguments.output_filetype,

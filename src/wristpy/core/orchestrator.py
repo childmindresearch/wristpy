@@ -55,7 +55,7 @@ def run(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[float, None] = 5,
+    epoch_length: float = 5,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
@@ -81,9 +81,7 @@ def run(
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given, and `enmo` is the chosen physical activity metric,
-            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
-            ValueError will be raised.
+            to. It must be > 0.0.
         activity_metric: The metric to be used for physical activity categorization.
         nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
@@ -165,7 +163,7 @@ def _run_directory(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[float, None] = 5,
+    epoch_length: float = 5,
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
@@ -187,9 +185,7 @@ def _run_directory(
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given, and `enmo` is the chosen physical activity metric,
-            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
-            ValueError will be raised.
+            to. It must be > 0.0.
         nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files.
@@ -265,7 +261,7 @@ def _run_file(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[float, None] = 5,
+    epoch_length: float = 5.0,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
@@ -287,9 +283,7 @@ def _run_file(
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given, and `enmo` is the chosen physical activity metric,
-            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
-            ValueError will be raised.
+            to. It must be > 0.0.
         activity_metric: The metric to be used for physical activity categorization.
         nonwear_algorithm: The algorithm to be used for nonwear detection. A sequence of
             algorithms can be provided. If so, a majority vote will be taken.
@@ -403,7 +397,7 @@ def _run_file(
 def _compute_activity(
     acceleration: models.Measurement,
     activity_metric: Literal["ag_count", "mad", "enmo"],
-    epoch_length: Union[float, None],
+    epoch_length: float,
 ) -> models.Measurement:
     """This is a helper function to organize the computation of the activity metric.
 
@@ -418,19 +412,12 @@ def _compute_activity(
 
     Returns:
         A Measurement object with the computed physical activity metric.
-
-    Raises:
-        ValueError: If the activity_metric is 'ag_count' or 'mad' and epoch_length is
-            None.
     """
-    if activity_metric in ("ag_count", "mad") and epoch_length is None:
-        raise ValueError("If using 'ag_count' or 'mad', epoch_length must be provided.")
-
     if activity_metric == "ag_count":
         return metrics.actigraph_activity_counts(
             acceleration,
-            epoch_length=epoch_length,  # type: ignore[arg-type] # Guarded by the ValueError statement above.
+            epoch_length=epoch_length,
         )
     elif activity_metric == "mad":
-        return metrics.mean_amplitude_deviation(acceleration, epoch_length=epoch_length)  # type: ignore[arg-type] # Guarded by the ValueError statement above.
+        return metrics.mean_amplitude_deviation(acceleration, epoch_length=epoch_length)
     return metrics.euclidean_norm_minus_one(acceleration, epoch_length=epoch_length)
