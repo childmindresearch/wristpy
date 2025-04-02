@@ -839,7 +839,8 @@ def butterworth_filter(
         acceleration: Acceleration data to be filtered.
         sampling_rate: Sampling rate of acceleration data in Hz.
         cutoffs: Cutoff values for bandpass filter.
-        order: Order of the butterworth filter, defaults to 4th order.
+        order: Order of the filter, defaults to 4th order.
+
 
     Returns:
         Acceleration Measurement of filtered data.
@@ -854,4 +855,102 @@ def butterworth_filter(
 
     return models.Measurement(
         measurements=np.column_stack(filtered_data), time=acceleration.time
+    )
+
+
+def aggregate_mims(
+    acceleration: models.Measurement,
+    epoch: int = 60,
+    rectify: bool = True,
+    sampling_rate: int = 100,
+) -> models.Measurement:
+    """Calculate the area under the curve(AUC), per epoch, per axis.
+
+    When an epoch has less than 90% of the expected values (based on the sampling rate
+    and epoch length), the AUC for that epoch is given as -1 for each axis. If rectify
+    is True, any axis with values below -150 will have the AUC value for that axis, will
+    be -1, for that epoch. Finally, following integration, any value greater than 16 *
+    sampling_rate * epoch will be set to -1.
+
+    Args:
+        acceleration: Acceleration data to be aggregated.
+        epoch: The desired epoch length in seconds that data will be aggregated over.
+            Defaults to 1 minute as per MIMS-unit paper.
+        rectify: Specifies if data should be rectified before integration. If True any
+            value below -150 will assign the value of that axis to -1 for that epoch.
+            Additionally the absolute value of accelerometer data will be used for
+            integration.
+        sampling_rate: The sampling rate of the accelerometer data in Hz.
+
+    Returns:
+        A models.Measurement instance with the area under the curve values for each
+        epoch.
+    """
+    acceleration_df = pl.DataFrame(
+        {
+            "time": acceleration.time,
+            "x": acceleration.measurements[:, 0],
+            "y": acceleration.measurements[:, 1],
+            "z": acceleration.measurements[:, 2],
+        }
+    )
+
+    result = acceleration_df.group_by_dynamic(
+        "time",
+        every=f"{epoch}s",
+    ).map_groups(
+        lambda group: _aggregate_epoch(
+            group=group,
+            sampling_rate=sampling_rate,
+            rectify=rectify,
+            epoch=epoch,
+        ),
+        schema={
+            "time": pl.Datetime("ns"),
+            "x": pl.Float64,
+            "y": pl.Float64,
+            "z": pl.Float64,
+        },
+    )
+
+    return models.Measurement(
+        measurements=result.select(["x", "y", "z"]).to_numpy(),
+        time=result["time"].cast(pl.Datetime("ns")),
+    )
+
+
+def _aggregate_epoch(
+    group: pl.DataFrame,
+    sampling_rate: int = 100,
+    rectify: bool = True,
+    epoch: int = 60,
+) -> pl.DataFrame:
+    timestamps = group["time"].cast(pl.Int64).to_numpy()
+    values = group.select(["x", "y", "z"]).to_numpy()
+
+    if len(timestamps) < 0.9 * sampling_rate * epoch:
+        return pl.DataFrame(
+            {"time": [group["time"].min()], "x": [-1.0], "y": [-1.0], "z": [-1.0]}
+        )
+
+    times_sec = timestamps / 1e9
+    aggregated_area = []
+
+    for col in range(3):
+        col_values = values[:, col]
+        if rectify:
+            if (col_values <= -150).any():
+                aggregated_area.append(-1.0)
+                continue
+            col_values = np.abs(col_values)
+        area = np.trapezoid(y=col_values, x=times_sec)
+        aggregated_area.append(area)
+
+    max_value = 16 * sampling_rate * epoch
+    area = np.array(aggregated_area)
+    area = np.where(area >= max_value, -1.0, area)
+    area = np.where(area < 0, -1.0, area)
+
+    return pl.DataFrame(
+        {"time": [group["time"].min()], "x": [area[0]], "y": [area[1]], "z": [area[2]]}
     )
