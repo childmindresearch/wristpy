@@ -1,7 +1,7 @@
 """This module contains helper functions for aggregated nonwear detection outputs."""
 
 import datetime
-from typing import Literal, Sequence
+from typing import Literal, Sequence, Union
 
 import numpy as np
 import polars as pl
@@ -101,7 +101,7 @@ def _time_fix(
 
 def get_nonwear_measurements(
     calibrated_acceleration: models.Measurement,
-    temperature: models.Measurement | None = None,
+    temperature: Union[models.Measurement, None] = None,
     non_wear_algorithms: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
 ) -> models.Measurement:
     """Non-wear measurement dispatcher.
