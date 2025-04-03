@@ -296,6 +296,7 @@ def _run_file(
         ValueError: If an invalid Calibrator is chosen
         ValueError: If the detach or CTA algorithms are requested without
             temperature information.
+        ValueError: If epoch_length is not greater than 0.
 
     References:
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
@@ -315,6 +316,11 @@ def _run_file(
             f"Invalid calibrator: {calibrator}. Choose: 'ggir', 'gradient'. "
             "Enter None if no calibration is desired."
         )
+        logger.error(msg)
+        raise ValueError(msg)
+
+    if epoch_length <= 0:
+        msg = "Epoch_length must be greater than 0."
         logger.error(msg)
         raise ValueError(msg)
 

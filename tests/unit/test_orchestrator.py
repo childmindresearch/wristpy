@@ -78,6 +78,15 @@ def test_bad_nonwear(sample_data_gt3x: pathlib.Path) -> None:
         orchestrator._run_file(input=sample_data_gt3x, nonwear_algorithm=["detach"])
 
 
+def test_bad_epoch_length(sample_data_gt3x: pathlib.Path) -> None:
+    """Test run when invalid epoch length given."""
+    with pytest.raises(
+        ValueError,
+        match="Epoch_length must be greater than 0.",
+    ):
+        orchestrator._run_file(input=sample_data_gt3x, epoch_length=-5)
+
+
 @pytest.mark.parametrize(
     "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
 )
