@@ -717,3 +717,25 @@ def test_extrapolate_interpolate(marker: np.ndarray) -> None:
     )
 
     assert np.allclose(interpolated, axis)
+
+
+def test_aggregation_good(
+    sample_data_gt3x: pathlib.Path, aggregation_r_version: pathlib.Path
+) -> None:
+    """Test MIMS aggregation. See mims_test_data_code.md for details on sample data."""
+    test_data = readers.read_watch_data(sample_data_gt3x)
+    test_data_interpolated = metrics.interpolate_measure(
+        acceleration=test_data.acceleration
+    )
+    expected_results = pl.read_csv(aggregation_r_version)
+    expected_acceleration = expected_results.select(
+        ["AGGREGATED_X", "AGGREGATED_Y", "AGGREGATED_Z"]
+    ).to_numpy()
+    expected_time = expected_results["HEADER_TIME_STAMP"]
+
+    results = metrics.aggregate_mims(acceleration=test_data_interpolated)
+
+    assert np.allclose(
+        expected_acceleration, results.measurements, atol=0.001
+    ), f"results: {results.measurements}"
+    assert (expected_time == results.time).all

@@ -941,6 +941,10 @@ def _aggregate_epoch(
         if rectify:
             if (col_values <= -150).any():
                 aggregated_area.append(-1.0)
+                logger.debug(
+                    "Value <= -150 found during aggregation."
+                    "Considering reviewing your data for issues."
+                )
                 continue
             col_values = np.abs(col_values)
         area = np.trapezoid(y=col_values, x=times_sec)
