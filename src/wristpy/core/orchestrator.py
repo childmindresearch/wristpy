@@ -293,9 +293,7 @@ def _run_file(
         All calculated data in a save ready format as a OrchestratorResults object.
 
     Raises:
-        ValueError: If an invalid Calibrator is chosen
-        ValueError: If the detach or CTA algorithms are requested without
-            temperature information.
+        ValueError: If an invalid Calibrator is chosen.
         ValueError: If epoch_length is not greater than 0.
 
     References:
