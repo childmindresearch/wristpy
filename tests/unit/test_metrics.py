@@ -725,7 +725,7 @@ def test_aggregation_good(
     """Test MIMS aggregation. See mims_test_data_code.md for details on sample data."""
     test_data = readers.read_watch_data(sample_data_gt3x)
     test_data_interpolated = metrics.interpolate_measure(
-        acceleration=test_data.acceleration
+        acceleration=test_data.acceleration, new_frequency=100
     )
     expected_results = pl.read_csv(aggregation_r_version)
     expected_acceleration = expected_results.select(
@@ -733,9 +733,46 @@ def test_aggregation_good(
     ).to_numpy()
     expected_time = expected_results["HEADER_TIME_STAMP"]
 
-    results = metrics.aggregate_mims(acceleration=test_data_interpolated)
+    results = metrics.aggregate_mims(
+        acceleration=test_data_interpolated, epoch=60, sampling_rate=100
+    )
 
     assert np.allclose(
         expected_acceleration, results.measurements, atol=0.001
-    ), f"results: {results.measurements}"
+    ), f"Results did not match expectation. Results: {results.measurements}"
     assert (expected_time == results.time).all
+
+
+def test_aggregation_few_samples(
+    sample_data_gt3x: pathlib.Path,
+) -> None:
+    """Testing scenario where there are less than the number of expected samples."""
+    test_data = readers.read_watch_data(sample_data_gt3x)
+    expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
+
+    results = metrics.aggregate_mims(
+        acceleration=test_data.acceleration, epoch=60, sampling_rate=100
+    )
+
+    assert np.all(
+        expected_acceleration == results.measurements
+    ), f"Results did not match expectation. Results: {results.measurements}"
+
+
+def test_aggregation_rectify() -> None:
+    """Test if value is set to -1 when any value is less than -150."""
+    below_threshold_data = np.full((6000, 3), -200)
+    dummy_date = datetime.now()
+    dummy_datetime_list = [dummy_date + timedelta(seconds=i / 100) for i in range(6000)]
+    below_threshold_measure = models.Measurement(
+        measurements=below_threshold_data, time=pl.Series(dummy_datetime_list)
+    )
+    expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
+
+    results = metrics.aggregate_mims(
+        acceleration=below_threshold_measure, epoch=60, sampling_rate=100
+    )
+
+    assert np.all(
+        expected_acceleration == results.measurements
+    ), f"Results did not match expectation. Results: {results.measurements}"
