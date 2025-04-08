@@ -1,7 +1,5 @@
 """Calculate base metrics, anglez and enmo."""
 
-from typing import Union
-
 import numpy as np
 import polars as pl
 from scipy import interpolate, signal
@@ -14,7 +12,7 @@ logger = config.get_logger()
 
 
 def euclidean_norm_minus_one(
-    acceleration: models.Measurement, epoch_length: Union[float, None] = None
+    acceleration: models.Measurement, epoch_length: float = 5.0
 ) -> models.Measurement:
     """Compute ENMO, the Euclidean Norm Minus One (1 standard gravity unit).
 
@@ -31,7 +29,7 @@ def euclidean_norm_minus_one(
         accelerometer data in an np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
         epoch_length: The temporal resolution of the downsampled enmo, in seconds.
-            Defaults to `None`, which means no downsampling.
+            Must be greater than 0. Defaults to 5.0s.
 
     Returns:
         A Measurement object containing the calculated ENMO values and the
@@ -41,16 +39,13 @@ def euclidean_norm_minus_one(
 
     enmo = np.maximum(enmo, 0)
 
-    if epoch_length is not None:
-        return computations.moving_mean(
-            models.Measurement(measurements=enmo, time=acceleration.time), epoch_length
-        )
-    else:
-        return models.Measurement(measurements=enmo, time=acceleration.time)
+    return computations.moving_mean(
+        models.Measurement(measurements=enmo, time=acceleration.time), epoch_length
+    )
 
 
 def angle_relative_to_horizontal(
-    acceleration: models.Measurement, epoch_length: Union[float, None] = None
+    acceleration: models.Measurement, epoch_length: float = 5.0
 ) -> models.Measurement:
     """Calculate the angle of the acceleration vector relative to the horizontal plane.
 
@@ -62,7 +57,7 @@ def angle_relative_to_horizontal(
         accelerometer data in an np.array and 2) time, a pl.Series containing
         datetime.datetime objects.
         epoch_length: The temporal resolution of the downsampled anglez, in seconds.
-            Defaults to `None`, which means no downsampling.
+            Must be greater than 0. Defaults to 5.0s.
 
     Returns:
         A Measurement instance containing the values of the angle relative to the
@@ -74,13 +69,11 @@ def angle_relative_to_horizontal(
     angle_radians = np.arctan(acceleration.measurements[:, 2] / xy_projection_magnitute)
 
     angle_degrees = np.degrees(angle_radians)
-    if epoch_length is not None:
-        return computations.moving_mean(
-            models.Measurement(measurements=angle_degrees, time=acceleration.time),
-            epoch_length,
-        )
-    else:
-        return models.Measurement(measurements=angle_degrees, time=acceleration.time)
+
+    return computations.moving_mean(
+        models.Measurement(measurements=angle_degrees, time=acceleration.time),
+        epoch_length,
+    )
 
 
 def mean_amplitude_deviation(

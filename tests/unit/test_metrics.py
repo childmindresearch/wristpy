@@ -67,19 +67,16 @@ def test_euclidean_norm_minus_one(
         measurements=np.column_stack((x, y, z)), time=test_time
     )
 
+    expected_length = math.ceil(len(test_time) / 5)
     enmo_results = metrics.euclidean_norm_minus_one(test_acceleration)
 
     assert np.all(
         np.isclose(enmo_results.measurements, expected_enmo)
     ), f"Expected {expected_enmo}"
 
-    assert enmo_results.time.equals(
-        test_acceleration.time
+    assert (
+        len(enmo_results.time) == expected_length
     ), "Input time attribute does not match output time attribute."
-
-    assert enmo_results.measurements.shape == (
-        TEST_LENGTH,
-    ), f"Expected enmo shape: ({TEST_LENGTH},), got ({enmo_results.measurements.shape})"
 
 
 @pytest.mark.parametrize(
@@ -102,19 +99,16 @@ def test_angle_relative_to_horizontal(
         measurements=measurements, time=dummy_datetime
     )
 
+    expected_length = math.ceil(len(dummy_datetime) / 5)
     angle_z_results = metrics.angle_relative_to_horizontal(test_acceleration)
 
     assert np.all(
         np.isclose(angle_z_results.measurements, expected_anglez, equal_nan=True)
     ), f"Expected {expected_anglez}, got: {angle_z_results.measurements}"
 
-    assert angle_z_results.time.equals(
-        test_acceleration.time
+    assert (
+        len(angle_z_results.time) == expected_length
     ), "Input time attribute does not match output time attribute."
-
-    assert angle_z_results.measurements.shape == (1,), (
-        f"Expected anglez shape: {(1,)}," f"got({angle_z_results.measurements.shape})"
-    )
 
 
 @pytest.mark.parametrize(
