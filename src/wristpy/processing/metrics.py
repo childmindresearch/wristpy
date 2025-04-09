@@ -850,7 +850,7 @@ def butterworth_filter(
 
     filtered_data = []
     for axis in acceleration.measurements.T:
-        filtered_axis = signal.filtfilt(b=b, a=a, x=axis)
+        filtered_axis = signal.lfilter(b=b, a=a, x=axis)
         filtered_data.append(filtered_axis)
 
     return models.Measurement(
@@ -901,9 +901,9 @@ def aggregate_mims(
     ).map_groups(
         lambda group: _aggregate_epoch(
             group=group,
-            sampling_rate=sampling_rate,
-            rectify=rectify,
             epoch=epoch,
+            rectify=rectify,
+            sampling_rate=sampling_rate,
         ),
         schema={
             "time": pl.Datetime("ns"),
@@ -921,10 +921,31 @@ def aggregate_mims(
 
 def _aggregate_epoch(
     group: pl.DataFrame,
-    sampling_rate: int = 100,
-    rectify: bool = True,
     epoch: int = 60,
+    rectify: bool = True,
+    sampling_rate: int = 100,
 ) -> pl.DataFrame:
+    """Calculate the area under the curve(AUC), per epoch.
+
+    When an epoch has less than 90% of the expected values (based on the sampling rate
+    and epoch length), the AUC for that epoch is given as -1 for each axis. If rectify
+    is True, any axis with values below -150 will have the AUC value for that axis, will
+    be -1, for that epoch. Finally, following integration, any value greater than 16 *
+    sampling_rate * epoch will be set to -1.
+
+    Args:
+        group: The epoch given by .map_groups()
+        epoch: The desired epoch length in seconds that data will be aggregated over.
+            Defaults to 1 minute as per MIMS-unit paper.
+        rectify: Specifies if data should be rectified before integration. If True any
+            value below -150 will assign the value of that axis to -1 for that epoch.
+            Additionally the absolute value of accelerometer data will be used for
+            integration.
+        sampling_rate: The sampling rate of the accelerometer data in Hz.
+
+    Returns:
+        A polars DataFrame containing the XYZ AUC values for one epoch.
+    """
     timestamps = group["time"].cast(pl.Int64).to_numpy()
     values = group.select(["x", "y", "z"]).to_numpy()
 
@@ -951,6 +972,7 @@ def _aggregate_epoch(
         aggregated_area.append(area)
 
     max_value = 16 * sampling_rate * epoch
+    print(f"MAAX VAL: {max_value}")
     area = np.array(aggregated_area)
     area = np.where(area >= max_value, -1.0, area)
     area = np.where(area < 0, -1.0, area)

@@ -719,6 +719,34 @@ def test_extrapolate_interpolate(marker: np.ndarray) -> None:
     assert np.allclose(interpolated, axis)
 
 
+def test_butterworth_filter(
+    sample_data_gt3x: pathlib.Path, butter_r_version: pathlib.Path
+) -> None:
+    """Test filter for mims. See mims_test_data_code.md for details on sample data."""
+    expected_data = pl.read_csv(butter_r_version)
+    expected_acceleration = expected_data.select(["IIR_X", "IIR_Y", "IIR_Z"]).to_numpy()
+    test_data = readers.read_watch_data(sample_data_gt3x)
+    interpolated_acceleration = metrics.interpolate_measure(
+        acceleration=test_data.acceleration, new_frequency=100
+    )
+
+    filtered_data = metrics.butterworth_filter(
+        acceleration=interpolated_acceleration,
+        sampling_rate=100,
+        cutoffs=(0.2, 5.0),
+        order=4,
+    )
+
+    for axis in range(3):
+        correlation = np.corrcoef(
+            expected_acceleration.T[axis, :],
+            filtered_data.measurements.T[axis, :],
+        )
+        assert np.all(
+            correlation > 0.99
+        ), f"Axis:{axis} did not meet the threshold, current values: {correlation}"
+
+
 def test_aggregation_good(
     sample_data_gt3x: pathlib.Path, aggregation_r_version: pathlib.Path
 ) -> None:
@@ -762,6 +790,25 @@ def test_aggregation_few_samples(
 def test_aggregation_rectify() -> None:
     """Test if value is set to -1 when any value is less than -150."""
     below_threshold_data = np.full((6000, 3), -200)
+    dummy_date = datetime.now()
+    dummy_datetime_list = [dummy_date + timedelta(seconds=i / 100) for i in range(6000)]
+    below_threshold_measure = models.Measurement(
+        measurements=below_threshold_data, time=pl.Series(dummy_datetime_list)
+    )
+    expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
+
+    results = metrics.aggregate_mims(
+        acceleration=below_threshold_measure, epoch=60, sampling_rate=100
+    )
+
+    assert np.all(
+        expected_acceleration == results.measurements
+    ), f"Results did not match expectation. Results: {results.measurements}"
+
+
+def test_aggregation_max_value() -> None:
+    """Test if value is set to -1 when max area is exceeded."""
+    below_threshold_data = np.full((6000, 3), 5000)
     dummy_date = datetime.now()
     dummy_datetime_list = [dummy_date + timedelta(seconds=i / 100) for i in range(6000)]
     below_threshold_measure = models.Measurement(
