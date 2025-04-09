@@ -877,11 +877,11 @@ def aggregate_mims(
         acceleration: Acceleration data to be aggregated.
         epoch: The desired epoch length in seconds that data will be aggregated over.
             Defaults to 1 minute as per MIMS-unit paper.
+        sampling_rate: The sampling rate of the accelerometer data in Hz.
         rectify: Specifies if data should be rectified before integration. If True any
             value below -150 will assign the value of that axis to -1 for that epoch.
             Additionally the absolute value of accelerometer data will be used for
             integration.
-        sampling_rate: The sampling rate of the accelerometer data in Hz.
 
     Returns:
         A models.Measurement instance with the area under the curve values for each
@@ -939,11 +939,11 @@ def _aggregate_epoch(
         group: The epoch given by .map_groups()
         epoch: The desired epoch length in seconds that data will be aggregated over.
             Defaults to 1 minute as per MIMS-unit paper.
+        sampling_rate: The sampling rate of the accelerometer data in Hz.
         rectify: Specifies if data should be rectified before integration. If True any
             value below -150 will assign the value of that axis to -1 for that epoch.
             Additionally the absolute value of accelerometer data will be used for
             integration.
-        sampling_rate: The sampling rate of the accelerometer data in Hz.
 
     Returns:
         A polars DataFrame containing the XYZ AUC values for one epoch.
