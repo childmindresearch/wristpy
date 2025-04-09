@@ -761,7 +761,7 @@ def test_aggregation_good(
     ).to_numpy()
 
     results = metrics.aggregate_mims(
-        acceleration=test_data_interpolated, epoch=60, sampling_rate=100
+        acceleration=test_data_interpolated, epoch=60, sampling_rate=100, rectify=True
     )
 
     assert np.allclose(
@@ -777,7 +777,7 @@ def test_aggregation_few_samples(
     expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
 
     results = metrics.aggregate_mims(
-        acceleration=test_data.acceleration, epoch=60, sampling_rate=100
+        acceleration=test_data.acceleration, epoch=60, sampling_rate=100, rectify=True
     )
 
     assert np.all(
@@ -806,11 +806,11 @@ def test_aggregation_rectify() -> None:
 
 def test_aggregation_max_value() -> None:
     """Test if value is set to -1 when max area is exceeded."""
-    below_threshold_data = np.full((6000, 3), 5000)
-    dummy_date = datetime.now()
+    max_value_data = np.full((6000, 3), 100000000)
+    dummy_date = datetime(2000, 1, 1)
     dummy_datetime_list = [dummy_date + timedelta(seconds=i / 100) for i in range(6000)]
     below_threshold_measure = models.Measurement(
-        measurements=below_threshold_data, time=pl.Series(dummy_datetime_list)
+        measurements=max_value_data, time=pl.Series(dummy_datetime_list)
     )
     expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
 

@@ -861,8 +861,9 @@ def butterworth_filter(
 def aggregate_mims(
     acceleration: models.Measurement,
     epoch: int = 60,
-    rectify: bool = True,
     sampling_rate: int = 100,
+    *,
+    rectify: bool = True,
 ) -> models.Measurement:
     """Calculate the area under the curve(AUC), per epoch, per axis.
 
@@ -902,8 +903,8 @@ def aggregate_mims(
         lambda group: _aggregate_epoch(
             group=group,
             epoch=epoch,
-            rectify=rectify,
             sampling_rate=sampling_rate,
+            rectify=rectify,
         ),
         schema={
             "time": pl.Datetime("ns"),
@@ -922,8 +923,9 @@ def aggregate_mims(
 def _aggregate_epoch(
     group: pl.DataFrame,
     epoch: int = 60,
-    rectify: bool = True,
     sampling_rate: int = 100,
+    *,
+    rectify: bool = True,
 ) -> pl.DataFrame:
     """Calculate the area under the curve(AUC), per epoch.
 
@@ -947,34 +949,27 @@ def _aggregate_epoch(
         A polars DataFrame containing the XYZ AUC values for one epoch.
     """
     timestamps = group["time"].cast(pl.Int64).to_numpy()
-    values = group.select(["x", "y", "z"]).to_numpy()
-
     if len(timestamps) < 0.9 * sampling_rate * epoch:
+        logger.debug("Not enough data to calculate AUC")
         return pl.DataFrame(
             {"time": [group["time"].min()], "x": [-1.0], "y": [-1.0], "z": [-1.0]}
         )
-    timestamps = timestamps - timestamps.min()
-    times_sec = timestamps / 1e9
-    aggregated_area = []
 
-    for col in range(3):
-        col_values = values[:, col]
-        if rectify:
-            if (col_values <= -150).any():
-                aggregated_area.append(-1.0)
-                logger.debug(
-                    "Value <= -150 found during aggregation."
-                    "Considering reviewing your data for issues."
-                )
-                continue
-            col_values = np.abs(col_values)
-        area = np.trapz(y=col_values, x=times_sec)  # type: ignore[attr-defined]
-        aggregated_area.append(area)
+    values = group.select(["x", "y", "z"]).to_numpy()
+
+    times_sec = timestamps / 1e9
+
+    if rectify:
+        area = np.trapezoid(y=np.abs(values), x=times_sec, axis=0)
+        low_values = np.any(values <= -150, axis=0)
+        if np.any(low_values):
+            logger.warning("Values below -150 detected. Consider checking your data.")
+        area = np.where(low_values, -1, area)
+    else:
+        area = np.trapezoid(y=values, x=times_sec, axis=0)
 
     max_value = 16 * sampling_rate * epoch
-    area = np.array(aggregated_area)
-    area = np.where(area >= max_value, -1.0, area)
-    area = np.where(area < 0, -1.0, area)
+    area = np.where(np.logical_or(area >= max_value, area < 0), -1.0, area)
 
     return pl.DataFrame(
         {"time": [group["time"].min()], "x": [area[0]], "y": [area[1]], "z": [area[2]]}
