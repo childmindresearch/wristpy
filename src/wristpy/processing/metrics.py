@@ -960,7 +960,7 @@ def _aggregate_epoch(
     times_sec = timestamps / 1e9
 
     if rectify:
-        area = np.trapezoid(y=np.abs(values), x=times_sec, axis=0)
+        area = integrate.trapezoid(y=np.abs(values), x=times_sec, axis=0)
         low_values = np.any(values <= -150, axis=0)
         if np.any(low_values):
             logger.warning("Values below -150 detected. Consider checking your data.")
