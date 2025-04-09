@@ -806,7 +806,7 @@ def test_aggregation_rectify() -> None:
 
 def test_aggregation_max_value() -> None:
     """Test if value is set to -1 when max area is exceeded."""
-    below_threshold_data = np.full((6000, 3), 100000)
+    below_threshold_data = np.full((6000, 3), 5000)
     dummy_date = datetime.now()
     dummy_datetime_list = [dummy_date + timedelta(seconds=i / 100) for i in range(6000)]
     below_threshold_measure = models.Measurement(
