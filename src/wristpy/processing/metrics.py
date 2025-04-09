@@ -968,11 +968,10 @@ def _aggregate_epoch(
                 )
                 continue
             col_values = np.abs(col_values)
-        area = np.trapz(y=col_values, x=times_sec)
+        area = np.trapz(y=col_values, x=times_sec)  # type: ignore[attr-defined]
         aggregated_area.append(area)
 
     max_value = 16 * sampling_rate * epoch
-    print(f"MAAX VAL: {max_value}")
     area = np.array(aggregated_area)
     area = np.where(area >= max_value, -1.0, area)
     area = np.where(area < 0, -1.0, area)

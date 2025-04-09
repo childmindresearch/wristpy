@@ -759,7 +759,6 @@ def test_aggregation_good(
     expected_acceleration = expected_results.select(
         ["AGGREGATED_X", "AGGREGATED_Y", "AGGREGATED_Z"]
     ).to_numpy()
-    expected_time = expected_results["HEADER_TIME_STAMP"]
 
     results = metrics.aggregate_mims(
         acceleration=test_data_interpolated, epoch=60, sampling_rate=100
@@ -768,7 +767,6 @@ def test_aggregation_good(
     assert np.allclose(
         expected_acceleration, results.measurements, atol=0.001
     ), f"Results did not match expectation. Results: {results.measurements}"
-    assert (expected_time == results.time).all
 
 
 def test_aggregation_few_samples(
