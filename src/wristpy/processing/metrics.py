@@ -894,7 +894,7 @@ def aggregate_mims(
             "y": acceleration.measurements[:, 1],
             "z": acceleration.measurements[:, 2],
         }
-    )
+    ).set_sorted("time")
 
     result = acceleration_df.group_by_dynamic(
         "time",
