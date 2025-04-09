@@ -447,7 +447,6 @@ def _brute_force_k(
     previous_k = 0
     result = 0
 
-
     for k in k_values:
         current_probability = stats.gamma.cdf(standard_deviation, a=k, scale=scale)
 
@@ -827,7 +826,6 @@ def _extrapolate_interpolate(
     return interp_values
 
 
-
 def butterworth_filter(
     acceleration: models.Measurement,
     sampling_rate: int = 100,
@@ -983,4 +981,3 @@ def _aggregate_epoch(
     return pl.DataFrame(
         {"time": [group["time"].min()], "x": [area[0]], "y": [area[1]], "z": [area[2]]}
     )
-
