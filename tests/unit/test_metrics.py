@@ -809,13 +809,13 @@ def test_aggregation_max_value() -> None:
     max_value_data = np.full((6000, 3), 100000000)
     dummy_date = datetime(2000, 1, 1)
     dummy_datetime_list = [dummy_date + timedelta(seconds=i / 100) for i in range(6000)]
-    below_threshold_measure = models.Measurement(
+    max_value_measure = models.Measurement(
         measurements=max_value_data, time=pl.Series(dummy_datetime_list)
     )
     expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
 
     results = metrics.aggregate_mims(
-        acceleration=below_threshold_measure, epoch=60, sampling_rate=100
+        acceleration=max_value_measure, epoch=60, sampling_rate=100
     )
 
     assert np.all(
