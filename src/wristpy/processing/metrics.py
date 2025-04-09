@@ -6,6 +6,7 @@ import numpy as np
 import polars as pl
 from scipy import interpolate, signal, stats
 
+
 from wristpy.core import config, models
 
 logger = config.get_logger()
@@ -443,8 +444,9 @@ def _brute_force_k(
     """
     k_values = np.arange(k_max, k_min, -k_step)
     previous_probability = 1.0
-    previous_k = 0.0
-    result = 0.0
+    previous_k = 0
+    result = 0
+
 
     for k in k_values:
         current_probability = stats.gamma.cdf(standard_deviation, a=k, scale=scale)
@@ -825,6 +827,7 @@ def _extrapolate_interpolate(
     return interp_values
 
 
+
 def butterworth_filter(
     acceleration: models.Measurement,
     sampling_rate: int = 100,
@@ -980,3 +983,4 @@ def _aggregate_epoch(
     return pl.DataFrame(
         {"time": [group["time"].min()], "x": [area[0]], "y": [area[1]], "z": [area[2]]}
     )
+

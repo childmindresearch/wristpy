@@ -719,6 +719,7 @@ def test_extrapolate_interpolate(marker: np.ndarray) -> None:
     assert np.allclose(interpolated, axis)
 
 
+
 def test_butterworth_filter(
     sample_data_gt3x: pathlib.Path, butter_r_version: pathlib.Path
 ) -> None:
@@ -823,3 +824,4 @@ def test_aggregation_max_value() -> None:
     assert np.all(
         expected_acceleration == results.measurements
     ), f"Results did not match expectation. Results: {results.measurements}"
+
