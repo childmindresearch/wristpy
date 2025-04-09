@@ -4,7 +4,7 @@ from typing import List, Literal, Optional, Tuple
 
 import numpy as np
 import polars as pl
-from scipy import interpolate, signal, stats
+from scipy import integrate, interpolate, signal, stats
 
 from wristpy.core import config, models
 
@@ -966,7 +966,7 @@ def _aggregate_epoch(
             logger.warning("Values below -150 detected. Consider checking your data.")
         area = np.where(low_values, -1, area)
     else:
-        area = np.trapezoid(y=values, x=times_sec, axis=0)
+        area = integrate.trapezoid(y=values, x=times_sec, axis=0)
 
     max_value = 16 * sampling_rate * epoch
     area = np.where(np.logical_or(area >= max_value, area < 0), -1.0, area)
