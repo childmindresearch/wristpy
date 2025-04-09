@@ -953,7 +953,7 @@ def _aggregate_epoch(
         return pl.DataFrame(
             {"time": [group["time"].min()], "x": [-1.0], "y": [-1.0], "z": [-1.0]}
         )
-
+    timestamps = timestamps - timestamps.min()
     times_sec = timestamps / 1e9
     aggregated_area = []
 
