@@ -6,7 +6,6 @@ import numpy as np
 import polars as pl
 from scipy import interpolate, signal, stats
 
-
 from wristpy.core import config, models
 
 logger = config.get_logger()
@@ -969,7 +968,7 @@ def _aggregate_epoch(
                 )
                 continue
             col_values = np.abs(col_values)
-        area = np.trapezoid(y=col_values, x=times_sec)
+        area = np.trapz(y=col_values, x=times_sec)
         aggregated_area.append(area)
 
     max_value = 16 * sampling_rate * epoch
