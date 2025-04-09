@@ -74,12 +74,23 @@ def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "-nw",
+        "--nonwear_algorithm",
+        type=parse_nonwear_algorithms,
+        default="ggir",
+        help="Specify the non-wear detection algorithm(s) to use."
+        "Specify one or more of 'ggir', 'cta', 'detach' as a comma-separated list"
+        "(e.g. 'ggir,detach')."
+        "When multiple algorithms are specified, majority voting will be applied.",
+    )
+
+    parser.add_argument(
         "-e",
         "--epoch_length",
         default=5,
         type=int,
-        help="Specify the sampling rate in seconds for all metrics. To skip resampling,"
-        " enter 0.",
+        help="Specify the sampling rate in seconds for all metrics."
+        "Must be greater than 0.",
     )
 
     parser.add_argument(
@@ -141,7 +152,8 @@ def main(
         thresholds=None
         if arguments.thresholds is None
         else cast(Tuple[float, float, float], tuple(arguments.thresholds)),
-        epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
+        epoch_length=arguments.epoch_length,
+        nonwear_algorithm=arguments.nonwear_algorithm,
         verbosity=log_level,
         output_filetype=arguments.output_filetype,
     )
@@ -180,3 +192,24 @@ def _none_or_float_list(value: str) -> Optional[List[float]]:
         raise argparse.ArgumentTypeError(
             f"Invalid value: {value}. Must be a comma-separated list or 'None'."
         )
+
+
+def parse_nonwear_algorithms(algorithm_name: str) -> List[str]:
+    """Parse comma-separated non-wear algorithm names.
+
+    Args:
+        algorithm_name: Command line input string, comma-separated algorithm names.
+
+    Returns:
+        The List of algorithm names.
+    """
+    valid_algorithm_names = ["ggir", "cta", "detach"]
+    algorithms = [algo.strip().lower() for algo in algorithm_name.split(",")]
+
+    for algo in algorithms:
+        if algo not in valid_algorithm_names:
+            raise argparse.ArgumentTypeError(
+                f"Invalid algorithm: '{algo}'. Must be one of: "
+                f"{', '.join(valid_algorithm_names)}."
+            )
+    return algorithms

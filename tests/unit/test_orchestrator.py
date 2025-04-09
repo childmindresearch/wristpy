@@ -3,7 +3,7 @@
 import datetime
 import pathlib
 import re
-from typing import Optional
+from typing import Literal, Optional, Sequence
 
 import numpy as np
 import polars as pl
@@ -59,30 +59,6 @@ def test_format_sleep() -> None:
     assert np.all(sleep_array == np.array([1, 1, 0, 1, 1]))
 
 
-def test_format_nonwear() -> None:
-    """Test nonwear formatter."""
-    dummy_date = datetime.datetime(2024, 5, 2)
-    dummy_datetime_list = [
-        dummy_date + datetime.timedelta(seconds=i * 5) for i in range(4)
-    ]
-    dummy_epoch = models.Measurement(
-        measurements=np.ones(4), time=pl.Series(dummy_datetime_list)
-    )
-    nonwear_measurement = models.Measurement(
-        measurements=np.array([1, 0]),
-        time=pl.Series([dummy_date, dummy_date + datetime.timedelta(seconds=10)]),
-    )
-
-    nonwear_epoch = orchestrator.format_nonwear_data(
-        nonwear_data=nonwear_measurement,
-        reference_measure=dummy_epoch,
-        original_temporal_resolution=5,
-    )
-
-    assert len(nonwear_epoch) == len(dummy_epoch.measurements) == len(dummy_epoch.time)
-    assert np.all(nonwear_epoch == np.array([1, 1, 0, 0]))
-
-
 def test_bad_calibrator(sample_data_gt3x: pathlib.Path) -> None:
     """Test run when invalid calibrator given."""
     with pytest.raises(
@@ -91,6 +67,24 @@ def test_bad_calibrator(sample_data_gt3x: pathlib.Path) -> None:
         "Enter None if no calibration is desired.",
     ):
         orchestrator._run_file(input=sample_data_gt3x, calibrator="Ggir")  # type: ignore[arg-type]
+
+
+def test_bad_nonwear(sample_data_gt3x: pathlib.Path) -> None:
+    """Test run when invalid calibrator given."""
+    with pytest.raises(
+        ValueError,
+        match="Temperature data is required for the CTA and DETACH nonwear algorithms.",
+    ):
+        orchestrator._run_file(input=sample_data_gt3x, nonwear_algorithm=["detach"])
+
+
+def test_bad_epoch_length(sample_data_gt3x: pathlib.Path) -> None:
+    """Test run when invalid epoch length given."""
+    with pytest.raises(
+        ValueError,
+        match="Epoch_length must be greater than 0.",
+    ):
+        orchestrator._run_file(input=sample_data_gt3x, epoch_length=-5)
 
 
 @pytest.mark.parametrize(
@@ -114,13 +108,13 @@ def test_validate_output_invalid_file_type(tmp_path: pathlib.Path) -> None:
 
 
 def test_run_single_file(
-    sample_data_gt3x: pathlib.Path,
+    sample_data_bin: pathlib.Path,
     tmp_path: pathlib.Path,
 ) -> None:
     """Testing running a single file."""
     output_file_path = tmp_path / "file_name.csv"
     results = orchestrator.run(
-        input=sample_data_gt3x,
+        input=sample_data_bin,
         output=output_file_path,
         activity_metric="mad",
         calibrator="ggir",
@@ -137,30 +131,32 @@ def test_run_single_file_agcount_default(
     """Testing running a single file."""
     output_file_path = tmp_path / "file_name.csv"
     results = orchestrator.run(
-        input=sample_data_bin, output=output_file_path, activity_metric="ag_count"
+        input=sample_data_bin,
+        output=output_file_path,
+        activity_metric="ag_count",
+        nonwear_algorithm=["detach"],
     )
 
     assert output_file_path.exists()
     assert isinstance(results, models.OrchestratorResults)
 
 
-def test_run_single_file_mad_epoch_none(
+@pytest.mark.parametrize("nonwear_algorithm", [["detach"], ["cta", "ggir"]])
+def test_run_single_file_nonwear_options(
     sample_data_bin: pathlib.Path,
     tmp_path: pathlib.Path,
+    nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]],
 ) -> None:
     """Testing running a single file."""
     output_file_path = tmp_path / "file_name.csv"
+    results = orchestrator.run(
+        input=sample_data_bin,
+        output=output_file_path,
+        nonwear_algorithm=nonwear_algorithm,
+    )
 
-    with pytest.raises(
-        ValueError,
-        match="If using 'ag_count' or 'mad', epoch_length must be provided.",
-    ):
-        orchestrator.run(
-            input=sample_data_bin,
-            output=output_file_path,
-            activity_metric="mad",
-            epoch_length=None,
-        )
+    assert output_file_path.exists()
+    assert isinstance(results, models.OrchestratorResults)
 
 
 def test_run_single_file_bad_output_filetype(

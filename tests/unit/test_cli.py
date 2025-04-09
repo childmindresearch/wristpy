@@ -103,6 +103,7 @@ def test_main_default(
         calibrator=None,
         activity_metric="enmo",
         epoch_length=5,
+        nonwear_algorithm=["ggir"],
         verbosity=logging.WARNING,
         output_filetype=None,
     )
@@ -124,6 +125,7 @@ def test_main_enmo_default(
         calibrator=None,
         activity_metric="enmo",
         epoch_length=5,
+        nonwear_algorithm=["ggir"],
         verbosity=logging.WARNING,
     )
 
@@ -143,6 +145,7 @@ def test_main_mad_default(
         thresholds=default_thresholds,
         calibrator=None,
         activity_metric="mad",
+        nonwear_algorithm=["ggir"],
         epoch_length=5,
         verbosity=logging.WARNING,
     )
@@ -163,6 +166,7 @@ def test_main_agcount_default(
         thresholds=default_thresholds,
         calibrator=None,
         activity_metric="ag_count",
+        nonwear_algorithm=["ggir"],
         epoch_length=5,
         verbosity=logging.WARNING,
     )
@@ -187,9 +191,11 @@ def test_main_with_options(
             "-t",
             "0.1, 1.0, 1.5",
             "-e",
-            "0",
+            "3",
             "-a",
             "mad",
+            "-nw",
+            "cta, ggir",
         ]
     )
 
@@ -199,7 +205,8 @@ def test_main_with_options(
         thresholds=(0.1, 1.0, 1.5),
         calibrator="gradient",
         activity_metric="mad",
-        epoch_length=None,
+        nonwear_algorithm=["cta", "ggir"],
+        epoch_length=3,
         verbosity=logging.WARNING,
         output_filetype=None,
     )
@@ -244,3 +251,12 @@ def test_incomplete_comma_separated_thresholds() -> None:
         "Must be a comma-separated list of exactly three numbers or 'None'.",
     ):
         cli._none_or_float_list("1, 2")
+
+
+def test_invalid_nonwear_algorithm() -> None:
+    """Test the nonwear algopriothm name parser wiht invalid input."""
+    with pytest.raises(
+        argparse.ArgumentTypeError,
+        match="Invalid algorithm: '1'. Must be one of: ggir, cta, detach.",
+    ):
+        cli.parse_nonwear_algorithms("1")
