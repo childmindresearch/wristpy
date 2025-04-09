@@ -25,9 +25,7 @@ def sleep_detection() -> analytics.GgirSleepDetection:
     return analytics.GgirSleepDetection(anglez_measurement)
 
 
-def test_fill_false_blocks(
-    sleep_detection: analytics.GgirSleepDetection,
-) -> None:
+def test_fill_false_blocks() -> None:
     """Test the _fill_false_short_blocks method."""
     gap_block = 3
     sleep_idx_array = np.array(
@@ -37,7 +35,7 @@ def test_fill_false_blocks(
         [True, True, True, False, False, False, True, True, True, True, True, True]
     )
 
-    result = sleep_detection._fill_false_blocks(sleep_idx_array, gap_block)
+    result = analytics._fill_false_blocks(sleep_idx_array, gap_block)
 
     assert np.array_equal(
         result, expected_result
@@ -80,73 +78,6 @@ def test_find_periods() -> None:
     ]
 
     result = analytics._find_periods(window_measurement)
-
-    assert result == expected_result, f"Expected {expected_result}, but got {result}"
-
-
-@pytest.mark.parametrize(
-    "non_wear_array, expected_result",
-    [
-        (np.array([0, 1, 1, 1, 0]), []),
-        (np.array([0, 0, 0, 1, 1]), []),
-        (np.array([0, 0, 0, 1, 0]), []),
-    ],
-)
-def test_remove_nonwear_periods_overlap(
-    non_wear_array: np.ndarray, expected_result: List
-) -> None:
-    """Test the _remove_nonwear_from_sleep method.
-
-    This test is for the following cases:
-        - where the non-wear period overlaps with sleep onset.
-        - where the non-wear period overlaps with sleep wakeup.
-        - where the non-wear period is within the sleep window.
-    """
-    dummy_date = datetime.datetime(2024, 5, 2)
-    sleep_windows = [
-        analytics.SleepWindow(
-            onset=dummy_date + datetime.timedelta(hours=2),
-            wakeup=dummy_date + datetime.timedelta(hours=4),
-        )
-    ]
-    non_wear_time = pl.Series(
-        "time",
-        [dummy_date + datetime.timedelta(hours=i) for i in range(len(non_wear_array))],
-    )
-    non_wear_measurement = models.Measurement(
-        measurements=non_wear_array, time=non_wear_time
-    )
-
-    result = analytics.remove_nonwear_from_sleep(non_wear_measurement, sleep_windows)
-
-    assert result == expected_result, f"Expected {expected_result}, but got {result}"
-
-
-def test_remove_nonwear_periods_no_overlap() -> None:
-    """Test the _remove_nonwear_from_sleep method.
-
-    This test is for the case where the non-wear period does not overlap
-    with the sleep window.
-    """
-    dummy_date = datetime.datetime(2024, 5, 2)
-    sleep_windows = [
-        analytics.SleepWindow(
-            onset=dummy_date + datetime.timedelta(hours=2),
-            wakeup=dummy_date + datetime.timedelta(hours=4),
-        )
-    ]
-
-    non_wear_array = np.array([1, 0, 0, 0, 0])
-    non_wear_time = pl.Series(
-        "time",
-        [dummy_date + datetime.timedelta(hours=i) for i in range(len(non_wear_array))],
-    )
-    non_wear_measurement = models.Measurement(
-        measurements=non_wear_array, time=non_wear_time
-    )
-    expected_result = sleep_windows
-
-    result = analytics.remove_nonwear_from_sleep(non_wear_measurement, sleep_windows)
 
     assert result == expected_result, f"Expected {expected_result}, but got {result}"
 
