@@ -195,3 +195,28 @@ def test_bad_physical_activity_thresholds() -> None:
         analytics.compute_physical_activty_categories(
             tmp_measurement, thresholds=(10, 5, 1)
         )
+
+
+def test_sleep_cleanup() -> None:
+    """Test the sleep_cleanup method."""
+    dummy_date = datetime.datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + datetime.timedelta(seconds=i) for i in range(3600)
+    ]
+    time = pl.Series("time", dummy_datetime_list)
+    nonwear_measurement = models.Measurement(measurements=np.zeros(3600), time=time)
+    sleep_windows = [
+        analytics.SleepWindow(
+            onset=dummy_date + datetime.timedelta(minutes=10),
+            wakeup=dummy_date + datetime.timedelta(minutes=40),
+        )
+    ]
+
+    result = analytics.sleep_cleanup(
+        sleep_windows=sleep_windows, nonwear_measurement=nonwear_measurement
+    )
+    expected_result = np.zeros(3600)
+    expected_result[600:2401] = 1
+
+    assert len(result.time) == 3600
+    assert np.array_equal(result.measurements, expected_result)
