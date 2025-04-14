@@ -399,8 +399,9 @@ def sleep_cleanup(
     """This function will filter the sleep windows based on the nonwear measurement.
 
     The SleepWindows are first converted to a Measurement object with the same
-    timestamps as the reference nonwear_measurement. Then any overlap with nonwear
-    is removed, and finally any blocks of sleep that are less than 15 minutes are removed.
+    timestamps as the reference measurement. Then any overlap with nonwear
+    is removed, and finally any blocks of sleep that are less than 15 minutes
+    long are removed.
     """
     sleep = _sleep_windows_as_measurement(nonwear_measurement, sleep_windows)
 
@@ -419,7 +420,8 @@ def _sleep_windows_as_measurement(
 ) -> models.Measurement:
     """Helper function to convert list of sleep windows to a Measurement instance.
 
-    The temporal resolution of the output Measurement instance is 60s.
+    The temporal resolution of the output Measurement instance matches the
+    reference measurement.
 
     Args:
         ref_measurement: Reference measurement data to match time stamps to.
@@ -429,10 +431,15 @@ def _sleep_windows_as_measurement(
     Returns:
         A new Measurement instance with the sleep values.
     """
-    start_time = ref_measurement.time[0]
-    end_time = ref_measurement.time[-1]
+    logger.debug("Converting sleep windows to measurement.")
+    temporal_resolution = ref_measurement.time[1] - ref_measurement.time[0]
+
     time_range = pl.datetime_range(
-        start_time, end_time, interval="60s", eager=True, time_unit="ns"
+        ref_measurement.time[0],
+        ref_measurement.time[-1],
+        interval=temporal_resolution,
+        eager=True,
+        time_unit="ns",
     ).alias("time")
 
     sleep_value = np.zeros(len(time_range), dtype=int)
