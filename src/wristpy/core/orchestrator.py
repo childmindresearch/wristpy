@@ -3,9 +3,7 @@
 import itertools
 import logging
 import pathlib
-from typing import Dict, List, Literal, Optional, Sequence, Tuple, Union
-
-import numpy as np
+from typing import Dict, Literal, Optional, Sequence, Tuple, Union
 
 from wristpy.core import config, exceptions, models
 from wristpy.io.readers import readers

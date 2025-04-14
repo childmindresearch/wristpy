@@ -10,7 +10,6 @@ import polars as pl
 import pytest
 
 from wristpy.core import exceptions, models, orchestrator
-from wristpy.processing import analytics
 
 
 @pytest.fixture
