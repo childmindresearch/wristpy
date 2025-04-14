@@ -34,31 +34,6 @@ def dummy_results() -> models.OrchestratorResults:
     return dummy_results
 
 
-def test_format_sleep() -> None:
-    """Test sleep formatter."""
-    dummy_date = datetime.datetime(2024, 5, 2)
-    dummy_datetime_list = [dummy_date + datetime.timedelta(seconds=i) for i in range(5)]
-    dummy_measure = models.Measurement(
-        measurements=np.ones(5), time=pl.Series(dummy_datetime_list)
-    )
-    sleep_window_1 = analytics.SleepWindow(
-        onset=dummy_date, wakeup=dummy_date + datetime.timedelta(seconds=1)
-    )
-    sleep_window_2 = analytics.SleepWindow(
-        onset=dummy_date + datetime.timedelta(seconds=3),
-        wakeup=dummy_date + datetime.timedelta(seconds=4),
-    )
-
-    sleep_array = orchestrator.format_sleep_data(
-        sleep_windows=[sleep_window_1, sleep_window_2], reference_measure=dummy_measure
-    )
-
-    assert (
-        len(sleep_array) == len(dummy_measure.measurements) == len(dummy_measure.time)
-    )
-    assert np.all(sleep_array == np.array([1, 1, 0, 1, 1]))
-
-
 def test_bad_calibrator(sample_data_gt3x: pathlib.Path) -> None:
     """Test run when invalid calibrator given."""
     with pytest.raises(

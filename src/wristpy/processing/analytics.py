@@ -449,4 +449,4 @@ def _sleep_windows_as_measurement(
             time_mask = (time_range >= sw.onset) & (time_range <= sw.wakeup)
             sleep_value[time_mask] = 1
 
-    return models.Measurement(time=time_range.dt.round("1m"), measurements=sleep_value)
+    return models.Measurement(time=time_range, measurements=sleep_value)
