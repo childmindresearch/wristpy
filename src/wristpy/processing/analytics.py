@@ -403,6 +403,7 @@ def sleep_cleanup(
     is removed, and finally any blocks of sleep that are less than 15 minutes
     long are removed.
     """
+    logger.debug("Starting the sleep Window cleanup.")
     sleep = _sleep_windows_as_measurement(nonwear_measurement, sleep_windows)
 
     filtered_sleep = sleep.measurements - nonwear_measurement.measurements
