@@ -204,7 +204,9 @@ def test_sleep_cleanup() -> None:
         dummy_date + datetime.timedelta(seconds=i) for i in range(3600)
     ]
     time = pl.Series("time", dummy_datetime_list)
-    nonwear_measurement = models.Measurement(measurements=np.zeros(3600), time=time)
+    nonwear_data = np.zeros(3600)
+    nonwear_data[2000:2400] = 1
+    nonwear_measurement = models.Measurement(measurements=nonwear_data, time=time)
     sleep_windows = [
         analytics.SleepWindow(
             onset=dummy_date + datetime.timedelta(minutes=10),
@@ -215,8 +217,8 @@ def test_sleep_cleanup() -> None:
     result = analytics.sleep_cleanup(
         sleep_windows=sleep_windows, nonwear_measurement=nonwear_measurement
     )
-    expected_result = np.zeros(3600)
-    expected_result[600:2401] = 1
+    expected_result = np.zeros(len(nonwear_measurement.time))
+    expected_result[600:2000] = 1
 
     assert len(result.time) == 3600
     assert np.array_equal(result.measurements, expected_result)

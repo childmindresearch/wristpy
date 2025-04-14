@@ -405,9 +405,7 @@ def sleep_cleanup(
     """
     sleep = _sleep_windows_as_measurement(nonwear_measurement, sleep_windows)
 
-    filtered_sleep = np.where(
-        (sleep.measurements - nonwear_measurement.measurements) > 0, 1, 0
-    )
+    filtered_sleep = sleep.measurements - nonwear_measurement.measurements
     cleaned_sleep = np.logical_not(
         _fill_false_blocks(np.logical_not(filtered_sleep), 15)
     )
