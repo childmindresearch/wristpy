@@ -41,3 +41,19 @@ def actigraph_interpolation_r_version() -> pathlib.Path:
         / "sample_data"
         / "actigraph_interpolation_r_version.csv"
     )
+
+
+@pytest.fixture
+def aggregation_r_version() -> pathlib.Path:
+    """The actigraphy sample data processed by the mims aggregation function in R."""
+    return pathlib.Path(__file__).parent / "sample_data" / "aggregation_r_version.csv"
+
+
+@pytest.fixture
+def butter_r_version() -> pathlib.Path:
+    """The actigraphy sample data processed by the mims iir function in R."""
+    return (
+        pathlib.Path(__file__).parent
+        / "sample_data"
+        / "mims_butterworth_filtered_data.csv"
+    )
