@@ -828,7 +828,7 @@ def _extrapolate_interpolate(
 def butterworth_filter(
     acceleration: models.Measurement,
     sampling_rate: int = 100,
-    cutoffs: tuple = (0.2, 5.0),
+    cutoffs: tuple[float, float] = (0.2, 5.0),
     order: int = 4,
 ) -> models.Measurement:
     """Apply butterworth IIR filter to acceleration data.
@@ -848,10 +848,9 @@ def butterworth_filter(
     normalized_cutoffs = [cutoff / (sampling_rate * 0.5) for cutoff in cutoffs]
     b, a = signal.butter(N=order, Wn=normalized_cutoffs, btype="bandpass")
 
-    filtered_data = []
-    for axis in acceleration.measurements.T:
-        filtered_axis = signal.lfilter(b=b, a=a, x=axis)
-        filtered_data.append(filtered_axis)
+    filtered_data = [
+        signal.lfilter(b=b, a=a, x=column) for column in acceleration.measurements.T
+    ]
 
     return models.Measurement(
         measurements=np.column_stack(filtered_data), time=acceleration.time
