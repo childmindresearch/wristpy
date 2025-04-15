@@ -402,20 +402,31 @@ def sleep_cleanup(
     timestamps as the reference measurement. Then any overlap with nonwear
     is removed, and finally any blocks of sleep that are less than 15 minutes
     long are removed.
+
+    Args:
+        sleep_windows: List of the sleep windows (Onset/Wake pairs).
+        nonwear_measurement: The nonwear measurement data used for reference time
+            stamps and to remove overlaps with periods of sleep.
+
+    Returns:
+        A Measurement instance with the cleaned sleep data.
     """
     logger.debug("Starting the sleep Window cleanup.")
-    sleep = _sleep_windows_as_measurement(nonwear_measurement, sleep_windows)
+    temporal_resolution = nonwear_measurement.time[1] - nonwear_measurement.time[0]
+    num_samples_15min = int(15 * 60 / temporal_resolution.total_seconds())
+
+    sleep = _sleep_windows_as_measurement(nonwear_measurement.time, sleep_windows)
 
     filtered_sleep = sleep.measurements - nonwear_measurement.measurements
     cleaned_sleep = np.logical_not(
-        _fill_false_blocks(np.logical_not(filtered_sleep), 15)
+        _fill_false_blocks(np.logical_not(filtered_sleep), num_samples_15min)
     )
 
     return models.Measurement(time=sleep.time, measurements=cleaned_sleep.astype(int))
 
 
 def _sleep_windows_as_measurement(
-    ref_measurement: models.Measurement, sleep_windows: List[SleepWindow]
+    ref_measurement_time: pl.Series, sleep_windows: List[SleepWindow]
 ) -> models.Measurement:
     """Helper function to convert list of sleep windows to a Measurement instance.
 
@@ -423,7 +434,8 @@ def _sleep_windows_as_measurement(
     reference measurement.
 
     Args:
-        ref_measurement: Reference measurement data to match time stamps to.
+        ref_measurement_time: Reference polars Series with time stamps from a
+            reference Measurement.
         sleep_windows: The list of sleep windows, where the entries are
             instances of the SleepWindow class.
 
@@ -431,21 +443,14 @@ def _sleep_windows_as_measurement(
         A new Measurement instance with the sleep values.
     """
     logger.debug("Converting sleep windows to measurement.")
-    temporal_resolution = ref_measurement.time[1] - ref_measurement.time[0]
 
-    time_range = pl.datetime_range(
-        ref_measurement.time[0],
-        ref_measurement.time[-1],
-        interval=temporal_resolution,
-        eager=True,
-        time_unit="ns",
-    ).alias("time")
-
-    sleep_value = np.zeros(len(time_range), dtype=int)
+    sleep_value = np.zeros(len(ref_measurement_time), dtype=int)
 
     for sw in sleep_windows:
         if sw.onset is not None and sw.wakeup is not None:
-            time_mask = (time_range >= sw.onset) & (time_range <= sw.wakeup)
+            time_mask = (ref_measurement_time >= sw.onset) & (
+                ref_measurement_time <= sw.wakeup
+            )
             sleep_value[time_mask] = 1
 
-    return models.Measurement(time=time_range, measurements=sleep_value)
+    return models.Measurement(time=ref_measurement_time, measurements=sleep_value)
