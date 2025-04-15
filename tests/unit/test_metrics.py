@@ -12,7 +12,7 @@ from scipy import stats
 
 from wristpy.core import models
 from wristpy.io.readers import readers
-from wristpy.processing import metrics
+from wristpy.processing import metrics, mims
 
 TEST_LENGTH = 100
 
@@ -272,7 +272,7 @@ def test_interpolate_time(
     data = readers.read_watch_data(sample_data_gt3x)
     acceleration = data.acceleration
 
-    interpolated_acceleration = metrics.interpolate_measure(
+    interpolated_acceleration = mims.interpolate_measure(
         acceleration=acceleration, new_frequency=100
     )
     interpolated_ms = interpolated_acceleration.time.dt.epoch(time_unit="ms").to_numpy()
@@ -294,7 +294,7 @@ def test_interpolate_data(
 
     test_data = readers.read_watch_data(sample_data_gt3x)
 
-    interpolated_acceleration = metrics.interpolate_measure(
+    interpolated_acceleration = mims.interpolate_measure(
         acceleration=test_data.acceleration, new_frequency=100
     )
 
@@ -318,7 +318,7 @@ def test_extrapolate_points() -> None:
     test_measure = models.Measurement(measurements=test_data, time=test_time)
     ground_truth = create_clipped_sine_data(threshold=None)
 
-    result = metrics.extrapolate_points(
+    result = mims.extrapolate_points(
         acceleration=test_measure, dynamic_range=(-0.95, 0.95)
     )
 
@@ -334,7 +334,7 @@ def test_find_marker() -> None:
     dummy_maxed_out_data[negative_idx] = -1
     confidence_threshold = 0.5
 
-    result = metrics._find_markers(
+    result = mims._find_markers(
         axis=dummy_maxed_out_data, dynamic_range=(-1, 1), noise=0.03
     )
 
@@ -351,7 +351,7 @@ def test_brute_force_k() -> None:
     k_min = 0.01
     k_step = 0.001
 
-    result = metrics._brute_force_k(
+    result = mims._brute_force_k(
         standard_deviation=standard_deviation,
         target_probability=target_probability,
         scale=scale,
@@ -378,7 +378,7 @@ def test_extrapolate_neighbors(maxed_out_value: float) -> None:
     neighborhood_size = 0.1
     sampling_rate = 10
 
-    result = metrics._extrapolate_neighbors(
+    result = mims._extrapolate_neighbors(
         marker=marker,
         neighborhood_size=neighborhood_size,
         confidence_threshold=confidence_threshold,
@@ -409,11 +409,9 @@ def test_extrapolate_neighbors_out_of_range(
 
     mock_edges = pl.DataFrame({"start": start, "end": end})
 
-    monkeypatch.setattr(
-        metrics, "_extrapolate_edges", lambda *args, **kwargs: mock_edges
-    )
+    monkeypatch.setattr(mims, "_extrapolate_edges", lambda *args, **kwargs: mock_edges)
 
-    result = metrics._extrapolate_neighbors(
+    result = mims._extrapolate_neighbors(
         marker=marker,
         neighborhood_size=neighborhood_size,
         confidence_threshold=0.5,
@@ -435,7 +433,7 @@ def test_extrapolate_edges() -> None:
     confidence_threshold = 0.5
     sampling_rate = 10
 
-    result = metrics._extrapolate_edges(
+    result = mims._extrapolate_edges(
         marker, confidence_threshold=confidence_threshold, sampling_rate=sampling_rate
     )
     result_sorted = result.sort("start")
@@ -454,7 +452,7 @@ def test_align_edges_good_case() -> None:
     left = np.array([1, 8])
     right = np.array([2, 9])
 
-    result = metrics._align_edges(
+    result = mims._align_edges(
         marker_length=10,
         left=left,
         right=right,
@@ -483,7 +481,7 @@ def test_align_edges_beyond_range(
     left_indices = np.array(left)
     right_indices = np.array(right)
 
-    result = metrics._align_edges(
+    result = mims._align_edges(
         marker_length=10,
         left=left_indices,
         right=right_indices,
@@ -512,7 +510,7 @@ def test_align_edges_not_enough_samples(
     left_indices = np.array(left)
     right_indices = np.array(right)
 
-    result = metrics._align_edges(
+    result = mims._align_edges(
         marker_length=10,
         left=left_indices,
         right=right_indices,
@@ -530,7 +528,7 @@ def test_align_edges_empty_result(left: List[int], right: List[int]) -> None:
     left_index = np.array(left)
     right_index = np.array(right)
 
-    result = metrics._align_edges(
+    result = mims._align_edges(
         marker_length=10,
         left=left_index,
         right=right_index,
@@ -550,7 +548,7 @@ def test_align_edges_mismatch() -> None:
     with pytest.raises(
         ValueError, match="Mismatch in hill edges. # left: 3, # right: 1"
     ):
-        metrics._align_edges(
+        mims._align_edges(
             marker_length=10,
             left=left_indices,
             right=right_indices,
@@ -573,7 +571,7 @@ def test_extrapolate_fit_happy_path() -> None:
         }
     )
 
-    result = metrics._extrapolate_fit(
+    result = mims._extrapolate_fit(
         axis=axis,
         time_numeric=time_numeric,
         marker=marker,
@@ -607,7 +605,7 @@ def test_extrapolate_fit_missing_fits() -> None:
         }
     )
 
-    result = metrics._extrapolate_fit(
+    result = mims._extrapolate_fit(
         axis=axis,
         time_numeric=time_numeric,
         marker=marker,
@@ -632,7 +630,7 @@ def test_fit_weighted_valid_region() -> None:
     neighborhood_size = 0.5
     mid_time = (time_numeric[start] + time_numeric[end]) / 2
 
-    spline = metrics._fit_weighted(
+    spline = mims._fit_weighted(
         axis=axis,
         time_numeric=time_numeric,
         marker=marker,
@@ -658,7 +656,7 @@ def test_fit_weighted_insufficient_data() -> None:
     start = 1
     end = 1
 
-    spline = metrics._fit_weighted(
+    spline = mims._fit_weighted(
         axis=axis,
         time_numeric=time_numeric,
         marker=marker,
@@ -680,7 +678,7 @@ def test_fit_weighted_out_of_range() -> None:
     time_numeric = np.arange(10, dtype=float)
     marker = np.zeros(10)
 
-    spline = metrics._fit_weighted(
+    spline = mims._fit_weighted(
         axis=axis,
         time_numeric=time_numeric,
         marker=marker,
@@ -708,7 +706,7 @@ def test_extrapolate_interpolate(marker: np.ndarray) -> None:
 
     points = [(4.5, 4.5)]
 
-    interpolated = metrics._extrapolate_interpolate(
+    interpolated = mims._extrapolate_interpolate(
         axis=axis,
         time_numeric=time_numeric,
         marker=marker,
@@ -726,11 +724,11 @@ def test_butterworth_filter(
     expected_data = pl.read_csv(butter_r_version)
     expected_acceleration = expected_data.select(["IIR_X", "IIR_Y", "IIR_Z"]).to_numpy()
     test_data = readers.read_watch_data(sample_data_gt3x)
-    interpolated_acceleration = metrics.interpolate_measure(
+    interpolated_acceleration = mims.interpolate_measure(
         acceleration=test_data.acceleration, new_frequency=100
     )
 
-    filtered_data = metrics.butterworth_filter(
+    filtered_data = mims.butterworth_filter(
         acceleration=interpolated_acceleration,
         sampling_rate=100,
         cutoffs=(0.2, 5.0),
@@ -752,7 +750,7 @@ def test_aggregation_good(
 ) -> None:
     """Test MIMS aggregation. See mims_test_data_code.md for details on sample data."""
     test_data = readers.read_watch_data(sample_data_gt3x)
-    test_data_interpolated = metrics.interpolate_measure(
+    test_data_interpolated = mims.interpolate_measure(
         acceleration=test_data.acceleration, new_frequency=100
     )
     expected_results = pl.read_csv(aggregation_r_version)
@@ -760,7 +758,7 @@ def test_aggregation_good(
         ["AGGREGATED_X", "AGGREGATED_Y", "AGGREGATED_Z"]
     ).to_numpy()
 
-    results = metrics.aggregate_mims(
+    results = mims.aggregate_mims(
         acceleration=test_data_interpolated, epoch=60, sampling_rate=100, rectify=True
     )
 
@@ -776,7 +774,7 @@ def test_aggregation_few_samples(
     test_data = readers.read_watch_data(sample_data_gt3x)
     expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
 
-    results = metrics.aggregate_mims(
+    results = mims.aggregate_mims(
         acceleration=test_data.acceleration, epoch=60, sampling_rate=100, rectify=True
     )
 
@@ -795,7 +793,7 @@ def test_aggregation_rectify() -> None:
     )
     expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
 
-    results = metrics.aggregate_mims(
+    results = mims.aggregate_mims(
         acceleration=below_threshold_measure, epoch=60, sampling_rate=100
     )
 
@@ -814,7 +812,7 @@ def test_aggregation_max_value() -> None:
     )
     expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
 
-    results = metrics.aggregate_mims(
+    results = mims.aggregate_mims(
         acceleration=max_value_measure, epoch=60, sampling_rate=100
     )
 
