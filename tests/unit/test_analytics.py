@@ -214,11 +214,12 @@ def test_sleep_cleanup() -> None:
         )
     ]
 
+    expected_result = np.zeros(len(nonwear_measurement.time))
+    expected_result[600:2000] = 1
+
     result = analytics.sleep_cleanup(
         sleep_windows=sleep_windows, nonwear_measurement=nonwear_measurement
     )
-    expected_result = np.zeros(len(nonwear_measurement.time))
-    expected_result[600:2000] = 1
 
     assert len(result.time) == 3600
     assert np.array_equal(result.measurements, expected_result)
