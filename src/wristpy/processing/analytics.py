@@ -301,9 +301,9 @@ def _find_periods(
 
 
 def _fill_false_blocks(boolean_array: np.ndarray, gap_block: int) -> np.ndarray:
-    """Helper function to fill gaps in SPT window that are less than gap_blocks.
+    """Helper function to fill gaps in any window that are less than gap_blocks.
 
-    We find the first non-zero in the sleep_idx_array, if there are none ,
+    We find the first non-zero in the boolean_array, if there are none ,
     we return the initial array.
     We then iterate over the array and count every zero between ones
     (skipping the leading zeros),
@@ -314,7 +314,7 @@ def _fill_false_blocks(boolean_array: np.ndarray, gap_block: int) -> np.ndarray:
         gap_block: the length of the gap that needs to be filled.
 
     Returns:
-        A numpy array with 1s, typically for identified SPT windows.
+        A booelan numpy array where true, typically, idicates the SPT windows.
     """
     n_zeros = 0
     first_one_idx = next(
@@ -417,12 +417,15 @@ def sleep_cleanup(
 
     sleep = _sleep_windows_as_measurement(nonwear_measurement.time, sleep_windows)
 
-    filtered_sleep = sleep.measurements - nonwear_measurement.measurements
+    filtered_sleep = np.logical_and(
+        sleep.measurements,
+        np.logical_not(nonwear_measurement.measurements.astype(bool)),
+    )
     cleaned_sleep = np.logical_not(
         _fill_false_blocks(np.logical_not(filtered_sleep), num_samples_15min)
     )
 
-    return models.Measurement(time=sleep.time, measurements=cleaned_sleep.astype(int))
+    return models.Measurement(time=sleep.time, measurements=cleaned_sleep)
 
 
 def _sleep_windows_as_measurement(
@@ -440,17 +443,17 @@ def _sleep_windows_as_measurement(
             instances of the SleepWindow class.
 
     Returns:
-        A new Measurement instance with the sleep values.
+        A new Measurement instance with the sleep values, as a booleans.
     """
     logger.debug("Converting sleep windows to measurement.")
 
-    sleep_value = np.zeros(len(ref_measurement_time), dtype=int)
+    sleep_value = np.zeros(len(ref_measurement_time), dtype=bool)
 
     for sw in sleep_windows:
         if sw.onset is not None and sw.wakeup is not None:
             time_mask = (ref_measurement_time >= sw.onset) & (
                 ref_measurement_time <= sw.wakeup
             )
-            sleep_value[time_mask] = 1
+            sleep_value[time_mask] = True
 
     return models.Measurement(time=ref_measurement_time, measurements=sleep_value)
