@@ -1,12 +1,12 @@
 """Calculate base metrics, anglez and enmo."""
 
-from typing import List, Literal, Optional, Tuple
+from typing import Literal
 
 import numpy as np
 import polars as pl
-from scipy import integrate, interpolate, signal, stats
 
 from wristpy.core import config, models
+from wristpy.processing import mims
 
 logger = config.get_logger()
 
@@ -248,3 +248,21 @@ def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.
     nonwear_value_array[condition] = 2
 
     return nonwear_value_array
+
+
+def monitor_independent_movement_summary_units(
+    acceleration: models.Measurement,
+    combination_method: Literal["sum", "vector_magnitude"] = "sum",
+) -> models.Measurement:
+    """Calculates monitor independent movement summary units (MIMS)."""
+    interpolated_measure = mims.interpolate_measure(acceleration=acceleration)
+    extrapolated_measure = mims.extrapolate_points(acceleration=interpolated_measure)
+    filtered_measure = mims.butterworth_filter(acceleration=extrapolated_measure)
+    aggregated_measure = mims.aggregate_mims(acceleration=filtered_measure)
+    aggregated_measure.measurements = np.where(
+        aggregated_measure.measurements <= 0.001, 0, aggregated_measure.measurements
+    )
+    combined_mims = mims.combine_mims(
+        acceleration=aggregated_measure, combination_method=combination_method
+    )
+    return combined_mims

@@ -1,4 +1,4 @@
-"""Calculate Monitor Indepdent Summary Units."""
+"""Calculate Monitor Indepdent Movement Summary Units."""
 
 from typing import List, Literal, Optional, Tuple
 
@@ -734,3 +734,25 @@ def _aggregate_epoch(
     return pl.DataFrame(
         {"time": [group["time"].min()], "x": [area[0]], "y": [area[1]], "z": [area[2]]}
     )
+
+
+def combine_mims(
+    acceleration: models.Measurement,
+    combination_method: Literal["sum", "vector_magnitude"] = "sum",
+) -> models.Measurement:
+    """Combine MIMS values of xyz axis into one MIMS value."""
+    row_contains_negative = np.any(acceleration.measurements == -1, axis=1)
+
+    if combination_method == "sum":
+        row_sum = np.sum(acceleration.measurements, axis=1)
+        combined_mims = np.where(row_contains_negative, -1, row_sum)
+    elif combination_method == "vector_magnitude":
+        row_norm = np.linalg.norm(acceleration.measurements, axis=1)
+        combined_mims = np.where(row_contains_negative, -1, row_norm)
+    else:
+        raise ValueError(
+            f"Invalid combination_method given:{combination_method}."
+            "Must be 'sum' or 'vector_magnitude'. "
+        )
+
+    return models.Measurement(measurements=combined_mims, time=acceleration.time)
