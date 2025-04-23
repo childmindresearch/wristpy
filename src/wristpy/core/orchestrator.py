@@ -3,9 +3,7 @@
 import itertools
 import logging
 import pathlib
-from typing import Dict, List, Literal, Optional, Sequence, Tuple, Union
-
-import numpy as np
+from typing import Dict, Literal, Optional, Sequence, Tuple, Union
 
 from wristpy.core import config, exceptions, models
 from wristpy.io.readers import readers
@@ -20,31 +18,6 @@ from wristpy.processing import (
 logger = config.get_logger()
 
 VALID_FILE_TYPES = (".csv", ".parquet")
-
-
-def format_sleep_data(
-    sleep_windows: List[analytics.SleepWindow], reference_measure: models.Measurement
-) -> np.ndarray:
-    """Formats sleep windows into an array for saving.
-
-    Args:
-        sleep_windows: The list of time stamp pairs indicating periods of sleep.
-        reference_measure: The measure from which the temporal resolution will be taken.
-
-    Returns:
-        1-D np.ndarray, with 1 indicating sleep. Will be of the same length as
-            the timestamps in the reference_measure.
-    """
-    logger.debug("Formatting sleep array from sleep windows.")
-    sleep_array = np.zeros(len(reference_measure.time), dtype=bool)
-
-    for window in sleep_windows:
-        sleep_mask = (reference_measure.time >= window.onset) & (
-            reference_measure.time <= window.wakeup
-        )
-        sleep_array[sleep_mask] = 1
-
-    return sleep_array
 
 
 def run(
@@ -361,17 +334,14 @@ def _run_file(
         reference_measurement=activity_measurement,
         epoch_length=epoch_length,
     )
+
     physical_activity_levels = analytics.compute_physical_activty_categories(
         activity_measurement, thresholds
     )
 
-    sleep_array = models.Measurement(
-        measurements=format_sleep_data(
-            sleep_windows=sleep_windows, reference_measure=activity_measurement
-        ),
-        time=activity_measurement.time,
+    sleep_array = analytics.sleep_cleanup(
+        sleep_windows=sleep_windows, nonwear_measurement=nonwear_epoch
     )
-
     results = models.OrchestratorResults(
         physical_activity_metric=activity_measurement,
         anglez=anglez,

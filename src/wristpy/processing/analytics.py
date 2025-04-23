@@ -134,12 +134,10 @@ class GgirSleepDetection(AbstractSleepDetector):
         ).flatten()
 
         sleep_candidates = np.logical_not(
-            self._fill_false_blocks(non_sleep_candidates, long_block)
+            _fill_false_blocks(non_sleep_candidates, long_block)
         )
 
-        sleep_idx_array_filled = self._fill_false_blocks(
-            sleep_candidates, short_block_gap
-        )
+        sleep_idx_array_filled = _fill_false_blocks(sleep_candidates, short_block_gap)
         return models.Measurement(
             measurements=sleep_idx_array_filled, time=anglez_median_long_epoch.time
         )
@@ -238,43 +236,6 @@ class GgirSleepDetection(AbstractSleepDetector):
         logger.debug("Sleep windows found: %s", len(sleep_windows))
         return sleep_windows
 
-    def _fill_false_blocks(
-        self, boolean_array: np.ndarray, gap_block: int
-    ) -> np.ndarray:
-        """Helper function to fill gaps in SPT window that are less than gap_blocks.
-
-        We find the first non-zero in the sleep_idx_array, if there are none ,
-        we return the initial array.
-        We then iterate over the array and count every zero between ones
-        (skipping the leading zeros),
-        if that value is less than the gap_block, we fill in with ones.
-
-        Args:
-            boolean_array: A generic boolean array, typically the SPT window.
-            gap_block: the length of the gap that needs to be filled.
-
-        Returns:
-            A numpy array with 1s, typically for identified SPT windows.
-        """
-        n_zeros = 0
-        first_one_idx = next(
-            (index for index, value in enumerate(boolean_array) if value), None
-        )
-        if first_one_idx is None:
-            return boolean_array
-
-        for sleep_array_idx in range(first_one_idx, len(boolean_array)):
-            sleep_value = boolean_array[sleep_array_idx]
-            if not sleep_value:
-                n_zeros += 1
-                continue
-
-            if n_zeros < gap_block:
-                boolean_array[sleep_array_idx - n_zeros : sleep_array_idx] = True
-            n_zeros = 0
-
-        return boolean_array
-
     def _compute_abs_diff_mean_anglez(
         self, anglez_data: models.Measurement, window_size_seconds: int = 5
     ) -> models.Measurement:
@@ -339,50 +300,40 @@ def _find_periods(
     return all_periods
 
 
-def remove_nonwear_from_sleep(
-    non_wear_array: models.Measurement,
-    sleep_windows: List[SleepWindow],
-) -> List[SleepWindow]:
-    """Remove non-wear periods from sleep windows.
+def _fill_false_blocks(boolean_array: np.ndarray, gap_block: int) -> np.ndarray:
+    """Helper function to fill gaps in any window that are less than gap_blocks.
 
-    This function finds all the non-wear periods and removes any sleep windows that have
-    any overlap with the non-wear periods (including non-wear completely
-    within the sleep window).
+    We find the first non-zero in the boolean_array, if there are none ,
+    we return the initial array.
+    We then iterate over the array and count every zero between ones
+    (skipping the leading zeros),
+    if that value is less than the gap_block, we fill in with ones.
 
     Args:
-        non_wear_array: The non-wear array generated from metrics.detect_nonwear
-        sleep_windows : The list of sleep windows, where the entries are
-            instances of the SleepWindow class.
+        boolean_array: A generic boolean array, typically the SPT window.
+        gap_block: the length of the gap that needs to be filled.
 
     Returns:
-        A List of the filtered sleep windows.
+        A booelan numpy array where true, typically, idicates the SPT windows.
     """
-    logger.debug(
-        "Finding non-wear periods that overlap with any of the %s sleep windows.",
-        len(sleep_windows),
+    n_zeros = 0
+    first_one_idx = next(
+        (index for index, value in enumerate(boolean_array) if value), None
     )
-    nonwear_periods = _find_periods(non_wear_array)
+    if first_one_idx is None:
+        return boolean_array
 
-    filtered_sleep_windows = []
-    for sleep_window in sleep_windows:
-        if isinstance(sleep_window.onset, datetime.datetime) and isinstance(
-            sleep_window.wakeup, datetime.datetime
-        ):
-            if not any(
-                (
-                    nonwear_period[0] <= sleep_window.onset <= nonwear_period[1]
-                    or nonwear_period[0] <= sleep_window.wakeup <= nonwear_period[1]
-                )
-                or (
-                    sleep_window.onset <= nonwear_period[0]
-                    and sleep_window.wakeup >= nonwear_period[1]
-                )
-                for nonwear_period in nonwear_periods
-            ):
-                filtered_sleep_windows.append(sleep_window)
+    for sleep_array_idx in range(first_one_idx, len(boolean_array)):
+        sleep_value = boolean_array[sleep_array_idx]
+        if not sleep_value:
+            n_zeros += 1
+            continue
 
-    logger.debug("Non-wear removed. %s sleep windows remain.", len(sleep_windows))
-    return filtered_sleep_windows
+        if n_zeros < gap_block:
+            boolean_array[sleep_array_idx - n_zeros : sleep_array_idx] = True
+        n_zeros = 0
+
+    return boolean_array
 
 
 def compute_physical_activty_categories(
@@ -440,3 +391,69 @@ def compute_physical_activty_categories(
     return models.Measurement(
         measurements=activity_levels, time=activity_metric_epoch1.time
     )
+
+
+def sleep_cleanup(
+    sleep_windows: List[SleepWindow], nonwear_measurement: models.Measurement
+) -> models.Measurement:
+    """This function will filter the sleep windows based on the nonwear measurement.
+
+    The SleepWindows are first converted to a Measurement object with the same
+    timestamps as the reference measurement. Then any overlap with nonwear
+    is removed, and finally any blocks of sleep that are less than 15 minutes
+    long are removed.
+
+    Args:
+        sleep_windows: List of the sleep windows (Onset/Wake pairs).
+        nonwear_measurement: The nonwear measurement data used for reference time
+            stamps and to remove overlaps with periods of sleep.
+
+    Returns:
+        A Measurement instance with the cleaned sleep data.
+    """
+    logger.debug("Starting the sleep Window cleanup.")
+    temporal_resolution = nonwear_measurement.time[1] - nonwear_measurement.time[0]
+    num_samples_15min = int(15 * 60 / temporal_resolution.total_seconds())
+
+    sleep = _sleep_windows_as_measurement(nonwear_measurement.time, sleep_windows)
+
+    filtered_sleep = np.logical_and(
+        sleep.measurements,
+        np.logical_not(nonwear_measurement.measurements.astype(bool)),
+    )
+    cleaned_sleep = np.logical_not(
+        _fill_false_blocks(np.logical_not(filtered_sleep), num_samples_15min)
+    )
+
+    return models.Measurement(time=sleep.time, measurements=cleaned_sleep)
+
+
+def _sleep_windows_as_measurement(
+    ref_measurement_time: pl.Series, sleep_windows: List[SleepWindow]
+) -> models.Measurement:
+    """Helper function to convert list of sleep windows to a Measurement instance.
+
+    The temporal resolution of the output Measurement instance matches the
+    reference measurement.
+
+    Args:
+        ref_measurement_time: Reference polars Series with time stamps from a
+            reference Measurement.
+        sleep_windows: The list of sleep windows, where the entries are
+            instances of the SleepWindow class.
+
+    Returns:
+        A new Measurement instance with the sleep values, as a booleans.
+    """
+    logger.debug("Converting sleep windows to measurement.")
+
+    sleep_value = np.zeros(len(ref_measurement_time), dtype=bool)
+
+    for sw in sleep_windows:
+        if sw.onset is not None and sw.wakeup is not None:
+            time_mask = (ref_measurement_time >= sw.onset) & (
+                ref_measurement_time <= sw.wakeup
+            )
+            sleep_value[time_mask] = True
+
+    return models.Measurement(time=ref_measurement_time, measurements=sleep_value)
