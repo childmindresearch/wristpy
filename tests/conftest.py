@@ -57,3 +57,9 @@ def butter_r_version() -> pathlib.Path:
         / "sample_data"
         / "mims_butterworth_filtered_data.csv"
     )
+
+
+@pytest.fixture
+def mims_r_version() -> pathlib.Path:
+    """The actigraphy sample data processed by the mims function in R."""
+    return pathlib.Path(__file__).parent / "sample_data" / "mims_example_full_run.csv"

@@ -253,12 +253,15 @@ def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.
 def monitor_independent_movement_summary_units(
     acceleration: models.Measurement,
     combination_method: Literal["sum", "vector_magnitude"] = "sum",
+    epoch: int = 60,
 ) -> models.Measurement:
     """Calculates monitor independent movement summary units (MIMS)."""
-    interpolated_measure = mims.interpolate_measure(acceleration=acceleration)
+    interpolated_measure = mims.interpolate_measure(
+        acceleration=acceleration,
+    )
     extrapolated_measure = mims.extrapolate_points(acceleration=interpolated_measure)
     filtered_measure = mims.butterworth_filter(acceleration=extrapolated_measure)
-    aggregated_measure = mims.aggregate_mims(acceleration=filtered_measure)
+    aggregated_measure = mims.aggregate_mims(acceleration=filtered_measure, epoch=epoch)
     aggregated_measure.measurements = np.where(
         aggregated_measure.measurements <= 0.001, 0, aggregated_measure.measurements
     )
