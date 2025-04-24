@@ -2,11 +2,12 @@
 
 import logging
 import pathlib
+from enum import Enum
 from typing import List, Literal, Optional, Tuple, Union, cast
 
 import typer
 
-from wristpy.core import config, orchestrator
+from wristpy.core import config
 
 logger = config.get_logger()
 app = typer.Typer(
@@ -15,35 +16,36 @@ app = typer.Typer(
 )
 
 
-def _none_or_float_list(value: str) -> Optional[List[float]]:
-    """Helper function to process thresholds argument."""
-    if value.lower() == "none":
-        return None
-    try:
-        float_list = [float(v) for v in value.split(",")]
-        if len(float_list) != 3:
-            raise typer.BadParameter(
-                f"Invalid value: {value}."
-                "Must be a comma-separated list of exactly three numbers or 'None'."
-            )
-        return float_list
-    except ValueError:
-        raise typer.BadParameter(
-            f"Invalid value: {value}. Must be a comma-separated list or 'None'."
-        )
+class Calibrator(str, Enum):
+    """Setting a calibrator class for typer.
+
+    This class is used to define the literal types that are allowed for
+    calibration, and parsing the strings for the orchestrator.
+    """
+
+    none = "none"
+    ggir = "ggir"
+    gradient = "gradient"
 
 
-def _parse_nonwear_algorithms(algorithm_name: str) -> List[str]:
-    """Parse comma-separated non-wear algorithm names."""
-    valid_algorithm_names = ["ggir", "cta", "detach"]
-    algorithms = [algo.strip().lower() for algo in algorithm_name.split(",")]
-    for algo in algorithms:
-        if algo not in valid_algorithm_names:
-            raise typer.BadParameter(
-                f"Invalid algorithm: '{algo}'. Must be one of: "
-                f"{', '.join(valid_algorithm_names)}."
-            )
-    return algorithms
+class ActivityMetric(str, Enum):
+    """Valid activity metrics for physical activity categorization."""
+
+    enmo = "enmo"
+    mad = "mad"
+    ag_count = "ag_count"
+
+
+class NonwearAlgorithms(str, Enum):
+    """Setting a nonwear algorithm class for typer.
+
+    This class is used to define the literal types that are allowed for
+    nonwear algorithms, and parsing the strings for the orchestrator.
+    """
+
+    ggir = "ggir"
+    cta = "cta"
+    detach = "detach"
 
 
 @app.command()
@@ -64,50 +66,47 @@ def main(
         help="Format for save files when processing directories. "
         "Leave as None when processing single files.",
     ),
-    calibrator: Union[
+    calibrator: Calibrator = typer.Option(
         None,
-        Literal["ggir", "gradient"],
-    ] = typer.Option(
-        "none",
         "-c",
         "--calibrator",
-        help="Pick which calibrator to use.",
+        help="Pick which calibrator to use."
+        "Must choose one of 'none', 'ggir', or 'gradient'.",
         case_sensitive=False,
-        callback=lambda x: x.lower() if x else x,
     ),
-    activity_metric: str = typer.Option(
-        "enmo",
+    activity_metric: ActivityMetric = typer.Option(
+        ActivityMetric.enmo,
         "-a",
         "--activity-metric",
-        help="Pick which physical activity metric should be used for physical activity categorization.",
+        help="Metric should be used for physical activity categorization."
+        "Choose from 'enmo', 'mad', or 'ag_count'.",
         case_sensitive=False,
-        callback=lambda x: x.lower() if x else x,
     ),
-    thresholds: Optional[str] = typer.Option(
+    thresholds: tuple[float, float, float] = typer.Option(
         None,
         "-t",
         "--thresholds",
         help="Provide three thresholds for light, moderate, and vigorous activity. "
-        "Exactly three values must be given in ascending order, and comma seperated.",
-        callback=_none_or_float_list,
+        "Exactly three values must be >= 0, given in ascending order,"
+        " and separated by a space.",
+        min=0,
     ),
-    nonwear_algorithm: List[str] = typer.Option(
-        ["ggir"],
-        "-nw",
+    nonwear_algorithm: list[NonwearAlgorithms] = typer.Option(
+        [NonwearAlgorithms.ggir],
+        "-n",
         "--nonwear-algorithm",
         help="Specify the non-wear detection algorithm(s) to use. "
-        "Specify one or more of 'ggir', 'cta', 'detach' as a comma-separated list "
-        "(e.g. 'ggir,detach'). "
+        "Specify one or more of 'ggir', 'cta', 'detach'. "
+        "(e.g. '-n ggir -n cta'). "
         "When multiple algorithms are specified, majority voting will be applied.",
-        callback=_parse_nonwear_algorithms,
     ),
     epoch_length: int = typer.Option(
         5,
         "-e",
         "--epoch-length",
         help="Specify the sampling rate in seconds for all metrics. "
-        "Must be greater than 0.",
-        min=0,
+        "Must be greater than 1.",
+        min=1,
     ),
     verbosity: int = typer.Option(
         0,
@@ -122,6 +121,8 @@ def main(
     ),
 ) -> None:
     """Run wristpy orchestrator with command line arguments."""
+    from wristpy.core import orchestrator
+
     if version:
         typer.echo(f"Wristpy version: {config.get_version()}")
         raise typer.Exit()
@@ -134,17 +135,17 @@ def main(
         log_level = logging.DEBUG
     logger.setLevel(log_level)
 
+    nonwear_algorithms = [algo.value for algo in nonwear_algorithm]
+
     logger.debug("Running wristpy. arguments given: %s", locals())
     orchestrator.run(
         input=input,
         output=output,
-        calibrator=None if calibrator == "none" else calibrator,
-        activity_metric=activity_metric,
-        thresholds=None
-        if thresholds is None
-        else cast(Tuple[float, float, float], tuple(thresholds)),
+        calibrator=calibrator.value if calibrator else None,
+        activity_metric=activity_metric.value,
+        thresholds=None if thresholds is None else thresholds,
         epoch_length=epoch_length,
-        nonwear_algorithm=nonwear_algorithm,
+        nonwear_algorithm=nonwear_algorithms,
         verbosity=log_level,
         output_filetype=output_filetype,
     )
