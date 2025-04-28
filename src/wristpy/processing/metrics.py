@@ -1,6 +1,6 @@
 """Calculate base metrics, anglez and enmo."""
 
-from typing import Literal
+from typing import Literal, Tuple
 
 import numpy as np
 import polars as pl
@@ -254,6 +254,12 @@ def monitor_independent_movement_summary_units(
     acceleration: models.Measurement,
     combination_method: Literal["sum", "vector_magnitude"] = "sum",
     epoch: int = 60,
+    interpolation_frequency: int = 100,
+    dynamic_range: Tuple[float, float] = (-8.0, 8.0),
+    cutoffs: Tuple[float, float] = (0.2, 5.0),
+    order: int = 4,
+    *,
+    rectify: bool = True,
 ) -> models.Measurement:
     """Calculates monitor independent movement summary units (MIMS)."""
     interpolated_measure = mims.interpolate_measure(

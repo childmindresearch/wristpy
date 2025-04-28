@@ -819,3 +819,49 @@ def test_aggregation_max_value() -> None:
     assert np.all(
         expected_acceleration == results.measurements
     ), f"Results did not match expectation. Results: {results.measurements}"
+
+
+def test_combine_mims() -> None:
+    """Test combine mims helper function."""
+    dummy_datetime = pl.Series(
+        "time", [datetime(2024, 5, 2) + timedelta(seconds=i) for i in range(2)]
+    )
+    dummy_data = np.array([[-1, 1, 1], [1, 1, 1]])
+    dummy_measure = models.Measurement(measurements=dummy_data, time=dummy_datetime)
+    expected_data = np.array([-1, 3])
+
+    results = mims.combine_mims(acceleration=dummy_measure)
+
+    assert np.array_equal(
+        results.measurements, expected_data
+    ), f"Expected array was {expected_data}, result was: {results.measurements}"
+
+
+def test_combine_mims_method_error(create_acceleration: pl.DataFrame) -> None:
+    """Test error when invalid combination method given."""
+    test_model = models.Measurement(
+        measurements=create_acceleration["X", "Y", "Z"].to_numpy(),
+        time=create_acceleration["time"],
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Invalid combination_method given:bad_method."
+        "Must be 'sum' or 'vector_magnitude'. ",
+    ):
+        mims.combine_mims(acceleration=test_model, combination_method="bad_method")  # type: ignore
+
+
+def test_monitor_independent_movement_summary_units(
+    sample_data_gt3x: pathlib.Path, mims_r_version: pathlib.Path
+) -> None:
+    """Tests implementation of the MIMS algorithm against original R version."""
+    watch_data = readers.read_watch_data(sample_data_gt3x)
+    acceleration_test_data = watch_data.acceleration
+    expected_results = pl.read_csv(mims_r_version)
+    expected_values = expected_results["MIMS_UNIT"].to_numpy()
+    results = metrics.monitor_independent_movement_summary_units(
+        acceleration=acceleration_test_data, epoch=1
+    )
+
+    assert np.allclose(results.measurements[:-1], expected_values, atol=0.005)
