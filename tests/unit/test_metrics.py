@@ -3,7 +3,7 @@
 import math
 import pathlib
 from datetime import datetime, timedelta
-from typing import List, Union
+from typing import List, Literal, Union
 
 import numpy as np
 import polars as pl
@@ -821,16 +821,28 @@ def test_aggregation_max_value() -> None:
     ), f"Results did not match expectation. Results: {results.measurements}"
 
 
-def test_combine_mims() -> None:
+@pytest.mark.parametrize(
+    "dummy_data, expected_data, combination_method",
+    [
+        (np.array([[-1, 1, 1], [1, 1, 1]]), np.array([-1, 3]), "sum"),
+        (np.array([[-1, 1, 1], [2, 3, 6]]), np.array([-1, 7]), "vector_magnitude"),
+    ],
+)
+def test_combine_mims(
+    dummy_data: np.ndarray,
+    expected_data: np.ndarray,
+    combination_method: Literal["sum", "vector_magnitude"],
+) -> None:
     """Test combine mims helper function."""
     dummy_datetime = pl.Series(
         "time", [datetime(2024, 5, 2) + timedelta(seconds=i) for i in range(2)]
     )
-    dummy_data = np.array([[-1, 1, 1], [1, 1, 1]])
     dummy_measure = models.Measurement(measurements=dummy_data, time=dummy_datetime)
-    expected_data = np.array([-1, 3])
 
-    results = mims.combine_mims(acceleration=dummy_measure)
+    results = mims.combine_mims(
+        acceleration=dummy_measure,
+        combination_method=combination_method,
+    )
 
     assert np.array_equal(
         results.measurements, expected_data
