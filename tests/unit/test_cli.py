@@ -166,7 +166,7 @@ def test_main_with_bad_thresholds(
     result = create_typer_cli_runner.invoke(
         cli.app, [str(sample_data_gt3x), "-t", "-3.0"]
     )
-    print(result.output)
+
     assert result.exit_code != 0
     assert "Option '-t' requires 3 arguments." in result.output
 
