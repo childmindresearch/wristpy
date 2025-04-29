@@ -16,6 +16,13 @@ app = typer.Typer(
 )
 
 
+class OutputFileType(str, Enum):
+    """Valid output file types for saving data."""
+
+    csv = "csv"
+    parquet = "parquet"
+
+
 class Calibrator(str, Enum):
     """Setting a calibrator class for typer.
 
@@ -53,13 +60,13 @@ def main(
     input: pathlib.Path = typer.Argument(
         ..., help="Path to the input data.", exists=True
     ),
-    output: Optional[pathlib.Path] = typer.Option(
+    output: pathlib.Path = typer.Option(
         None,
         "-o",
         "--output",
         help="Path where data will be saved. Supports .csv and .parquet formats.",
     ),
-    output_filetype: Optional[str] = typer.Option(
+    output_filetype: OutputFileType = typer.Option(
         None,
         "-O",
         "--output-filetype",
@@ -141,13 +148,13 @@ def main(
     orchestrator.run(
         input=input,
         output=output,
-        calibrator=calibrator.value if calibrator else None,
+        calibrator=calibrator.value if calibrator else None,  # type: ignore[arg-type] # Covered by Calibrator Enum class
         activity_metric=activity_metric.value,
         thresholds=None if thresholds is None else thresholds,
         epoch_length=epoch_length,
-        nonwear_algorithm=nonwear_algorithms,
+        nonwear_algorithm=nonwear_algorithms,  # type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class
         verbosity=log_level,
-        output_filetype=output_filetype,
+        output_filetype=output_filetype,  # type: ignore[arg-type] # Covered by OutputFileType Enum class
     )
 
 
