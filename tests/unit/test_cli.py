@@ -199,7 +199,7 @@ def test_main_verbosity(
     mocker: pytest_mock.MockerFixture,
     sample_data_gt3x: pathlib.Path,
     create_typer_cli_runner: CliRunner,
-    verbosity: int,
+    verbosity: str,
     expected_log_level: int,
 ) -> None:
     """Test cli with different verbosity levels."""
