@@ -111,7 +111,7 @@ def main(
         "-e",
         "--epoch-length",
         help="Specify the sampling rate in seconds for all metrics. "
-        "Must be greater than 1.",
+        "Must be greater than or equal to 1.",
         min=1,
     ),
     verbosity: int = typer.Option(
@@ -119,7 +119,8 @@ def main(
         "-v",
         "--verbosity",
         count=True,
-        help="Determines the level of verbosity. Use -v for info, -vv for debug. "
+        help="Determines the level of verbosity. Use -v for info, -vv for debug."
+        "If -vvv or more, it will be set to debug."
         "Default for warning.",
     ),
     version: bool = typer.Option(

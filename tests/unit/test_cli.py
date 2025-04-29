@@ -164,7 +164,7 @@ def test_main_with_bad_thresholds(
 ) -> None:
     """Test cli with bad thresholds."""
     result = create_typer_cli_runner.invoke(
-        cli.app, [str(sample_data_gt3x), "-t", "-3.0"]
+        cli.app, [str(sample_data_gt3x), "-t", "3.0"]
     )
 
     assert result.exit_code != 0
@@ -178,10 +178,33 @@ def test_main_with_bad_epoch(
 ) -> None:
     """Test cli with invalid epoch length."""
     result = create_typer_cli_runner.invoke(
-        cli.app, ([str(sample_data_gt3x), "-e", "-5"])
+        cli.app, [str(sample_data_gt3x), "-e", "-5"]
     )
 
     assert result.exit_code != 0
     # partial matching due to ANSI escape sequences in Github Actions
     assert "Invalid value for" in result.output
     assert "is not in the range x>=1." in result.output
+
+
+@pytest.mark.parametrize(
+    "verbosity, expected_log_level",
+    [
+        ("-v", logging.INFO),
+        ("-vv", logging.DEBUG),
+        ("-vvv", logging.DEBUG),
+    ],
+)
+def test_main_verbosity(
+    mocker: pytest_mock.MockerFixture,
+    sample_data_gt3x: pathlib.Path,
+    create_typer_cli_runner: CliRunner,
+    verbosity: int,
+    expected_log_level: int,
+) -> None:
+    """Test cli with different verbosity levels."""
+    mock_run = mocker.patch.object(orchestrator, "run")
+
+    create_typer_cli_runner.invoke(cli.app, [str(sample_data_gt3x), verbosity])
+
+    assert mock_run.call_args.kwargs["verbosity"] == expected_log_level
