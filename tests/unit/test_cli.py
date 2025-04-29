@@ -168,7 +168,8 @@ def test_main_with_bad_thresholds(
     )
 
     assert result.exit_code != 0
-    assert "Option '-t' requires 3 arguments." in result.output
+    # partial matching due to ANSI escape sequences in Github Actions
+    assert "requires 3 arguments." in result.output
 
 
 def test_main_with_bad_epoch(
@@ -181,7 +182,6 @@ def test_main_with_bad_epoch(
     )
 
     assert result.exit_code != 0
-    assert (
-        "Invalid value for '-e' / '--epoch-length': -5 is not in the range x>=1."
-        in result.output
-    )
+    # partial matching due to ANSI escape sequences in Github Actions
+    assert "Invalid value for" in result.output
+    assert "is not in the range x>=1." in result.output
