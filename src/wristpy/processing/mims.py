@@ -740,7 +740,17 @@ def combine_mims(
     acceleration: models.Measurement,
     combination_method: Literal["sum", "vector_magnitude"] = "sum",
 ) -> models.Measurement:
-    """Combine MIMS values of xyz axis into one MIMS value."""
+    """Combine MIMS values of xyz axis into one MIMS value.
+
+    Args:
+        acceleration: An object containing per-axis MIMS measurements and their
+            corresponding timestamps.
+        combination_method: The method to combine MIMS values across axes. Defaults to
+            "sum".
+
+    Returns:
+            A Measurement object with combined MIMS values and corresponding timestamps.
+    """
     row_contains_negative = np.any(acceleration.measurements == -1, axis=1)
 
     if combination_method == "sum":
