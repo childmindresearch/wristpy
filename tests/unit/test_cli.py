@@ -164,11 +164,12 @@ def test_main_with_bad_thresholds(
 ) -> None:
     """Test cli with bad thresholds."""
     result = create_typer_cli_runner.invoke(
-        cli.app, [str(sample_data_gt3x), "-t", "3.0"], color=False
+        cli.app, [str(sample_data_gt3x), "-t", "3.0"]
     )
 
     assert result.exit_code != 0
-    assert "Option '-t' requires 3 arguments." in result.output
+    # partial matching due to ANSI escape sequences in Github Actions
+    assert "requires 3 arguments." in result.output
 
 
 def test_main_with_bad_epoch(
@@ -177,14 +178,13 @@ def test_main_with_bad_epoch(
 ) -> None:
     """Test cli with invalid epoch length."""
     result = create_typer_cli_runner.invoke(
-        cli.app, [str(sample_data_gt3x), "-e", "-5"], color=False
+        cli.app, [str(sample_data_gt3x), "-e", "-5"]
     )
 
     assert result.exit_code != 0
-    assert (
-        "Invalid value for '-e' / '--epoch-length': -5 is not in the range x>=1."
-        in result.output
-    )
+    # partial matching due to ANSI escape sequences in Github Actions
+    assert "Invalid value for" in result.output
+    assert "is not in the range x>=1." in result.output
 
 
 @pytest.mark.parametrize(
