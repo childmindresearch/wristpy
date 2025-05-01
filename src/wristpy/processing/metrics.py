@@ -261,13 +261,62 @@ def monitor_independent_movement_summary_units(
     *,
     rectify: bool = True,
 ) -> models.Measurement:
-    """Calculates monitor independent movement summary units (MIMS)."""
+    """Calculates monitor independent movement summary units (MIMS).
+
+    This function processes raw acceleration data to calculate MIMS units,
+    based on the original R implementation by John et al.(2019). The main processing
+    steps as described in  the original paper are interpolation (100Hz by default),
+    extrapolation of any values that went beyond the dynamic range of the device,
+    filtering using a 4th order butterworth filter, aggregation by calculating the area
+    under the curve over a given epoch, and finally trunction of small values.
+    The MIMS value per axis is then combined through a sum or vector magnitude, and
+    returned as a single vector.
+
+    Args:
+        acceleration: Triaxial acceleration data to be processed.
+        combination_method: Method to combine MIMS values accross axes.
+        epoch: Duration over which each MIMS value will be calculated. Measured in
+            seconds.
+        interpolation_frequency: Frequency to interpolate acceleration data, defaults
+            to 100 Hz as described in John et al. 2019.
+        dynamic_range: Tuple specifying the minimum and maximum values (in g) of the
+            accelerometer's dynamic range.
+        cutoffs: Tuple specifying the low and high cutoff frequencies (in Hz) for the
+            Butterworth filter.
+        order: Order of the Butterworth filter.
+        rectify:If True, rectifies the filtered signal before aggregation. ,
+
+    Returns:
+        Processed MIMS values after combining the values of each axis with the provided
+        method.
+
+    References:
+        John, D., Tang, Q., Albinali, F. and Intille, S., 2019.
+        An Open-Source Monitor-Independent Movement Summary for Accelerometer Data
+        Processing. Journal for the Measurement of Physical Behaviour, 2(4), pp.268-281.
+
+    """
     interpolated_measure = mims.interpolate_measure(
         acceleration=acceleration,
+        new_frequency=interpolation_frequency,
     )
-    extrapolated_measure = mims.extrapolate_points(acceleration=interpolated_measure)
-    filtered_measure = mims.butterworth_filter(acceleration=extrapolated_measure)
-    aggregated_measure = mims.aggregate_mims(acceleration=filtered_measure, epoch=epoch)
+    extrapolated_measure = mims.extrapolate_points(
+        acceleration=interpolated_measure,
+        dynamic_range=dynamic_range,
+        sampling_rate=interpolation_frequency,
+    )
+    filtered_measure = mims.butterworth_filter(
+        acceleration=extrapolated_measure,
+        sampling_rate=interpolation_frequency,
+        cutoffs=cutoffs,
+        order=order,
+    )
+    aggregated_measure = mims.aggregate_mims(
+        acceleration=filtered_measure,
+        epoch=epoch,
+        sampling_rate=interpolation_frequency,
+        rectify=rectify,
+    )
     aggregated_measure.measurements = np.where(
         aggregated_measure.measurements <= 0.001, 0, aggregated_measure.measurements
     )
