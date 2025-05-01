@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 15.0.1"/>
+    <meta name="generator" content="pdoc 15.0.2"/>
     <title>wristpy.core.cli API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -34,13 +34,67 @@
                     <a class="variable" href="#logger">logger</a>
             </li>
             <li>
-                    <a class="function" href="#parse_arguments">parse_arguments</a>
+                    <a class="variable" href="#app">app</a>
+            </li>
+            <li>
+                    <a class="class" href="#OutputFileType">OutputFileType</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#OutputFileType.csv">csv</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#OutputFileType.parquet">parquet</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#Calibrator">Calibrator</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#Calibrator.none">none</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Calibrator.ggir">ggir</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Calibrator.gradient">gradient</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#ActivityMetric">ActivityMetric</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#ActivityMetric.enmo">enmo</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ActivityMetric.mad">mad</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ActivityMetric.ag_count">ag_count</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#NonwearAlgorithms">NonwearAlgorithms</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#NonwearAlgorithms.ggir">ggir</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#NonwearAlgorithms.cta">cta</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#NonwearAlgorithms.detach">detach</a>
+                        </li>
+                </ul>
+
             </li>
             <li>
                     <a class="function" href="#main">main</a>
-            </li>
-            <li>
-                    <a class="function" href="#parse_nonwear_algorithms">parse_nonwear_algorithms</a>
             </li>
     </ul>
 
@@ -67,219 +121,166 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&quot;&quot;&quot;CLI for wristpy.&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">cast</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">wristpy.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">orchestrator</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="n">logger</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">:</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Argument parser for Wristpy&#39;s cli.</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="sd">    Args:</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="sd">        args: A list of command line arguments given as strings. If None, the parser</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">            will take the args from `sys.argv`.</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">    Returns:</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">        Namespace object with all the input arguments and default values.</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Run the main Wristpy pipeline.&quot;</span><span class="p">,</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>        <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentDefaultsHelpFormatter</span><span class="p">,</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>        <span class="n">epilog</span><span class="o">=</span><span class="s2">&quot;Please report issues at https://github.com/childmindresearch/wristpy.&quot;</span><span class="p">,</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>    <span class="p">)</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the input data.&quot;</span><span class="p">)</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>        <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>        <span class="s2">&quot;--output&quot;</span><span class="p">,</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>        <span class="nb">type</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path where data will be saved. Supports .csv and .parquet formats.&quot;</span><span class="p">,</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>    <span class="p">)</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>        <span class="s2">&quot;-O&quot;</span><span class="p">,</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>        <span class="s2">&quot;--output_filetype&quot;</span><span class="p">,</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Format for save files when processing directories. &quot;</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>        <span class="s2">&quot;Leave as None when processing single files.&quot;</span><span class="p">,</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>    <span class="p">)</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>        <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="s2">&quot;--calibrator&quot;</span><span class="p">,</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="nb">type</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;gradient&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">],</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pick which calibrator to use. Can be &#39;ggir&#39; or &#39;gradient&#39;.&quot;</span><span class="p">,</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="p">)</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">typer</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">wristpy.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="n">logger</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="n">app</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">(</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Run the main Wristpy pipeline.&quot;</span><span class="p">,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>    <span class="n">epilog</span><span class="o">=</span><span class="s2">&quot;Please report issues at https://github.com/childmindresearch/wristpy.&quot;</span><span class="p">,</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="p">)</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="k">class</span><span class="w"> </span><span class="nc">OutputFileType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Valid output file types for saving data.&quot;&quot;&quot;</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>    <span class="n">csv</span> <span class="o">=</span> <span class="s2">&quot;csv&quot;</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>    <span class="n">parquet</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Calibrator</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Setting a calibrator class for typer.</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="sd">    This class is used to define the literal types that are allowed for</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="sd">    calibration, and parsing the strings for the orchestrator.</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>    <span class="n">none</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>    <span class="n">ggir</span> <span class="o">=</span> <span class="s2">&quot;ggir&quot;</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>    <span class="n">gradient</span> <span class="o">=</span> <span class="s2">&quot;gradient&quot;</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ActivityMetric</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Valid activity metrics for physical activity categorization.&quot;&quot;&quot;</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="n">enmo</span> <span class="o">=</span> <span class="s2">&quot;enmo&quot;</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>    <span class="n">mad</span> <span class="o">=</span> <span class="s2">&quot;mad&quot;</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>    <span class="n">ag_count</span> <span class="o">=</span> <span class="s2">&quot;ag_count&quot;</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NonwearAlgorithms</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Setting a nonwear algorithm class for typer.</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">    This class is used to define the literal types that are allowed for</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="sd">    nonwear algorithms, and parsing the strings for the orchestrator.</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>    <span class="n">ggir</span> <span class="o">=</span> <span class="s2">&quot;ggir&quot;</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="n">cta</span> <span class="o">=</span> <span class="s2">&quot;cta&quot;</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="n">detach</span> <span class="o">=</span> <span class="s2">&quot;detach&quot;</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>        <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>        <span class="s2">&quot;--activity_metric&quot;</span><span class="p">,</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>        <span class="nb">type</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;enmo&quot;</span><span class="p">,</span> <span class="s2">&quot;mad&quot;</span><span class="p">,</span> <span class="s2">&quot;ag_count&quot;</span><span class="p">],</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;enmo&quot;</span><span class="p">,</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pick which physical activity metric should be used. &quot;</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>        <span class="s2">&quot;This will be used to determine physical activity categorization. &quot;</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>        <span class="s2">&quot;Can be &#39;enmo&#39;, &#39;mad&#39;, or &#39;ag_count&#39;.&quot;</span><span class="p">,</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>    <span class="p">)</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>        <span class="s2">&quot;--thresholds&quot;</span><span class="p">,</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>        <span class="nb">type</span><span class="o">=</span><span class="n">_none_or_float_list</span><span class="p">,</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Provide three thresholds for light, moderate, and vigorous activity. &quot;</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>        <span class="s2">&quot;Exactly three values must be given in ascending order, and comma seperated.&quot;</span><span class="p">,</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="p">)</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="s2">&quot;-nw&quot;</span><span class="p">,</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>        <span class="s2">&quot;--nonwear_algorithm&quot;</span><span class="p">,</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>        <span class="nb">type</span><span class="o">=</span><span class="n">parse_nonwear_algorithms</span><span class="p">,</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the non-wear detection algorithm(s) to use.&quot;</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>        <span class="s2">&quot;Specify one or more of &#39;ggir&#39;, &#39;cta&#39;, &#39;detach&#39; as a comma-separated list&quot;</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>        <span class="s2">&quot;(e.g. &#39;ggir,detach&#39;).&quot;</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>        <span class="s2">&quot;When multiple algorithms are specified, majority voting will be applied.&quot;</span><span class="p">,</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="p">)</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>        <span class="s2">&quot;--epoch_length&quot;</span><span class="p">,</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the sampling rate in seconds for all metrics.&quot;</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>        <span class="s2">&quot;Must be greater than 0.&quot;</span><span class="p">,</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>    <span class="p">)</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="p">)</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>        <span class="s2">&quot;-v&quot;</span><span class="p">,</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="s2">&quot;--verbosity&quot;</span><span class="p">,</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Determines the level of verbosity. Use -v for info, -vv for debug.&quot;</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>        <span class="s2">&quot;Default for warning.&quot;</span><span class="p">,</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="p">)</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs wristpy orchestrator with command line arguments.</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">    Args:</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">         args: A list of command line arguments given as strings. If None, the parser</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">            will take the args from `sys.argv`.</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">    Returns:</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="sd">        A Results object containing enmo, anglez, physical activity levels, nonwear</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">        detection, and sleep detection.</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">    Raises:</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">        ValueError: If the epoch_length is less than 0.</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>    <span class="n">arguments</span> <span class="o">=</span> <span class="n">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>    <span class="k">elif</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="nb">input</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>        <span class="o">...</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the input data.&quot;</span><span class="p">,</span> <span class="n">exists</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="p">),</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>    <span class="n">output</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>        <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>        <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>        <span class="s2">&quot;--output&quot;</span><span class="p">,</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path where data will be saved. Supports .csv and .parquet formats.&quot;</span><span class="p">,</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="p">),</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="n">output_filetype</span><span class="p">:</span> <span class="n">OutputFileType</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>        <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>        <span class="s2">&quot;-O&quot;</span><span class="p">,</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="s2">&quot;--output-filetype&quot;</span><span class="p">,</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Format for save files when processing directories. &quot;</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>        <span class="s2">&quot;Leave as None when processing single files.&quot;</span><span class="p">,</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="p">),</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="n">calibrator</span><span class="p">:</span> <span class="n">Calibrator</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>        <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>        <span class="s2">&quot;--calibrator&quot;</span><span class="p">,</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pick which calibrator to use.&quot;</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>        <span class="s2">&quot;Must choose one of &#39;none&#39;, &#39;ggir&#39;, or &#39;gradient&#39;.&quot;</span><span class="p">,</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>        <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="p">),</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="n">activity_metric</span><span class="p">:</span> <span class="n">ActivityMetric</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>        <span class="n">ActivityMetric</span><span class="o">.</span><span class="n">enmo</span><span class="p">,</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="s2">&quot;--activity-metric&quot;</span><span class="p">,</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Metric used for physical activity categorization.&quot;</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="s2">&quot;Choose from &#39;enmo&#39;, &#39;mad&#39;, or &#39;ag_count&#39;.&quot;</span><span class="p">,</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>        <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="p">),</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="n">thresholds</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>        <span class="s2">&quot;--thresholds&quot;</span><span class="p">,</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Provide three thresholds for light, moderate, and vigorous activity. &quot;</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>        <span class="s2">&quot;Exactly three values must be &gt;= 0, given in ascending order,&quot;</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="s2">&quot; and separated by a space. (e.g. &#39;-t 0.1 1.0 1.5&#39;).&quot;</span><span class="p">,</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>        <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="p">),</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="n">nonwear_algorithm</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NonwearAlgorithms</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>        <span class="p">[</span><span class="n">NonwearAlgorithms</span><span class="o">.</span><span class="n">ggir</span><span class="p">],</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="s2">&quot;-n&quot;</span><span class="p">,</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="s2">&quot;--nonwear-algorithm&quot;</span><span class="p">,</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the non-wear detection algorithm(s) to use. &quot;</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="s2">&quot;Specify one or more of &#39;ggir&#39;, &#39;cta&#39;, &#39;detach&#39;. &quot;</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>        <span class="s2">&quot;(e.g. &#39;-n ggir -n cta&#39;). &quot;</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>        <span class="s2">&quot;When multiple algorithms are specified, majority voting will be applied.&quot;</span><span class="p">,</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="p">),</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>    <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        <span class="mi">5</span><span class="p">,</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>        <span class="s2">&quot;--epoch-length&quot;</span><span class="p">,</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the sampling rate in seconds for all metrics. &quot;</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>        <span class="s2">&quot;Must be greater than or equal to 1.&quot;</span><span class="p">,</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="p">),</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="mi">0</span><span class="p">,</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>        <span class="s2">&quot;-v&quot;</span><span class="p">,</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="s2">&quot;--verbosity&quot;</span><span class="p">,</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="n">count</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Determines the level of verbosity. Use -v for info, -vv for debug.&quot;</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>        <span class="s2">&quot;If -vvv or more, it will be set to debug.&quot;</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        <span class="s2">&quot;Default for warning.&quot;</span><span class="p">,</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="p">),</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>    <span class="n">version</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>        <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Show the version and exit.&quot;</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>    <span class="p">),</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Run wristpy orchestrator with command line arguments.&quot;&quot;&quot;</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">wristpy.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">orchestrator</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>    <span class="k">if</span> <span class="n">version</span><span class="p">:</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>        <span class="n">typer</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wristpy version: </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Exit</span><span class="p">()</span>
 </span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>
-</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>            <span class="sa">f</span><span class="s2">&quot;Value for epoch_length is:</span><span class="si">{</span><span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="si">}</span><span class="s2">.&quot;</span>
-</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>            <span class="s2">&quot;Please enter an integer &gt;= 0.&quot;</span>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>        <span class="p">)</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>    <span class="k">if</span> <span class="n">verbosity</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>    <span class="k">elif</span> <span class="n">verbosity</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
 </span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running wristpy. arguments given: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>    <span class="n">nonwear_algorithms</span> <span class="o">=</span> <span class="p">[</span><span class="n">algo</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">algo</span> <span class="ow">in</span> <span class="n">nonwear_algorithm</span><span class="p">]</span>
 </span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>    <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>        <span class="nb">input</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>        <span class="n">output</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>        <span class="n">calibrator</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span> <span class="k">else</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span><span class="p">,</span>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>        <span class="n">activity_metric</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">activity_metric</span><span class="p">,</span>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>        <span class="n">thresholds</span><span class="o">=</span><span class="kc">None</span>
-</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>        <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span> <span class="ow">is</span> <span class="kc">None</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>        <span class="k">else</span> <span class="n">cast</span><span class="p">(</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">)),</span>
-</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>        <span class="n">epoch_length</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="p">,</span>
-</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>        <span class="n">nonwear_algorithm</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">nonwear_algorithm</span><span class="p">,</span>
-</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>        <span class="n">verbosity</span><span class="o">=</span><span class="n">log_level</span><span class="p">,</span>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>        <span class="n">output_filetype</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">output_filetype</span><span class="p">,</span>
-</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>    <span class="p">)</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running wristpy. arguments given: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">locals</span><span class="p">())</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>    <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>        <span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>        <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">,</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>        <span class="n">calibrator</span><span class="o">=</span><span class="n">calibrator</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">calibrator</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type] # Covered by Calibrator Enum class</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>        <span class="n">activity_metric</span><span class="o">=</span><span class="n">activity_metric</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>        <span class="n">thresholds</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">thresholds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">thresholds</span><span class="p">,</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>        <span class="n">epoch_length</span><span class="o">=</span><span class="n">epoch_length</span><span class="p">,</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>        <span class="n">nonwear_algorithm</span><span class="o">=</span><span class="n">nonwear_algorithms</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>        <span class="n">verbosity</span><span class="o">=</span><span class="n">log_level</span><span class="p">,</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>        <span class="n">output_filetype</span><span class="o">=</span><span class="n">output_filetype</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type] # Covered by OutputFileType Enum class</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>    <span class="p">)</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>
 </span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>
-</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_none_or_float_list</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
-</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to process thresholds argument.</span>
-</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>
-</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="sd">    This function is used to parse the thresholds argument in the CLI.</span>
-</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a><span class="sd">    It converts the comma separated string to a list of floats.</span>
-</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="sd">    If the user enters &#39;None&#39;, it will return None. This is an extra</span>
-</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a><span class="sd">    check in case the user accidentally enters &#39;None&#39;</span>
-</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="sd">    instead of allowing the default None type.</span>
-</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>
-</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a><span class="sd">    Args:</span>
-</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="sd">        value: The value of the argument taken from the CLI.</span>
-</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>
-</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="sd">    Returns:</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="sd">        A list of floats or None.</span>
-</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>
-</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="sd">    Raises:</span>
-</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a><span class="sd">        argparse.ArgumentTypeError: If the value is not a comma separated list of</span>
-</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a><span class="sd">        floats or &#39;None&#39;.</span>
-</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
-</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a>        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a>        <span class="n">float_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
-</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">float_list</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-</span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a>            <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span>
-</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a>                <span class="sa">f</span><span class="s2">&quot;Invalid value: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">.&quot;</span>
-</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a>                <span class="s2">&quot;Must be a comma-separated list of exactly three numbers or &#39;None&#39;.&quot;</span>
-</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>            <span class="p">)</span>
-</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a>        <span class="k">return</span> <span class="n">float_list</span>
-</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a>    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a>        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span>
-</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a>            <span class="sa">f</span><span class="s2">&quot;Invalid value: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">. Must be a comma-separated list or &#39;None&#39;.&quot;</span>
-</span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a>        <span class="p">)</span>
-</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a>
-</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a>
-</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_nonwear_algorithms</span><span class="p">(</span><span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse comma-separated non-wear algorithm names.</span>
-</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a>
-</span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a><span class="sd">    Args:</span>
-</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a><span class="sd">        algorithm_name: Command line input string, comma-separated algorithm names.</span>
-</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>
-</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a><span class="sd">    Returns:</span>
-</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a><span class="sd">        The List of algorithm names.</span>
-</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>    <span class="n">valid_algorithm_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;cta&quot;</span><span class="p">,</span> <span class="s2">&quot;detach&quot;</span><span class="p">]</span>
-</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a>    <span class="n">algorithms</span> <span class="o">=</span> <span class="p">[</span><span class="n">algo</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">algo</span> <span class="ow">in</span> <span class="n">algorithm_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
-</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>
-</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>    <span class="k">for</span> <span class="n">algo</span> <span class="ow">in</span> <span class="n">algorithms</span><span class="p">:</span>
-</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a>        <span class="k">if</span> <span class="n">algo</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_algorithm_names</span><span class="p">:</span>
-</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>            <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span>
-</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a>                <span class="sa">f</span><span class="s2">&quot;Invalid algorithm: &#39;</span><span class="si">{</span><span class="n">algo</span><span class="si">}</span><span class="s2">&#39;. Must be one of: &quot;</span>
-</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">valid_algorithm_names</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>            <span class="p">)</span>
-</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a>    <span class="k">return</span> <span class="n">algorithms</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>    <span class="n">app</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -296,268 +297,381 @@
     
 
                 </section>
-                <section id="parse_arguments">
-                            <input id="parse_arguments-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">parse_arguments</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span>:</span></span>
+                <section id="app">
+                    <div class="attr variable">
+            <span class="name">app</span>        =
+<span class="default_value">&lt;typer.main.Typer object&gt;</span>
 
-                <label class="view-source-button" for="parse_arguments-view-source"><span>View Source</span></label>
+        
+    </div>
+    <a class="headerlink" href="#app"></a>
+    
+    
+
+                </section>
+                <section id="OutputFileType">
+                            <input id="OutputFileType-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">OutputFileType</span><wbr>(<span class="base">builtins.str</span>, <span class="base">enum.Enum</span>):
+
+                <label class="view-source-button" for="OutputFileType-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#parse_arguments"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="parse_arguments-14"><a href="#parse_arguments-14"><span class="linenos"> 14</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">:</span>
-</span><span id="parse_arguments-15"><a href="#parse_arguments-15"><span class="linenos"> 15</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Argument parser for Wristpy&#39;s cli.</span>
-</span><span id="parse_arguments-16"><a href="#parse_arguments-16"><span class="linenos"> 16</span></a>
-</span><span id="parse_arguments-17"><a href="#parse_arguments-17"><span class="linenos"> 17</span></a><span class="sd">    Args:</span>
-</span><span id="parse_arguments-18"><a href="#parse_arguments-18"><span class="linenos"> 18</span></a><span class="sd">        args: A list of command line arguments given as strings. If None, the parser</span>
-</span><span id="parse_arguments-19"><a href="#parse_arguments-19"><span class="linenos"> 19</span></a><span class="sd">            will take the args from `sys.argv`.</span>
-</span><span id="parse_arguments-20"><a href="#parse_arguments-20"><span class="linenos"> 20</span></a>
-</span><span id="parse_arguments-21"><a href="#parse_arguments-21"><span class="linenos"> 21</span></a><span class="sd">    Returns:</span>
-</span><span id="parse_arguments-22"><a href="#parse_arguments-22"><span class="linenos"> 22</span></a><span class="sd">        Namespace object with all the input arguments and default values.</span>
-</span><span id="parse_arguments-23"><a href="#parse_arguments-23"><span class="linenos"> 23</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="parse_arguments-24"><a href="#parse_arguments-24"><span class="linenos"> 24</span></a>    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
-</span><span id="parse_arguments-25"><a href="#parse_arguments-25"><span class="linenos"> 25</span></a>        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Run the main Wristpy pipeline.&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-26"><a href="#parse_arguments-26"><span class="linenos"> 26</span></a>        <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentDefaultsHelpFormatter</span><span class="p">,</span>
-</span><span id="parse_arguments-27"><a href="#parse_arguments-27"><span class="linenos"> 27</span></a>        <span class="n">epilog</span><span class="o">=</span><span class="s2">&quot;Please report issues at https://github.com/childmindresearch/wristpy.&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-28"><a href="#parse_arguments-28"><span class="linenos"> 28</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-29"><a href="#parse_arguments-29"><span class="linenos"> 29</span></a>
-</span><span id="parse_arguments-30"><a href="#parse_arguments-30"><span class="linenos"> 30</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the input data.&quot;</span><span class="p">)</span>
-</span><span id="parse_arguments-31"><a href="#parse_arguments-31"><span class="linenos"> 31</span></a>
-</span><span id="parse_arguments-32"><a href="#parse_arguments-32"><span class="linenos"> 32</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-33"><a href="#parse_arguments-33"><span class="linenos"> 33</span></a>        <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-34"><a href="#parse_arguments-34"><span class="linenos"> 34</span></a>        <span class="s2">&quot;--output&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-35"><a href="#parse_arguments-35"><span class="linenos"> 35</span></a>        <span class="nb">type</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
-</span><span id="parse_arguments-36"><a href="#parse_arguments-36"><span class="linenos"> 36</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path where data will be saved. Supports .csv and .parquet formats.&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-37"><a href="#parse_arguments-37"><span class="linenos"> 37</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-38"><a href="#parse_arguments-38"><span class="linenos"> 38</span></a>
-</span><span id="parse_arguments-39"><a href="#parse_arguments-39"><span class="linenos"> 39</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-40"><a href="#parse_arguments-40"><span class="linenos"> 40</span></a>        <span class="s2">&quot;-O&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-41"><a href="#parse_arguments-41"><span class="linenos"> 41</span></a>        <span class="s2">&quot;--output_filetype&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-42"><a href="#parse_arguments-42"><span class="linenos"> 42</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-</span><span id="parse_arguments-43"><a href="#parse_arguments-43"><span class="linenos"> 43</span></a>        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="parse_arguments-44"><a href="#parse_arguments-44"><span class="linenos"> 44</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Format for save files when processing directories. &quot;</span>
-</span><span id="parse_arguments-45"><a href="#parse_arguments-45"><span class="linenos"> 45</span></a>        <span class="s2">&quot;Leave as None when processing single files.&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-46"><a href="#parse_arguments-46"><span class="linenos"> 46</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-47"><a href="#parse_arguments-47"><span class="linenos"> 47</span></a>
-</span><span id="parse_arguments-48"><a href="#parse_arguments-48"><span class="linenos"> 48</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-49"><a href="#parse_arguments-49"><span class="linenos"> 49</span></a>        <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-50"><a href="#parse_arguments-50"><span class="linenos"> 50</span></a>        <span class="s2">&quot;--calibrator&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-51"><a href="#parse_arguments-51"><span class="linenos"> 51</span></a>        <span class="nb">type</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
-</span><span id="parse_arguments-52"><a href="#parse_arguments-52"><span class="linenos"> 52</span></a>        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;gradient&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">],</span>
-</span><span id="parse_arguments-53"><a href="#parse_arguments-53"><span class="linenos"> 53</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-54"><a href="#parse_arguments-54"><span class="linenos"> 54</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pick which calibrator to use. Can be &#39;ggir&#39; or &#39;gradient&#39;.&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-55"><a href="#parse_arguments-55"><span class="linenos"> 55</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-56"><a href="#parse_arguments-56"><span class="linenos"> 56</span></a>
-</span><span id="parse_arguments-57"><a href="#parse_arguments-57"><span class="linenos"> 57</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-58"><a href="#parse_arguments-58"><span class="linenos"> 58</span></a>        <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-59"><a href="#parse_arguments-59"><span class="linenos"> 59</span></a>        <span class="s2">&quot;--activity_metric&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-60"><a href="#parse_arguments-60"><span class="linenos"> 60</span></a>        <span class="nb">type</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
-</span><span id="parse_arguments-61"><a href="#parse_arguments-61"><span class="linenos"> 61</span></a>        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;enmo&quot;</span><span class="p">,</span> <span class="s2">&quot;mad&quot;</span><span class="p">,</span> <span class="s2">&quot;ag_count&quot;</span><span class="p">],</span>
-</span><span id="parse_arguments-62"><a href="#parse_arguments-62"><span class="linenos"> 62</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;enmo&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-63"><a href="#parse_arguments-63"><span class="linenos"> 63</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pick which physical activity metric should be used. &quot;</span>
-</span><span id="parse_arguments-64"><a href="#parse_arguments-64"><span class="linenos"> 64</span></a>        <span class="s2">&quot;This will be used to determine physical activity categorization. &quot;</span>
-</span><span id="parse_arguments-65"><a href="#parse_arguments-65"><span class="linenos"> 65</span></a>        <span class="s2">&quot;Can be &#39;enmo&#39;, &#39;mad&#39;, or &#39;ag_count&#39;.&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-66"><a href="#parse_arguments-66"><span class="linenos"> 66</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-67"><a href="#parse_arguments-67"><span class="linenos"> 67</span></a>
-</span><span id="parse_arguments-68"><a href="#parse_arguments-68"><span class="linenos"> 68</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-69"><a href="#parse_arguments-69"><span class="linenos"> 69</span></a>        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-70"><a href="#parse_arguments-70"><span class="linenos"> 70</span></a>        <span class="s2">&quot;--thresholds&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-71"><a href="#parse_arguments-71"><span class="linenos"> 71</span></a>        <span class="nb">type</span><span class="o">=</span><span class="n">_none_or_float_list</span><span class="p">,</span>
-</span><span id="parse_arguments-72"><a href="#parse_arguments-72"><span class="linenos"> 72</span></a>        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="parse_arguments-73"><a href="#parse_arguments-73"><span class="linenos"> 73</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Provide three thresholds for light, moderate, and vigorous activity. &quot;</span>
-</span><span id="parse_arguments-74"><a href="#parse_arguments-74"><span class="linenos"> 74</span></a>        <span class="s2">&quot;Exactly three values must be given in ascending order, and comma seperated.&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-75"><a href="#parse_arguments-75"><span class="linenos"> 75</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-76"><a href="#parse_arguments-76"><span class="linenos"> 76</span></a>
-</span><span id="parse_arguments-77"><a href="#parse_arguments-77"><span class="linenos"> 77</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-78"><a href="#parse_arguments-78"><span class="linenos"> 78</span></a>        <span class="s2">&quot;-nw&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-79"><a href="#parse_arguments-79"><span class="linenos"> 79</span></a>        <span class="s2">&quot;--nonwear_algorithm&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-80"><a href="#parse_arguments-80"><span class="linenos"> 80</span></a>        <span class="nb">type</span><span class="o">=</span><span class="n">parse_nonwear_algorithms</span><span class="p">,</span>
-</span><span id="parse_arguments-81"><a href="#parse_arguments-81"><span class="linenos"> 81</span></a>        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-82"><a href="#parse_arguments-82"><span class="linenos"> 82</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the non-wear detection algorithm(s) to use.&quot;</span>
-</span><span id="parse_arguments-83"><a href="#parse_arguments-83"><span class="linenos"> 83</span></a>        <span class="s2">&quot;Specify one or more of &#39;ggir&#39;, &#39;cta&#39;, &#39;detach&#39; as a comma-separated list&quot;</span>
-</span><span id="parse_arguments-84"><a href="#parse_arguments-84"><span class="linenos"> 84</span></a>        <span class="s2">&quot;(e.g. &#39;ggir,detach&#39;).&quot;</span>
-</span><span id="parse_arguments-85"><a href="#parse_arguments-85"><span class="linenos"> 85</span></a>        <span class="s2">&quot;When multiple algorithms are specified, majority voting will be applied.&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-86"><a href="#parse_arguments-86"><span class="linenos"> 86</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-87"><a href="#parse_arguments-87"><span class="linenos"> 87</span></a>
-</span><span id="parse_arguments-88"><a href="#parse_arguments-88"><span class="linenos"> 88</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-89"><a href="#parse_arguments-89"><span class="linenos"> 89</span></a>        <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-90"><a href="#parse_arguments-90"><span class="linenos"> 90</span></a>        <span class="s2">&quot;--epoch_length&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-91"><a href="#parse_arguments-91"><span class="linenos"> 91</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-</span><span id="parse_arguments-92"><a href="#parse_arguments-92"><span class="linenos"> 92</span></a>        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-</span><span id="parse_arguments-93"><a href="#parse_arguments-93"><span class="linenos"> 93</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the sampling rate in seconds for all metrics.&quot;</span>
-</span><span id="parse_arguments-94"><a href="#parse_arguments-94"><span class="linenos"> 94</span></a>        <span class="s2">&quot;Must be greater than 0.&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-95"><a href="#parse_arguments-95"><span class="linenos"> 95</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-96"><a href="#parse_arguments-96"><span class="linenos"> 96</span></a>
-</span><span id="parse_arguments-97"><a href="#parse_arguments-97"><span class="linenos"> 97</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-98"><a href="#parse_arguments-98"><span class="linenos"> 98</span></a>        <span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
-</span><span id="parse_arguments-99"><a href="#parse_arguments-99"><span class="linenos"> 99</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-100"><a href="#parse_arguments-100"><span class="linenos">100</span></a>
-</span><span id="parse_arguments-101"><a href="#parse_arguments-101"><span class="linenos">101</span></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span><span id="parse_arguments-102"><a href="#parse_arguments-102"><span class="linenos">102</span></a>        <span class="s2">&quot;-v&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-103"><a href="#parse_arguments-103"><span class="linenos">103</span></a>        <span class="s2">&quot;--verbosity&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-104"><a href="#parse_arguments-104"><span class="linenos">104</span></a>        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-105"><a href="#parse_arguments-105"><span class="linenos">105</span></a>        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="parse_arguments-106"><a href="#parse_arguments-106"><span class="linenos">106</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Determines the level of verbosity. Use -v for info, -vv for debug.&quot;</span>
-</span><span id="parse_arguments-107"><a href="#parse_arguments-107"><span class="linenos">107</span></a>        <span class="s2">&quot;Default for warning.&quot;</span><span class="p">,</span>
-</span><span id="parse_arguments-108"><a href="#parse_arguments-108"><span class="linenos">108</span></a>    <span class="p">)</span>
-</span><span id="parse_arguments-109"><a href="#parse_arguments-109"><span class="linenos">109</span></a>
-</span><span id="parse_arguments-110"><a href="#parse_arguments-110"><span class="linenos">110</span></a>    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <a class="headerlink" href="#OutputFileType"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="OutputFileType-19"><a href="#OutputFileType-19"><span class="linenos">19</span></a><span class="k">class</span><span class="w"> </span><span class="nc">OutputFileType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+</span><span id="OutputFileType-20"><a href="#OutputFileType-20"><span class="linenos">20</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Valid output file types for saving data.&quot;&quot;&quot;</span>
+</span><span id="OutputFileType-21"><a href="#OutputFileType-21"><span class="linenos">21</span></a>
+</span><span id="OutputFileType-22"><a href="#OutputFileType-22"><span class="linenos">22</span></a>    <span class="n">csv</span> <span class="o">=</span> <span class="s2">&quot;csv&quot;</span>
+</span><span id="OutputFileType-23"><a href="#OutputFileType-23"><span class="linenos">23</span></a>    <span class="n">parquet</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Argument parser for Wristpy's cli.</p>
-
-<h6 id="arguments">Arguments:</h6>
-
-<ul>
-<li><strong>args:</strong>  A list of command line arguments given as strings. If None, the parser
-will take the args from <code>sys.argv</code>.</li>
-</ul>
-
-<h6 id="returns">Returns:</h6>
-
-<blockquote>
-  <p>Namespace object with all the input arguments and default values.</p>
-</blockquote>
+            <div class="docstring"><p>Valid output file types for saving data.</p>
 </div>
 
 
+                            <div id="OutputFileType.csv" class="classattr">
+                                <div class="attr variable">
+            <span class="name">csv</span>        =
+<span class="default_value">&lt;<a href="#OutputFileType.csv">OutputFileType.csv</a>: &#39;csv&#39;&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#OutputFileType.csv"></a>
+    
+    
+
+                            </div>
+                            <div id="OutputFileType.parquet" class="classattr">
+                                <div class="attr variable">
+            <span class="name">parquet</span>        =
+<span class="default_value">&lt;<a href="#OutputFileType.parquet">OutputFileType.parquet</a>: &#39;parquet&#39;&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#OutputFileType.parquet"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="Calibrator">
+                            <input id="Calibrator-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">Calibrator</span><wbr>(<span class="base">builtins.str</span>, <span class="base">enum.Enum</span>):
+
+                <label class="view-source-button" for="Calibrator-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Calibrator"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Calibrator-26"><a href="#Calibrator-26"><span class="linenos">26</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Calibrator</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+</span><span id="Calibrator-27"><a href="#Calibrator-27"><span class="linenos">27</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Setting a calibrator class for typer.</span>
+</span><span id="Calibrator-28"><a href="#Calibrator-28"><span class="linenos">28</span></a>
+</span><span id="Calibrator-29"><a href="#Calibrator-29"><span class="linenos">29</span></a><span class="sd">    This class is used to define the literal types that are allowed for</span>
+</span><span id="Calibrator-30"><a href="#Calibrator-30"><span class="linenos">30</span></a><span class="sd">    calibration, and parsing the strings for the orchestrator.</span>
+</span><span id="Calibrator-31"><a href="#Calibrator-31"><span class="linenos">31</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Calibrator-32"><a href="#Calibrator-32"><span class="linenos">32</span></a>
+</span><span id="Calibrator-33"><a href="#Calibrator-33"><span class="linenos">33</span></a>    <span class="n">none</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+</span><span id="Calibrator-34"><a href="#Calibrator-34"><span class="linenos">34</span></a>    <span class="n">ggir</span> <span class="o">=</span> <span class="s2">&quot;ggir&quot;</span>
+</span><span id="Calibrator-35"><a href="#Calibrator-35"><span class="linenos">35</span></a>    <span class="n">gradient</span> <span class="o">=</span> <span class="s2">&quot;gradient&quot;</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Setting a calibrator class for typer.</p>
+
+<p>This class is used to define the literal types that are allowed for
+calibration, and parsing the strings for the orchestrator.</p>
+</div>
+
+
+                            <div id="Calibrator.none" class="classattr">
+                                <div class="attr variable">
+            <span class="name">none</span>        =
+<span class="default_value">&lt;<a href="#Calibrator.none">Calibrator.none</a>: &#39;none&#39;&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Calibrator.none"></a>
+    
+    
+
+                            </div>
+                            <div id="Calibrator.ggir" class="classattr">
+                                <div class="attr variable">
+            <span class="name">ggir</span>        =
+<span class="default_value">&lt;<a href="#Calibrator.ggir">Calibrator.ggir</a>: &#39;ggir&#39;&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Calibrator.ggir"></a>
+    
+    
+
+                            </div>
+                            <div id="Calibrator.gradient" class="classattr">
+                                <div class="attr variable">
+            <span class="name">gradient</span>        =
+<span class="default_value">&lt;<a href="#Calibrator.gradient">Calibrator.gradient</a>: &#39;gradient&#39;&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Calibrator.gradient"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="ActivityMetric">
+                            <input id="ActivityMetric-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ActivityMetric</span><wbr>(<span class="base">builtins.str</span>, <span class="base">enum.Enum</span>):
+
+                <label class="view-source-button" for="ActivityMetric-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#ActivityMetric"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ActivityMetric-38"><a href="#ActivityMetric-38"><span class="linenos">38</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ActivityMetric</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+</span><span id="ActivityMetric-39"><a href="#ActivityMetric-39"><span class="linenos">39</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Valid activity metrics for physical activity categorization.&quot;&quot;&quot;</span>
+</span><span id="ActivityMetric-40"><a href="#ActivityMetric-40"><span class="linenos">40</span></a>
+</span><span id="ActivityMetric-41"><a href="#ActivityMetric-41"><span class="linenos">41</span></a>    <span class="n">enmo</span> <span class="o">=</span> <span class="s2">&quot;enmo&quot;</span>
+</span><span id="ActivityMetric-42"><a href="#ActivityMetric-42"><span class="linenos">42</span></a>    <span class="n">mad</span> <span class="o">=</span> <span class="s2">&quot;mad&quot;</span>
+</span><span id="ActivityMetric-43"><a href="#ActivityMetric-43"><span class="linenos">43</span></a>    <span class="n">ag_count</span> <span class="o">=</span> <span class="s2">&quot;ag_count&quot;</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Valid activity metrics for physical activity categorization.</p>
+</div>
+
+
+                            <div id="ActivityMetric.enmo" class="classattr">
+                                <div class="attr variable">
+            <span class="name">enmo</span>        =
+<span class="default_value">&lt;<a href="#ActivityMetric.enmo">ActivityMetric.enmo</a>: &#39;enmo&#39;&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ActivityMetric.enmo"></a>
+    
+    
+
+                            </div>
+                            <div id="ActivityMetric.mad" class="classattr">
+                                <div class="attr variable">
+            <span class="name">mad</span>        =
+<span class="default_value">&lt;<a href="#ActivityMetric.mad">ActivityMetric.mad</a>: &#39;mad&#39;&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ActivityMetric.mad"></a>
+    
+    
+
+                            </div>
+                            <div id="ActivityMetric.ag_count" class="classattr">
+                                <div class="attr variable">
+            <span class="name">ag_count</span>        =
+<span class="default_value">&lt;<a href="#ActivityMetric.ag_count">ActivityMetric.ag_count</a>: &#39;ag_count&#39;&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ActivityMetric.ag_count"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="NonwearAlgorithms">
+                            <input id="NonwearAlgorithms-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">NonwearAlgorithms</span><wbr>(<span class="base">builtins.str</span>, <span class="base">enum.Enum</span>):
+
+                <label class="view-source-button" for="NonwearAlgorithms-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NonwearAlgorithms"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NonwearAlgorithms-46"><a href="#NonwearAlgorithms-46"><span class="linenos">46</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NonwearAlgorithms</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+</span><span id="NonwearAlgorithms-47"><a href="#NonwearAlgorithms-47"><span class="linenos">47</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Setting a nonwear algorithm class for typer.</span>
+</span><span id="NonwearAlgorithms-48"><a href="#NonwearAlgorithms-48"><span class="linenos">48</span></a>
+</span><span id="NonwearAlgorithms-49"><a href="#NonwearAlgorithms-49"><span class="linenos">49</span></a><span class="sd">    This class is used to define the literal types that are allowed for</span>
+</span><span id="NonwearAlgorithms-50"><a href="#NonwearAlgorithms-50"><span class="linenos">50</span></a><span class="sd">    nonwear algorithms, and parsing the strings for the orchestrator.</span>
+</span><span id="NonwearAlgorithms-51"><a href="#NonwearAlgorithms-51"><span class="linenos">51</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="NonwearAlgorithms-52"><a href="#NonwearAlgorithms-52"><span class="linenos">52</span></a>
+</span><span id="NonwearAlgorithms-53"><a href="#NonwearAlgorithms-53"><span class="linenos">53</span></a>    <span class="n">ggir</span> <span class="o">=</span> <span class="s2">&quot;ggir&quot;</span>
+</span><span id="NonwearAlgorithms-54"><a href="#NonwearAlgorithms-54"><span class="linenos">54</span></a>    <span class="n">cta</span> <span class="o">=</span> <span class="s2">&quot;cta&quot;</span>
+</span><span id="NonwearAlgorithms-55"><a href="#NonwearAlgorithms-55"><span class="linenos">55</span></a>    <span class="n">detach</span> <span class="o">=</span> <span class="s2">&quot;detach&quot;</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Setting a nonwear algorithm class for typer.</p>
+
+<p>This class is used to define the literal types that are allowed for
+nonwear algorithms, and parsing the strings for the orchestrator.</p>
+</div>
+
+
+                            <div id="NonwearAlgorithms.ggir" class="classattr">
+                                <div class="attr variable">
+            <span class="name">ggir</span>        =
+<span class="default_value">&lt;<a href="#NonwearAlgorithms.ggir">NonwearAlgorithms.ggir</a>: &#39;ggir&#39;&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#NonwearAlgorithms.ggir"></a>
+    
+    
+
+                            </div>
+                            <div id="NonwearAlgorithms.cta" class="classattr">
+                                <div class="attr variable">
+            <span class="name">cta</span>        =
+<span class="default_value">&lt;<a href="#NonwearAlgorithms.cta">NonwearAlgorithms.cta</a>: &#39;cta&#39;&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#NonwearAlgorithms.cta"></a>
+    
+    
+
+                            </div>
+                            <div id="NonwearAlgorithms.detach" class="classattr">
+                                <div class="attr variable">
+            <span class="name">detach</span>        =
+<span class="default_value">&lt;<a href="#NonwearAlgorithms.detach">NonwearAlgorithms.detach</a>: &#39;detach&#39;&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#NonwearAlgorithms.detach"></a>
+    
+    
+
+                            </div>
                 </section>
                 <section id="main">
                             <input id="main-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
-            
+                    <div class="decorator decorator-app.command">@app.command()</div>
+
         <span class="def">def</span>
-        <span class="name">main</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">main</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="nb">input</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">typer</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">ArgumentInfo</span> <span class="nb">object</span><span class="o">&gt;</span>,</span><span class="param">	<span class="n">output</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">typer</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">OptionInfo</span> <span class="nb">object</span><span class="o">&gt;</span>,</span><span class="param">	<span class="n">output_filetype</span><span class="p">:</span> <span class="n"><a href="#OutputFileType">OutputFileType</a></span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">typer</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">OptionInfo</span> <span class="nb">object</span><span class="o">&gt;</span>,</span><span class="param">	<span class="n">calibrator</span><span class="p">:</span> <span class="n"><a href="#Calibrator">Calibrator</a></span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">typer</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">OptionInfo</span> <span class="nb">object</span><span class="o">&gt;</span>,</span><span class="param">	<span class="n">activity_metric</span><span class="p">:</span> <span class="n"><a href="#ActivityMetric">ActivityMetric</a></span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">typer</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">OptionInfo</span> <span class="nb">object</span><span class="o">&gt;</span>,</span><span class="param">	<span class="n">thresholds</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">typer</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">OptionInfo</span> <span class="nb">object</span><span class="o">&gt;</span>,</span><span class="param">	<span class="n">nonwear_algorithm</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#NonwearAlgorithms">NonwearAlgorithms</a></span><span class="p">]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">typer</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">OptionInfo</span> <span class="nb">object</span><span class="o">&gt;</span>,</span><span class="param">	<span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">typer</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">OptionInfo</span> <span class="nb">object</span><span class="o">&gt;</span>,</span><span class="param">	<span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">typer</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">OptionInfo</span> <span class="nb">object</span><span class="o">&gt;</span>,</span><span class="param">	<span class="n">version</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">typer</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">OptionInfo</span> <span class="nb">object</span><span class="o">&gt;</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="main-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#main"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="main-113"><a href="#main-113"><span class="linenos">113</span></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span>
-</span><span id="main-114"><a href="#main-114"><span class="linenos">114</span></a>    <span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="main-115"><a href="#main-115"><span class="linenos">115</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="main-116"><a href="#main-116"><span class="linenos">116</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs wristpy orchestrator with command line arguments.</span>
-</span><span id="main-117"><a href="#main-117"><span class="linenos">117</span></a>
-</span><span id="main-118"><a href="#main-118"><span class="linenos">118</span></a><span class="sd">    Args:</span>
-</span><span id="main-119"><a href="#main-119"><span class="linenos">119</span></a><span class="sd">         args: A list of command line arguments given as strings. If None, the parser</span>
-</span><span id="main-120"><a href="#main-120"><span class="linenos">120</span></a><span class="sd">            will take the args from `sys.argv`.</span>
-</span><span id="main-121"><a href="#main-121"><span class="linenos">121</span></a>
-</span><span id="main-122"><a href="#main-122"><span class="linenos">122</span></a><span class="sd">    Returns:</span>
-</span><span id="main-123"><a href="#main-123"><span class="linenos">123</span></a><span class="sd">        A Results object containing enmo, anglez, physical activity levels, nonwear</span>
-</span><span id="main-124"><a href="#main-124"><span class="linenos">124</span></a><span class="sd">        detection, and sleep detection.</span>
-</span><span id="main-125"><a href="#main-125"><span class="linenos">125</span></a>
-</span><span id="main-126"><a href="#main-126"><span class="linenos">126</span></a><span class="sd">    Raises:</span>
-</span><span id="main-127"><a href="#main-127"><span class="linenos">127</span></a><span class="sd">        ValueError: If the epoch_length is less than 0.</span>
-</span><span id="main-128"><a href="#main-128"><span class="linenos">128</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="main-129"><a href="#main-129"><span class="linenos">129</span></a>    <span class="n">arguments</span> <span class="o">=</span> <span class="n">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-</span><span id="main-130"><a href="#main-130"><span class="linenos">130</span></a>
-</span><span id="main-131"><a href="#main-131"><span class="linenos">131</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="main-132"><a href="#main-132"><span class="linenos">132</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-</span><span id="main-133"><a href="#main-133"><span class="linenos">133</span></a>    <span class="k">elif</span> <span class="n">arguments</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="main-134"><a href="#main-134"><span class="linenos">134</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
-</span><span id="main-135"><a href="#main-135"><span class="linenos">135</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="main-136"><a href="#main-136"><span class="linenos">136</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="main-58"><a href="#main-58"><span class="linenos"> 58</span></a><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+</span><span id="main-59"><a href="#main-59"><span class="linenos"> 59</span></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span>
+</span><span id="main-60"><a href="#main-60"><span class="linenos"> 60</span></a>    <span class="nb">input</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span>
+</span><span id="main-61"><a href="#main-61"><span class="linenos"> 61</span></a>        <span class="o">...</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the input data.&quot;</span><span class="p">,</span> <span class="n">exists</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="main-62"><a href="#main-62"><span class="linenos"> 62</span></a>    <span class="p">),</span>
+</span><span id="main-63"><a href="#main-63"><span class="linenos"> 63</span></a>    <span class="n">output</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="main-64"><a href="#main-64"><span class="linenos"> 64</span></a>        <span class="kc">None</span><span class="p">,</span>
+</span><span id="main-65"><a href="#main-65"><span class="linenos"> 65</span></a>        <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+</span><span id="main-66"><a href="#main-66"><span class="linenos"> 66</span></a>        <span class="s2">&quot;--output&quot;</span><span class="p">,</span>
+</span><span id="main-67"><a href="#main-67"><span class="linenos"> 67</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path where data will be saved. Supports .csv and .parquet formats.&quot;</span><span class="p">,</span>
+</span><span id="main-68"><a href="#main-68"><span class="linenos"> 68</span></a>    <span class="p">),</span>
+</span><span id="main-69"><a href="#main-69"><span class="linenos"> 69</span></a>    <span class="n">output_filetype</span><span class="p">:</span> <span class="n">OutputFileType</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="main-70"><a href="#main-70"><span class="linenos"> 70</span></a>        <span class="kc">None</span><span class="p">,</span>
+</span><span id="main-71"><a href="#main-71"><span class="linenos"> 71</span></a>        <span class="s2">&quot;-O&quot;</span><span class="p">,</span>
+</span><span id="main-72"><a href="#main-72"><span class="linenos"> 72</span></a>        <span class="s2">&quot;--output-filetype&quot;</span><span class="p">,</span>
+</span><span id="main-73"><a href="#main-73"><span class="linenos"> 73</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Format for save files when processing directories. &quot;</span>
+</span><span id="main-74"><a href="#main-74"><span class="linenos"> 74</span></a>        <span class="s2">&quot;Leave as None when processing single files.&quot;</span><span class="p">,</span>
+</span><span id="main-75"><a href="#main-75"><span class="linenos"> 75</span></a>    <span class="p">),</span>
+</span><span id="main-76"><a href="#main-76"><span class="linenos"> 76</span></a>    <span class="n">calibrator</span><span class="p">:</span> <span class="n">Calibrator</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="main-77"><a href="#main-77"><span class="linenos"> 77</span></a>        <span class="kc">None</span><span class="p">,</span>
+</span><span id="main-78"><a href="#main-78"><span class="linenos"> 78</span></a>        <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+</span><span id="main-79"><a href="#main-79"><span class="linenos"> 79</span></a>        <span class="s2">&quot;--calibrator&quot;</span><span class="p">,</span>
+</span><span id="main-80"><a href="#main-80"><span class="linenos"> 80</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pick which calibrator to use.&quot;</span>
+</span><span id="main-81"><a href="#main-81"><span class="linenos"> 81</span></a>        <span class="s2">&quot;Must choose one of &#39;none&#39;, &#39;ggir&#39;, or &#39;gradient&#39;.&quot;</span><span class="p">,</span>
+</span><span id="main-82"><a href="#main-82"><span class="linenos"> 82</span></a>        <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="main-83"><a href="#main-83"><span class="linenos"> 83</span></a>    <span class="p">),</span>
+</span><span id="main-84"><a href="#main-84"><span class="linenos"> 84</span></a>    <span class="n">activity_metric</span><span class="p">:</span> <span class="n">ActivityMetric</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="main-85"><a href="#main-85"><span class="linenos"> 85</span></a>        <span class="n">ActivityMetric</span><span class="o">.</span><span class="n">enmo</span><span class="p">,</span>
+</span><span id="main-86"><a href="#main-86"><span class="linenos"> 86</span></a>        <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
+</span><span id="main-87"><a href="#main-87"><span class="linenos"> 87</span></a>        <span class="s2">&quot;--activity-metric&quot;</span><span class="p">,</span>
+</span><span id="main-88"><a href="#main-88"><span class="linenos"> 88</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Metric used for physical activity categorization.&quot;</span>
+</span><span id="main-89"><a href="#main-89"><span class="linenos"> 89</span></a>        <span class="s2">&quot;Choose from &#39;enmo&#39;, &#39;mad&#39;, or &#39;ag_count&#39;.&quot;</span><span class="p">,</span>
+</span><span id="main-90"><a href="#main-90"><span class="linenos"> 90</span></a>        <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="main-91"><a href="#main-91"><span class="linenos"> 91</span></a>    <span class="p">),</span>
+</span><span id="main-92"><a href="#main-92"><span class="linenos"> 92</span></a>    <span class="n">thresholds</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="main-93"><a href="#main-93"><span class="linenos"> 93</span></a>        <span class="kc">None</span><span class="p">,</span>
+</span><span id="main-94"><a href="#main-94"><span class="linenos"> 94</span></a>        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+</span><span id="main-95"><a href="#main-95"><span class="linenos"> 95</span></a>        <span class="s2">&quot;--thresholds&quot;</span><span class="p">,</span>
+</span><span id="main-96"><a href="#main-96"><span class="linenos"> 96</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Provide three thresholds for light, moderate, and vigorous activity. &quot;</span>
+</span><span id="main-97"><a href="#main-97"><span class="linenos"> 97</span></a>        <span class="s2">&quot;Exactly three values must be &gt;= 0, given in ascending order,&quot;</span>
+</span><span id="main-98"><a href="#main-98"><span class="linenos"> 98</span></a>        <span class="s2">&quot; and separated by a space. (e.g. &#39;-t 0.1 1.0 1.5&#39;).&quot;</span><span class="p">,</span>
+</span><span id="main-99"><a href="#main-99"><span class="linenos"> 99</span></a>        <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="main-100"><a href="#main-100"><span class="linenos">100</span></a>    <span class="p">),</span>
+</span><span id="main-101"><a href="#main-101"><span class="linenos">101</span></a>    <span class="n">nonwear_algorithm</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NonwearAlgorithms</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="main-102"><a href="#main-102"><span class="linenos">102</span></a>        <span class="p">[</span><span class="n">NonwearAlgorithms</span><span class="o">.</span><span class="n">ggir</span><span class="p">],</span>
+</span><span id="main-103"><a href="#main-103"><span class="linenos">103</span></a>        <span class="s2">&quot;-n&quot;</span><span class="p">,</span>
+</span><span id="main-104"><a href="#main-104"><span class="linenos">104</span></a>        <span class="s2">&quot;--nonwear-algorithm&quot;</span><span class="p">,</span>
+</span><span id="main-105"><a href="#main-105"><span class="linenos">105</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the non-wear detection algorithm(s) to use. &quot;</span>
+</span><span id="main-106"><a href="#main-106"><span class="linenos">106</span></a>        <span class="s2">&quot;Specify one or more of &#39;ggir&#39;, &#39;cta&#39;, &#39;detach&#39;. &quot;</span>
+</span><span id="main-107"><a href="#main-107"><span class="linenos">107</span></a>        <span class="s2">&quot;(e.g. &#39;-n ggir -n cta&#39;). &quot;</span>
+</span><span id="main-108"><a href="#main-108"><span class="linenos">108</span></a>        <span class="s2">&quot;When multiple algorithms are specified, majority voting will be applied.&quot;</span><span class="p">,</span>
+</span><span id="main-109"><a href="#main-109"><span class="linenos">109</span></a>    <span class="p">),</span>
+</span><span id="main-110"><a href="#main-110"><span class="linenos">110</span></a>    <span class="n">epoch_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="main-111"><a href="#main-111"><span class="linenos">111</span></a>        <span class="mi">5</span><span class="p">,</span>
+</span><span id="main-112"><a href="#main-112"><span class="linenos">112</span></a>        <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+</span><span id="main-113"><a href="#main-113"><span class="linenos">113</span></a>        <span class="s2">&quot;--epoch-length&quot;</span><span class="p">,</span>
+</span><span id="main-114"><a href="#main-114"><span class="linenos">114</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the sampling rate in seconds for all metrics. &quot;</span>
+</span><span id="main-115"><a href="#main-115"><span class="linenos">115</span></a>        <span class="s2">&quot;Must be greater than or equal to 1.&quot;</span><span class="p">,</span>
+</span><span id="main-116"><a href="#main-116"><span class="linenos">116</span></a>        <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+</span><span id="main-117"><a href="#main-117"><span class="linenos">117</span></a>    <span class="p">),</span>
+</span><span id="main-118"><a href="#main-118"><span class="linenos">118</span></a>    <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="main-119"><a href="#main-119"><span class="linenos">119</span></a>        <span class="mi">0</span><span class="p">,</span>
+</span><span id="main-120"><a href="#main-120"><span class="linenos">120</span></a>        <span class="s2">&quot;-v&quot;</span><span class="p">,</span>
+</span><span id="main-121"><a href="#main-121"><span class="linenos">121</span></a>        <span class="s2">&quot;--verbosity&quot;</span><span class="p">,</span>
+</span><span id="main-122"><a href="#main-122"><span class="linenos">122</span></a>        <span class="n">count</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="main-123"><a href="#main-123"><span class="linenos">123</span></a>        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Determines the level of verbosity. Use -v for info, -vv for debug.&quot;</span>
+</span><span id="main-124"><a href="#main-124"><span class="linenos">124</span></a>        <span class="s2">&quot;If -vvv or more, it will be set to debug.&quot;</span>
+</span><span id="main-125"><a href="#main-125"><span class="linenos">125</span></a>        <span class="s2">&quot;Default for warning.&quot;</span><span class="p">,</span>
+</span><span id="main-126"><a href="#main-126"><span class="linenos">126</span></a>    <span class="p">),</span>
+</span><span id="main-127"><a href="#main-127"><span class="linenos">127</span></a>    <span class="n">version</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+</span><span id="main-128"><a href="#main-128"><span class="linenos">128</span></a>        <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Show the version and exit.&quot;</span>
+</span><span id="main-129"><a href="#main-129"><span class="linenos">129</span></a>    <span class="p">),</span>
+</span><span id="main-130"><a href="#main-130"><span class="linenos">130</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="main-131"><a href="#main-131"><span class="linenos">131</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Run wristpy orchestrator with command line arguments.&quot;&quot;&quot;</span>
+</span><span id="main-132"><a href="#main-132"><span class="linenos">132</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">wristpy.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">orchestrator</span>
+</span><span id="main-133"><a href="#main-133"><span class="linenos">133</span></a>
+</span><span id="main-134"><a href="#main-134"><span class="linenos">134</span></a>    <span class="k">if</span> <span class="n">version</span><span class="p">:</span>
+</span><span id="main-135"><a href="#main-135"><span class="linenos">135</span></a>        <span class="n">typer</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wristpy version: </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="main-136"><a href="#main-136"><span class="linenos">136</span></a>        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Exit</span><span class="p">()</span>
 </span><span id="main-137"><a href="#main-137"><span class="linenos">137</span></a>
-</span><span id="main-138"><a href="#main-138"><span class="linenos">138</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
-</span><span id="main-139"><a href="#main-139"><span class="linenos">139</span></a>
-</span><span id="main-140"><a href="#main-140"><span class="linenos">140</span></a>    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="main-141"><a href="#main-141"><span class="linenos">141</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="main-142"><a href="#main-142"><span class="linenos">142</span></a>            <span class="sa">f</span><span class="s2">&quot;Value for epoch_length is:</span><span class="si">{</span><span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="si">}</span><span class="s2">.&quot;</span>
-</span><span id="main-143"><a href="#main-143"><span class="linenos">143</span></a>            <span class="s2">&quot;Please enter an integer &gt;= 0.&quot;</span>
-</span><span id="main-144"><a href="#main-144"><span class="linenos">144</span></a>        <span class="p">)</span>
+</span><span id="main-138"><a href="#main-138"><span class="linenos">138</span></a>    <span class="k">if</span> <span class="n">verbosity</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="main-139"><a href="#main-139"><span class="linenos">139</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
+</span><span id="main-140"><a href="#main-140"><span class="linenos">140</span></a>    <span class="k">elif</span> <span class="n">verbosity</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="main-141"><a href="#main-141"><span class="linenos">141</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+</span><span id="main-142"><a href="#main-142"><span class="linenos">142</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="main-143"><a href="#main-143"><span class="linenos">143</span></a>        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+</span><span id="main-144"><a href="#main-144"><span class="linenos">144</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
 </span><span id="main-145"><a href="#main-145"><span class="linenos">145</span></a>
-</span><span id="main-146"><a href="#main-146"><span class="linenos">146</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running wristpy. arguments given: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
+</span><span id="main-146"><a href="#main-146"><span class="linenos">146</span></a>    <span class="n">nonwear_algorithms</span> <span class="o">=</span> <span class="p">[</span><span class="n">algo</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">algo</span> <span class="ow">in</span> <span class="n">nonwear_algorithm</span><span class="p">]</span>
 </span><span id="main-147"><a href="#main-147"><span class="linenos">147</span></a>
-</span><span id="main-148"><a href="#main-148"><span class="linenos">148</span></a>    <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span id="main-149"><a href="#main-149"><span class="linenos">149</span></a>        <span class="nb">input</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
-</span><span id="main-150"><a href="#main-150"><span class="linenos">150</span></a>        <span class="n">output</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
-</span><span id="main-151"><a href="#main-151"><span class="linenos">151</span></a>        <span class="n">calibrator</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span> <span class="k">else</span> <span class="n">arguments</span><span class="o">.</span><span class="n">calibrator</span><span class="p">,</span>
-</span><span id="main-152"><a href="#main-152"><span class="linenos">152</span></a>        <span class="n">activity_metric</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">activity_metric</span><span class="p">,</span>
-</span><span id="main-153"><a href="#main-153"><span class="linenos">153</span></a>        <span class="n">thresholds</span><span class="o">=</span><span class="kc">None</span>
-</span><span id="main-154"><a href="#main-154"><span class="linenos">154</span></a>        <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span> <span class="ow">is</span> <span class="kc">None</span>
-</span><span id="main-155"><a href="#main-155"><span class="linenos">155</span></a>        <span class="k">else</span> <span class="n">cast</span><span class="p">(</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">thresholds</span><span class="p">)),</span>
-</span><span id="main-156"><a href="#main-156"><span class="linenos">156</span></a>        <span class="n">epoch_length</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">epoch_length</span><span class="p">,</span>
-</span><span id="main-157"><a href="#main-157"><span class="linenos">157</span></a>        <span class="n">nonwear_algorithm</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">nonwear_algorithm</span><span class="p">,</span>
-</span><span id="main-158"><a href="#main-158"><span class="linenos">158</span></a>        <span class="n">verbosity</span><span class="o">=</span><span class="n">log_level</span><span class="p">,</span>
-</span><span id="main-159"><a href="#main-159"><span class="linenos">159</span></a>        <span class="n">output_filetype</span><span class="o">=</span><span class="n">arguments</span><span class="o">.</span><span class="n">output_filetype</span><span class="p">,</span>
-</span><span id="main-160"><a href="#main-160"><span class="linenos">160</span></a>    <span class="p">)</span>
+</span><span id="main-148"><a href="#main-148"><span class="linenos">148</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running wristpy. arguments given: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">locals</span><span class="p">())</span>
+</span><span id="main-149"><a href="#main-149"><span class="linenos">149</span></a>    <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="main-150"><a href="#main-150"><span class="linenos">150</span></a>        <span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span>
+</span><span id="main-151"><a href="#main-151"><span class="linenos">151</span></a>        <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">,</span>
+</span><span id="main-152"><a href="#main-152"><span class="linenos">152</span></a>        <span class="n">calibrator</span><span class="o">=</span><span class="n">calibrator</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">calibrator</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type] # Covered by Calibrator Enum class</span>
+</span><span id="main-153"><a href="#main-153"><span class="linenos">153</span></a>        <span class="n">activity_metric</span><span class="o">=</span><span class="n">activity_metric</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+</span><span id="main-154"><a href="#main-154"><span class="linenos">154</span></a>        <span class="n">thresholds</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">thresholds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">thresholds</span><span class="p">,</span>
+</span><span id="main-155"><a href="#main-155"><span class="linenos">155</span></a>        <span class="n">epoch_length</span><span class="o">=</span><span class="n">epoch_length</span><span class="p">,</span>
+</span><span id="main-156"><a href="#main-156"><span class="linenos">156</span></a>        <span class="n">nonwear_algorithm</span><span class="o">=</span><span class="n">nonwear_algorithms</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class</span>
+</span><span id="main-157"><a href="#main-157"><span class="linenos">157</span></a>        <span class="n">verbosity</span><span class="o">=</span><span class="n">log_level</span><span class="p">,</span>
+</span><span id="main-158"><a href="#main-158"><span class="linenos">158</span></a>        <span class="n">output_filetype</span><span class="o">=</span><span class="n">output_filetype</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type] # Covered by OutputFileType Enum class</span>
+</span><span id="main-159"><a href="#main-159"><span class="linenos">159</span></a>    <span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Runs wristpy orchestrator with command line arguments.</p>
-
-<h6 id="arguments">Arguments:</h6>
-
-<ul>
-<li><strong>args:</strong>  A list of command line arguments given as strings. If None, the parser
-will take the args from <code>sys.argv</code>.</li>
-</ul>
-
-<h6 id="returns">Returns:</h6>
-
-<blockquote>
-  <p>A Results object containing enmo, anglez, physical activity levels, nonwear
-  detection, and sleep detection.</p>
-</blockquote>
-
-<h6 id="raises">Raises:</h6>
-
-<ul>
-<li><strong>ValueError:</strong>  If the epoch_length is less than 0.</li>
-</ul>
-</div>
-
-
-                </section>
-                <section id="parse_nonwear_algorithms">
-                            <input id="parse_nonwear_algorithms-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">parse_nonwear_algorithms</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
-
-                <label class="view-source-button" for="parse_nonwear_algorithms-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#parse_nonwear_algorithms"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="parse_nonwear_algorithms-198"><a href="#parse_nonwear_algorithms-198"><span class="linenos">198</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_nonwear_algorithms</span><span class="p">(</span><span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="parse_nonwear_algorithms-199"><a href="#parse_nonwear_algorithms-199"><span class="linenos">199</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse comma-separated non-wear algorithm names.</span>
-</span><span id="parse_nonwear_algorithms-200"><a href="#parse_nonwear_algorithms-200"><span class="linenos">200</span></a>
-</span><span id="parse_nonwear_algorithms-201"><a href="#parse_nonwear_algorithms-201"><span class="linenos">201</span></a><span class="sd">    Args:</span>
-</span><span id="parse_nonwear_algorithms-202"><a href="#parse_nonwear_algorithms-202"><span class="linenos">202</span></a><span class="sd">        algorithm_name: Command line input string, comma-separated algorithm names.</span>
-</span><span id="parse_nonwear_algorithms-203"><a href="#parse_nonwear_algorithms-203"><span class="linenos">203</span></a>
-</span><span id="parse_nonwear_algorithms-204"><a href="#parse_nonwear_algorithms-204"><span class="linenos">204</span></a><span class="sd">    Returns:</span>
-</span><span id="parse_nonwear_algorithms-205"><a href="#parse_nonwear_algorithms-205"><span class="linenos">205</span></a><span class="sd">        The List of algorithm names.</span>
-</span><span id="parse_nonwear_algorithms-206"><a href="#parse_nonwear_algorithms-206"><span class="linenos">206</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="parse_nonwear_algorithms-207"><a href="#parse_nonwear_algorithms-207"><span class="linenos">207</span></a>    <span class="n">valid_algorithm_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ggir&quot;</span><span class="p">,</span> <span class="s2">&quot;cta&quot;</span><span class="p">,</span> <span class="s2">&quot;detach&quot;</span><span class="p">]</span>
-</span><span id="parse_nonwear_algorithms-208"><a href="#parse_nonwear_algorithms-208"><span class="linenos">208</span></a>    <span class="n">algorithms</span> <span class="o">=</span> <span class="p">[</span><span class="n">algo</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">algo</span> <span class="ow">in</span> <span class="n">algorithm_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
-</span><span id="parse_nonwear_algorithms-209"><a href="#parse_nonwear_algorithms-209"><span class="linenos">209</span></a>
-</span><span id="parse_nonwear_algorithms-210"><a href="#parse_nonwear_algorithms-210"><span class="linenos">210</span></a>    <span class="k">for</span> <span class="n">algo</span> <span class="ow">in</span> <span class="n">algorithms</span><span class="p">:</span>
-</span><span id="parse_nonwear_algorithms-211"><a href="#parse_nonwear_algorithms-211"><span class="linenos">211</span></a>        <span class="k">if</span> <span class="n">algo</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_algorithm_names</span><span class="p">:</span>
-</span><span id="parse_nonwear_algorithms-212"><a href="#parse_nonwear_algorithms-212"><span class="linenos">212</span></a>            <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span>
-</span><span id="parse_nonwear_algorithms-213"><a href="#parse_nonwear_algorithms-213"><span class="linenos">213</span></a>                <span class="sa">f</span><span class="s2">&quot;Invalid algorithm: &#39;</span><span class="si">{</span><span class="n">algo</span><span class="si">}</span><span class="s2">&#39;. Must be one of: &quot;</span>
-</span><span id="parse_nonwear_algorithms-214"><a href="#parse_nonwear_algorithms-214"><span class="linenos">214</span></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">valid_algorithm_names</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-</span><span id="parse_nonwear_algorithms-215"><a href="#parse_nonwear_algorithms-215"><span class="linenos">215</span></a>            <span class="p">)</span>
-</span><span id="parse_nonwear_algorithms-216"><a href="#parse_nonwear_algorithms-216"><span class="linenos">216</span></a>    <span class="k">return</span> <span class="n">algorithms</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Parse comma-separated non-wear algorithm names.</p>
-
-<h6 id="arguments">Arguments:</h6>
-
-<ul>
-<li><strong>algorithm_name:</strong>  Command line input string, comma-separated algorithm names.</li>
-</ul>
-
-<h6 id="returns">Returns:</h6>
-
-<blockquote>
-  <p>The List of algorithm names.</p>
-</blockquote>
+            <div class="docstring"><p>Run wristpy orchestrator with command line arguments.</p>
 </div>
 
 
