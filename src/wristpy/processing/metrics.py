@@ -270,7 +270,12 @@ def monitor_independent_movement_summary_units(
     filtering using a 4th order butterworth filter, aggregation by calculating the area
     under the curve over a given epoch, and finally trunction of small values.
     The MIMS value per axis is then combined through a sum or vector magnitude, and
-    returned as a single vector.
+    returned as a single vector. Due to differences in epoch segmentation between the R
+    and Python implementations of the MIMS algorithm, the Python version consistently
+    returns one additional timestamp compared to the R version. This extra timestamp
+    corresponds to the final epoch of data, which is omitted in the R implementation.
+    Aside from this single data point, the results from both implementations align
+    closely.
 
     Args:
         acceleration: Triaxial acceleration data to be processed.
