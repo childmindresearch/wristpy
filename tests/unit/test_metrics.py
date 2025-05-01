@@ -852,7 +852,7 @@ def test_combine_mims(
 def test_combine_mims_method_error(create_acceleration: pl.DataFrame) -> None:
     """Test error when invalid combination method given."""
     test_model = models.Measurement(
-        measurements=create_acceleration["X", "Y", "Z"].to_numpy(),
+        measurements=create_acceleration[["X", "Y", "Z"]].to_numpy(),
         time=create_acceleration["time"],
     )
 
