@@ -296,9 +296,9 @@ def monitor_independent_movement_summary_units(
         method.
 
     References:
-        John, D., Tang, Q., Albinali, F. and Intille, S., 2019.
-        An Open-Source Monitor-Independent Movement Summary for Accelerometer Data
-        Processing. Journal for the Measurement of Physical Behaviour, 2(4), pp.268-281.
+        John, D., Tang, Q., Albinali, F. and Intille, S., 2019. An Open-Source
+        Monitor-Independent Movement Summary for Accelerometer Data Processing. Journal
+        for the Measurement of Physical Behaviour, 2(4), pp.268-281.
 
     """
     interpolated_measure = mims.interpolate_measure(
