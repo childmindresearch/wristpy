@@ -1,3 +1,5 @@
+"""Testing functions of the mims.py module."""
+
 import pathlib
 from datetime import datetime, timedelta
 from typing import List, Literal, Union
