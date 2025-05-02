@@ -18,8 +18,8 @@ app = typer.Typer(
 class OutputFileType(str, Enum):
     """Valid output file types for saving data."""
 
-    csv = "csv"
-    parquet = "parquet"
+    csv = ".csv"
+    parquet = ".parquet"
 
 
 class Calibrator(str, Enum):
