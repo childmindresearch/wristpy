@@ -620,7 +620,7 @@ def butterworth_filter(
 
 def aggregate_mims(
     acceleration: models.Measurement,
-    epoch: int = 60,
+    epoch: float = 60.0,
     sampling_rate: int = 100,
     *,
     rectify: bool = True,
@@ -637,7 +637,6 @@ def aggregate_mims(
     Args:
         acceleration: Acceleration data to be aggregated.
         epoch: The desired epoch length in seconds that data will be aggregated over.
-            Defaults to 1 minute as per MIMS-unit paper.
         sampling_rate: The sampling rate of the accelerometer data in Hz.
         rectify: Specifies if data should be rectified before integration. If True any
             value below -150 will assign the value of that axis to -1 for that epoch.

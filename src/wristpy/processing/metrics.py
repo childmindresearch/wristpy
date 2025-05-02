@@ -253,7 +253,7 @@ def _cleanup_isolated_ones_nonwear_value(nonwear_value_array: np.ndarray) -> np.
 def monitor_independent_movement_summary_units(
     acceleration: models.Measurement,
     combination_method: Literal["sum", "vector_magnitude"] = "sum",
-    epoch: int = 60,
+    epoch: float = 60.0,
     interpolation_frequency: int = 100,
     dynamic_range: Tuple[float, float] = (-8.0, 8.0),
     cutoffs: Tuple[float, float] = (0.2, 5.0),
