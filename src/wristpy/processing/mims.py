@@ -629,8 +629,8 @@ def aggregate_mims(
 
     When an epoch has less than 90% of the expected values (based on the sampling rate
     and epoch length), the AUC for that epoch is given as -1 for each axis. If rectify
-    is True, any axis with values below -150 will have the AUC value for that axis, will
-    be -1, for that epoch. Finally, following integration, any value greater than 16 *
+    is True, any axis with values below -150 will have the AUC value for that axis
+    be -1 for that epoch. Finally, following integration, any value greater than 16 *
     sampling_rate * epoch will be set to -1.
 
     Args:
