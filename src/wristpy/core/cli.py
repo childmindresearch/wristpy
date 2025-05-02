@@ -18,8 +18,8 @@ app = typer.Typer(
 class OutputFileType(str, Enum):
     """Valid output file types for saving data."""
 
-    csv = "csv"
-    parquet = "parquet"
+    csv = ".csv"
+    parquet = ".parquet"
 
 
 class Calibrator(str, Enum):
@@ -154,7 +154,7 @@ def main(
         epoch_length=epoch_length,
         nonwear_algorithm=nonwear_algorithms,  # type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class
         verbosity=log_level,
-        output_filetype=output_filetype,  # type: ignore[arg-type] # Covered by OutputFileType Enum class
+        output_filetype=output_filetype.value if output_filetype else None,  # type: ignore[arg-type] # Covered by OutputFileType Enum class
     )
 
 
