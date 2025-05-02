@@ -694,7 +694,7 @@ def aggregate_mims(
 
 def _aggregate_epoch(
     group: pl.DataFrame,
-    epoch: int = 60,
+    epoch: float = 60.0,
     sampling_rate: int = 100,
     *,
     rectify: bool = True,
