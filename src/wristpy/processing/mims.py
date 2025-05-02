@@ -624,14 +624,15 @@ def aggregate_mims(
     sampling_rate: int = 100,
     *,
     rectify: bool = True,
+    truncate: bool = True,
 ) -> models.Measurement:
     """Calculate the area under the curve(AUC), per epoch, per axis.
 
     When an epoch has less than 90% of the expected values (based on the sampling rate
     and epoch length), the AUC for that epoch is given as -1 for each axis. If rectify
     is True, any axis with values below -150 will have the AUC value for that axis
-    be -1 for that epoch. Finally, following integration, any value greater than 16 *
-    sampling_rate * epoch will be set to -1.
+    be -1 for that epoch. Finally, following integration, any value greater than (16 *
+    sampling_rate * epoch) will be set to -1.
 
     Args:
         acceleration: Acceleration data to be aggregated.
@@ -642,11 +643,16 @@ def aggregate_mims(
             value below -150 will assign the value of that axis to -1 for that epoch.
             Additionally the absolute value of accelerometer data will be used for
             integration.
+        truncate: Specifies if data <= 0.001 should be truncated to 0.
 
     Returns:
         A models.Measurement instance with the area under the curve values for each
         epoch.
     """
+    if epoch <= 0:
+        raise ValueError("Epoch length must be greater than 0.")
+
+    epoch_ns = int(epoch * 1e9)
     acceleration_df = pl.DataFrame(
         {
             "time": acceleration.time,
@@ -658,7 +664,7 @@ def aggregate_mims(
 
     result = acceleration_df.group_by_dynamic(
         "time",
-        every=f"{epoch}s",
+        every=f"{epoch_ns}ns",
     ).map_groups(
         lambda group: _aggregate_epoch(
             group=group,
@@ -674,10 +680,17 @@ def aggregate_mims(
         },
     )
 
-    return models.Measurement(
+    aggregated_measure = models.Measurement(
         measurements=result.select(["x", "y", "z"]).to_numpy(),
         time=result["time"].cast(pl.Datetime("ns")),
     )
+
+    if truncate:
+        aggregated_measure.measurements = np.where(
+            aggregated_measure.measurements <= 0.001, 0, aggregated_measure.measurements
+        )
+
+    return aggregated_measure
 
 
 def _aggregate_epoch(
@@ -688,12 +701,6 @@ def _aggregate_epoch(
     rectify: bool = True,
 ) -> pl.DataFrame:
     """Calculate the area under the curve(AUC), per epoch.
-
-    When an epoch has less than 90% of the expected values (based on the sampling rate
-    and epoch length), the AUC for that epoch is given as -1 for each axis. If rectify
-    is True, any axis with values below -150 will have the AUC value for that axis, will
-    be -1, for that epoch. Finally, following integration, any value greater than 16 *
-    sampling_rate * epoch will be set to -1.
 
     Args:
         group: The epoch given by .map_groups()
@@ -709,6 +716,7 @@ def _aggregate_epoch(
         A polars DataFrame containing the XYZ AUC values for one epoch.
     """
     timestamps = group["time"].cast(pl.Int64).to_numpy()
+
     if len(timestamps) < 0.9 * sampling_rate * epoch:
         logger.debug("Not enough data to calculate AUC")
         return pl.DataFrame(
@@ -741,6 +749,9 @@ def combine_mims(
     combination_method: Literal["sum", "vector_magnitude"] = "sum",
 ) -> models.Measurement:
     """Combine MIMS values of xyz axis into one MIMS value.
+
+    If any value in an epoch is -1, the 'combined_mims' value for that epoch will
+    be set to -1 to flag it as an invalid epoch.
 
     Args:
         acceleration: An object containing per-axis MIMS measurements and their

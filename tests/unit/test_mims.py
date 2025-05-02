@@ -541,7 +541,11 @@ def test_aggregation_good(
     ).to_numpy()
 
     results = mims.aggregate_mims(
-        acceleration=test_data_interpolated, epoch=60, sampling_rate=100, rectify=True
+        acceleration=test_data_interpolated,
+        epoch=60,
+        sampling_rate=100,
+        rectify=True,
+        truncate=False,
     )
 
     assert np.allclose(
@@ -557,7 +561,11 @@ def test_aggregation_few_samples(
     expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
 
     results = mims.aggregate_mims(
-        acceleration=test_data.acceleration, epoch=60, sampling_rate=100, rectify=True
+        acceleration=test_data.acceleration,
+        epoch=60,
+        sampling_rate=100,
+        rectify=True,
+        truncate=False,
     )
 
     assert np.all(
@@ -576,7 +584,10 @@ def test_aggregation_rectify() -> None:
     expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
 
     results = mims.aggregate_mims(
-        acceleration=below_threshold_measure, epoch=60, sampling_rate=100
+        acceleration=below_threshold_measure,
+        epoch=60,
+        sampling_rate=100,
+        truncate=False,
     )
 
     assert np.all(
@@ -595,7 +606,7 @@ def test_aggregation_max_value() -> None:
     expected_acceleration = np.array([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]])
 
     results = mims.aggregate_mims(
-        acceleration=max_value_measure, epoch=60, sampling_rate=100
+        acceleration=max_value_measure, epoch=60, sampling_rate=100, truncate=False
     )
 
     assert np.all(
