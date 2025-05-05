@@ -17,7 +17,7 @@ from wristpy.processing import mims
 def create_clipped_sine_data(
     cycles: int = 2, threshold: Union[float, None] = 0.95
 ) -> np.ndarray:
-    """Fixture to create dummy sinusoidal data with clipped regions."""
+    """Function to create dummy sinusoidal data with clipped regions."""
     num_samples = cycles * 100
     x_values = np.linspace(0, 2 * np.pi * cycles, num_samples)
     sine_data = np.sin(x_values)
