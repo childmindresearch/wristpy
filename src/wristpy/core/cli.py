@@ -76,7 +76,7 @@ def main(
         Calibrator.none,
         "-c",
         "--calibrator",
-        help="Pick which calibrator to use."
+        help="Pick which calibrator to use. "
         "Must choose one of 'none', 'ggir', or 'gradient'.",
         case_sensitive=False,
     ),
