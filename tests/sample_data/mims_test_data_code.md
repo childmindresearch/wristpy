@@ -15,7 +15,7 @@ The MIMS algorithm consists of 5 main steps:
 Each major step has associated test data that was used to validate the wristpy implementation. Test data was gathered using an actigraph device model: wGT3XBT which has a dynamic range of
 ±8
 
-### 1. Interpolation test data.
+### 1. Interpolation Test Data.
 
 The interpolation test data was generated using the following R script and saved as 'actigraph_interpolation_r_version.csv' :
 
@@ -27,7 +27,7 @@ interpolate_df <- MIMSunit::interpolate_signal(df = accel_df, method = "spline_n
 write.csv(interpolate_df, "actigraph_interpolation_r_version.csv", row.names = FALSE)
 ```
 
-### 1. Interpolation test data.
+### 1. Interpolation Test Data.
 
 The interpolation test data was generated using the following R script and saved as 'actigraph_interpolation_r_version.csv' :
 
@@ -39,7 +39,7 @@ interpolate_df <- MIMSunit::interpolate_signal(df = accel_df, method = "spline_n
 write.csv(interpolate_df, "actigraph_interpolation_r_version.csv", row.names = FALSE)
 ```
 
-### 2. Bandpass Filter test data.
+### 2. Bandpass Filter Test Data.
 
 The Bandpass Filter test data was generated using the following R script and saved as 'mims_butterworth_filtered_data.csv' :
 
@@ -52,7 +52,7 @@ filtered_df <- MIMSunit::iir(interpolate_df, sr = 100, cutoff_freq = c(0.2, 5), 
 write.csv(filtered_df, "mims_butterworth_filtered_data.csv", row.names = FALSE)
 ```
 
-### 3. Aggregation test data.
+### 3. Aggregation Test Data.
 
 The Aggregation test data was generated using the following R script and saved as 'aggregation_r_version.csv' :
 
