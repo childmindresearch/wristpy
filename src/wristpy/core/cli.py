@@ -84,7 +84,7 @@ def main(
         ActivityMetric.enmo,
         "-a",
         "--activity-metric",
-        help="Metric used for physical activity categorization."
+        help="Metric used for physical activity categorization. "
         "Choose from 'enmo', 'mad', or 'ag_count'.",
         case_sensitive=False,
     ),
@@ -93,8 +93,8 @@ def main(
         "-t",
         "--thresholds",
         help="Provide three thresholds for light, moderate, and vigorous activity. "
-        "Exactly three values must be >= 0, given in ascending order,"
-        " and separated by a space. (e.g. '-t 0.1 1.0 1.5').",
+        "Exactly three values must be >= 0, given in ascending order, "
+        "and separated by a space. (e.g. '-t 0.1 1.0 1.5').",
         min=0,
     ),
     nonwear_algorithm: list[NonwearAlgorithms] = typer.Option(
@@ -119,8 +119,8 @@ def main(
         "-v",
         "--verbosity",
         count=True,
-        help="Determines the level of verbosity. Use -v for info, -vv for debug."
-        "If -vvv or more, it will be set to debug."
+        help="Determines the level of verbosity. Use -v for info, -vv for debug. "
+        "If -vvv or more, it will be set to debug. "
         "Default for warning.",
     ),
     version: bool = typer.Option(
