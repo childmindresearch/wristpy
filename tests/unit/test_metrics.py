@@ -15,23 +15,6 @@ from wristpy.processing import metrics
 TEST_LENGTH = 100
 
 
-@pytest.fixture
-def create_acceleration() -> pl.DataFrame:
-    """Fixture to create a dummy acceleration DataFrame to be used in multiple tests."""
-    dummy_date = datetime(2024, 5, 2)
-    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(1000)]
-    test_time = pl.Series("time", dummy_datetime_list)
-    acceleration_polars_df = pl.DataFrame(
-        {
-            "X": np.ones(1000),
-            "Y": np.ones(1000),
-            "Z": np.ones(1000),
-            "time": test_time,
-        }
-    )
-    return acceleration_polars_df
-
-
 @pytest.mark.parametrize(
     "x,y,z, expected_enmo",
     [
