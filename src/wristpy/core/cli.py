@@ -1,182 +1,162 @@
 """CLI for wristpy."""
 
-import argparse
 import logging
 import pathlib
-from typing import List, Optional, Tuple, cast
+from enum import Enum
 
-from wristpy.core import config, orchestrator
+import typer
+
+from wristpy.core import config
 
 logger = config.get_logger()
+app = typer.Typer(
+    help="Run the main Wristpy pipeline.",
+    epilog="Please report issues at https://github.com/childmindresearch/wristpy.",
+)
 
 
-def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
-    """Argument parser for Wristpy's cli.
+class OutputFileType(str, Enum):
+    """Valid output file types for saving data."""
 
-    Args:
-        args: A list of command line arguments given as strings. If None, the parser
-            will take the args from `sys.argv`.
+    csv = ".csv"
+    parquet = ".parquet"
 
-    Returns:
-        Namespace object with all of the input arguments and default values.
+
+class Calibrator(str, Enum):
+    """Setting a calibrator class for typer.
+
+    This class is used to define the literal types that are allowed for
+    calibration, and parsing the strings for the orchestrator.
     """
-    parser = argparse.ArgumentParser(
-        description="Run the main Wristpy pipeline.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        epilog="Please report issues at https://github.com/childmindresearch/wristpy.",
-    )
 
-    parser.add_argument("input", type=pathlib.Path, help="Path to the input data.")
+    none = "none"
+    ggir = "ggir"
+    gradient = "gradient"
 
-    parser.add_argument(
+
+class ActivityMetric(str, Enum):
+    """Valid activity metrics for physical activity categorization."""
+
+    enmo = "enmo"
+    mad = "mad"
+    ag_count = "ag_count"
+
+
+class NonwearAlgorithms(str, Enum):
+    """Setting a nonwear algorithm class for typer.
+
+    This class is used to define the literal types that are allowed for
+    nonwear algorithms, and parsing the strings for the orchestrator.
+    """
+
+    ggir = "ggir"
+    cta = "cta"
+    detach = "detach"
+
+
+@app.command()
+def main(
+    input: pathlib.Path = typer.Argument(
+        ..., help="Path to the input data.", exists=True
+    ),
+    output: pathlib.Path = typer.Option(
+        None,
         "-o",
         "--output",
-        type=pathlib.Path,
         help="Path where data will be saved. Supports .csv and .parquet formats.",
-    )
-
-    parser.add_argument(
+    ),
+    output_filetype: OutputFileType = typer.Option(
+        None,
         "-O",
-        "--output_filetype",
-        type=str,
-        default=None,
+        "--output-filetype",
         help="Format for save files when processing directories. "
         "Leave as None when processing single files.",
-    )
-
-    parser.add_argument(
+    ),
+    calibrator: Calibrator = typer.Option(
+        None,
         "-c",
         "--calibrator",
-        type=lambda s: s.lower(),
-        choices=["ggir", "gradient", "none"],
-        default="none",
-        help="Pick which calibrator to use. Can be 'ggir' or 'gradient'.",
-    )
-
-    parser.add_argument(
+        help="Pick which calibrator to use."
+        "Must choose one of 'none', 'ggir', or 'gradient'.",
+        case_sensitive=False,
+    ),
+    activity_metric: ActivityMetric = typer.Option(
+        ActivityMetric.enmo,
         "-a",
-        "--activity_metric",
-        type=lambda s: s.lower(),
-        choices=["enmo", "mad", "ag_count"],
-        default="enmo",
-        help="Pick which physical activity metric should be used. "
-        "This will be used to determine physical activity categorization. "
-        "Can be 'enmo', 'mad', or 'ag_count'.",
-    )
-
-    parser.add_argument(
+        "--activity-metric",
+        help="Metric used for physical activity categorization."
+        "Choose from 'enmo', 'mad', or 'ag_count'.",
+        case_sensitive=False,
+    ),
+    thresholds: tuple[float, float, float] = typer.Option(
+        None,
         "-t",
         "--thresholds",
-        type=_none_or_float_list,
-        default=None,
         help="Provide three thresholds for light, moderate, and vigorous activity. "
-        "Exactly three values must be given in ascending order, and comma seperated.",
-    )
-
-    parser.add_argument(
+        "Exactly three values must be >= 0, given in ascending order,"
+        " and separated by a space. (e.g. '-t 0.1 1.0 1.5').",
+        min=0,
+    ),
+    nonwear_algorithm: list[NonwearAlgorithms] = typer.Option(
+        [NonwearAlgorithms.ggir],
+        "-n",
+        "--nonwear-algorithm",
+        help="Specify the non-wear detection algorithm(s) to use. "
+        "Specify one or more of 'ggir', 'cta', 'detach'. "
+        "(e.g. '-n ggir -n cta'). "
+        "When multiple algorithms are specified, majority voting will be applied.",
+    ),
+    epoch_length: int = typer.Option(
+        5,
         "-e",
-        "--epoch_length",
-        default=5,
-        type=int,
-        help="Specify the sampling rate in seconds for all metrics. To skip resampling,"
-        " enter 0.",
-    )
-
-    parser.add_argument(
-        "-V", "--version", action="version", version=config.get_version()
-    )
-
-    parser.add_argument(
+        "--epoch-length",
+        help="Specify the sampling rate in seconds for all metrics. "
+        "Must be greater than or equal to 1.",
+        min=1,
+    ),
+    verbosity: int = typer.Option(
+        0,
         "-v",
         "--verbosity",
-        action="count",
-        default=0,
+        count=True,
         help="Determines the level of verbosity. Use -v for info, -vv for debug."
+        "If -vvv or more, it will be set to debug."
         "Default for warning.",
-    )
-
-    return parser.parse_args(args)
-
-
-def main(
-    args: Optional[List[str]] = None,
+    ),
+    version: bool = typer.Option(
+        False, "-V", "--version", help="Show the version and exit."
+    ),
 ) -> None:
-    """Runs wristpy orchestrator with command line arguments.
+    """Run wristpy orchestrator with command line arguments."""
+    from wristpy.core import orchestrator
 
-    Args:
-         args: A list of command line arguments given as strings. If None, the parser
-            will take the args from `sys.argv`.
+    if version:
+        typer.echo(f"Wristpy version: {config.get_version()}")
+        raise typer.Exit()
 
-    Returns:
-        A Results object containing enmo, anglez, physical activity levels, nonwear
-        detection, and sleep detection.
-
-    Raises:
-        ValueError: If the epoch_length is less than 0.
-    """
-    arguments = parse_arguments(args)
-
-    if arguments.verbosity == 0:
+    if verbosity == 0:
         log_level = logging.WARNING
-    elif arguments.verbosity == 1:
+    elif verbosity == 1:
         log_level = logging.INFO
     else:
         log_level = logging.DEBUG
-
     logger.setLevel(log_level)
 
-    if arguments.epoch_length < 0:
-        raise ValueError(
-            f"Value for epoch_length is:{arguments.epoch_length}."
-            "Please enter an integer >= 0."
-        )
+    nonwear_algorithms = [algo.value for algo in nonwear_algorithm]
 
-    logger.debug("Running wristpy. arguments given: %s", arguments)
-
+    logger.debug("Running wristpy. arguments given: %s", locals())
     orchestrator.run(
-        input=arguments.input,
-        output=arguments.output,
-        calibrator=None if arguments.calibrator == "none" else arguments.calibrator,
-        activity_metric=arguments.activity_metric,
-        thresholds=None
-        if arguments.thresholds is None
-        else cast(Tuple[float, float, float], tuple(arguments.thresholds)),
-        epoch_length=None if arguments.epoch_length == 0 else arguments.epoch_length,
+        input=input,
+        output=output,
+        calibrator=calibrator.value if calibrator else None,  # type: ignore[arg-type] # Covered by Calibrator Enum class
+        activity_metric=activity_metric.value,
+        thresholds=None if thresholds is None else thresholds,
+        epoch_length=epoch_length,
+        nonwear_algorithm=nonwear_algorithms,  # type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class
         verbosity=log_level,
-        output_filetype=arguments.output_filetype,
+        output_filetype=output_filetype.value if output_filetype else None,  # type: ignore[arg-type] # Covered by OutputFileType Enum class
     )
 
 
-def _none_or_float_list(value: str) -> Optional[List[float]]:
-    """Helper function to process thresholds argument.
-
-    This function is used to parse the thresholds argument in the CLI.
-    It converts the comma separated string to a list of floats.
-    If the user enters 'None', it will return None. This is an extra
-    check in case the user accidentally enters 'None'
-    instead of allowing the default None type.
-
-    Args:
-        value: The value of the argument taken from the CLI.
-
-    Returns:
-        A list of floats or None.
-
-    Raises:
-        argparse.ArgumentTypeError: If the value is not a comma separated list of
-        floats or 'None'.
-    """
-    if value.lower() == "none":
-        return None
-    try:
-        float_list = [float(v) for v in value.split(",")]
-        if len(float_list) != 3:
-            raise argparse.ArgumentTypeError(
-                f"Invalid value: {value}."
-                "Must be a comma-separated list of exactly three numbers or 'None'."
-            )
-        return float_list
-    except ValueError:
-        raise argparse.ArgumentTypeError(
-            f"Invalid value: {value}. Must be a comma-separated list or 'None'."
-        )
+if __name__ == "__main__":
+    app()

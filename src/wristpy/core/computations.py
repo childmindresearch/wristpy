@@ -106,7 +106,7 @@ def moving_median(array: models.Measurement, epoch_length: float) -> models.Meas
 
     Returns:
         Measurement object with rolling median applied to the measurement data. The
-        measurements data will retain it's shape, and the time data will be returned
+        measurements data will retain its shape, and the time data will be returned
         unaltered.
     """
     return _moving(array, epoch_length, "median", centered=True, continuous=True)

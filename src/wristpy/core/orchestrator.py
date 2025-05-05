@@ -1,13 +1,9 @@
 """Python based runner."""
 
-import datetime
 import itertools
 import logging
 import pathlib
-from typing import Dict, List, Literal, Optional, Tuple, Union
-
-import numpy as np
-import polars as pl
+from typing import Dict, Literal, Optional, Sequence, Tuple, Union
 
 from wristpy.core import config, exceptions, models
 from wristpy.io.readers import readers
@@ -16,83 +12,12 @@ from wristpy.processing import (
     calibration,
     idle_sleep_mode_imputation,
     metrics,
+    nonwear_utils,
 )
 
 logger = config.get_logger()
 
 VALID_FILE_TYPES = (".csv", ".parquet")
-
-
-def format_sleep_data(
-    sleep_windows: List[analytics.SleepWindow], reference_measure: models.Measurement
-) -> np.ndarray:
-    """Formats sleep windows into an array for saving.
-
-    Args:
-        sleep_windows: The list of time stamp pairs indicating periods of sleep.
-        reference_measure: The measure from which the temporal resolution will be taken.
-
-    Returns:
-        1-D np.ndarray, with 1 indicating sleep. Will be of the same length as
-            the timestamps in the reference_measure.
-    """
-    logger.debug("Formatting sleep array from sleep windows.")
-    sleep_array = np.zeros(len(reference_measure.time), dtype=bool)
-
-    for window in sleep_windows:
-        sleep_mask = (reference_measure.time >= window.onset) & (
-            reference_measure.time <= window.wakeup
-        )
-        sleep_array[sleep_mask] = 1
-
-    return sleep_array
-
-
-def format_nonwear_data(
-    nonwear_data: models.Measurement,
-    reference_measure: models.Measurement,
-    original_temporal_resolution: float,
-) -> np.ndarray:
-    """Formats nonwear data to match the temporal resolution of the other measures.
-
-    The detect_nonweaer algorithm outputs non-wear values in 15-minute windows, where
-    each timestamp represents the beginning of the window. This structure does not align
-    well with the polars upsample function, which treats the last timestamp as the end
-    of the time series. As a result, using the upsample function would cut off the
-    final window. To avoid this, we manually map the non-wear data to the reference
-    measure's resolution.
-
-    Args:
-        nonwear_data: The nonwear array to be upsampled.
-        reference_measure: The measurement we match the non_wear data's temporal
-            resolution to.
-        original_temporal_resolution: The original temporal resolution of the
-            nonwear_data.
-
-    Returns:
-        1-D np.ndarray with 1 indicating a nonwear timepoint. Will match the
-            length of the reference measure.
-    """
-    logger.debug("Upsampling nonwear data.")
-    nonwear_df = pl.DataFrame(
-        {
-            "nonwear": nonwear_data.measurements.astype(np.int64),
-            "time": nonwear_data.time,
-        }
-    ).set_sorted("time")
-
-    nonwear_array = np.zeros(len(reference_measure.time), dtype=bool)
-
-    for row in nonwear_df.iter_rows(named=True):
-        nonwear_value = row["nonwear"]
-        time = row["time"]
-        nonwear_mask = (reference_measure.time >= time) & (
-            reference_measure.time
-            <= time + datetime.timedelta(seconds=original_temporal_resolution)
-        )
-        nonwear_array[nonwear_mask] = nonwear_value
-
-    return nonwear_array
 
 
 def run(
@@ -103,8 +28,9 @@ def run(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[float, None] = 5,
+    epoch_length: float = 5,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
+    nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
@@ -119,8 +45,8 @@ def run(
 
 
     Args:
-        input: Path to the input file or directory of files to be read. Currently
-            supports .bin and .gt3x
+        input: Path to the input file or directory of files to be read. Currently,
+            this supports .bin and .gt3x
         output: Path to directory data will be saved to. If processing a single file the
             path should end in the save file name in either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
@@ -128,10 +54,9 @@ def run(
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given, and `enmo` is the chosen physical activity metric,
-            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
-            ValueError will be raised.
+            to. It must be > 0.0.
         activity_metric: The metric to be used for physical activity categorization.
+        nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files. Must be None when
             processing files, must be a valid file type when processing directories.
@@ -188,6 +113,7 @@ def run(
             epoch_length=epoch_length,
             activity_metric=activity_metric,
             verbosity=verbosity,
+            nonwear_algorithm=nonwear_algorithm,
         )
 
     return _run_directory(
@@ -198,6 +124,7 @@ def run(
         epoch_length=epoch_length,
         verbosity=verbosity,
         output_filetype=output_filetype,
+        nonwear_algorithm=nonwear_algorithm,
     )
 
 
@@ -209,7 +136,8 @@ def _run_directory(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[float, None] = 5,
+    epoch_length: float = 5,
+    nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
 ) -> Dict[str, models.OrchestratorResults]:
@@ -222,17 +150,16 @@ def _run_directory(
 
 
     Args:
-        input: Path to the input directory of files to be read. Currently
-            supports .bin and .gt3x
+        input: Path to the input directory of files to be read. Currently,
+            this supports .bin and .gt3x
         output: Path to directory data will be saved to.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
             given in that order. Values must be asscending, unique, and greater than 0.
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given, and `enmo` is the chosen physical activity metric,
-            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
-            ValueError will be raised.
+            to. It must be > 0.0.
+        nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files.
 
@@ -291,6 +218,7 @@ def _run_directory(
                 calibrator=calibrator,
                 epoch_length=epoch_length,
                 verbosity=verbosity,
+                nonwear_algorithm=nonwear_algorithm,
             )
         except Exception as e:
             logger.error("Did not run file: %s, Error: %s", file, e)
@@ -306,8 +234,9 @@ def _run_file(
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
-    epoch_length: Union[float, None] = 5,
+    epoch_length: float = 5.0,
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
+    nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
@@ -319,7 +248,8 @@ def _run_file(
     or enter None to proceed without calibration.
 
     Args:
-        input: Path to the input file to be read. Currently supports .bin and .gt3x
+        input: Path to the input file to be read. Currently, this supports .bin and
+            .gt3x
         output: Path to save data to. The path should end in the save file name in
             either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
@@ -327,14 +257,18 @@ def _run_file(
             Default values are optimized for subjects ages 7-11 [1].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
-            to. If None is given, and `enmo` is the chosen physical activity metric,
-            no down sampling is preformed. Otherwise, for `mad` and `ag_count`, a
-            ValueError will be raised.
+            to. It must be > 0.0.
         activity_metric: The metric to be used for physical activity categorization.
+        nonwear_algorithm: The algorithm to be used for nonwear detection. A sequence of
+            algorithms can be provided. If so, a majority vote will be taken.
         verbosity: The logging level for the logger.
 
     Returns:
         All calculated data in a save ready format as a OrchestratorResults object.
+
+    Raises:
+        ValueError: If an invalid Calibrator is chosen.
+        ValueError: If epoch_length is not greater than 0.
 
     References:
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
@@ -354,6 +288,11 @@ def _run_file(
             f"Invalid calibrator: {calibrator}. Choose: 'ggir', 'gradient'. "
             "Enter None if no calibration is desired."
         )
+        logger.error(msg)
+        raise ValueError(msg)
+
+    if epoch_length <= 0:
+        msg = "Epoch_length must be greater than 0."
         logger.error(msg)
         raise ValueError(msg)
 
@@ -385,27 +324,24 @@ def _run_file(
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
 
-    non_wear_array = metrics.detect_nonwear(calibrated_acceleration)
+    nonwear_array = nonwear_utils.get_nonwear_measurements(
+        calibrated_acceleration=calibrated_acceleration,
+        temperature=watch_data.temperature,
+        non_wear_algorithms=nonwear_algorithm,
+    )
+    nonwear_epoch = nonwear_utils.nonwear_array_cleanup(
+        nonwear_array=nonwear_array,
+        reference_measurement=activity_measurement,
+        epoch_length=epoch_length,
+    )
+
     physical_activity_levels = analytics.compute_physical_activty_categories(
-        activity_measurement,
-        thresholds,
+        activity_measurement, thresholds
     )
 
-    sleep_array = models.Measurement(
-        measurements=format_sleep_data(
-            sleep_windows=sleep_windows, reference_measure=activity_measurement
-        ),
-        time=activity_measurement.time,
+    sleep_array = analytics.sleep_cleanup(
+        sleep_windows=sleep_windows, nonwear_measurement=nonwear_epoch
     )
-    nonwear_epoch = models.Measurement(
-        measurements=format_nonwear_data(
-            nonwear_data=non_wear_array,
-            reference_measure=activity_measurement,
-            original_temporal_resolution=900,
-        ),
-        time=activity_measurement.time,
-    )
-
     results = models.OrchestratorResults(
         physical_activity_metric=activity_measurement,
         anglez=anglez,
@@ -436,7 +372,7 @@ def _run_file(
 def _compute_activity(
     acceleration: models.Measurement,
     activity_metric: Literal["ag_count", "mad", "enmo"],
-    epoch_length: Union[float, None],
+    epoch_length: float,
 ) -> models.Measurement:
     """This is a helper function to organize the computation of the activity metric.
 
@@ -451,19 +387,12 @@ def _compute_activity(
 
     Returns:
         A Measurement object with the computed physical activity metric.
-
-    Raises:
-        ValueError: If the activity_metric is 'ag_count' or 'mad' and epoch_length is
-            None.
     """
-    if activity_metric in ("ag_count", "mad") and epoch_length is None:
-        raise ValueError("If using 'ag_count' or 'mad', epoch_length must be provided.")
-
     if activity_metric == "ag_count":
         return metrics.actigraph_activity_counts(
             acceleration,
-            epoch_length=epoch_length,  # type: ignore[arg-type] # Guarded by the ValueError statement above.
+            epoch_length=epoch_length,
         )
     elif activity_metric == "mad":
-        return metrics.mean_amplitude_deviation(acceleration, epoch_length=epoch_length)  # type: ignore[arg-type] # Guarded by the ValueError statement above.
+        return metrics.mean_amplitude_deviation(acceleration, epoch_length=epoch_length)
     return metrics.euclidean_norm_minus_one(acceleration, epoch_length=epoch_length)

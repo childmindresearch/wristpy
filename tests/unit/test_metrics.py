@@ -30,6 +30,21 @@ def create_acceleration() -> pl.DataFrame:
     return acceleration_polars_df
 
 
+@pytest.fixture
+def create_temperature() -> pl.DataFrame:
+    """Fixture to create a dummy temperature DataFrame to be used in multiple tests."""
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(1000)]
+    test_time = pl.Series("time", dummy_datetime_list)
+    temperature_polars_df = pl.DataFrame(
+        {
+            "temperature": np.linspace(1.0, 25.0, 1000),
+            "time": test_time,
+        }
+    )
+    return temperature_polars_df
+
+
 @pytest.mark.parametrize(
     "x,y,z, expected_enmo",
     [
@@ -52,19 +67,16 @@ def test_euclidean_norm_minus_one(
         measurements=np.column_stack((x, y, z)), time=test_time
     )
 
+    expected_length = math.ceil(len(test_time) / 5)
     enmo_results = metrics.euclidean_norm_minus_one(test_acceleration)
 
     assert np.all(
         np.isclose(enmo_results.measurements, expected_enmo)
     ), f"Expected {expected_enmo}"
 
-    assert enmo_results.time.equals(
-        test_acceleration.time
+    assert (
+        len(enmo_results.time) == expected_length
     ), "Input time attribute does not match output time attribute."
-
-    assert enmo_results.measurements.shape == (
-        TEST_LENGTH,
-    ), f"Expected enmo shape: ({TEST_LENGTH},), got ({enmo_results.measurements.shape})"
 
 
 @pytest.mark.parametrize(
@@ -87,19 +99,16 @@ def test_angle_relative_to_horizontal(
         measurements=measurements, time=dummy_datetime
     )
 
+    expected_length = math.ceil(len(dummy_datetime) / 5)
     angle_z_results = metrics.angle_relative_to_horizontal(test_acceleration)
 
     assert np.all(
         np.isclose(angle_z_results.measurements, expected_anglez, equal_nan=True)
     ), f"Expected {expected_anglez}, got: {angle_z_results.measurements}"
 
-    assert angle_z_results.time.equals(
-        test_acceleration.time
+    assert (
+        len(angle_z_results.time) == expected_length
     ), "Input time attribute does not match output time attribute."
-
-    assert angle_z_results.measurements.shape == (1,), (
-        f"Expected anglez shape: {(1,)}," f"got({angle_z_results.measurements.shape})"
-    )
 
 
 @pytest.mark.parametrize(
@@ -289,3 +298,100 @@ def test_ag_counts_max() -> None:
     assert np.all(
         ag_counts.measurements[2:] == expected_result
     ), f"Expected activity counts to be {expected_result}, got: {ag_counts}"
+
+
+@pytest.mark.parametrize("temp_length", [498, 500])
+def test_pre_proc_temp(create_acceleration: pl.DataFrame, temp_length: int) -> None:
+    """Test the pre-process temperature function for time padding."""
+    acceleration_df = create_acceleration
+    acceleration = models.Measurement(
+        measurements=acceleration_df.select(["X", "Y", "Z"]).to_numpy(),
+        time=acceleration_df["time"],
+    )
+
+    dummy_date = datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + timedelta(seconds=2 * i) for i in range(temp_length)
+    ]
+    temp_time = pl.Series("time", dummy_datetime_list).cast(pl.Datetime("ns"))
+    temperature = models.Measurement(
+        measurements=np.ones(len(temp_time), dtype=np.float32), time=temp_time
+    )
+    expected_time_length = len(acceleration.time)
+    expected_end_time = int(acceleration.time[-1].timestamp())
+
+    low_pass_temp = metrics._pre_process_temperature(temperature, acceleration)
+
+    assert len(low_pass_temp["time"]) == expected_time_length
+    assert int(low_pass_temp["time"][-1].timestamp()) == expected_end_time
+    assert np.all(low_pass_temp["temperature"].to_numpy() == 1.0)
+
+
+@pytest.mark.parametrize("std_criteria, expected_result", [(0, 0), (0.013, 1)])
+def test_cta_non_wear(
+    create_acceleration: pl.DataFrame,
+    create_temperature: pl.DataFrame,
+    std_criteria: float,
+    expected_result: int,
+) -> None:
+    """Test the cta non wear function."""
+    acceleration_df = create_acceleration
+    acceleration = models.Measurement(
+        measurements=acceleration_df.select(["X", "Y", "Z"]).to_numpy(),
+        time=acceleration_df["time"],
+    )
+    temperature_df = create_temperature
+    temperature = models.Measurement(
+        measurements=temperature_df["temperature"].to_numpy(),
+        time=temperature_df["time"],
+    )
+    expected_time_length = math.ceil(len(acceleration.time) / 60)
+
+    non_wear_array = metrics.combined_temp_accel_detect_nonwear(
+        acceleration, temperature, std_criteria=std_criteria
+    )
+
+    assert len(non_wear_array.time) == expected_time_length
+    assert np.all(non_wear_array.measurements == expected_result)
+
+
+def test_cta_non_wear_decreasing_temp() -> None:
+    """Test the CTA algorithm when temperature is decreasing."""
+    num_samples = int(1000)
+    time_list = [
+        datetime(2024, 5, 2) + timedelta(milliseconds=100 * i)
+        for i in range(num_samples)
+    ]
+    time = pl.Series("time", time_list, dtype=pl.Datetime("ns"))
+    acceleration = models.Measurement(measurements=np.ones((num_samples, 3)), time=time)
+    temperature = models.Measurement(
+        measurements=np.linspace(20, 25, num_samples)[::-1], time=time
+    )
+
+    non_wear_array = metrics.combined_temp_accel_detect_nonwear(
+        acceleration, temperature, std_criteria=0
+    )
+
+    assert np.all(non_wear_array.measurements[1:] == 1)
+
+
+def test_DETACH_non_wear() -> None:
+    """Test the DETACH non wear function."""
+    num_samples = int(1e5)
+    time_list = [
+        datetime(2024, 5, 2) + timedelta(milliseconds=100 * i)
+        for i in range(num_samples)
+    ]
+    time = pl.Series("time", time_list, dtype=pl.Datetime("ns"))
+    acceleration = models.Measurement(measurements=np.ones((num_samples, 3)), time=time)
+    temperature = models.Measurement(
+        measurements=np.random.randint(low=22, high=32, size=num_samples), time=time
+    )
+
+    expected_time_length = round(num_samples / 600)
+
+    non_wear_array = metrics.detach_nonwear(
+        acceleration, temperature, std_criteria=0.013
+    )
+
+    assert len(non_wear_array.time) == expected_time_length
