@@ -73,7 +73,7 @@ def main(
         "Leave as None when processing single files.",
     ),
     calibrator: Calibrator = typer.Option(
-        None,
+        Calibrator.none,
         "-c",
         "--calibrator",
         help="Pick which calibrator to use."
@@ -143,12 +143,13 @@ def main(
     logger.setLevel(log_level)
 
     nonwear_algorithms = [algo.value for algo in nonwear_algorithm]
+    calibrator_value = None if calibrator == Calibrator.none else calibrator.value
 
     logger.debug("Running wristpy. arguments given: %s", locals())
     orchestrator.run(
         input=input,
         output=output,
-        calibrator=calibrator.value if calibrator else None,  # type: ignore[arg-type] # Covered by Calibrator Enum class
+        calibrator=calibrator_value,
         activity_metric=activity_metric.value,
         thresholds=None if thresholds is None else thresholds,
         epoch_length=epoch_length,
