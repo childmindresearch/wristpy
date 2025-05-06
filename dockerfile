@@ -11,6 +11,8 @@ ENV CALIBRATOR=none
 ENV ACTIVITY_METRIC=enmo
 ENV EPOCH_LENGTH=5
 ENV NONWEAR=ggir
+ENV THRESHOLDS=""
+
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -23,11 +25,7 @@ RUN pip install poetry && \
 
 RUN mkdir -p $INPUT_DIR $OUTPUT_DIR
 
-CMD poetry run wristpy $INPUT_DIR \
-    --output $OUTPUT_DIR \
-    --output-filetype $OUTPUT_TYPE \
-    --calibrator $CALIBRATOR \
-    --activity-metric $ACTIVITY_METRIC \
-    --epoch-length $EPOCH_LENGTH \
-    --nonwear-algorithm $NONWEAR
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
+ENTRYPOINT ["/entrypoint.sh"]
