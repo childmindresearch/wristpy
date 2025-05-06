@@ -2,9 +2,11 @@ name: Publish Docker image
 
 on:
   push:
+    branches:
+      - feature/issue-178/build-docker-image
     tags:
       - v*
-  workflow_dispatch:
+
 
 jobs:
   push_to_registry:
