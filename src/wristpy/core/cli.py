@@ -73,10 +73,10 @@ def main(
         "Leave as None when processing single files.",
     ),
     calibrator: Calibrator = typer.Option(
-        None,
+        Calibrator.none,
         "-c",
         "--calibrator",
-        help="Pick which calibrator to use."
+        help="Pick which calibrator to use. "
         "Must choose one of 'none', 'ggir', or 'gradient'.",
         case_sensitive=False,
     ),
@@ -84,7 +84,7 @@ def main(
         ActivityMetric.enmo,
         "-a",
         "--activity-metric",
-        help="Metric used for physical activity categorization."
+        help="Metric used for physical activity categorization. "
         "Choose from 'enmo', 'mad', or 'ag_count'.",
         case_sensitive=False,
     ),
@@ -93,8 +93,8 @@ def main(
         "-t",
         "--thresholds",
         help="Provide three thresholds for light, moderate, and vigorous activity. "
-        "Exactly three values must be >= 0, given in ascending order,"
-        " and separated by a space. (e.g. '-t 0.1 1.0 1.5').",
+        "Exactly three values must be >= 0, given in ascending order, "
+        "and separated by a space. (e.g. '-t 0.1 1.0 1.5').",
         min=0,
     ),
     nonwear_algorithm: list[NonwearAlgorithms] = typer.Option(
@@ -119,8 +119,8 @@ def main(
         "-v",
         "--verbosity",
         count=True,
-        help="Determines the level of verbosity. Use -v for info, -vv for debug."
-        "If -vvv or more, it will be set to debug."
+        help="Determines the level of verbosity. Use -v for info, -vv for debug. "
+        "If -vvv or more, it will be set to debug. "
         "Default for warning.",
     ),
     version: bool = typer.Option(
@@ -143,12 +143,13 @@ def main(
     logger.setLevel(log_level)
 
     nonwear_algorithms = [algo.value for algo in nonwear_algorithm]
+    calibrator_value = None if calibrator == Calibrator.none else calibrator.value
 
     logger.debug("Running wristpy. arguments given: %s", locals())
     orchestrator.run(
         input=input,
         output=output,
-        calibrator=calibrator.value if calibrator else None,  # type: ignore[arg-type] # Covered by Calibrator Enum class
+        calibrator=calibrator_value,
         activity_metric=activity_metric.value,
         thresholds=None if thresholds is None else thresholds,
         epoch_length=epoch_length,
