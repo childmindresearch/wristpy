@@ -2,6 +2,7 @@
 
 import math
 import pathlib
+import pathlib
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -9,6 +10,7 @@ import polars as pl
 import pytest
 
 from wristpy.core import models
+from wristpy.io.readers import readers
 from wristpy.io.readers import readers
 from wristpy.processing import metrics
 
