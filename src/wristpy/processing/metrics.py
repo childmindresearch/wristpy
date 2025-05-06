@@ -2,8 +2,6 @@
 
 from typing import Literal, Tuple
 
-from typing import Literal, Tuple
-
 import numpy as np
 import polars as pl
 from scipy import interpolate, signal
