@@ -151,7 +151,6 @@ docker run -it --rm \
   -e NONWEAR=ggir,cta \
   -e THRESHOLDS=0.1,1.0,1.5 \
   -e EPOCH_LENGTH=10 \
-  -e VERBOSITY=1 \
   adamsanto/wristpy
 ```
 
