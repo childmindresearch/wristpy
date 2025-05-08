@@ -40,6 +40,7 @@ class ActivityMetric(str, Enum):
     enmo = "enmo"
     mad = "mad"
     ag_count = "ag_count"
+    mims = "mims"
 
 
 class NonwearAlgorithms(str, Enum):
@@ -85,7 +86,7 @@ def main(
         "-a",
         "--activity-metric",
         help="Metric used for physical activity categorization. "
-        "Choose from 'enmo', 'mad', or 'ag_count'.",
+        "Choose from 'enmo', 'mad', 'ag_count', mims.  ",
         case_sensitive=False,
     ),
     thresholds: tuple[float, float, float] = typer.Option(

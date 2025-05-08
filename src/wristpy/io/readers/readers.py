@@ -2,7 +2,7 @@
 
 import os
 import pathlib
-from typing import Literal, Union
+from typing import Literal, Optional, Union
 
 import actfast
 import numpy as np
@@ -39,11 +39,17 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
             measurements[sensor_name] = models.Measurement(
                 measurements=sensor_values, time=time
             )
+
+    file_type = os.path.splitext(file_name)[1]
     idle_sleep_mode_flag = False
-    if os.path.splitext(file_name)[1] == ".gt3x":
+    if file_type == ".gt3x":
         idle_sleep_mode_flag = (
             data["metadata"]["device_feature_enabled"]["sleep_mode"].lower() == "true"
         )
+
+    dynamic_range = _extract_dynamic_range(
+        metadata=data["metadata"], file_type=file_type
+    )
 
     return models.WatchData(
         acceleration=measurements["acceleration"],
@@ -52,7 +58,29 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
         capsense=measurements.get("capsense"),
         temperature=measurements.get("temperature"),
         idle_sleep_mode_flag=idle_sleep_mode_flag,
+        dynamic_range=dynamic_range,
     )
+
+
+def _extract_dynamic_range(
+    metadata: dict, file_type: str
+) -> Optional[tuple[float, float]]:
+    """Extract the dynamic range metadata."""
+    if file_type == ".gt3x":
+        dynamic_range = (
+            float(metadata.get("info", {}).get("Acceleration Min")),
+            float(metadata.get("info", {}).get("Acceleration Max")),
+        )
+    elif file_type == ".bin":
+        range_str = (
+            metadata.get("Device Capabilities", {})
+            .get("Accelerometer Range")
+            .strip()
+            .split(" to ")
+        )
+        dynamic_range = (float(range_str[0]), float(range_str[1]))
+
+    return dynamic_range
 
 
 def unix_epoch_time_to_polars_datetime(

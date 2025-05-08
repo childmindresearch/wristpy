@@ -29,7 +29,7 @@ def run(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: float = 5,
-    activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
+    activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
@@ -91,8 +91,10 @@ def run(
         thresholds = thresholds or (0.029, 0.338, 0.604)
     elif activity_metric == "ag_count":
         thresholds = thresholds or (100, 3000, 5200)
+    elif activity_metric == "mims":
+        thresholds = thresholds or (10.558, 15.047, 19.614)
 
-    if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):
+    if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):  # type: ignore
         message = "Threshold values must be >=0, unique, and in ascending order."
         logger.error(message)
         raise ValueError(message)
@@ -122,6 +124,7 @@ def run(
         thresholds=thresholds,
         calibrator=calibrator,
         epoch_length=epoch_length,
+        activity_metric=activity_metric,
         verbosity=verbosity,
         output_filetype=output_filetype,
         nonwear_algorithm=nonwear_algorithm,
@@ -140,6 +143,7 @@ def _run_directory(
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
+    activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
 ) -> Dict[str, models.OrchestratorResults]:
     """Runs main processing steps for wristpy on  directories.
 
@@ -219,6 +223,7 @@ def _run_directory(
                 epoch_length=epoch_length,
                 verbosity=verbosity,
                 nonwear_algorithm=nonwear_algorithm,
+                activity_metric=activity_metric,
             )
         except Exception as e:
             logger.error("Did not run file: %s, Error: %s", file, e)
@@ -235,7 +240,7 @@ def _run_file(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: float = 5.0,
-    activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
+    activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
@@ -298,6 +303,8 @@ def _run_file(
 
     watch_data = readers.read_watch_data(input)
 
+    dynamic_range = watch_data.dynamic_range
+
     if calibrator is None:
         logger.debug("Running without calibration")
         calibrated_acceleration = watch_data.acceleration
@@ -318,7 +325,10 @@ def _run_file(
         calibrated_acceleration, epoch_length=epoch_length
     )
     activity_measurement = _compute_activity(
-        calibrated_acceleration, activity_metric, epoch_length
+        calibrated_acceleration,
+        activity_metric,
+        epoch_length,
+        dynamic_range=dynamic_range,
     )
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
@@ -371,8 +381,9 @@ def _run_file(
 
 def _compute_activity(
     acceleration: models.Measurement,
-    activity_metric: Literal["ag_count", "mad", "enmo"],
+    activity_metric: Literal["ag_count", "mad", "enmo", "mims"],
     epoch_length: float,
+    dynamic_range: Optional[tuple[float, float]],
 ) -> models.Measurement:
     """This is a helper function to organize the computation of the activity metric.
 
@@ -395,4 +406,15 @@ def _compute_activity(
         )
     elif activity_metric == "mad":
         return metrics.mean_amplitude_deviation(acceleration, epoch_length=epoch_length)
+    elif activity_metric == "mims":
+        return (
+            metrics.monitor_independent_movement_summary_units(
+                acceleration,
+                epoch=epoch_length,
+            )
+            if dynamic_range is None
+            else metrics.monitor_independent_movement_summary_units(
+                acceleration, epoch=epoch_length, dynamic_range=dynamic_range
+            )
+        )
     return metrics.euclidean_norm_minus_one(acceleration, epoch_length=epoch_length)
