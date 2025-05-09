@@ -51,7 +51,7 @@ def run(
             path should end in the save file name in either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
             given in that order. Values must be asscending, unique, and greater than 0.
-            Default values are optimized for subjects ages 7-11 [1].
+            Default values are optimized for subjects ages 7-11 [1][3].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. It must be > 0.0.
@@ -79,6 +79,10 @@ def run(
         Going S, Norman JE, Pate R. Defining accelerometer thresholds for activity
         intensities in adolescent girls. Med Sci Sports Exerc. 2004 Jul;36(7):1259-66.
         PMID: 15235335; PMCID: PMC2423321.
+        [3] Karas M, Muschelli J, Leroux A, Urbanek J, Wanigatunga A, Bai J,
+        Crainiceanu C, Schrack J Comparison of Accelerometry-Based Measures of Physical
+        Activity: Retrospective Observational Data Analysis Study JMIR Mhealth Uhealth
+        2022;10(7):e38077 URL: https://mhealth.jmir.org/2022/7/e38077 DOI: 10.2196/38077
     """
     logger.setLevel(verbosity)
 
@@ -159,7 +163,7 @@ def _run_directory(
         output: Path to directory data will be saved to.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
             given in that order. Values must be asscending, unique, and greater than 0.
-            Default values are optimized for subjects ages 7-11 [1].
+            Default values are optimized for subjects ages 7-11 [1][2].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. It must be > 0.0.
@@ -181,6 +185,10 @@ def _run_directory(
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
         output from wrist- and hip-worn monitors. Medicine and Science in Sports and
         Exercise, 46(9), 1816-1824.
+        [2] Karas M, Muschelli J, Leroux A, Urbanek J, Wanigatunga A, Bai J,
+        Crainiceanu C, Schrack J Comparison of Accelerometry-Based Measures of Physical
+        Activity: Retrospective Observational Data Analysis Study JMIR Mhealth Uhealth
+        2022;10(7):e38077 URL: https://mhealth.jmir.org/2022/7/e38077 DOI: 10.2196/38077
     """
     if output is None and output_filetype is not None:
         raise ValueError("If no output is given, output_filetype must be None.")
@@ -259,7 +267,7 @@ def _run_file(
             either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
             given in that order. Values must be ascending, unique, and greater than 0.
-            Default values are optimized for subjects ages 7-11 [1].
+            Default values are optimized for subjects ages 7-11 [1][3].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. It must be > 0.0.
@@ -283,6 +291,10 @@ def _run_file(
         calculated from raw acceleration data: a novel method for classifying the
         intensity of adolescents' physical activity irrespective of accelerometer brand.
         BMC Sports Sci Med Rehabil 7, 18 (2015). https://doi.org/10.1186/s13102-015-0010-0.
+        [3] Karas M, Muschelli J, Leroux A, Urbanek J, Wanigatunga A, Bai J,
+        Crainiceanu C, Schrack J Comparison of Accelerometry-Based Measures of Physical
+        Activity: Retrospective Observational Data Analysis Study JMIR Mhealth Uhealth
+        2022;10(7):e38077 URL: https://mhealth.jmir.org/2022/7/e38077 DOI: 10.2196/38077
     """
     logger.setLevel(verbosity)
     if output is not None:
