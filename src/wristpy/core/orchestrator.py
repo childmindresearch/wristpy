@@ -170,6 +170,7 @@ def _run_directory(
         nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files.
+        activity_metric: The metric to be used for physical activity categorization.
 
     Returns:
         All calculated data in a save ready format as a dictionary of
