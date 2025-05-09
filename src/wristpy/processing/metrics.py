@@ -677,9 +677,6 @@ def monitor_independent_movement_summary_units(
         sampling_rate=interpolation_frequency,
         rectify=rectify,
     )
-    aggregated_measure.measurements = np.where(
-        aggregated_measure.measurements <= 0.001, 0, aggregated_measure.measurements
-    )
     combined_mims = mims.combine_mims(
         acceleration=aggregated_measure, combination_method=combination_method
     )
