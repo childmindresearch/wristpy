@@ -1,6 +1,7 @@
 """Testing functions of metrics module."""
 
 import math
+import pathlib
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -8,26 +9,10 @@ import polars as pl
 import pytest
 
 from wristpy.core import models
+from wristpy.io.readers import readers
 from wristpy.processing import metrics
 
 TEST_LENGTH = 100
-
-
-@pytest.fixture
-def create_acceleration() -> pl.DataFrame:
-    """Fixture to create a dummy acceleration DataFrame to be used in multiple tests."""
-    dummy_date = datetime(2024, 5, 2)
-    dummy_datetime_list = [dummy_date + timedelta(seconds=i) for i in range(1000)]
-    test_time = pl.Series("time", dummy_datetime_list)
-    acceleration_polars_df = pl.DataFrame(
-        {
-            "X": np.ones(1000),
-            "Y": np.ones(1000),
-            "Z": np.ones(1000),
-            "time": test_time,
-        }
-    )
-    return acceleration_polars_df
 
 
 @pytest.fixture
@@ -395,3 +380,18 @@ def test_DETACH_non_wear() -> None:
     )
 
     assert len(non_wear_array.time) == expected_time_length
+
+
+def test_monitor_independent_movement_summary_units(
+    sample_data_gt3x: pathlib.Path, mims_r_version: pathlib.Path
+) -> None:
+    """Tests implementation of the MIMS algorithm against original R version."""
+    watch_data = readers.read_watch_data(sample_data_gt3x)
+    acceleration_test_data = watch_data.acceleration
+    expected_results = pl.read_csv(mims_r_version)
+    expected_values = expected_results["MIMS_UNIT"].to_numpy()
+    results = metrics.monitor_independent_movement_summary_units(
+        acceleration=acceleration_test_data, epoch=1
+    )
+
+    assert np.allclose(results.measurements[:-1], expected_values, atol=0.005)
