@@ -65,7 +65,15 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
 def _extract_dynamic_range(
     metadata: dict, file_type: str
 ) -> Optional[tuple[float, float]]:
-    """Extract the dynamic range metadata."""
+    """Extract the dynamic range from metadata.
+
+    Args:
+        metadata: Metadata subdictionary where accelerometer range values can be found.
+        file_type: Accelerometer data file type. Supports .gt3x and .bin.
+
+    Returns:
+        A tuple containing the accelerometer range.
+    """
     if file_type == ".gt3x":
         dynamic_range = (
             float(metadata.get("info", {}).get("Acceleration Min")),

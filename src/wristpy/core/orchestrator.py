@@ -395,6 +395,10 @@ def _compute_activity(
         activity_metric: The metric to be used for physical activity categorization.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to.
+        dynamic_range: Tuple of the minimum and maximum accelerometer values. This
+            argument is only relevant to the mims metric. Values are taken from watch
+            metadata, if no metadata could be extracted, the default
+            values of (-8,8) are used.
 
     Returns:
         A Measurement object with the computed physical activity metric.
