@@ -679,6 +679,8 @@ def aggregate_mims(
         },
     )
 
+    result = result.with_columns(pl.col("time").dt.truncate(f"{int(epoch)}s"))
+
     aggregated_measure = models.Measurement(
         measurements=result.select(["x", "y", "z"]).to_numpy(),
         time=result["time"].cast(pl.Datetime("ns")),

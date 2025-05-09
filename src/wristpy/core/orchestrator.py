@@ -351,6 +351,7 @@ def _run_file(
         temperature=watch_data.temperature,
         non_wear_algorithms=nonwear_algorithm,
     )
+
     nonwear_epoch = nonwear_utils.nonwear_array_cleanup(
         nonwear_array=nonwear_array,
         reference_measurement=activity_measurement,
