@@ -138,6 +138,14 @@ sleep_windows = subject1.sleep_windows_epoch
    ```
    Replace `/local/path/to/data` with the path to your input data directory and `/local/path/to/output` with where you want results saved.
 
+   To run a single file, we simply need to modify the mounting structure for the docker call slightly:
+    ```bash
+    docker run -it --rm \
+     -v "/local/path/to/data/file.bin:/data/file.bin" \
+     -v "/local/path/to/output:/output" \
+     adamsanto/wristpy
+   ```
+
 ### Customizing the Pipeline:
 
 The Docker image supports multiple environment variables to customize processing. You can set these using the `-e` flag:
@@ -158,12 +166,12 @@ docker run -it --rm \
 
 | Variable | Description | Default | Options |
 |----------|-------------|---------|---------|
-| `INPUT_DIR` | Path for input data inside container | `/data` | Any valid path |
-| `OUTPUT_DIR` | Path for output data inside container | `/output` | Any valid path |
+| `INPUT_DIR` | Path for input data inside container | `/data` | Any valid path. |
+| `OUTPUT_DIR` | Path for output data inside container | `/output` | Any valid path. |
 | `OUTPUT_TYPE` | Format for output files | `csv` | `csv`, `parquet` |
 | `CALIBRATOR` | Calibration method | `none` | `none`, `ggir`, `gradient` |
 | `ACTIVITY_METRIC` | Activity metric for analysis | `enmo` | `enmo`, `mad`, `ag_count` |
-| `EPOCH_LENGTH` | Sampling rate in seconds | `5` | Any integer ≥ 1 |
+| `EPOCH_LENGTH` | Sampling rate in seconds | `5` | Any integer ≥ 1. |
 | `NONWEAR` | Non-wear detection algorithm(s) | `ggir` | `ggir`, `cta`, `detach` or comma-separated list. |
 | `THRESHOLDS` | Activity level thresholds | `""` | Specify three threshold values as comma-separated numbers. |
 
