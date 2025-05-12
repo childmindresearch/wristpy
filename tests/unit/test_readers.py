@@ -2,8 +2,9 @@
 
 import pathlib
 
-import pytest
 import actfast
+import pytest
+
 from wristpy.core import models
 from wristpy.io.readers import readers
 
