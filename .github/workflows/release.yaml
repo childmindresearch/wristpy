@@ -3,7 +3,7 @@ name: Publish Docker image
 on:
   push:
     branches:
-    - main
+    - feature/issue-178/build-docker-image
     tags:
     - v*
 
@@ -35,7 +35,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5.5.1
       with:
-        images: adamsanto/wristpy
+        images: cmidair/wristpy
 
 
     - name: Build and push Docker image

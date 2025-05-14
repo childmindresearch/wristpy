@@ -3,17 +3,6 @@ FROM python:3.11-buster
 WORKDIR /app
 COPY . /app/
 
-
-ENV INPUT_DIR=/data
-ENV OUTPUT_DIR=/output
-ENV OUTPUT_TYPE=.csv
-ENV CALIBRATOR=none
-ENV ACTIVITY_METRIC=enmo
-ENV EPOCH_LENGTH=5
-ENV NONWEAR=ggir
-ENV THRESHOLDS=""
-
-
 RUN apt-get update && apt-get install -y \
     build-essential \
     gfortran \
@@ -23,9 +12,9 @@ RUN pip install poetry && \
     poetry config virtualenvs.create false && \
     poetry install --only main
 
-RUN mkdir -p $INPUT_DIR $OUTPUT_DIR
+RUN mkdir -p /data /output
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["poetry", "run", "wristpy"]
 
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/data", "--output", "/output", "--output-filetype", ".csv", "--calibrator", "none", \
+     "--activity-metric", "enmo", "--epoch-length", "5", "--nonwear-algorithm", "ggir"]
