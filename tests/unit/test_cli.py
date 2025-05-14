@@ -182,8 +182,7 @@ def test_main_with_bad_epoch(
     )
 
     assert result.exit_code != 0
-    assert result.exception is not None
-    assert isinstance(result.exception, (ValueError, TypeError))
+    assert isinstance(result.exception, TypeError)
 
 
 @pytest.mark.parametrize(
