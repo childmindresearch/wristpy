@@ -2,7 +2,7 @@
 
 import os
 import pathlib
-from typing import Literal, Optional, Union
+from typing import Literal, Union, cast
 
 import actfast
 import numpy as np
@@ -41,6 +41,7 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
             )
 
     file_type = os.path.splitext(file_name)[1]
+    file_type = cast(Literal[".gt3x", ".bin"], file_type)
     idle_sleep_mode_flag = False
     if file_type == ".gt3x":
         idle_sleep_mode_flag = (
@@ -48,7 +49,8 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
         )
 
     dynamic_range = _extract_dynamic_range(
-        metadata=data["metadata"], file_type=file_type
+        metadata=data["metadata"],
+        file_type=file_type,
     )
 
     return models.WatchData(
@@ -63,8 +65,8 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
 
 
 def _extract_dynamic_range(
-    metadata: dict, file_type: str
-) -> Optional[tuple[float, float]]:
+    metadata: dict, file_type: Literal[".gt3x", ".bin"]
+) -> tuple[float, float]:
     """Extract the dynamic range from metadata.
 
     Args:
@@ -73,9 +75,12 @@ def _extract_dynamic_range(
 
     Returns:
         A tuple containing the accelerometer range.
+
+    Raises:
+        ValueError: If file type is not supported.
     """
     if file_type == ".gt3x":
-        dynamic_range = (
+        return (
             float(metadata.get("info", {}).get("Acceleration Min")),
             float(metadata.get("info", {}).get("Acceleration Max")),
         )
@@ -86,9 +91,9 @@ def _extract_dynamic_range(
             .strip()
             .split(" to ")
         )
-        dynamic_range = (float(range_str[0]), float(range_str[1]))
+        return (float(range_str[0]), float(range_str[1]))
 
-    return dynamic_range
+    raise ValueError(f"Unsupported file type given: {file_type}")
 
 
 def unix_epoch_time_to_polars_datetime(

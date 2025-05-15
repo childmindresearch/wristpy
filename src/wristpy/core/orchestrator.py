@@ -316,8 +316,6 @@ def _run_file(
 
     watch_data = readers.read_watch_data(input)
 
-    dynamic_range = watch_data.dynamic_range
-
     if calibrator is None:
         logger.debug("Running without calibration")
         calibrated_acceleration = watch_data.acceleration
@@ -341,7 +339,7 @@ def _run_file(
         calibrated_acceleration,
         activity_metric,
         epoch_length,
-        dynamic_range=dynamic_range,
+        dynamic_range=watch_data.dynamic_range,
     )
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
@@ -425,14 +423,13 @@ def _compute_activity(
     elif activity_metric == "mad":
         return metrics.mean_amplitude_deviation(acceleration, epoch_length=epoch_length)
     elif activity_metric == "mims":
-        return (
-            metrics.monitor_independent_movement_summary_units(
+        if dynamic_range is None:
+            return metrics.monitor_independent_movement_summary_units(
                 acceleration,
                 epoch=epoch_length,
             )
-            if dynamic_range is None
-            else metrics.monitor_independent_movement_summary_units(
-                acceleration, epoch=epoch_length, dynamic_range=dynamic_range
-            )
+        return metrics.monitor_independent_movement_summary_units(
+            acceleration, epoch=epoch_length, dynamic_range=dynamic_range
         )
+
     return metrics.euclidean_norm_minus_one(acceleration, epoch_length=epoch_length)

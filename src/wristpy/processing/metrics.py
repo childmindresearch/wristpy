@@ -1,6 +1,6 @@
 """Calculate base metrics, anglez and enmo."""
 
-from typing import Literal, Tuple
+from typing import Literal, Optional, Tuple
 
 import numpy as np
 import polars as pl
@@ -615,7 +615,7 @@ def monitor_independent_movement_summary_units(
     combination_method: Literal["sum", "vector_magnitude"] = "sum",
     epoch: float = 60.0,
     interpolation_frequency: int = 100,
-    dynamic_range: Tuple[float, float] = (-8.0, 8.0),
+    dynamic_range: tuple[float, float] = (-8.0, 8.0),
     cutoffs: Tuple[float, float] = (0.2, 5.0),
     order: int = 4,
     *,

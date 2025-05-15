@@ -1,6 +1,7 @@
 """Test readers.py functions."""
 
 import pathlib
+from typing import Literal, cast
 
 import actfast
 import pytest
@@ -49,9 +50,10 @@ def test_extract_dynamic_range_bin(sample_data_bin: pathlib.Path) -> None:
     """Test extracting dynamic range metadata from .bin files."""
     expected_dynamic_range = (-8, 8)
     data = actfast.read(sample_data_bin)
+    file_type = cast(Literal[".gt3x", ".bin"], sample_data_bin.suffix)
 
     result = readers._extract_dynamic_range(
-        metadata=data["metadata"], file_type=sample_data_bin.suffix
+        metadata=data["metadata"], file_type=file_type
     )
 
     assert (
@@ -63,9 +65,10 @@ def test_extract_dynamic_range_gt3x(sample_data_bin: pathlib.Path) -> None:
     """Test extracting dynamic range metadata from .gt3x files."""
     expected_dynamic_range = (-8, 8)
     data = actfast.read(sample_data_bin)
+    file_type = cast(Literal[".gt3x", ".bin"], sample_data_bin.suffix)
 
     result = readers._extract_dynamic_range(
-        metadata=data["metadata"], file_type=sample_data_bin.suffix
+        metadata=data["metadata"], file_type=file_type
     )
 
     assert (
