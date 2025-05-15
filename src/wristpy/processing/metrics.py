@@ -644,7 +644,10 @@ def monitor_independent_movement_summary_units(
         cutoffs: Tuple specifying the low and high cutoff frequencies (in Hz) for the
             Butterworth filter.
         order: Order of the Butterworth filter.
-        rectify:If True, rectifies the filtered signal before aggregation. ,
+        rectify: Specifies if data should be rectified before integration. If True any
+            value below -150 will assign the value of that axis to -1 for that epoch.
+            Additionally the absolute value of accelerometer data will be used for
+            integration.
 
     Returns:
         Processed MIMS values after combining the values of each axis with the provided
