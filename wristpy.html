@@ -136,6 +136,8 @@ wristpy    </h1>
 
 <h2 id="quick-start">Quick start</h2>
 
+<p><code><a href="">wristpy</a></code> provides three flexible interfaces: a command-line tool for direct execution, an importable Python library, and a Docker image for containerized deployment.</p>
+
 <h3 id="using-wristpy-through-the-command-line">Using Wristpy through the command-line:</h3>
 
 <h4 id="run-single-files">Run single files:</h4>
@@ -210,6 +212,52 @@ wristpy    </h1>
 <span class="n">sleep_windows</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">sleep_windows_epoch</span>
 </code></pre>
 </div>
+
+<h3 id="using-wristpy-through-docker">Using Wristpy Through Docker</h3>
+
+<ol>
+<li><p><strong>Install Docker</strong>: Ensure you have Docker installed on your system. <a href="https://docs.docker.com/get-docker/">Get Docker</a></p></li>
+<li><p><strong>Pull the Docker image</strong>:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>docker<span class="w"> </span>pull<span class="w"> </span>cmidair/wristpy:main
+</code></pre>
+</div></li>
+
+<li><p><strong>Run the Docker image</strong> with your data:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="s2">&quot;/local/path/to/data:/data&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="s2">&quot;/local/path/to/output:/output&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>cmidair/wristpy
+</code></pre>
+</div>
+
+<p>Replace <code>/local/path/to/data</code> with the path to your input data directory and <code>/local/path/to/output</code> with where you want results saved.</p>
+
+<p>To run a single file, we simply need to modify the mounting structure for the docker call slightly:
+ <code>bash
+ docker run -it --rm \
+  -v "/local/path/to/data/file.bin:/data/file.bin" \
+  -v "/local/path/to/output:/output" \
+  cmidair/wristpy
+</code></p></li>
+</ol>
+
+<h3 id="customizing-the-pipeline">Customizing the Pipeline:</h3>
+
+<p>The Docker image supports multiple input variables to customize processing. You can set these by simply chaining these inputs as you would for the CLI input:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="s2">&quot;/local/path/to/data/file.bin:/data/file.bin&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="s2">&quot;/local/path/to/output:/output&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>cmidair/wristpy<span class="w"> </span>/data<span class="w"> </span>--output<span class="w"> </span>/output<span class="w"> </span>--epoch-length<span class="w"> </span><span class="m">5</span><span class="w"> </span>--nonwear-algorithm<span class="w"> </span>ggir<span class="w"> </span>--nonwear-algorithm<span class="w"> </span>detach<span class="w"> </span>--thresholds<span class="w"> </span><span class="m">0</span>.1<span class="w"> </span><span class="m">0</span>.2<span class="w"> </span><span class="m">0</span>.4
+</code></pre>
+</div>
+
+<p>For more details on available options, see the <a href="https://childmindresearch.github.io/wristpy/wristpy/core/orchestrator.html#run">orchestrator documentation</a>.</p>
 
 <h2 id="references">References</h2>
 
