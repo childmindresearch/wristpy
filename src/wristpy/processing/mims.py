@@ -204,8 +204,8 @@ def _brute_force_k(
     """
     k_values = np.arange(k_max, k_min, -k_step)
     previous_probability = 1.0
-    previous_k = 0
-    result = 0
+    previous_k = 0.0
+    result = 0.0
 
     for k in k_values:
         current_probability = stats.gamma.cdf(standard_deviation, a=k, scale=scale)
@@ -217,13 +217,13 @@ def _brute_force_k(
             if abs(target_probability - previous_probability) > abs(
                 current_probability - target_probability
             ):
-                result = k
+                result = float(k)
             else:
                 result = previous_k
-            return float(result)
+            return result
 
         previous_probability = current_probability
-        previous_k = k
+        previous_k = float(k)
 
     return result
 
