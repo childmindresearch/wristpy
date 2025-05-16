@@ -50,6 +50,8 @@ pip install wristpy
 
 ## Quick start
 
+`wristpy` provides three flexible interfaces: a command-line tool for direct execution, an importable Python library, and a Docker image for containerized deployment.
+
 ### Using Wristpy through the command-line:
 #### Run single files:
 ```sh
@@ -116,6 +118,49 @@ physical_activity_levels = subject1.physical_activity_levels
 nonwear_array = subject1.nonwear_epoch
 sleep_windows = subject1.sleep_windows_epoch
 ```
+
+### Using Wristpy Through Docker
+
+
+1. **Install Docker**: Ensure you have Docker installed on your system. [Get Docker](https://docs.docker.com/get-docker/)
+
+2. **Pull the Docker image**:
+   ```bash
+   docker pull cmidair/wristpy:main
+   ```
+
+3. **Run the Docker image** with your data:
+   ```bash
+   docker run -it --rm \
+     -v "/local/path/to/data:/data" \
+     -v "/local/path/to/output:/output" \
+     cmidair/wristpy
+   ```
+   Replace `/local/path/to/data` with the path to your input data directory and `/local/path/to/output` with where you want results saved.
+
+   To run a single file, we simply need to modify the mounting structure for the docker call slightly:
+    ```bash
+    docker run -it --rm \
+     -v "/local/path/to/data/file.bin:/data/file.bin" \
+     -v "/local/path/to/output:/output" \
+     cmidair/wristpy
+   ```
+
+### Customizing the Pipeline:
+
+The Docker image supports multiple input variables to customize processing. You can set these by simply chaining these inputs as you would for the CLI input:
+
+```bash
+docker run -it --rm \
+  -v "/local/path/to/data/file.bin:/data/file.bin" \
+  -v "/local/path/to/output:/output" \
+  cmidair/wristpy /data --output /output --epoch-length 5 --nonwear-algorithm ggir --nonwear-algorithm detach --thresholds 0.1 0.2 0.4
+```
+
+
+
+For more details on available options, see the [orchestrator documentation](https://childmindresearch.github.io/wristpy/wristpy/core/orchestrator.html#run).
+
 
 ## References
 1. van Hees, V.T., Sabia, S., Jones, S.E. et al. Estimating sleep parameters
