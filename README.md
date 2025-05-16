@@ -126,7 +126,7 @@ sleep_windows = subject1.sleep_windows_epoch
 
 2. **Pull the Docker image**:
    ```bash
-   docker pull cmidair/wristpy:latest
+   docker pull cmidair/wristpy:main
    ```
 
 3. **Run the Docker image** with your data:
