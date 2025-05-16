@@ -2,7 +2,7 @@
 
 import os
 import pathlib
-from typing import Literal, Union, cast
+from typing import Literal, Union
 
 import actfast
 import numpy as np
@@ -41,7 +41,6 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
             )
 
     file_type = os.path.splitext(file_name)[1]
-    file_type = cast(Literal[".gt3x", ".bin"], file_type)
     idle_sleep_mode_flag = False
     if file_type == ".gt3x":
         idle_sleep_mode_flag = (
@@ -50,7 +49,7 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
 
     dynamic_range = _extract_dynamic_range(
         metadata=data["metadata"],
-        file_type=file_type,
+        file_type=file_type,  # type: ignore
     )
 
     return models.WatchData(
