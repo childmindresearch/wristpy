@@ -17,7 +17,7 @@ packages = [{include = "wristpy", from = "src"}]
 python = ">=3.10"
 polars = "^1.21.0"
 scikit-learn = "^1.4.1.post1"
-pyarrow = ">=18,<20"
+pyarrow = ">=18,<21"
 actfast = "^1.1.0"
 numpy = ">=1.26.0, <3.0.0"
 pydantic = "^2.7.1"
