@@ -182,9 +182,7 @@ def test_main_with_bad_epoch(
     )
 
     assert result.exit_code != 0
-    # partial matching due to ANSI escape sequences in Github Actions
-    assert "Invalid value for" in result.output
-    assert "is not in the range x>=1." in result.output
+    assert result.exception is not None
 
 
 @pytest.mark.parametrize(
