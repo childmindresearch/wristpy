@@ -268,7 +268,7 @@ def _run_file(
             either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
             given in that order. Values must be ascending, unique, and greater than 0.
-            Default values are optimized for subjects ages 7-11 [1][3].
+            Default values are optimized for subjects ages 7-11 [1] - [3].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. It must be > 0.0.
