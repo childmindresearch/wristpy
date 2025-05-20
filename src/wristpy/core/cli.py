@@ -86,7 +86,7 @@ def main(
         "-a",
         "--activity-metric",
         help="Metric used for physical activity categorization. "
-        "Choose from 'enmo', 'mad', 'ag_count', mims.  ",
+        "Choose from 'enmo', 'mad', 'ag_count', or 'mims'.  ",
         case_sensitive=False,
     ),
     thresholds: tuple[float, float, float] = typer.Option(
