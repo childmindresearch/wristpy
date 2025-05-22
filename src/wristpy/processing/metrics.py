@@ -306,9 +306,9 @@ def combined_temp_accel_detect_nonwear(
         The temporal resolutions is one minute.
 
     References:
-        Zhou S, Hill RA, Morgan K, et alClassification of accelerometer wear and
+        Zhou S, Hill RA, Morgan K, et al, Classification of accelerometer wear and
         non-wear events in seconds for monitoring free-living physical activityBMJ
-        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447
+        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447.
     """
     logger.debug("Combined temperature and accelereation non-wear detection algorithm.")
 

@@ -13,7 +13,7 @@
 [![LGPL--2.1 License](https://img.shields.io/badge/license-LGPL--2.1-blue.svg)](https://github.com/childmindresearch/wristpy/blob/main/LICENSE)
 [![pages](https://img.shields.io/badge/api-docs-blue)](https://childmindresearch.github.io/wristpy)
 
-Welcome to wristpy, a Python library designed for processing and analyzing wrist-worn accelerometer data. This library provides a set of tools for loading sensor information, calibrating raw accelerometer data, calculating physical activity metrics (ENMO derived) and sleep metrics (angle-Z derived), finding non-wear periods, and detecting sleep periods (onset and wakeup times). Additionally, we provide access to other sensor data that may be recorded by the watch, including; temperature, luminosity, capacitive sensing, battery voltage, and all metadata.
+Welcome to wristpy, a Python library designed for processing and analyzing wrist-worn accelerometer data. This library provides a set of tools for loading sensor information, calibrating raw accelerometer data, calculating various physical activity metrics, finding non-wear periods, and detecting sleep periods (onset and wakeup times). Additionally, we provide access to other sensor data that may be recorded by the watch, including; temperature, luminosity, capacitive sensing, battery voltage, and all metadata.
 
 ## Supported formats & devices
 
@@ -31,13 +31,13 @@ The package currently supports the following formats:
 
 The main processing pipeline of the wristpy module can be described as follows:
 
-- **Data loading**: sensor data is loaded using [`actfast`](https://github.com/childmindresearch/actfast), and a `WatchData` object is created to store all sensor data
+- **Data loading**: sensor data is loaded using [`actfast`](https://github.com/childmindresearch/actfast), and a `WatchData` object is created to store all sensor data.
 - **Data calibration**: A post-manufacturer calibration step can be applied, to ensure that the acceleration sensor is measuring 1*g* force during periods of no motion. There are three possible options: `None`, `gradient`, `ggir`.
 - ***Data imputation*** In the special case when dealing with the Actigraph `idle_sleep_mode == enabled`, the gaps in acceleration are filled in after calibration, to avoid biasing the calibration phase.
-- **Metrics Calculation**: Calculates various metrics on the calibrated data, namely ENMO (Euclidean norm , minus one) and angle-Z (angle of acceleration relative to the *x-y* axis).
-- **Non-wear detection**: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide `wear` or `not wear`.
-- **Sleep Detection**: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.
-- **Physical activity levels**: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.
+- **Metrics Calculation**: Calculates various activity metrics on the calibrated data, namely ENMO (Euclidean norm , minus one), MAD (mean amplitude deviation) <sup>1</sup>, Actigraph activity counts<sup>2</sup>, MIMS (monitor-independent movement summary) unit <sup>3</sup>, and angle-Z (angle of acceleration relative to the *x-y* axis).
+- **Non-wear detection**: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide `wear` or `not wear`. Additionally, we can use temperature sensor, when avaialable, to augment the acceleration data. This is used in the CTA (combined temperature and acceleartion) algorithm <sup>4</sup>, and in the `skdh` DETACH algorithm <sup>5</sup>. Furthermore, ensemble classification of non-wear periods is possible by providing a list (of any length) of non-wear algorithm options.
+- **Sleep Detection**: Using the HDCZ<sup>6</sup> and HSPT<sup>7</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected. Any sleep periods that overlap with detected non-wear times are removed, and any remaining sleep periods shorter than 15 minutes (defaul value) are removed.
+- **Physical activity levels**: Using the chosen physical activty metric (aggreagated into time bins, 5 second default) we compute activity levels into the following categories: [`inactive`, `light`, `moderate`, `vigorous`]. The threshold values can be defined by the user, while the default values are chosen based on the specific activity metric and the values found in the literature  <sup>8-10</sup>.
 
 
 ## Installation
@@ -61,6 +61,11 @@ wristpy /input/file/path.gt3x -o /save/path/file_name.csv -c gradient
 #### Run entire directories:
 ```sh
 wristpy /path/to/files/input_dir -o /path/to/files/output_dir -c gradient -O .csv
+```
+
+A full list of the command line interface parameters can easiy be found via:
+```sh
+wristpy --help
 ```
 
 ### Using Wristpy through a python script or notebook:
@@ -163,13 +168,38 @@ For more details on available options, see the [orchestrator documentation](http
 
 
 ## References
-1. van Hees, V.T., Sabia, S., Jones, S.E. et al. Estimating sleep parameters
+1.  Vähä-Ypyä H, Vasankari T, Husu P, Suni J, Sievänen H. A universal, accurate
+        intensity-based classification of different physical activities using raw data
+        of accelerometer. Clin Physiol Funct Imaging. 2015 Jan;35(1):64-70.
+        doi: 10.1111/cpf.12127. Epub 2014 Jan 7. PMID: 24393233.
+2.  A. Neishabouri et al., “Quantification of acceleration as activity counts
+        in ActiGraph wearable,” Sci Rep, vol. 12, no. 1, Art. no. 1, Jul. 2022,
+        doi: 10.1038/s41598-022-16003-x.
+3.  John, D., Tang, Q., Albinali, F. and Intille, S., 2019. An Open-Source
+        Monitor-Independent Movement Summary for Accelerometer Data Processing. Journal
+        for the Measurement of Physical Behaviour, 2(4), pp.268-281. 
+4.  Zhou S, Hill RA, Morgan K, et al, Classification of accelerometer wear and
+        non-wear events in seconds for monitoring free-living physical activityBMJ
+        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447.
+5.  A. Vert et al., “Detecting accelerometer non-wear periods using change
+        in acceleration combined with rate-of-change in temperature,” BMC Medical
+        Research Methodology, vol. 22, no. 1, p. 147, May 2022,
+        doi: 10.1186/s12874-022-01633-6.
+6. van Hees, V.T., Sabia, S., Jones, S.E. et al. Estimating sleep parameters
               using an accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
-              https://doi.org/10.1038/s41598-018-31266-z
-2. van Hees, V. T., et al. A Novel, Open Access Method to Assess Sleep
+              https://doi.org/10.1038/s41598-018-31266-z.
+7. van Hees, V. T., et al. A Novel, Open Access Method to Assess Sleep
             Duration Using a Wrist-Worn Accelerometer. PLoS One 10, e0142533 (2015).
-            https://doi.org/10.1371/journal.pone.0142533
-3. Hildebrand, M., et al. Age group comparability of raw accelerometer output
+            https://doi.org/10.1371/journal.pone.0142533.
+8. Hildebrand, M., et al. Age group comparability of raw accelerometer output
             from wrist- and hip-worn monitors. Medicine and Science in
             Sports and Exercise, 46(9), 1816-1824 (2014).
-            https://doi.org/10.1249/mss.0000000000000289
+            https://doi.org/10.1249/mss.0000000000000289.
+9.  Treuth MS, Schmitz K, Catellier DJ, McMurray RG, Murray DM, Almeida MJ,
+        Going S, Norman JE, Pate R. Defining accelerometer thresholds for activity
+        intensities in adolescent girls. Med Sci Sports Exerc. 2004 Jul;36(7):1259-66.
+        PMID: 15235335; PMCID: PMC2423321.
+10. Aittasalo, M., Vähä-Ypyä, H., Vasankari, T. et al. Mean amplitude deviation
+        calculated from raw acceleration data: a novel method for classifying the
+        intensity of adolescents' physical activity irrespective of accelerometer brand.
+        BMC Sports Sci Med Rehabil 7, 18 (2015). https://doi.org/10.1186/s13102-015-0010-0.
