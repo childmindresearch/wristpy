@@ -7,6 +7,7 @@ from typing import Dict, Literal, Optional, Sequence, Tuple, Union
 
 from wristpy.core import config, exceptions, models
 from wristpy.io.readers import readers
+from wristpy.io.writers import writers
 from wristpy.processing import (
     analytics,
     calibration,
@@ -33,7 +34,7 @@ def run(
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
-) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
+) -> Union[writers.OrchestratorResults, Dict[str, writers.OrchestratorResults]]:
     """Runs main processing steps for wristpy on single files, or directories.
 
     The run() function will execute the run_file() function on individual files, or
@@ -140,7 +141,7 @@ def _run_directory(
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
-) -> Dict[str, models.OrchestratorResults]:
+) -> Dict[str, writers.OrchestratorResults]:
     """Runs main processing steps for wristpy on  directories.
 
     The run_directory() function will execute the run_file() function on entire
@@ -238,7 +239,7 @@ def _run_file(
     activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
-) -> models.OrchestratorResults:
+) -> writers.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
 
     The run_file() function will provide the user with the specified physical activity
@@ -281,7 +282,16 @@ def _run_file(
     """
     logger.setLevel(verbosity)
     if output is not None:
-        models.OrchestratorResults.validate_output(output=output)
+        writers.OrchestratorResults.validate_output(output=output)
+
+    parameters_dictionary = {
+        "thresholds": list(thresholds),
+        "calibrator": calibrator,
+        "epoch_length": epoch_length,
+        "activity_metric": activity_metric,
+        "nonwear_algorithm": list(nonwear_algorithm),
+        "input_file": str(input),
+    }
 
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
         msg = (
@@ -342,12 +352,13 @@ def _run_file(
     sleep_array = analytics.sleep_cleanup(
         sleep_windows=sleep_windows, nonwear_measurement=nonwear_epoch
     )
-    results = models.OrchestratorResults(
+    results = writers.OrchestratorResults(
         physical_activity_metric=activity_measurement,
         anglez=anglez,
         physical_activity_levels=physical_activity_levels,
         sleep_windows_epoch=sleep_array,
         nonwear_epoch=nonwear_epoch,
+        processing_params=parameters_dictionary,
     )
     if output is not None:
         try:

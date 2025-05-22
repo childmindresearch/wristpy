@@ -10,10 +10,11 @@ import polars as pl
 import pytest
 
 from wristpy.core import exceptions, models, orchestrator
+from wristpy.io.writers import writers
 
 
 @pytest.fixture
-def dummy_results() -> models.OrchestratorResults:
+def dummy_results() -> writers.OrchestratorResults:
     """Makes a results object for the purpose of testing."""
     dummy_date = datetime.datetime(2024, 5, 2)
     dummy_measure = models.Measurement(
@@ -22,7 +23,7 @@ def dummy_results() -> models.OrchestratorResults:
             [dummy_date + datetime.timedelta(seconds=i) for i in range(100)]
         ),
     )
-    dummy_results = models.OrchestratorResults(
+    dummy_results = writers.OrchestratorResults(
         physical_activity_metric=dummy_measure,
         anglez=dummy_measure,
         physical_activity_levels=dummy_measure,
@@ -65,7 +66,7 @@ def test_bad_epoch_length(sample_data_gt3x: pathlib.Path) -> None:
     "file_name", [pathlib.Path("test_output.csv"), pathlib.Path("test_output.parquet")]
 )
 def test_save_results(
-    dummy_results: models.OrchestratorResults,
+    dummy_results: writers.OrchestratorResults,
     file_name: pathlib.Path,
     tmp_path: pathlib.Path,
 ) -> None:
@@ -78,7 +79,7 @@ def test_save_results(
 def test_validate_output_invalid_file_type(tmp_path: pathlib.Path) -> None:
     """Test when a bad extention is given."""
     with pytest.raises(exceptions.InvalidFileTypeError):
-        models.OrchestratorResults.validate_output(tmp_path / "bad_file.oops")
+        writers.OrchestratorResults.validate_output(tmp_path / "bad_file.oops")
 
 
 def test_run_single_file(
@@ -95,7 +96,7 @@ def test_run_single_file(
     )
 
     assert output_file_path.exists()
-    assert isinstance(results, models.OrchestratorResults)
+    assert isinstance(results, writers.OrchestratorResults)
 
 
 def test_run_single_file_agcount_default(
@@ -112,7 +113,7 @@ def test_run_single_file_agcount_default(
     )
 
     assert output_file_path.exists()
-    assert isinstance(results, models.OrchestratorResults)
+    assert isinstance(results, writers.OrchestratorResults)
 
 
 @pytest.mark.parametrize("nonwear_algorithm", [["detach"], ["cta", "ggir"]])
@@ -130,7 +131,7 @@ def test_run_single_file_nonwear_options(
     )
 
     assert output_file_path.exists()
-    assert isinstance(results, models.OrchestratorResults)
+    assert isinstance(results, writers.OrchestratorResults)
 
 
 def test_run_single_file_bad_output_filetype(
