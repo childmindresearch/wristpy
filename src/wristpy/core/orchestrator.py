@@ -29,7 +29,7 @@ def run(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: float = 5,
-    activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
+    activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
@@ -51,7 +51,7 @@ def run(
             path should end in the save file name in either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
             given in that order. Values must be asscending, unique, and greater than 0.
-            Default values are optimized for subjects ages 7-11 [1].
+            Default values are optimized for subjects ages 7-11 [1][3].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. It must be > 0.0.
@@ -79,6 +79,10 @@ def run(
         Going S, Norman JE, Pate R. Defining accelerometer thresholds for activity
         intensities in adolescent girls. Med Sci Sports Exerc. 2004 Jul;36(7):1259-66.
         PMID: 15235335; PMCID: PMC2423321.
+        [3] Karas M, Muschelli J, Leroux A, Urbanek J, Wanigatunga A, Bai J,
+        Crainiceanu C, Schrack J Comparison of Accelerometry-Based Measures of Physical
+        Activity: Retrospective Observational Data Analysis Study JMIR Mhealth Uhealth
+        2022;10(7):e38077 URL: https://mhealth.jmir.org/2022/7/e38077 DOI: 10.2196/38077
     """
     logger.setLevel(verbosity)
 
@@ -91,8 +95,10 @@ def run(
         thresholds = thresholds or (0.029, 0.338, 0.604)
     elif activity_metric == "ag_count":
         thresholds = thresholds or (100, 3000, 5200)
+    elif activity_metric == "mims":
+        thresholds = thresholds or (10.558, 15.047, 19.614)
 
-    if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):
+    if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):  # type: ignore
         message = "Threshold values must be >=0, unique, and in ascending order."
         logger.error(message)
         raise ValueError(message)
@@ -122,6 +128,7 @@ def run(
         thresholds=thresholds,
         calibrator=calibrator,
         epoch_length=epoch_length,
+        activity_metric=activity_metric,
         verbosity=verbosity,
         output_filetype=output_filetype,
         nonwear_algorithm=nonwear_algorithm,
@@ -140,6 +147,7 @@ def _run_directory(
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
+    activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
 ) -> Dict[str, models.OrchestratorResults]:
     """Runs main processing steps for wristpy on  directories.
 
@@ -155,13 +163,14 @@ def _run_directory(
         output: Path to directory data will be saved to.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
             given in that order. Values must be asscending, unique, and greater than 0.
-            Default values are optimized for subjects ages 7-11 [1].
+            Default values are optimized for subjects ages 7-11 [1][2].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. It must be > 0.0.
         nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files.
+        activity_metric: The metric to be used for physical activity categorization.
 
     Returns:
         All calculated data in a save ready format as a dictionary of
@@ -177,6 +186,10 @@ def _run_directory(
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
         output from wrist- and hip-worn monitors. Medicine and Science in Sports and
         Exercise, 46(9), 1816-1824.
+        [2] Karas M, Muschelli J, Leroux A, Urbanek J, Wanigatunga A, Bai J,
+        Crainiceanu C, Schrack J Comparison of Accelerometry-Based Measures of Physical
+        Activity: Retrospective Observational Data Analysis Study JMIR Mhealth Uhealth
+        2022;10(7):e38077 URL: https://mhealth.jmir.org/2022/7/e38077 DOI: 10.2196/38077
     """
     if output is None and output_filetype is not None:
         raise ValueError("If no output is given, output_filetype must be None.")
@@ -219,6 +232,7 @@ def _run_directory(
                 epoch_length=epoch_length,
                 verbosity=verbosity,
                 nonwear_algorithm=nonwear_algorithm,
+                activity_metric=activity_metric,
             )
         except Exception as e:
             logger.error("Did not run file: %s, Error: %s", file, e)
@@ -235,7 +249,7 @@ def _run_file(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: float = 5.0,
-    activity_metric: Literal["enmo", "mad", "ag_count"] = "enmo",
+    activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
 ) -> models.OrchestratorResults:
@@ -254,7 +268,7 @@ def _run_file(
             either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
             given in that order. Values must be ascending, unique, and greater than 0.
-            Default values are optimized for subjects ages 7-11 [1].
+            Default values are optimized for subjects ages 7-11 [1] - [3].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. It must be > 0.0.
@@ -278,6 +292,10 @@ def _run_file(
         calculated from raw acceleration data: a novel method for classifying the
         intensity of adolescents' physical activity irrespective of accelerometer brand.
         BMC Sports Sci Med Rehabil 7, 18 (2015). https://doi.org/10.1186/s13102-015-0010-0.
+        [3] Karas M, Muschelli J, Leroux A, Urbanek J, Wanigatunga A, Bai J,
+        Crainiceanu C, Schrack J Comparison of Accelerometry-Based Measures of Physical
+        Activity: Retrospective Observational Data Analysis Study JMIR Mhealth Uhealth
+        2022;10(7):e38077 URL: https://mhealth.jmir.org/2022/7/e38077 DOI: 10.2196/38077
     """
     logger.setLevel(verbosity)
     if output is not None:
@@ -318,7 +336,10 @@ def _run_file(
         calibrated_acceleration, epoch_length=epoch_length
     )
     activity_measurement = _compute_activity(
-        calibrated_acceleration, activity_metric, epoch_length
+        calibrated_acceleration,
+        activity_metric,
+        epoch_length,
+        dynamic_range=watch_data.dynamic_range,
     )
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
@@ -329,6 +350,7 @@ def _run_file(
         temperature=watch_data.temperature,
         non_wear_algorithms=nonwear_algorithm,
     )
+
     nonwear_epoch = nonwear_utils.nonwear_array_cleanup(
         nonwear_array=nonwear_array,
         reference_measurement=activity_measurement,
@@ -371,8 +393,9 @@ def _run_file(
 
 def _compute_activity(
     acceleration: models.Measurement,
-    activity_metric: Literal["ag_count", "mad", "enmo"],
+    activity_metric: Literal["ag_count", "mad", "enmo", "mims"],
     epoch_length: float,
+    dynamic_range: Optional[tuple[float, float]],
 ) -> models.Measurement:
     """This is a helper function to organize the computation of the activity metric.
 
@@ -384,6 +407,10 @@ def _compute_activity(
         activity_metric: The metric to be used for physical activity categorization.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to.
+        dynamic_range: Tuple of the minimum and maximum accelerometer values. This
+            argument is only relevant to the mims metric. Values are taken from watch
+            metadata, if no metadata could be extracted, the default
+            values of (-8,8) are used.
 
     Returns:
         A Measurement object with the computed physical activity metric.
@@ -395,4 +422,14 @@ def _compute_activity(
         )
     elif activity_metric == "mad":
         return metrics.mean_amplitude_deviation(acceleration, epoch_length=epoch_length)
+    elif activity_metric == "mims":
+        if dynamic_range is None:
+            return metrics.monitor_independent_movement_summary_units(
+                acceleration,
+                epoch=epoch_length,
+            )
+        return metrics.monitor_independent_movement_summary_units(
+            acceleration, epoch=epoch_length, dynamic_range=dynamic_range
+        )
+
     return metrics.euclidean_norm_minus_one(acceleration, epoch_length=epoch_length)

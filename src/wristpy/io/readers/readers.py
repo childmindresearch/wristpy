@@ -1,6 +1,5 @@
 """Function to read accelerometer data from a file."""
 
-import os
 import pathlib
 from typing import Literal, Union
 
@@ -39,11 +38,18 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
             measurements[sensor_name] = models.Measurement(
                 measurements=sensor_values, time=time
             )
+
+    file_type = pathlib.Path(file_name).suffix
     idle_sleep_mode_flag = False
-    if os.path.splitext(file_name)[1] == ".gt3x":
+    if file_type == ".gt3x":
         idle_sleep_mode_flag = (
             data["metadata"]["device_feature_enabled"]["sleep_mode"].lower() == "true"
         )
+
+    dynamic_range = _extract_dynamic_range(
+        metadata=data["metadata"],
+        file_type=file_type,  # type: ignore[arg-type]
+    )
 
     return models.WatchData(
         acceleration=measurements["acceleration"],
@@ -52,7 +58,40 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
         capsense=measurements.get("capsense"),
         temperature=measurements.get("temperature"),
         idle_sleep_mode_flag=idle_sleep_mode_flag,
+        dynamic_range=dynamic_range,
     )
+
+
+def _extract_dynamic_range(
+    metadata: dict, file_type: Literal[".gt3x", ".bin"]
+) -> tuple[float, float]:
+    """Extract the dynamic range from metadata.
+
+    Args:
+        metadata: Metadata subdictionary where accelerometer range values can be found.
+        file_type: Accelerometer data file type. Supports .gt3x and .bin.
+
+    Returns:
+        A tuple containing the accelerometer range.
+
+    Raises:
+        ValueError: If file type is not supported.
+    """
+    if file_type == ".gt3x":
+        return (
+            float(metadata.get("info", {}).get("Acceleration Min")),
+            float(metadata.get("info", {}).get("Acceleration Max")),
+        )
+    elif file_type == ".bin":
+        range_str = (
+            metadata.get("Device Capabilities", {})
+            .get("Accelerometer Range")
+            .strip()
+            .split(" to ")
+        )
+        return (float(range_str[0]), float(range_str[1]))
+
+    raise ValueError(f"Unsupported file type given: {file_type}")
 
 
 def unix_epoch_time_to_polars_datetime(

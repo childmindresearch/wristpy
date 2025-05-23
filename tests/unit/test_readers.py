@@ -1,7 +1,9 @@
 """Test readers.py functions."""
 
 import pathlib
+from typing import Literal, cast
 
+import actfast
 import pytest
 
 from wristpy.core import models
@@ -42,3 +44,33 @@ def test_nonexistent_file() -> None:
     """Test the correct error is raised for nonexistent file."""
     with pytest.raises(IOError):
         readers.read_watch_data("nonexistent_file.gt3x")
+
+
+def test_extract_dynamic_range_bin(sample_data_bin: pathlib.Path) -> None:
+    """Test extracting dynamic range metadata from .bin files."""
+    expected_dynamic_range = (-8, 8)
+    data = actfast.read(sample_data_bin)
+    file_type = cast(Literal[".gt3x", ".bin"], sample_data_bin.suffix)
+
+    result = readers._extract_dynamic_range(
+        metadata=data["metadata"], file_type=file_type
+    )
+
+    assert (
+        result == expected_dynamic_range
+    ), f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
+
+
+def test_extract_dynamic_range_gt3x(sample_data_gt3x: pathlib.Path) -> None:
+    """Test extracting dynamic range metadata from .gt3x files."""
+    expected_dynamic_range = (-8, 8)
+    data = actfast.read(sample_data_gt3x)
+    file_type = cast(Literal[".gt3x", ".bin"], sample_data_gt3x.suffix)
+
+    result = readers._extract_dynamic_range(
+        metadata=data["metadata"], file_type=file_type
+    )
+
+    assert (
+        result == expected_dynamic_range
+    ), f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
