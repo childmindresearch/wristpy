@@ -1,6 +1,5 @@
 """Function to read accelerometer data from a file."""
 
-import os
 import pathlib
 from typing import Literal, Union
 
