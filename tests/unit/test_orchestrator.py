@@ -27,8 +27,8 @@ def dummy_results() -> writers.OrchestratorResults:
         physical_activity_metric=dummy_measure,
         anglez=dummy_measure,
         physical_activity_levels=dummy_measure,
-        nonwear_epoch=dummy_measure,
-        sleep_windows_epoch=dummy_measure,
+        nonwear_status=dummy_measure,
+        sleep_status=dummy_measure,
     )
 
     return dummy_results

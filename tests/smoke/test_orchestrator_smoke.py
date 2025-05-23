@@ -25,8 +25,8 @@ def test_orchestrator_happy_path(
     assert isinstance(results, writers.OrchestratorResults)
     assert isinstance(results.physical_activity_metric, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
-    assert isinstance(results.nonwear_epoch, models.Measurement)
-    assert isinstance(results.sleep_windows_epoch, models.Measurement)
+    assert isinstance(results.nonwear_status, models.Measurement)
+    assert isinstance(results.sleep_status, models.Measurement)
     assert isinstance(results.physical_activity_levels, models.Measurement)
 
 
@@ -43,8 +43,8 @@ def test_orchestrator_idle_sleep_mode_run(
     assert isinstance(results, writers.OrchestratorResults)
     assert isinstance(results.physical_activity_metric, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
-    assert isinstance(results.nonwear_epoch, models.Measurement)
-    assert isinstance(results.sleep_windows_epoch, models.Measurement)
+    assert isinstance(results.nonwear_status, models.Measurement)
+    assert isinstance(results.sleep_status, models.Measurement)
     assert isinstance(results.physical_activity_levels, models.Measurement)
     assert isinstance(results.processing_params, dict)
     assert results.processing_params["calibrator"] == "gradient"

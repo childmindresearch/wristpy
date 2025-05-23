@@ -356,8 +356,8 @@ def _run_file(
         physical_activity_metric=activity_measurement,
         anglez=anglez,
         physical_activity_levels=physical_activity_levels,
-        sleep_windows_epoch=sleep_array,
-        nonwear_epoch=nonwear_epoch,
+        sleep_status=sleep_array,
+        nonwear_status=nonwear_epoch,
         processing_params=parameters_dictionary,
     )
     if output is not None:
