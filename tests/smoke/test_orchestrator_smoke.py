@@ -46,3 +46,5 @@ def test_orchestrator_idle_sleep_mode_run(
     assert isinstance(results.nonwear_epoch, models.Measurement)
     assert isinstance(results.sleep_windows_epoch, models.Measurement)
     assert isinstance(results.physical_activity_levels, models.Measurement)
+    assert isinstance(results.processing_params, dict)
+    assert results.processing_params["calibrator"] == "ggir"
