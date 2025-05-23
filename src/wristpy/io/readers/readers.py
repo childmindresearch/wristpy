@@ -40,7 +40,7 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
                 measurements=sensor_values, time=time
             )
 
-    file_type = os.path.splitext(file_name)[1]
+    file_type = pathlib.Path(file_name).suffix
     idle_sleep_mode_flag = False
     if file_type == ".gt3x":
         idle_sleep_mode_flag = (
@@ -49,7 +49,7 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
 
     dynamic_range = _extract_dynamic_range(
         metadata=data["metadata"],
-        file_type=file_type,  # type: ignore
+        file_type=file_type,  # type: ignore[arg-type]
     )
 
     return models.WatchData(

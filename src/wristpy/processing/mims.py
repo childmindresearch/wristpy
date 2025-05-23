@@ -374,21 +374,18 @@ def _align_edges(
     if len(left) - len(right) == 1:
         if marker_length - left[-1] > out_of_range_threshold:
             right = np.concatenate((right, [-1]))
-
+        elif len(left) == 1:
+            left = np.array([])
         else:
-            if len(left) == 1:
-                left = np.array([])
-            else:
-                left = left[:-1]
+            left = left[:-1]
+
     elif len(left) - len(right) == -1:
         if right[0] > out_of_range_threshold:
             left = np.concatenate(([-1], left))
+        elif len(right) == 1:
+            right = np.array([])
         else:
-            if len(right) == 1:
-                right = np.array([])
-
-            else:
-                right = right[1:]
+            right = right[1:]
 
     valid_indices = (left != -1) & (right != -1)
     if np.any((right[valid_indices] - left[valid_indices]) < 0) and (len(right) > 1):
