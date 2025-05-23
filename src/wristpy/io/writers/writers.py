@@ -51,10 +51,6 @@ class OrchestratorResults(pydantic.BaseModel):
             results_dataframe.write_csv(output, separator=",")
         elif output.suffix == ".parquet":
             results_dataframe.write_parquet(output)
-        else:
-            raise exceptions.InvalidFileTypeError(
-                f"File type must be one of {VALID_FILE_TYPES}"
-            )
 
         logger.debug("results saved in: %s", output)
 
