@@ -352,8 +352,10 @@ def _align_edges(
 
     Args:
         marker_length: Length of marker array.
-        left: indices indicating the left edge of a potential maxed-out region.
-        right: indices indicating the right edge of a potential maxed-out region.
+        left: 1D vector of indices indicating the left edge of a potential maxed-out
+            region.
+        right: 1D vector of indices indicating the right edge of a potential maxed-out
+            region.
         out_of_range_threshold: The number of samples that determines if an un matched
             edge extends beyond the data range, or if the edge is spurious. Typically 5
             seconds worth of data.
