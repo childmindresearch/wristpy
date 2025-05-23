@@ -49,3 +49,4 @@ def test_orchestrator_idle_sleep_mode_run(
     assert isinstance(results.processing_params, dict)
     assert results.processing_params["calibrator"] == "gradient"
     assert results.processing_params["nonwear_algorithm"] == ["ggir"]
+    assert results.processing_params["activity_metric"] == "enmo"
