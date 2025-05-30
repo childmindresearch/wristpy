@@ -83,7 +83,7 @@ results = orchestrator.run(
 )
 
 #Data available in results object
-enmo = results.enmo
+physical_activity_metric = results.physical_activity_metric
 anglez = results.anglez
 physical_activity_levels = results.physical_activity_levels
 nonwear_array = results.nonwear_epoch
@@ -112,7 +112,7 @@ results_dict = orchestrator.run(
 #Data available in dictionry of results.
 subject1 = results_dict['subject1']
 
-enmo = subject1.enmo
+physical_activity_metric = subject1.physical_activity_metric
 anglez = subject1.anglez
 physical_activity_levels = subject1.physical_activity_levels
 nonwear_array = subject1.nonwear_epoch
@@ -134,7 +134,7 @@ sleep_windows = subject1.sleep_windows_epoch
    docker run -it --rm \
      -v "/local/path/to/data:/data" \
      -v "/local/path/to/output:/output" \
-     cmidair/wristpy
+     cmidair/wristpy:main
    ```
    Replace `/local/path/to/data` with the path to your input data directory and `/local/path/to/output` with where you want results saved.
 
