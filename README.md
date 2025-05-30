@@ -25,7 +25,7 @@ The package currently supports the following formats:
 | BIN | GENEActiv | GENEActiv | ✅ |
 
 **Special Note**
-    The `idle_sleep_mode` for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this [here](https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained)). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, we fill in the missing acceleration data with the assumption that the watch is perfeclty idle in the face-up position (Acceleration vector = [0, 0, -1]). The data is filled in at the same sampling rate as the raw acceleration data. In the special circumstance when acceleration samples are not evenly spaced, the data is resampled to the highest effective sampling rate to ensure linearly sampled data.
+    The `idle_sleep_mode` for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this [here](https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained)). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, we fill in the missing acceleration data with the assumption that the watch is perfectly idle in the face-up position (Acceleration vector = [0, 0, -1]). The data is filled in at the same sampling rate as the raw acceleration data. In the special circumstance when acceleration samples are not evenly spaced, the data is resampled to the highest effective sampling rate to ensure linearly sampled data.
 
 ## Processing pipeline implementation
 
@@ -37,7 +37,7 @@ The main processing pipeline of the wristpy module can be described as follows:
 - **Metrics Calculation**: Calculates various metrics on the calibrated data, namely ENMO (Euclidean norm , minus one) and angle-Z (angle of acceleration relative to the *x-y* axis).
 - **Non-wear detection**: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide `wear` or `not wear`.
 - **Sleep Detection**: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.
-- **Physical activity levels**: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.
+- **Physical activity levels**: Using the enmo data (aggregated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.
 
 
 ## Installation
@@ -109,7 +109,7 @@ results_dict = orchestrator.run(
 )
 
 
-#Data available in dictionry of results.
+#Data available in dictionary of results.
 subject1 = results_dict['subject1']
 
 physical_activity_metric = subject1.physical_activity_metric

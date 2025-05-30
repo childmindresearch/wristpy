@@ -252,7 +252,7 @@ def detect_nonwear(
 
 
     Args:
-        acceleration: The Measurment instance that contains the calibrated acceleration
+        acceleration: The Measurement instance that contains the calibrated acceleration
             data.
         short_epoch_length: The short window size, in seconds.
         n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.
@@ -260,7 +260,7 @@ def detect_nonwear(
 
 
     Returns:
-        A new Measurment instance with the non-wear flag and corresponding timestamps.
+        A new Measurement instance with the non-wear flag and corresponding timestamps.
     """
     logger.debug("Detecting non-wear data.")
     acceleration_grouped_by_short_window = _group_acceleration_data_by_time(
@@ -296,13 +296,13 @@ def combined_temp_accel_detect_nonwear(
     "non-wear", here denoted by 0 and 1, respectively.
 
     Args:
-        acceleration: The Measurment instance that contains the calibrated acceleration.
-        temperature: The Measurment instance that contains the temperature data.
+        acceleration: The Measurement instance that contains the calibrated acceleration.
+        temperature: The Measurement instance that contains the temperature data.
         std_criteria: Threshold criteria for standard deviation.
         temperature_threshold: The temperature threshold for non-wear detection.
 
     Returns:
-        A new Measurment instance with the non-wear flag and corresponding timestamps.
+        A new Measurement instance with the non-wear flag and corresponding timestamps.
         The temporal resolutions is one minute.
 
     References:
@@ -363,12 +363,12 @@ def detach_nonwear(
     The nonwear array is downsampled to 60 second resolution.
 
     Args:
-        acceleration: The Measurment instance that contains the calibrated acceleration.
-        temperature: The Measurment instance that contains the temperature data.
+        acceleration: The Measurement instance that contains the calibrated acceleration.
+        temperature: The Measurement instance that contains the temperature data.
         std_criteria: The acceleration STD threshold for non-wear detection.
 
     Returns:
-        A new Measurment instance with the non-wear flag and corresponding timestamps.
+        A new Measurement instance with the non-wear flag and corresponding timestamps.
         The temporal resolutions is one minute.
 
     References:
@@ -425,7 +425,7 @@ def _group_acceleration_data_by_time(
     """Helper function to group the acceleration data by short windows.
 
     Args:
-        acceleration: The Measurment instance that contains the calibrated acceleration.
+        acceleration: The Measurement instance that contains the calibrated acceleration.
         window_length: The window size, in seconds.
 
     Returns:
@@ -562,8 +562,8 @@ def _pre_process_temperature(
     intervals and then low-pass filters the data by applying a 2 minute rolling mean.
 
     Args:
-        temperature: The Measurment instance that contains the temperature data.
-        acceleration: The Measurment instance that contains the acceleration data.
+        temperature: The Measurement instance that contains the temperature data.
+        acceleration: The Measurement instance that contains the acceleration data.
 
     Returns:
         A polars DataFrame with the pre-processed temperature data.
