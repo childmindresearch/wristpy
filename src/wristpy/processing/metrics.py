@@ -296,7 +296,7 @@ def combined_temp_accel_detect_nonwear(
     "non-wear", here denoted by 0 and 1, respectively.
 
     Args:
-        acceleration: The Measurement instance that contains the calibrated acceleration.
+        acceleration: The Measurement instance that contains calibrated acceleration.
         temperature: The Measurement instance that contains the temperature data.
         std_criteria: Threshold criteria for standard deviation.
         temperature_threshold: The temperature threshold for non-wear detection.
@@ -363,7 +363,7 @@ def detach_nonwear(
     The nonwear array is downsampled to 60 second resolution.
 
     Args:
-        acceleration: The Measurement instance that contains the calibrated acceleration.
+        acceleration: The Measurement instance that contains calibrated acceleration.
         temperature: The Measurement instance that contains the temperature data.
         std_criteria: The acceleration STD threshold for non-wear detection.
 
@@ -425,7 +425,7 @@ def _group_acceleration_data_by_time(
     """Helper function to group the acceleration data by short windows.
 
     Args:
-        acceleration: The Measurement instance that contains the calibrated acceleration.
+        acceleration: The Measurement instance that contains calibrated acceleration.
         window_length: The window size, in seconds.
 
     Returns:
