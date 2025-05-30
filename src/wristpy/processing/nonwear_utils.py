@@ -120,7 +120,7 @@ def get_nonwear_measurements(
 
     Raises:
         ValueError:
-            If the CTA or DETACH algorith is requested without temperature data.
+            If the CTA or DETACH algorithm is requested without temperature data.
             If an unknown algorithm is specified.
 
     """
@@ -181,7 +181,8 @@ def nonwear_array_cleanup(
             Defaults to 5.0.
 
     Returns:
-        A new Measurement instance with the cleaned up nonwear detection.
+        A new Measurement instance with the cleaned up nonwear detection,
+        returned as a boolean (True == nonwear).
     """
     time_fix_nonwear = _time_fix(
         nonwear_array, reference_measurement.time[-1], reference_measurement.time[0]
@@ -203,4 +204,6 @@ def nonwear_array_cleanup(
     matched_indices = joined["idx"].to_numpy()
     matched_values = binary_nonwear[matched_indices]
 
-    return models.Measurement(measurements=matched_values, time=joined["time"])
+    return models.Measurement(
+        measurements=matched_values.astype(bool), time=joined["time"]
+    )
