@@ -42,14 +42,13 @@ The main processing pipeline of the wristpy module can be described as follows:
 
 ## Installation
 
-<div style="background-color:rgb(32, 43, 201); padding: 15px; border-radius: 5px; border-left: 5px solid#ffc107;">
-<h3>⚠️ Important Note for macOS Users</h3>
-<p>wristpy depends on <code>libomp</code>, a system-level dependency that is not always installed by default on macOS. Install it via:</p>
-<pre><code>brew install libomp</code></pre>
-
-</div>
-<br>
-<br>
+> ### ⚠️ Important Note for macOS Users
+> 
+> **wristpy** depends on `libomp`, a system-level dependency that is not always installed by default on macOS. Install it via:
+> 
+> ```bash
+> brew install libomp
+> ```
 
 
 Install the `wristpy` package from PyPI via:
@@ -57,21 +56,6 @@ Install the `wristpy` package from PyPI via:
 ```sh
 pip install wristpy
 ```
-
-The latest development version can be installed via:
-
-```sh
-pip install git+https://github.com/childmindresearch/wristpy
-```
-
-
-It can also be installed via the `uv` package manager.
-
-```sh
-#Install wristpy in your current environment
-uv pip install wristpy
-```
-
 
 ## Quick start
 

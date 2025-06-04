@@ -68,10 +68,7 @@ class OrchestratorResults(pydantic.BaseModel):
             logger.warning("No processing parameters to save as JSON")
             return
 
-        try:
-            wristpy_version = importlib.metadata.version("wristpy")
-        except importlib.metadata.PackageNotFoundError:
-            wristpy_version = "unknown"
+        wristpy_version = config.get_version()
 
         config_data = {
             "processing_time": datetime.datetime.now().isoformat(timespec="seconds"),
