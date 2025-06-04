@@ -1,7 +1,6 @@
 """Module containg the output classes for writing data to files."""
 
 import datetime
-import importlib.metadata
 import json
 import pathlib
 from typing import Any, Dict, Optional
