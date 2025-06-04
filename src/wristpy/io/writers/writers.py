@@ -51,7 +51,7 @@ class OrchestratorResults(pydantic.BaseModel):
         elif output.suffix == ".parquet":
             results_dataframe.write_parquet(output)
 
-        logger.info("results saved in: %s", output)
+        logger.info("Results saved in: %s", output)
 
         if self.processing_params:
             self.save_config_as_json(output)

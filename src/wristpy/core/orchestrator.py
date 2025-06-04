@@ -376,7 +376,9 @@ def _run_file(
                     "results."
                 )
             )
-
+    logger.info(
+        "Processing has been successfully completed. Results ready for analysis."
+    )
     return results
 
 
