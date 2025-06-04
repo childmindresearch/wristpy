@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies on macOS
       if: runner.os == 'macOS'
       run: |
-        brew install libomp
+        brew install libomp gfortran
 
     - name: Install dependencies
       run: |
