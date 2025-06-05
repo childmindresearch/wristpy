@@ -213,11 +213,6 @@ class GgirSleepDetection(AbstractSleepDetector):
             If there is no overlap between spt_windows and sib_periods,
             the onset and wakeup lists will be empty.
         """
-        logger.debug(
-            "Finding SIB periods within SPT windows. SPT periods:%s, SIB periods: %s",
-            spt_periods,
-            sib_periods,
-        )
         sleep_windows = []
         for sleep_guide in spt_periods:
             min_onset = None
