@@ -223,7 +223,7 @@ def _run_directory(
             )
         except Exception as e:
             logger.error("Did not run file: %s, Error: %s", file, e)
-
+    logger.info("Processing for directory %s completed successfully.", output)
     return results_dict
 
 
@@ -371,14 +371,13 @@ def _run_file(
             # Allowed to pass to recover in Jupyter Notebook scenarios.
             logger.error(
                 (
-                    f"Could not save output due to: {exc_info}. Call save_results "
-                    " on the output object with a correct filename to save these "
-                    "results."
+                    "Could not save output due to: %s. Call save_results "
+                    "on the output object with a correct filename to save these "
+                    "results.",
+                    exc_info,
                 )
             )
-    logger.info(
-        "Processing has been successfully completed. Results ready for analysis."
-    )
+    logger.info("Processing for %s completed successfully.", input.stem)
     return results
 
 
