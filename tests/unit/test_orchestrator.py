@@ -210,4 +210,4 @@ def test_run_single_file_mims(
     )
 
     assert output_file_path.exists()
-    assert isinstance(results, models.OrchestratorResults)
+    assert isinstance(results, writers.OrchestratorResults)
