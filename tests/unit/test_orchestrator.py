@@ -195,3 +195,19 @@ def test_bad_file_type(
             output=tmp_path,
             output_filetype=invalid_file_type,  # type: ignore[arg-type]
         )
+
+
+def test_run_single_file_mims(
+    sample_data_bin: pathlib.Path,
+    tmp_path: pathlib.Path,
+) -> None:
+    """Testing running a single file with mims."""
+    output_file_path = tmp_path / "file_name.csv"
+    results = orchestrator.run(
+        input=sample_data_bin,
+        output=output_file_path,
+        activity_metric="mims",
+    )
+
+    assert output_file_path.exists()
+    assert isinstance(results, models.OrchestratorResults)
