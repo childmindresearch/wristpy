@@ -115,14 +115,12 @@ def main(
         "Must be greater than or equal to 1.",
         min=1,
     ),
-    verbosity: int = typer.Option(
-        0,
+    verbosity: bool = typer.Option(
+        False,
         "-v",
         "--verbosity",
-        count=True,
-        help="Determines the level of verbosity. Use -v for info, -vv for debug. "
-        "If -vvv or more, it will be set to debug. "
-        "Default for warning.",
+        help="Determines the level of verbosity. Use -v for DEBUG. "
+        "Defaults to INFO if not included.",
     ),
     version: bool = typer.Option(
         False, "-V", "--version", help="Show the version and exit."
@@ -135,11 +133,8 @@ def main(
         typer.echo(f"Wristpy version: {config.get_version()}")
         raise typer.Exit()
 
-    if verbosity == 0:
-        log_level = logging.WARNING
-    elif verbosity == 1:
-        log_level = logging.INFO
-    else:
+    log_level = logging.INFO
+    if verbosity:
         log_level = logging.DEBUG
     logger.setLevel(log_level)
 

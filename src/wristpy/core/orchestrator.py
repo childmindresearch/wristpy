@@ -7,6 +7,7 @@ from typing import Dict, Literal, Optional, Sequence, Tuple, Union
 
 from wristpy.core import config, exceptions, models
 from wristpy.io.readers import readers
+from wristpy.io.writers import writers
 from wristpy.processing import (
     analytics,
     calibration,
@@ -33,7 +34,7 @@ def run(
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
-) -> Union[models.OrchestratorResults, Dict[str, models.OrchestratorResults]]:
+) -> Union[writers.OrchestratorResults, Dict[str, writers.OrchestratorResults]]:
     """Runs main processing steps for wristpy on single files, or directories.
 
     The run() function will execute the run_file() function on individual files, or
@@ -148,7 +149,7 @@ def _run_directory(
     verbosity: int = logging.WARNING,
     output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
     activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
-) -> Dict[str, models.OrchestratorResults]:
+) -> Dict[str, writers.OrchestratorResults]:
     """Runs main processing steps for wristpy on  directories.
 
     The run_directory() function will execute the run_file() function on entire
@@ -236,7 +237,7 @@ def _run_directory(
             )
         except Exception as e:
             logger.error("Did not run file: %s, Error: %s", file, e)
-
+    logger.info("Processing for directory %s completed successfully.", output)
     return results_dict
 
 
@@ -252,7 +253,7 @@ def _run_file(
     activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
-) -> models.OrchestratorResults:
+) -> writers.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
 
     The run_file() function will provide the user with the specified physical activity
@@ -299,7 +300,16 @@ def _run_file(
     """
     logger.setLevel(verbosity)
     if output is not None:
-        models.OrchestratorResults.validate_output(output=output)
+        writers.OrchestratorResults.validate_output(output=output)
+
+    parameters_dictionary = {
+        "thresholds": list(thresholds),
+        "calibrator": calibrator,
+        "epoch_length": epoch_length,
+        "activity_metric": activity_metric,
+        "nonwear_algorithm": list(nonwear_algorithm),
+        "input_file": str(input),
+    }
 
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
         msg = (
@@ -364,12 +374,13 @@ def _run_file(
     sleep_array = analytics.sleep_cleanup(
         sleep_windows=sleep_windows, nonwear_measurement=nonwear_epoch
     )
-    results = models.OrchestratorResults(
+    results = writers.OrchestratorResults(
         physical_activity_metric=activity_measurement,
         anglez=anglez,
         physical_activity_levels=physical_activity_levels,
-        sleep_windows_epoch=sleep_array,
-        nonwear_epoch=nonwear_epoch,
+        sleep_status=sleep_array,
+        nonwear_status=nonwear_epoch,
+        processing_params=parameters_dictionary,
     )
     if output is not None:
         try:
@@ -382,12 +393,13 @@ def _run_file(
             # Allowed to pass to recover in Jupyter Notebook scenarios.
             logger.error(
                 (
-                    f"Could not save output due to: {exc_info}. Call save_results "
-                    " on the output object with a correct filename to save these "
-                    "results."
+                    "Could not save output due to: %s. Call save_results "
+                    "on the output object with a correct filename to save these "
+                    "results.",
+                    exc_info,
                 )
             )
-
+    logger.info("Processing for %s completed successfully.", input.stem)
     return results
 
 

@@ -178,7 +178,8 @@ class GgirSleepDetection(AbstractSleepDetector):
         flag = anglez_grouped_by_window_length["angz_diff"].map_elements(
             lambda grouped_list_data: all(
                 list_data < threshold_degrees for list_data in grouped_list_data
-            )
+            ),
+            return_dtype=pl.Boolean,
         )
 
         return models.Measurement(

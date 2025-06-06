@@ -25,7 +25,7 @@ The package currently supports the following formats:
 | BIN | GENEActiv | GENEActiv | ✅ |
 
 **Special Note**
-    The `idle_sleep_mode` for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this [here](https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained)). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, we fill in the missing acceleration data with the assumption that the watch is perfeclty idle in the face-up position (Acceleration vector = [0, 0, -1]). The data is filled in at the same sampling rate as the raw acceleration data. In the special circumstance when acceleration samples are not evenly spaced, the data is resampled to the highest effective sampling rate to ensure linearly sampled data.
+    The `idle_sleep_mode` for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this [here](https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained)). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, we fill in the missing acceleration data with the assumption that the watch is perfectly idle in the face-up position (Acceleration vector = [0, 0, -1]). The data is filled in at the same sampling rate as the raw acceleration data. In the special circumstance when acceleration samples are not evenly spaced, the data is resampled to the highest effective sampling rate to ensure linearly sampled data.
 
 ## Processing pipeline implementation
 
@@ -37,12 +37,21 @@ The main processing pipeline of the wristpy module can be described as follows:
 - **Metrics Calculation**: Calculates various metrics on the calibrated data, namely ENMO (Euclidean norm , minus one) and angle-Z (angle of acceleration relative to the *x-y* axis).
 - **Non-wear detection**: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide `wear` or `not wear`.
 - **Sleep Detection**: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.
-- **Physical activity levels**: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.
+- **Physical activity levels**: Using the enmo data (aggregated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.
 
 
 ## Installation
 
-Install this package from PyPI via :
+> ### ⚠️ Important Note for macOS Users
+>
+> **wristpy** depends on `libomp`, a system-level dependency that is not always installed by default on macOS. Install it via:
+>
+> ```bash
+> brew install libomp
+> ```
+
+
+Install the `wristpy` package from PyPI via:
 
 ```sh
 pip install wristpy
@@ -62,6 +71,12 @@ wristpy /input/file/path.gt3x -o /save/path/file_name.csv -c gradient
 ```sh
 wristpy /path/to/files/input_dir -o /path/to/files/output_dir -c gradient -O .csv
 ```
+
+#### For a full list of command line arguments:
+```sh
+wristpy --help
+```
+
 
 ### Using Wristpy through a python script or notebook:
 
@@ -83,7 +98,7 @@ results = orchestrator.run(
 )
 
 #Data available in results object
-enmo = results.enmo
+physical_activity_metric = results.physical_activity_metric
 anglez = results.anglez
 physical_activity_levels = results.physical_activity_levels
 nonwear_array = results.nonwear_epoch
@@ -109,10 +124,10 @@ results_dict = orchestrator.run(
 )
 
 
-#Data available in dictionry of results.
+#Data available in dictionary of results.
 subject1 = results_dict['subject1']
 
-enmo = subject1.enmo
+physical_activity_metric = subject1.physical_activity_metric
 anglez = subject1.anglez
 physical_activity_levels = subject1.physical_activity_levels
 nonwear_array = subject1.nonwear_epoch
@@ -134,7 +149,7 @@ sleep_windows = subject1.sleep_windows_epoch
    docker run -it --rm \
      -v "/local/path/to/data:/data" \
      -v "/local/path/to/output:/output" \
-     cmidair/wristpy
+     cmidair/wristpy:main
    ```
    Replace `/local/path/to/data` with the path to your input data directory and `/local/path/to/output` with where you want results saved.
 
@@ -143,7 +158,7 @@ sleep_windows = subject1.sleep_windows_epoch
     docker run -it --rm \
      -v "/local/path/to/data/file.bin:/data/file.bin" \
      -v "/local/path/to/output:/output" \
-     cmidair/wristpy
+     cmidair/wristpy:main
    ```
 
 ### Customizing the Pipeline:
@@ -154,7 +169,7 @@ The Docker image supports multiple input variables to customize processing. You 
 docker run -it --rm \
   -v "/local/path/to/data/file.bin:/data/file.bin" \
   -v "/local/path/to/output:/output" \
-  cmidair/wristpy /data --output /output --epoch-length 5 --nonwear-algorithm ggir --nonwear-algorithm detach --thresholds 0.1 0.2 0.4
+  cmidair/wristpy:main /data --output /output --epoch-length 5 --nonwear-algorithm ggir --nonwear-algorithm detach --thresholds 0.1 0.2 0.4
 ```
 
 
