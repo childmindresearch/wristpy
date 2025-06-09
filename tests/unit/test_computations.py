@@ -181,9 +181,9 @@ def test_moving_median(window_size: int, expected_output: np.ndarray) -> None:
         f"measurements array are not the same shape. Expected {expected_output.shape}, "
         f"instead got: {test_result.measurements.shape}"
     )
-    assert np.all(
-        np.isclose(test_result.measurements, expected_output)
-    ), "Test results do not match the expected output"
+    assert np.all(np.isclose(test_result.measurements, expected_output)), (
+        "Test results do not match the expected output"
+    )
 
 
 def test_resample_downsample_simple() -> None:
