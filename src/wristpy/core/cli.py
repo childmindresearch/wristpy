@@ -15,22 +15,6 @@ app = typer.Typer(
 )
 
 
-@app.callback(invoke_without_command=True)
-def version_check(
-    version: bool = typer.Option(
-        False,
-        "-V",
-        "--version",
-        help="Check the current version of wristpy and exist.",
-        is_eager=True,
-    ),
-) -> None:
-    """Print current version of wristpy and exit."""
-    if version:
-        typer.echo(f"Wristpy version: {config.get_version()}")
-        raise typer.Exit()
-
-
 class OutputFileType(str, Enum):
     """Valid output file types for saving data."""
 
@@ -68,6 +52,13 @@ class NonwearAlgorithms(str, Enum):
     ggir = "ggir"
     cta = "cta"
     detach = "detach"
+
+
+def version_check(version: bool) -> None:
+    """Print the current version of wristpy and exit."""
+    if version:
+        typer.echo(f"Wristpy version: {config.get_version()}")
+        raise typer.Exit()
 
 
 @app.command()
@@ -138,6 +129,14 @@ def main(
         help="Determines the level of verbosity. Use -v for info, -vv for debug. "
         "If -vvv or more, it will be set to debug. "
         "Default for warning.",
+    ),
+    version: bool = typer.Option(
+        False,
+        "-V",
+        "--version",
+        help="Print the current version of wristpy and exit.",
+        is_eager=True,
+        callback=version_check,
     ),
 ) -> None:
     """Run wristpy orchestrator with command line arguments."""
