@@ -628,13 +628,13 @@ def monitor_independent_movement_summary_units(
     steps as described in  the original paper are interpolation (100Hz by default),
     extrapolation of any values that went beyond the dynamic range of the device,
     filtering using a 4th order butterworth filter, aggregation by calculating the area
-    under the curve over a given epoch, and finally trunction of small values.
+    under the curve over a given epoch, and finally truncation of small values.
     The MIMS value per axis is then combined through a sum or vector magnitude, and
     returned as a single vector.
 
     Args:
         acceleration: Triaxial acceleration data to be processed.
-        combination_method: Method to combine MIMS values accross axes.
+        combination_method: Method to combine MIMS values across axes.
         epoch: Duration over which each MIMS value will be calculated. Measured in
             seconds.
         interpolation_frequency: Frequency to interpolate acceleration data, defaults

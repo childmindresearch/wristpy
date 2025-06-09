@@ -105,7 +105,7 @@ Example 2: Loading data and plotting the raw signals
 
 In this example we will go over the built-in functions to directly read the raw accelerometer and light data, and how to quickly visualize this information.
 
-The built in `readers` module can be used to load all the sensor and metadata from one of the support wristwatches (`.gt3x` or `.bin`), the reader will automatically select the appropriate loading methodology.
+The built-in `readers` module can be used to load all the sensor and metadata from one of the support wristwatches (`.gt3x` or `.bin`), the reader will automatically select the appropriate loading methodology.
 
 ```python
 from wristpy.io.readers import readers

@@ -309,7 +309,7 @@ def _fill_false_blocks(boolean_array: np.ndarray, gap_block: int) -> np.ndarray:
         gap_block: the length of the gap that needs to be filled.
 
     Returns:
-        A booelan numpy array where true, typically, idicates the SPT windows.
+        A booelan numpy array where true, typically, indicates the SPT windows.
     """
     n_zeros = 0
     first_one_idx = next(
