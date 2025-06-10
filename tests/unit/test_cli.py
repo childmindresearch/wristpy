@@ -232,4 +232,4 @@ def test_main_version_with_options(
 
     assert result.exit_code == 0
     assert "Wristpy version" in result.output
-    mock_run.assert_not_called
+    mock_run.assert_not_called()
