@@ -1,5 +1,7 @@
 """Calculate base metrics, anglez and enmo."""
 
+from typing import Literal, Tuple
+
 import numpy as np
 import polars as pl
 from scipy import interpolate, signal
@@ -7,6 +9,7 @@ from skdh.preprocessing import wear_detection
 
 from wristpy.core import computations, config, models
 from wristpy.io.readers import readers
+from wristpy.processing import mims
 
 logger = config.get_logger()
 
@@ -252,7 +255,7 @@ def detect_nonwear(
 
 
     Args:
-        acceleration: The Measurment instance that contains the calibrated acceleration
+        acceleration: The Measurement instance that contains the calibrated acceleration
             data.
         short_epoch_length: The short window size, in seconds.
         n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.
@@ -260,7 +263,7 @@ def detect_nonwear(
 
 
     Returns:
-        A new Measurment instance with the non-wear flag and corresponding timestamps.
+        A new Measurement instance with the non-wear flag and corresponding timestamps.
     """
     logger.debug("Detecting non-wear data.")
     acceleration_grouped_by_short_window = _group_acceleration_data_by_time(
@@ -296,13 +299,13 @@ def combined_temp_accel_detect_nonwear(
     "non-wear", here denoted by 0 and 1, respectively.
 
     Args:
-        acceleration: The Measurment instance that contains the calibrated acceleration.
-        temperature: The Measurment instance that contains the temperature data.
+        acceleration: The Measurement instance that contains calibrated acceleration.
+        temperature: The Measurement instance that contains the temperature data.
         std_criteria: Threshold criteria for standard deviation.
         temperature_threshold: The temperature threshold for non-wear detection.
 
     Returns:
-        A new Measurment instance with the non-wear flag and corresponding timestamps.
+        A new Measurement instance with the non-wear flag and corresponding timestamps.
         The temporal resolutions is one minute.
 
     References:
@@ -363,12 +366,12 @@ def detach_nonwear(
     The nonwear array is downsampled to 60 second resolution.
 
     Args:
-        acceleration: The Measurment instance that contains the calibrated acceleration.
-        temperature: The Measurment instance that contains the temperature data.
+        acceleration: The Measurement instance that contains calibrated acceleration.
+        temperature: The Measurement instance that contains the temperature data.
         std_criteria: The acceleration STD threshold for non-wear detection.
 
     Returns:
-        A new Measurment instance with the non-wear flag and corresponding timestamps.
+        A new Measurement instance with the non-wear flag and corresponding timestamps.
         The temporal resolutions is one minute.
 
     References:
@@ -425,7 +428,7 @@ def _group_acceleration_data_by_time(
     """Helper function to group the acceleration data by short windows.
 
     Args:
-        acceleration: The Measurment instance that contains the calibrated acceleration.
+        acceleration: The Measurement instance that contains calibrated acceleration.
         window_length: The window size, in seconds.
 
     Returns:
@@ -562,8 +565,8 @@ def _pre_process_temperature(
     intervals and then low-pass filters the data by applying a 2 minute rolling mean.
 
     Args:
-        temperature: The Measurment instance that contains the temperature data.
-        acceleration: The Measurment instance that contains the acceleration data.
+        temperature: The Measurement instance that contains the temperature data.
+        acceleration: The Measurement instance that contains the acceleration data.
 
     Returns:
         A polars DataFrame with the pre-processed temperature data.
@@ -605,3 +608,79 @@ def _pre_process_temperature(
         [pl.mean("temperature")]
     )
     return low_pass_temp
+
+
+def monitor_independent_movement_summary_units(
+    acceleration: models.Measurement,
+    combination_method: Literal["sum", "vector_magnitude"] = "sum",
+    epoch: float = 60.0,
+    interpolation_frequency: int = 100,
+    dynamic_range: tuple[float, float] = (-8.0, 8.0),
+    cutoffs: Tuple[float, float] = (0.2, 5.0),
+    order: int = 4,
+    *,
+    rectify: bool = True,
+) -> models.Measurement:
+    """Calculates monitor independent movement summary units (MIMS).
+
+    This function processes raw acceleration data to calculate MIMS units,
+    based on the original R implementation by John et al.(2019). The main processing
+    steps as described in  the original paper are interpolation (100Hz by default),
+    extrapolation of any values that went beyond the dynamic range of the device,
+    filtering using a 4th order butterworth filter, aggregation by calculating the area
+    under the curve over a given epoch, and finally trunction of small values.
+    The MIMS value per axis is then combined through a sum or vector magnitude, and
+    returned as a single vector.
+
+    Args:
+        acceleration: Triaxial acceleration data to be processed.
+        combination_method: Method to combine MIMS values accross axes.
+        epoch: Duration over which each MIMS value will be calculated. Measured in
+            seconds.
+        interpolation_frequency: Frequency to interpolate acceleration data, defaults
+            to 100 Hz as described in John et al. 2019.
+        dynamic_range: Tuple specifying the minimum and maximum values (in g) of the
+            accelerometer's dynamic range.
+        cutoffs: Tuple specifying the low and high cutoff frequencies (in Hz) for the
+            Butterworth filter.
+        order: Order of the Butterworth filter.
+        rectify: Specifies if data should be rectified before integration. If True any
+            value below -150 will assign the value of that axis to -1 for that epoch.
+            Additionally the absolute value of accelerometer data will be used for
+            integration.
+
+    Returns:
+        Processed MIMS values after combining the values of each axis with the provided
+        method.
+
+    References:
+        John, D., Tang, Q., Albinali, F. and Intille, S., 2019. An Open-Source
+        Monitor-Independent Movement Summary for Accelerometer Data Processing. Journal
+        for the Measurement of Physical Behaviour, 2(4), pp.268-281.
+
+    """
+    interpolated_measure = mims.interpolate_measure(
+        acceleration=acceleration,
+        new_frequency=interpolation_frequency,
+    )
+    extrapolated_measure = mims.extrapolate_points(
+        acceleration=interpolated_measure,
+        dynamic_range=dynamic_range,
+        sampling_rate=interpolation_frequency,
+    )
+    filtered_measure = mims.butterworth_filter(
+        acceleration=extrapolated_measure,
+        sampling_rate=interpolation_frequency,
+        cutoffs=cutoffs,
+        order=order,
+    )
+    aggregated_measure = mims.aggregate_mims(
+        acceleration=filtered_measure,
+        epoch=epoch,
+        sampling_rate=interpolation_frequency,
+        rectify=rectify,
+    )
+    combined_mims = mims.combine_mims(
+        acceleration=aggregated_measure, combination_method=combination_method
+    )
+    return combined_mims

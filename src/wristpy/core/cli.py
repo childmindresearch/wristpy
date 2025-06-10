@@ -40,6 +40,7 @@ class ActivityMetric(str, Enum):
     enmo = "enmo"
     mad = "mad"
     ag_count = "ag_count"
+    mims = "mims"
 
 
 class NonwearAlgorithms(str, Enum):
@@ -92,7 +93,7 @@ def main(
         "-a",
         "--activity-metric",
         help="Metric used for physical activity categorization. "
-        "Choose from 'enmo', 'mad', or 'ag_count'.",
+        "Choose from 'enmo', 'mad', 'ag_count', or 'mims'.  ",
         case_sensitive=False,
     ),
     thresholds: tuple[float, float, float] = typer.Option(
@@ -121,14 +122,12 @@ def main(
         "Must be greater than or equal to 1.",
         min=1,
     ),
-    verbosity: int = typer.Option(
-        0,
+    verbosity: bool = typer.Option(
+        False,
         "-v",
         "--verbosity",
-        count=True,
-        help="Determines the level of verbosity. Use -v for info, -vv for debug. "
-        "If -vvv or more, it will be set to debug. "
-        "Default for warning.",
+        help="Determines the level of verbosity. Use -v for DEBUG. "
+        "Defaults to INFO if not included.",
     ),
     version: bool = typer.Option(
         False,
@@ -142,11 +141,12 @@ def main(
     """Run wristpy orchestrator with command line arguments."""
     from wristpy.core import orchestrator
 
-    if verbosity == 0:
-        log_level = logging.WARNING
-    elif verbosity == 1:
-        log_level = logging.INFO
-    else:
+    if version:
+        typer.echo(f"Wristpy version: {config.get_version()}")
+        raise typer.Exit()
+
+    log_level = logging.INFO
+    if verbosity:
         log_level = logging.DEBUG
     logger.setLevel(log_level)
 
