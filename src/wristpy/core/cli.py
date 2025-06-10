@@ -141,10 +141,6 @@ def main(
     """Run wristpy orchestrator with command line arguments."""
     from wristpy.core import orchestrator
 
-    if version:
-        typer.echo(f"Wristpy version: {config.get_version()}")
-        raise typer.Exit()
-
     log_level = logging.INFO
     if verbosity:
         log_level = logging.DEBUG
