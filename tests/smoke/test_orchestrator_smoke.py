@@ -5,6 +5,7 @@ import pathlib
 import pytest
 
 from wristpy.core import models, orchestrator
+from wristpy.io.writers import writers
 
 
 @pytest.mark.parametrize(
@@ -21,11 +22,11 @@ def test_orchestrator_happy_path(
     results = orchestrator._run_file(input=sample_data_gt3x, output=output_path)
 
     assert output_path.exists()
-    assert isinstance(results, models.OrchestratorResults)
+    assert isinstance(results, writers.OrchestratorResults)
     assert isinstance(results.physical_activity_metric, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
-    assert isinstance(results.nonwear_epoch, models.Measurement)
-    assert isinstance(results.sleep_windows_epoch, models.Measurement)
+    assert isinstance(results.nonwear_status, models.Measurement)
+    assert isinstance(results.sleep_status, models.Measurement)
     assert isinstance(results.physical_activity_levels, models.Measurement)
 
 
@@ -39,9 +40,13 @@ def test_orchestrator_idle_sleep_mode_run(
     )
 
     assert (tmp_path / "good_file.csv").exists()
-    assert isinstance(results, models.OrchestratorResults)
+    assert isinstance(results, writers.OrchestratorResults)
     assert isinstance(results.physical_activity_metric, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
-    assert isinstance(results.nonwear_epoch, models.Measurement)
-    assert isinstance(results.sleep_windows_epoch, models.Measurement)
+    assert isinstance(results.nonwear_status, models.Measurement)
+    assert isinstance(results.sleep_status, models.Measurement)
     assert isinstance(results.physical_activity_levels, models.Measurement)
+    assert isinstance(results.processing_params, dict)
+    assert results.processing_params["calibrator"] == "gradient"
+    assert results.processing_params["nonwear_algorithm"] == ["ggir"]
+    assert results.processing_params["activity_metric"] == "enmo"
