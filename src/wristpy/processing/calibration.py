@@ -655,7 +655,7 @@ class CalibrationDispatcher:
         ) as exc_info:
             if not return_input_on_error:
                 raise
-            logger.error(
+            logger.warning(
                 "Calibration FAILED: %s. Proceeding without calibration.", exc_info
             )
             return acceleration
