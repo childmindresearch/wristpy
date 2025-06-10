@@ -806,7 +806,7 @@
 </span><span id="L-655"><a href="#L-655"><span class="linenos">655</span></a>        <span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
 </span><span id="L-656"><a href="#L-656"><span class="linenos">656</span></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">return_input_on_error</span><span class="p">:</span>
 </span><span id="L-657"><a href="#L-657"><span class="linenos">657</span></a>                <span class="k">raise</span>
-</span><span id="L-658"><a href="#L-658"><span class="linenos">658</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+</span><span id="L-658"><a href="#L-658"><span class="linenos">658</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
 </span><span id="L-659"><a href="#L-659"><span class="linenos">659</span></a>                <span class="s2">&quot;Calibration FAILED: </span><span class="si">%s</span><span class="s2">. Proceeding without calibration.&quot;</span><span class="p">,</span> <span class="n">exc_info</span>
 </span><span id="L-660"><a href="#L-660"><span class="linenos">660</span></a>            <span class="p">)</span>
 </span><span id="L-661"><a href="#L-661"><span class="linenos">661</span></a>            <span class="k">return</span> <span class="n">acceleration</span>
@@ -2080,7 +2080,7 @@ error exceeds the <code><a href="#ConstrainedMinimizationCalibration.max_calibra
 </span><span id="CalibrationDispatcher-656"><a href="#CalibrationDispatcher-656"><span class="linenos">656</span></a>        <span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
 </span><span id="CalibrationDispatcher-657"><a href="#CalibrationDispatcher-657"><span class="linenos">657</span></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">return_input_on_error</span><span class="p">:</span>
 </span><span id="CalibrationDispatcher-658"><a href="#CalibrationDispatcher-658"><span class="linenos">658</span></a>                <span class="k">raise</span>
-</span><span id="CalibrationDispatcher-659"><a href="#CalibrationDispatcher-659"><span class="linenos">659</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+</span><span id="CalibrationDispatcher-659"><a href="#CalibrationDispatcher-659"><span class="linenos">659</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
 </span><span id="CalibrationDispatcher-660"><a href="#CalibrationDispatcher-660"><span class="linenos">660</span></a>                <span class="s2">&quot;Calibration FAILED: </span><span class="si">%s</span><span class="s2">. Proceeding without calibration.&quot;</span><span class="p">,</span> <span class="n">exc_info</span>
 </span><span id="CalibrationDispatcher-661"><a href="#CalibrationDispatcher-661"><span class="linenos">661</span></a>            <span class="p">)</span>
 </span><span id="CalibrationDispatcher-662"><a href="#CalibrationDispatcher-662"><span class="linenos">662</span></a>            <span class="k">return</span> <span class="n">acceleration</span>
@@ -2179,7 +2179,7 @@ error exceeds the <code><a href="#ConstrainedMinimizationCalibration.max_calibra
 </span><span id="CalibrationDispatcher.run-656"><a href="#CalibrationDispatcher.run-656"><span class="linenos">656</span></a>        <span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
 </span><span id="CalibrationDispatcher.run-657"><a href="#CalibrationDispatcher.run-657"><span class="linenos">657</span></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">return_input_on_error</span><span class="p">:</span>
 </span><span id="CalibrationDispatcher.run-658"><a href="#CalibrationDispatcher.run-658"><span class="linenos">658</span></a>                <span class="k">raise</span>
-</span><span id="CalibrationDispatcher.run-659"><a href="#CalibrationDispatcher.run-659"><span class="linenos">659</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+</span><span id="CalibrationDispatcher.run-659"><a href="#CalibrationDispatcher.run-659"><span class="linenos">659</span></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
 </span><span id="CalibrationDispatcher.run-660"><a href="#CalibrationDispatcher.run-660"><span class="linenos">660</span></a>                <span class="s2">&quot;Calibration FAILED: </span><span class="si">%s</span><span class="s2">. Proceeding without calibration.&quot;</span><span class="p">,</span> <span class="n">exc_info</span>
 </span><span id="CalibrationDispatcher.run-661"><a href="#CalibrationDispatcher.run-661"><span class="linenos">661</span></a>            <span class="p">)</span>
 </span><span id="CalibrationDispatcher.run-662"><a href="#CalibrationDispatcher.run-662"><span class="linenos">662</span></a>            <span class="k">return</span> <span class="n">acceleration</span>

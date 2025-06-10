@@ -109,7 +109,7 @@ wristpy    </h1>
 </table>
 
 <p><strong>Special Note</strong>
-    The <code>idle_sleep_mode</code> for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this <a href="https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained">here</a>). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, we fill in the missing acceleration data with the assumption that the watch is perfeclty idle in the face-up position (Acceleration vector = [0, 0, -1]). The data is filled in at the same sampling rate as the raw acceleration data. In the special circumstance when acceleration samples are not evenly spaced, the data is resampled to the highest effective sampling rate to ensure linearly sampled data.</p>
+    The <code>idle_sleep_mode</code> for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this <a href="https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained">here</a>). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, we fill in the missing acceleration data with the assumption that the watch is perfectly idle in the face-up position (Acceleration vector = [0, 0, -1]). The data is filled in at the same sampling rate as the raw acceleration data. In the special circumstance when acceleration samples are not evenly spaced, the data is resampled to the highest effective sampling rate to ensure linearly sampled data.</p>
 
 <h2 id="processing-pipeline-implementation">Processing pipeline implementation</h2>
 
@@ -122,12 +122,23 @@ wristpy    </h1>
 <li><strong>Metrics Calculation</strong>: Calculates various metrics on the calibrated data, namely ENMO (Euclidean norm , minus one) and angle-Z (angle of acceleration relative to the <em>x-y</em> axis).</li>
 <li><strong>Non-wear detection</strong>: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide <code>wear</code> or <code>not wear</code>.</li>
 <li><strong>Sleep Detection</strong>: Using the HDCZ<sup>1</sup> and HSPT<sup>2</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected.</li>
-<li><strong>Physical activity levels</strong>: Using the enmo data (aggreagated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.</li>
+<li><strong>Physical activity levels</strong>: Using the enmo data (aggregated into epoch 1 time bins, 5 second default) we compute activity levels into the following categories: inactivity, light activity, moderate activity, vigorous activity. The default threshold values have been chosen based on the values presented in the Hildenbrand 2014 study<sup>3</sup>.</li>
 </ul>
 
 <h2 id="installation">Installation</h2>
 
-<p>Install this package from PyPI via :</p>
+<blockquote>
+  <h3 id="important-note-for-macos-users">⚠️ Important Note for macOS Users</h3>
+  
+  <p><strong>wristpy</strong> depends on <code>libomp</code>, a system-level dependency that is not always installed by default on macOS. Install it via:</p>
+  
+  <div class="pdoc-code codehilite">
+<pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>libomp
+</code></pre>
+  </div>
+</blockquote>
+
+<p>Install the <code><a href="">wristpy</a></code> package from PyPI via:</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>wristpy
@@ -154,6 +165,13 @@ wristpy    </h1>
 </code></pre>
 </div>
 
+<h4 id="for-a-full-list-of-command-line-arguments">For a full list of command line arguments:</h4>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>wristpy<span class="w"> </span>--help
+</code></pre>
+</div>
+
 <h3 id="using-wristpy-through-a-python-script-or-notebook">Using Wristpy through a python script or notebook:</h3>
 
 <h4 id="running-single-files">Running single files:</h4>
@@ -174,7 +192,7 @@ wristpy    </h1>
 <span class="p">)</span>
 
 <span class="c1">#Data available in results object</span>
-<span class="n">enmo</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">enmo</span>
+<span class="n">physical_activity_metric</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">physical_activity_metric</span>
 <span class="n">anglez</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">anglez</span>
 <span class="n">physical_activity_levels</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">physical_activity_levels</span>
 <span class="n">nonwear_array</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">nonwear_epoch</span>
@@ -202,10 +220,10 @@ wristpy    </h1>
 <span class="p">)</span>
 
 
-<span class="c1">#Data available in dictionry of results.</span>
+<span class="c1">#Data available in dictionary of results.</span>
 <span class="n">subject1</span> <span class="o">=</span> <span class="n">results_dict</span><span class="p">[</span><span class="s1">&#39;subject1&#39;</span><span class="p">]</span>
 
-<span class="n">enmo</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">enmo</span>
+<span class="n">physical_activity_metric</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">physical_activity_metric</span>
 <span class="n">anglez</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">anglez</span>
 <span class="n">physical_activity_levels</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">physical_activity_levels</span>
 <span class="n">nonwear_array</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">nonwear_epoch</span>
@@ -230,7 +248,7 @@ wristpy    </h1>
 <pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-v<span class="w"> </span><span class="s2">&quot;/local/path/to/data:/data&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-v<span class="w"> </span><span class="s2">&quot;/local/path/to/output:/output&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>cmidair/wristpy
+<span class="w">  </span>cmidair/wristpy:main
 </code></pre>
 </div>
 
@@ -241,7 +259,7 @@ wristpy    </h1>
  docker run -it --rm \
   -v "/local/path/to/data/file.bin:/data/file.bin" \
   -v "/local/path/to/output:/output" \
-  cmidair/wristpy
+  cmidair/wristpy:main
 </code></p></li>
 </ol>
 
@@ -253,7 +271,7 @@ wristpy    </h1>
 <pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-v<span class="w"> </span><span class="s2">&quot;/local/path/to/data/file.bin:/data/file.bin&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-v<span class="w"> </span><span class="s2">&quot;/local/path/to/output:/output&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>cmidair/wristpy<span class="w"> </span>/data<span class="w"> </span>--output<span class="w"> </span>/output<span class="w"> </span>--epoch-length<span class="w"> </span><span class="m">5</span><span class="w"> </span>--nonwear-algorithm<span class="w"> </span>ggir<span class="w"> </span>--nonwear-algorithm<span class="w"> </span>detach<span class="w"> </span>--thresholds<span class="w"> </span><span class="m">0</span>.1<span class="w"> </span><span class="m">0</span>.2<span class="w"> </span><span class="m">0</span>.4
+<span class="w">  </span>cmidair/wristpy:main<span class="w"> </span>/data<span class="w"> </span>--output<span class="w"> </span>/output<span class="w"> </span>--epoch-length<span class="w"> </span><span class="m">5</span><span class="w"> </span>--nonwear-algorithm<span class="w"> </span>ggir<span class="w"> </span>--nonwear-algorithm<span class="w"> </span>detach<span class="w"> </span>--thresholds<span class="w"> </span><span class="m">0</span>.1<span class="w"> </span><span class="m">0</span>.2<span class="w"> </span><span class="m">0</span>.4
 </code></pre>
 </div>
 

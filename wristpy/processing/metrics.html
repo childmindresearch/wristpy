@@ -337,7 +337,7 @@
 </span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a>
 </span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a>
 </span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a><span class="sd">    Args:</span>
-</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="sd">        acceleration: The Measurment instance that contains the calibrated acceleration</span>
+</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="sd">        acceleration: The Measurement instance that contains the calibrated acceleration</span>
 </span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a><span class="sd">            data.</span>
 </span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a><span class="sd">        short_epoch_length: The short window size, in seconds.</span>
 </span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a><span class="sd">        n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.</span>
@@ -345,7 +345,7 @@
 </span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a>
 </span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>
 </span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="sd">    Returns:</span>
-</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">        A new Measurment instance with the non-wear flag and corresponding timestamps.</span>
+</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">        A new Measurement instance with the non-wear flag and corresponding timestamps.</span>
 </span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Detecting non-wear data.&quot;</span><span class="p">)</span>
 </span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a>    <span class="n">acceleration_grouped_by_short_window</span> <span class="o">=</span> <span class="n">_group_acceleration_data_by_time</span><span class="p">(</span>
@@ -381,13 +381,13 @@
 </span><span id="L-299"><a href="#L-299"><span class="linenos">299</span></a><span class="sd">    &quot;non-wear&quot;, here denoted by 0 and 1, respectively.</span>
 </span><span id="L-300"><a href="#L-300"><span class="linenos">300</span></a>
 </span><span id="L-301"><a href="#L-301"><span class="linenos">301</span></a><span class="sd">    Args:</span>
-</span><span id="L-302"><a href="#L-302"><span class="linenos">302</span></a><span class="sd">        acceleration: The Measurment instance that contains the calibrated acceleration.</span>
-</span><span id="L-303"><a href="#L-303"><span class="linenos">303</span></a><span class="sd">        temperature: The Measurment instance that contains the temperature data.</span>
+</span><span id="L-302"><a href="#L-302"><span class="linenos">302</span></a><span class="sd">        acceleration: The Measurement instance that contains calibrated acceleration.</span>
+</span><span id="L-303"><a href="#L-303"><span class="linenos">303</span></a><span class="sd">        temperature: The Measurement instance that contains the temperature data.</span>
 </span><span id="L-304"><a href="#L-304"><span class="linenos">304</span></a><span class="sd">        std_criteria: Threshold criteria for standard deviation.</span>
 </span><span id="L-305"><a href="#L-305"><span class="linenos">305</span></a><span class="sd">        temperature_threshold: The temperature threshold for non-wear detection.</span>
 </span><span id="L-306"><a href="#L-306"><span class="linenos">306</span></a>
 </span><span id="L-307"><a href="#L-307"><span class="linenos">307</span></a><span class="sd">    Returns:</span>
-</span><span id="L-308"><a href="#L-308"><span class="linenos">308</span></a><span class="sd">        A new Measurment instance with the non-wear flag and corresponding timestamps.</span>
+</span><span id="L-308"><a href="#L-308"><span class="linenos">308</span></a><span class="sd">        A new Measurement instance with the non-wear flag and corresponding timestamps.</span>
 </span><span id="L-309"><a href="#L-309"><span class="linenos">309</span></a><span class="sd">        The temporal resolutions is one minute.</span>
 </span><span id="L-310"><a href="#L-310"><span class="linenos">310</span></a>
 </span><span id="L-311"><a href="#L-311"><span class="linenos">311</span></a><span class="sd">    References:</span>
@@ -448,12 +448,12 @@
 </span><span id="L-366"><a href="#L-366"><span class="linenos">366</span></a><span class="sd">    The nonwear array is downsampled to 60 second resolution.</span>
 </span><span id="L-367"><a href="#L-367"><span class="linenos">367</span></a>
 </span><span id="L-368"><a href="#L-368"><span class="linenos">368</span></a><span class="sd">    Args:</span>
-</span><span id="L-369"><a href="#L-369"><span class="linenos">369</span></a><span class="sd">        acceleration: The Measurment instance that contains the calibrated acceleration.</span>
-</span><span id="L-370"><a href="#L-370"><span class="linenos">370</span></a><span class="sd">        temperature: The Measurment instance that contains the temperature data.</span>
+</span><span id="L-369"><a href="#L-369"><span class="linenos">369</span></a><span class="sd">        acceleration: The Measurement instance that contains calibrated acceleration.</span>
+</span><span id="L-370"><a href="#L-370"><span class="linenos">370</span></a><span class="sd">        temperature: The Measurement instance that contains the temperature data.</span>
 </span><span id="L-371"><a href="#L-371"><span class="linenos">371</span></a><span class="sd">        std_criteria: The acceleration STD threshold for non-wear detection.</span>
 </span><span id="L-372"><a href="#L-372"><span class="linenos">372</span></a>
 </span><span id="L-373"><a href="#L-373"><span class="linenos">373</span></a><span class="sd">    Returns:</span>
-</span><span id="L-374"><a href="#L-374"><span class="linenos">374</span></a><span class="sd">        A new Measurment instance with the non-wear flag and corresponding timestamps.</span>
+</span><span id="L-374"><a href="#L-374"><span class="linenos">374</span></a><span class="sd">        A new Measurement instance with the non-wear flag and corresponding timestamps.</span>
 </span><span id="L-375"><a href="#L-375"><span class="linenos">375</span></a><span class="sd">        The temporal resolutions is one minute.</span>
 </span><span id="L-376"><a href="#L-376"><span class="linenos">376</span></a>
 </span><span id="L-377"><a href="#L-377"><span class="linenos">377</span></a><span class="sd">    References:</span>
@@ -510,7 +510,7 @@
 </span><span id="L-428"><a href="#L-428"><span class="linenos">428</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to group the acceleration data by short windows.</span>
 </span><span id="L-429"><a href="#L-429"><span class="linenos">429</span></a>
 </span><span id="L-430"><a href="#L-430"><span class="linenos">430</span></a><span class="sd">    Args:</span>
-</span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a><span class="sd">        acceleration: The Measurment instance that contains the calibrated acceleration.</span>
+</span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a><span class="sd">        acceleration: The Measurement instance that contains calibrated acceleration.</span>
 </span><span id="L-432"><a href="#L-432"><span class="linenos">432</span></a><span class="sd">        window_length: The window size, in seconds.</span>
 </span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a>
 </span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a><span class="sd">    Returns:</span>
@@ -647,8 +647,8 @@
 </span><span id="L-565"><a href="#L-565"><span class="linenos">565</span></a><span class="sd">    intervals and then low-pass filters the data by applying a 2 minute rolling mean.</span>
 </span><span id="L-566"><a href="#L-566"><span class="linenos">566</span></a>
 </span><span id="L-567"><a href="#L-567"><span class="linenos">567</span></a><span class="sd">    Args:</span>
-</span><span id="L-568"><a href="#L-568"><span class="linenos">568</span></a><span class="sd">        temperature: The Measurment instance that contains the temperature data.</span>
-</span><span id="L-569"><a href="#L-569"><span class="linenos">569</span></a><span class="sd">        acceleration: The Measurment instance that contains the acceleration data.</span>
+</span><span id="L-568"><a href="#L-568"><span class="linenos">568</span></a><span class="sd">        temperature: The Measurement instance that contains the temperature data.</span>
+</span><span id="L-569"><a href="#L-569"><span class="linenos">569</span></a><span class="sd">        acceleration: The Measurement instance that contains the acceleration data.</span>
 </span><span id="L-570"><a href="#L-570"><span class="linenos">570</span></a>
 </span><span id="L-571"><a href="#L-571"><span class="linenos">571</span></a><span class="sd">    Returns:</span>
 </span><span id="L-572"><a href="#L-572"><span class="linenos">572</span></a><span class="sd">        A polars DataFrame with the pre-processed temperature data.</span>
@@ -1200,7 +1200,7 @@ the chosen epoch length.</p>
 </span><span id="detect_nonwear-256"><a href="#detect_nonwear-256"><span class="linenos">256</span></a>
 </span><span id="detect_nonwear-257"><a href="#detect_nonwear-257"><span class="linenos">257</span></a>
 </span><span id="detect_nonwear-258"><a href="#detect_nonwear-258"><span class="linenos">258</span></a><span class="sd">    Args:</span>
-</span><span id="detect_nonwear-259"><a href="#detect_nonwear-259"><span class="linenos">259</span></a><span class="sd">        acceleration: The Measurment instance that contains the calibrated acceleration</span>
+</span><span id="detect_nonwear-259"><a href="#detect_nonwear-259"><span class="linenos">259</span></a><span class="sd">        acceleration: The Measurement instance that contains the calibrated acceleration</span>
 </span><span id="detect_nonwear-260"><a href="#detect_nonwear-260"><span class="linenos">260</span></a><span class="sd">            data.</span>
 </span><span id="detect_nonwear-261"><a href="#detect_nonwear-261"><span class="linenos">261</span></a><span class="sd">        short_epoch_length: The short window size, in seconds.</span>
 </span><span id="detect_nonwear-262"><a href="#detect_nonwear-262"><span class="linenos">262</span></a><span class="sd">        n_short_epoch_in_long_epoch: Number of short epochs that makeup one long epoch.</span>
@@ -1208,7 +1208,7 @@ the chosen epoch length.</p>
 </span><span id="detect_nonwear-264"><a href="#detect_nonwear-264"><span class="linenos">264</span></a>
 </span><span id="detect_nonwear-265"><a href="#detect_nonwear-265"><span class="linenos">265</span></a>
 </span><span id="detect_nonwear-266"><a href="#detect_nonwear-266"><span class="linenos">266</span></a><span class="sd">    Returns:</span>
-</span><span id="detect_nonwear-267"><a href="#detect_nonwear-267"><span class="linenos">267</span></a><span class="sd">        A new Measurment instance with the non-wear flag and corresponding timestamps.</span>
+</span><span id="detect_nonwear-267"><a href="#detect_nonwear-267"><span class="linenos">267</span></a><span class="sd">        A new Measurement instance with the non-wear flag and corresponding timestamps.</span>
 </span><span id="detect_nonwear-268"><a href="#detect_nonwear-268"><span class="linenos">268</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="detect_nonwear-269"><a href="#detect_nonwear-269"><span class="linenos">269</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Detecting non-wear data.&quot;</span><span class="p">)</span>
 </span><span id="detect_nonwear-270"><a href="#detect_nonwear-270"><span class="linenos">270</span></a>    <span class="n">acceleration_grouped_by_short_window</span> <span class="o">=</span> <span class="n">_group_acceleration_data_by_time</span><span class="p">(</span>
@@ -1253,7 +1253,7 @@ value, and set them to 2 if surrounded by &gt; 1 values. The non-wear flag is se
 <h6 id="arguments">Arguments:</h6>
 
 <ul>
-<li><strong>acceleration:</strong>  The Measurment instance that contains the calibrated acceleration
+<li><strong>acceleration:</strong>  The Measurement instance that contains the calibrated acceleration
 data.</li>
 <li><strong>short_epoch_length:</strong>  The short window size, in seconds.</li>
 <li><strong>n_short_epoch_in_long_epoch:</strong>  Number of short epochs that makeup one long epoch.</li>
@@ -1263,7 +1263,7 @@ data.</li>
 <h6 id="returns">Returns:</h6>
 
 <blockquote>
-  <p>A new Measurment instance with the non-wear flag and corresponding timestamps.</p>
+  <p>A new Measurement instance with the non-wear flag and corresponding timestamps.</p>
 </blockquote>
 </div>
 
@@ -1293,13 +1293,13 @@ data.</li>
 </span><span id="combined_temp_accel_detect_nonwear-300"><a href="#combined_temp_accel_detect_nonwear-300"><span class="linenos">300</span></a><span class="sd">    &quot;non-wear&quot;, here denoted by 0 and 1, respectively.</span>
 </span><span id="combined_temp_accel_detect_nonwear-301"><a href="#combined_temp_accel_detect_nonwear-301"><span class="linenos">301</span></a>
 </span><span id="combined_temp_accel_detect_nonwear-302"><a href="#combined_temp_accel_detect_nonwear-302"><span class="linenos">302</span></a><span class="sd">    Args:</span>
-</span><span id="combined_temp_accel_detect_nonwear-303"><a href="#combined_temp_accel_detect_nonwear-303"><span class="linenos">303</span></a><span class="sd">        acceleration: The Measurment instance that contains the calibrated acceleration.</span>
-</span><span id="combined_temp_accel_detect_nonwear-304"><a href="#combined_temp_accel_detect_nonwear-304"><span class="linenos">304</span></a><span class="sd">        temperature: The Measurment instance that contains the temperature data.</span>
+</span><span id="combined_temp_accel_detect_nonwear-303"><a href="#combined_temp_accel_detect_nonwear-303"><span class="linenos">303</span></a><span class="sd">        acceleration: The Measurement instance that contains calibrated acceleration.</span>
+</span><span id="combined_temp_accel_detect_nonwear-304"><a href="#combined_temp_accel_detect_nonwear-304"><span class="linenos">304</span></a><span class="sd">        temperature: The Measurement instance that contains the temperature data.</span>
 </span><span id="combined_temp_accel_detect_nonwear-305"><a href="#combined_temp_accel_detect_nonwear-305"><span class="linenos">305</span></a><span class="sd">        std_criteria: Threshold criteria for standard deviation.</span>
 </span><span id="combined_temp_accel_detect_nonwear-306"><a href="#combined_temp_accel_detect_nonwear-306"><span class="linenos">306</span></a><span class="sd">        temperature_threshold: The temperature threshold for non-wear detection.</span>
 </span><span id="combined_temp_accel_detect_nonwear-307"><a href="#combined_temp_accel_detect_nonwear-307"><span class="linenos">307</span></a>
 </span><span id="combined_temp_accel_detect_nonwear-308"><a href="#combined_temp_accel_detect_nonwear-308"><span class="linenos">308</span></a><span class="sd">    Returns:</span>
-</span><span id="combined_temp_accel_detect_nonwear-309"><a href="#combined_temp_accel_detect_nonwear-309"><span class="linenos">309</span></a><span class="sd">        A new Measurment instance with the non-wear flag and corresponding timestamps.</span>
+</span><span id="combined_temp_accel_detect_nonwear-309"><a href="#combined_temp_accel_detect_nonwear-309"><span class="linenos">309</span></a><span class="sd">        A new Measurement instance with the non-wear flag and corresponding timestamps.</span>
 </span><span id="combined_temp_accel_detect_nonwear-310"><a href="#combined_temp_accel_detect_nonwear-310"><span class="linenos">310</span></a><span class="sd">        The temporal resolutions is one minute.</span>
 </span><span id="combined_temp_accel_detect_nonwear-311"><a href="#combined_temp_accel_detect_nonwear-311"><span class="linenos">311</span></a>
 </span><span id="combined_temp_accel_detect_nonwear-312"><a href="#combined_temp_accel_detect_nonwear-312"><span class="linenos">312</span></a><span class="sd">    References:</span>
@@ -1360,8 +1360,8 @@ data is chunked into one minute windows. Each windows is classified as "wear" or
 <h6 id="arguments">Arguments:</h6>
 
 <ul>
-<li><strong>acceleration:</strong>  The Measurment instance that contains the calibrated acceleration.</li>
-<li><strong>temperature:</strong>  The Measurment instance that contains the temperature data.</li>
+<li><strong>acceleration:</strong>  The Measurement instance that contains calibrated acceleration.</li>
+<li><strong>temperature:</strong>  The Measurement instance that contains the temperature data.</li>
 <li><strong>std_criteria:</strong>  Threshold criteria for standard deviation.</li>
 <li><strong>temperature_threshold:</strong>  The temperature threshold for non-wear detection.</li>
 </ul>
@@ -1369,7 +1369,7 @@ data is chunked into one minute windows. Each windows is classified as "wear" or
 <h6 id="returns">Returns:</h6>
 
 <blockquote>
-  <p>A new Measurment instance with the non-wear flag and corresponding timestamps.
+  <p>A new Measurement instance with the non-wear flag and corresponding timestamps.
   The temporal resolutions is one minute.</p>
 </blockquote>
 
@@ -1405,12 +1405,12 @@ data is chunked into one minute windows. Each windows is classified as "wear" or
 </span><span id="detach_nonwear-367"><a href="#detach_nonwear-367"><span class="linenos">367</span></a><span class="sd">    The nonwear array is downsampled to 60 second resolution.</span>
 </span><span id="detach_nonwear-368"><a href="#detach_nonwear-368"><span class="linenos">368</span></a>
 </span><span id="detach_nonwear-369"><a href="#detach_nonwear-369"><span class="linenos">369</span></a><span class="sd">    Args:</span>
-</span><span id="detach_nonwear-370"><a href="#detach_nonwear-370"><span class="linenos">370</span></a><span class="sd">        acceleration: The Measurment instance that contains the calibrated acceleration.</span>
-</span><span id="detach_nonwear-371"><a href="#detach_nonwear-371"><span class="linenos">371</span></a><span class="sd">        temperature: The Measurment instance that contains the temperature data.</span>
+</span><span id="detach_nonwear-370"><a href="#detach_nonwear-370"><span class="linenos">370</span></a><span class="sd">        acceleration: The Measurement instance that contains calibrated acceleration.</span>
+</span><span id="detach_nonwear-371"><a href="#detach_nonwear-371"><span class="linenos">371</span></a><span class="sd">        temperature: The Measurement instance that contains the temperature data.</span>
 </span><span id="detach_nonwear-372"><a href="#detach_nonwear-372"><span class="linenos">372</span></a><span class="sd">        std_criteria: The acceleration STD threshold for non-wear detection.</span>
 </span><span id="detach_nonwear-373"><a href="#detach_nonwear-373"><span class="linenos">373</span></a>
 </span><span id="detach_nonwear-374"><a href="#detach_nonwear-374"><span class="linenos">374</span></a><span class="sd">    Returns:</span>
-</span><span id="detach_nonwear-375"><a href="#detach_nonwear-375"><span class="linenos">375</span></a><span class="sd">        A new Measurment instance with the non-wear flag and corresponding timestamps.</span>
+</span><span id="detach_nonwear-375"><a href="#detach_nonwear-375"><span class="linenos">375</span></a><span class="sd">        A new Measurement instance with the non-wear flag and corresponding timestamps.</span>
 </span><span id="detach_nonwear-376"><a href="#detach_nonwear-376"><span class="linenos">376</span></a><span class="sd">        The temporal resolutions is one minute.</span>
 </span><span id="detach_nonwear-377"><a href="#detach_nonwear-377"><span class="linenos">377</span></a>
 </span><span id="detach_nonwear-378"><a href="#detach_nonwear-378"><span class="linenos">378</span></a><span class="sd">    References:</span>
@@ -1469,15 +1469,15 @@ data is chunked into one minute windows. Each windows is classified as "wear" or
 <h6 id="arguments">Arguments:</h6>
 
 <ul>
-<li><strong>acceleration:</strong>  The Measurment instance that contains the calibrated acceleration.</li>
-<li><strong>temperature:</strong>  The Measurment instance that contains the temperature data.</li>
+<li><strong>acceleration:</strong>  The Measurement instance that contains calibrated acceleration.</li>
+<li><strong>temperature:</strong>  The Measurement instance that contains the temperature data.</li>
 <li><strong>std_criteria:</strong>  The acceleration STD threshold for non-wear detection.</li>
 </ul>
 
 <h6 id="returns">Returns:</h6>
 
 <blockquote>
-  <p>A new Measurment instance with the non-wear flag and corresponding timestamps.
+  <p>A new Measurement instance with the non-wear flag and corresponding timestamps.
   The temporal resolutions is one minute.</p>
 </blockquote>
 
