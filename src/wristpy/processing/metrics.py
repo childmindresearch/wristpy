@@ -132,7 +132,7 @@ def actigraph_activity_counts(
     """Compute Actigraph acitivty counts.
 
     This function computes the Actigraph activity counts based on [1].
-    The acceleartion data is downsample to 30Hz, bandpass filtered, scaled,
+    The acceleration data is downsample to 30Hz, bandpass filtered, scaled,
     and then thresholded. The counts are then summed along each axis for
     the chosen epoch length.
 
@@ -148,7 +148,7 @@ def actigraph_activity_counts(
         in ActiGraph wearable,” Sci Rep, vol. 12, no. 1, Art. no. 1, Jul. 2022,
         doi: 10.1038/s41598-022-16003-x.
     """
-    logger.debug("Running activty count physical activity metric.")
+    logger.debug("Running activity count physical activity metric.")
 
     epoch_length_nanoseconds = round(epoch_length * 1e9)
 
@@ -391,7 +391,7 @@ def detach_nonwear(
         return temperature_interpolator(x_acceleration)
 
     def cleanup_DETACH_nonwear(nonwear: models.Measurement) -> models.Measurement:
-        """Helper function to downsample DETACH ouptut to 60s."""
+        """Helper function to downsample DETACH outptut to 60s."""
         nonwear_downsample = computations.moving_mean(nonwear, 60)
 
         nonwear_downsample.measurements = np.where(
