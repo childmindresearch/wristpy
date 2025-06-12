@@ -55,6 +55,13 @@ class NonwearAlgorithms(str, Enum):
     detach = "detach"
 
 
+def version_check(version: bool) -> None:
+    """Print the current version of wristpy and exit."""
+    if version:
+        typer.echo(f"Wristpy version: {config.get_version()}")
+        raise typer.Exit()
+
+
 @app.command()
 def main(
     input: pathlib.Path = typer.Argument(
@@ -123,15 +130,16 @@ def main(
         "Defaults to INFO if not included.",
     ),
     version: bool = typer.Option(
-        False, "-V", "--version", help="Show the version and exit."
+        False,
+        "-V",
+        "--version",
+        help="Print the current version of wristpy and exit.",
+        is_eager=True,
+        callback=version_check,
     ),
 ) -> None:
     """Run wristpy orchestrator with command line arguments."""
     from wristpy.core import orchestrator
-
-    if version:
-        typer.echo(f"Wristpy version: {config.get_version()}")
-        raise typer.Exit()
 
     log_level = logging.INFO
     if verbosity:
