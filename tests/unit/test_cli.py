@@ -206,3 +206,30 @@ def test_main_verbosity(
         verbosity=logging.DEBUG,
         output_filetype=None,
     )
+
+
+def test_main_version(
+    create_typer_cli_runner: testing.CliRunner,
+) -> None:
+    """Test cli version output."""
+    result = create_typer_cli_runner.invoke(cli.app, ["--version"])
+
+    assert result.exit_code == 0
+    assert "Wristpy version" in result.output
+
+
+def test_main_version_with_options(
+    create_typer_cli_runner: testing.CliRunner,
+    sample_data_gt3x: pathlib.Path,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """Test other arguments and options are ignored when --version is passed."""
+    mock_run = mocker.patch.object(orchestrator, "run")
+
+    result = create_typer_cli_runner.invoke(
+        cli.app, [str(sample_data_gt3x), "-e", "5", "--version"]
+    )
+
+    assert result.exit_code == 0
+    assert "Wristpy version" in result.output
+    mock_run.assert_not_called()
