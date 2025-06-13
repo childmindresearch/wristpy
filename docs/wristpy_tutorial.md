@@ -30,7 +30,7 @@ results = orchestrator.run(
    output = 'path/to/save/file_name.csv'
 )
 ```
-This runs the processing pipeline with all the default arguments, creates an output `.csv` file, a `.json` file with the pipeline configuration parameters, and will create a `results` object that contains the various output metrics (namely, the specified physical activity metric, angle-z, physical activity classification values, non-wear detection, sleep detection).
+This runs the processing pipeline with all the default arguments, creates an output `.csv` file, a `.json` file with the pipeline configuration parameters, and will create a `results` object that contains the various output metrics (namely; the specified physical activity metric, angle-z, physical activity classification values, non-wear status, and sleep status).
 
 
 The orchestrator can also process entire directories. The call to the orchestrator remains largely the same but now output is expected to be a directory and the desired filetype for the saved files **must** be specified:
@@ -49,7 +49,7 @@ results = orchestrator.run(
 
 We can visualize some of the outputs within the `results` object, directly, with the following scripts:
 
-Plot the ENMO across the entire data set:
+Plot the default physical activity metrics (ENMO) across the entire data set:
 ```python
 from matplotlib import pyplot as plt
 plt.plot(results.physical_activity_metric.time, results.physical_activity_metric.measurements)
@@ -104,9 +104,13 @@ Inactivity percent: 87.21338876269661
 
 > ### Configuring a custom pipeline
 >
-> We can modify the defualt values of the following parameters: calibration, epoch_length, physical activity metric, non-wear algorithm
->
->
+> A custom processing pipeline can be easily created by modifying the input arguments to the `orchestrator.run` call.
+> 
+>> For example:
+>> ```python
+>> results = orchestrator.run(input = '/path/to/input/dir', output = '/path/to/output/dir', output_filetype = ".parquet", calibrator="gradient", activity_metric="ag_count", nonwear_algorithm=["detach"], epoch_length=10, thresholds=[0.05, 0.1, 0.3])
+>> ```
+> Complete documentation on these parameters can be found [here](https://childmindresearch.github.io/wristpy/wristpy/core/orchestrator.html#run).
 
 
 ## Example 2: Loading data and plotting the raw signals
@@ -138,9 +142,9 @@ Plot the light data:
 
 
 
-## Example 3:  Plot the epoch1 level measurements
+## Example 3:  Plot the epoch-level measurements
 
-In this example we will expand on the skills learned in `Example 2`: we will load the sensor data, calibrate, and then calculate the ENMO and angle-z data in 5s windows (epoch 1 data).
+In this example we will expand on the skills learned in `Example 2`: we will load the sensor data, calibrate, and then calculate the ENMO and angle-z data in 5s windows (epoch-level data).
 
 ```python
 from wristpy.io.readers import readers
@@ -157,7 +161,7 @@ calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
 enmo = metrics.euclidean_norm_minus_one(calibrated_data)
 anglez = metrics.angle_relative_to_horizontal(calibrated_data)
 
-#Obtain the epoch1 level data
+#Obtain the epoch-level data, default is 5s windows
 enmo_epoch1 = computations.moving_mean(enmo)
 anglez_epoch1 = computations.moving_mean(anglez)
 ```
@@ -193,12 +197,12 @@ watch_data = readers.read_watch_data('/path/to/geneactive/file.bin')
 calibrator_object = calibration.ConstrainedMinimizationCalibration()
 calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
 
-#Find non-wear periods
+#Find non-wear periods, using default GGIR algorithm
 non_wear_array = metrics.detect_nonwear(calibrated_data)
 
 ```
 
-We can then visualize the non-wear periods, in comparison to movement (ENMO at the epoch1 level):
+We can then visualize the non-wear periods, in comparison to movement (ENMO at the epoch-level):
 ```python
 from wristpy.core import computations
 
@@ -215,66 +219,21 @@ plt.legend(['ENMO Epoch1', 'Non-wear'])
 
 
 
-## Example 5: Find and filter the sleep windows
-
-The following script will obtain the sleep window pairs (onset,wakeup):
-
-```python
-from wristpy.io.readers import readers
-from wristpy.processing import analytics, calibration, metrics
+## Example 5: Compute and plot the sleep windows
 
 
-watch_data = readers.read_watch_data('/path/to/geneactive/file.bin')
-calibrator_object = calibration.ConstrainedMinimizationCalibration()
-calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
-anglez = metrics.angle_relative_to_horizontal(calibrated_data)
-
-sleep_detector = analytics.GgirSleepDetection(anglez)
-sleep_windows = sleep_detector.run_sleep_detection()
-```
-
-We can then visualize the sleep periods in comparison to the angle-z data and the non-wear periods, where sleep periods are visualized by a horizontal blue line, and non-wear periods are visualized with a green trace and the angle-z data with the semi-transparent red trace:
+We can visualize the sleep periods in comparison to other metrics; in this example, we compare the sleep windows to the angle-z data and the non-wear periods. In the default pipeline any sleep periods that overlap with non-wear periods are filtered out.
+This plot shows the sleep periods visualized by a blue trace, non-wear periods are visualized with a green trace, and the angle-z data with the semi-transparent red trace. These are all accessible directly from the results object calculated from the default pipeline:
 
 ```python
 import matplotlib.pyplot as plt
 
 fig, ax1 = plt.subplots()
 
-# Plot each sleep window as a horizontal line
-for sw in sleep_windows:
-    if sw.onset is not None and sw.wakeup is not None:
-        plt.hlines(1, sw.onset, sw.wakeup, colors='blue', linestyles='solid')
-
-plt.plot(non_wear_array.time, non_wear_array.measurements, color='green')
+ax1.plot(results.sleep_status.time, results.sleep_status.measurements, color='blue', label='Sleep Periods')
+plt.plot(results.nonwear_status.time, results.nonwear_status.measurements, color='green')
 ax2 = ax1.twinx()
-ax2.plot(anglez.time, anglez.measurements, color='red', alpha=0.5)
-ax2.set_ylabel('Anglez Epoch1', color='red')
-
-ax1.set_ylabel('Sleep Period/Non-wear')
-ax1.set_ylim(0, 1.5)
-
-plt.show()
-```
-![Plot the sleep periods compared to angelz data.](sleep_angz_example5.png)
-
-
-The filtered sleep windows can easily be obtained with the following function. This removes all sleep periods that have any overlap with non-wear time.
-
-`filtered_sleep_windows = analytics.remove_nonwear_from_sleep(non_wear_array, sleep_windows )`
-
-And these can be visualized and compared to angle-z and the non-wear periods as previously:
-```python
-import matplotlib.pyplot as plt
-
-fig, ax1 = plt.subplots()
-
-for sw in filtered_sleep_windows:
-    if sw.onset is not None and sw.wakeup is not None:
-        plt.hlines(1, sw.onset, sw.wakeup, colors='blue', linestyles='solid')
-
-plt.plot(non_wear_array.time, non_wear_array.measurements, color='green')
-ax2 = ax1.twinx()
-ax2.plot(anglez.time, anglez.measurements, color='red', alpha=0.5)
+ax2.plot(results.anglez.time, results.anglez.measurements, color='red', alpha=0.5)
 ax2.set_ylabel('Anglez Epoch1', color='red')
 
 ax1.set_ylabel('Sleep Period/Non-wear')
