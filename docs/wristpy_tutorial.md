@@ -1,22 +1,24 @@
-Wristpy Tutorial
-================
+# Wristpy Tutorial
 
-Introduction
-------------
+
+## Introduction
+
 
 Wristpy is a Python library designed for processing and analyzing wrist-worn accelerometer data.
-This tutorial will guide you through the basic steps of using Wristpy to analyze your accelerometer data. Specifically,
+This tutorial will guide you through the basic steps of using `wristpy` to analyze your accelerometer data. Specifically,
 we will cover the following topics through a few examples:
    - running the default processor, analyzing the output data, and visualizing the results.
    - loading data and plotting the raw signals.
    - how to calibrate the data, computing ENMO and angle-z from the calibrated data and then plotting those metrics.
    - how to obtain non-wear windows and visualize them.
    - how to obtain sleep windows and visualize them.
-      - how we can filter sleep windows that overlap with non-wear periods.
+      - how we can filter sleep windows that overlap with non-wear periods.   
+  
+    
 
 
-Example 1: Running the default processor
-----------------------------------------
+## Example 1: Running the default processor
+
 
 The `orchestrator` module of wristpy contains the default processor that will run the entire wristpy processing pipeline. This can be called as simply as:
 
@@ -28,7 +30,8 @@ results = orchestrator.run(
    output = 'path/to/save/file_name.csv'
 )
 ```
-This runs the processing pipeline with all the default arguments, creates an output `.csv` file, and will create a `results` object that contains the various output metrics (namely, enmo, angle-z, physical activity values, non-wear detection, sleep detection).
+This runs the processing pipeline with all the default arguments, creates an output `.csv` file, a `.json` file with the pipeline configuration parameters, and will create a `results` object that contains the various output metrics (namely, the specified physical activity metric, angle-z, physical activity classification values, non-wear detection, sleep detection).
+
 
 The orchestrator can also process entire directories. The call to the orchestrator remains largely the same but now output is expected to be a directory and the desired filetype for the saved files **must** be specified:
 
@@ -49,7 +52,7 @@ We can visualize some of the outputs within the `results` object, directly, with
 Plot the ENMO across the entire data set:
 ```python
 from matplotlib import pyplot as plt
-plt.plot(results.enmo.time, results.enmo.measurements)
+plt.plot(results.physical_activity_metric.time, results.physical_activity_metric.measurements)
 ```
 
 ![Example of the ENMO result](enmo_example1.png)
@@ -59,7 +62,7 @@ Plot the sleep windows with normalized angle-z data:
 from matplotlib import pyplot as plt
 
 plt.plot(results.anglez.time, results.anglez.measurements/90)
-plt.plot(results.sleep_windows_epoch.time, results.sleep_windows_epoch.measurements)
+plt.plot(results.sleep_status.time, results.sleep_status.measurements)
 plt.legend(['Angle Z', 'Sleep Windows'])
 plt.show()
 ```
@@ -80,10 +83,10 @@ plt.plot(output_results['time'], phys_activity)
 It is also possible to do some analysis on these output variables, for example, if we want to find the percent of time spent inactive, or in light, moderate, or vigorous physical activity:
 
 ```python
-inactivity_count = sum(output_results['physical_activity_levels'] == 0)
-light_activity_count = sum(output_results['physical_activity_levels'] == 1)
-moderate_activity_count = sum(output_results['physical_activity_levels'] == 2)
-vigorous_activity_count = sum(output_results['physical_activity_levels'] == 3)
+inactivity_count = sum(phys_activity == 0)
+light_activity_count = sum(phys_activity== 1)
+moderate_activity_count = sum(phys_activity == 2)
+vigorous_activity_count = sum(phys_activity == 3)
 total_activity_count = len(output_results['physical_activity_levels'])
 
 print(f'Light activity percent: {light_activity_count*100/total_activity_count}')
@@ -93,15 +96,21 @@ print(f'Inactivity percent: {inactivity_count*100/total_activity_count}')
 ```
 
 ```
-Light activity percent: 12.394840157038699
-Moderate activity percent: 1.1030099083940923
-Vigorous activity percent: 0.031158471988533682
-Inactivity percent: 86.47099146257868
+Light activity percent: 11.678738267689539
+Moderate activity percent: 1.0778725410363006
+Vigorous activity percent: 0.030000428577551107
+Inactivity percent: 87.21338876269661
 ```
 
+> ### Configuring a custom pipeline
+>
+> We can modify the defualt values of the following parameters: calibration, epoch_length, physical activity metric, non-wear algorithm
+>
+>
 
-Example 2: Loading data and plotting the raw signals
-----------------------------------------------------
+
+## Example 2: Loading data and plotting the raw signals
+
 
 In this example we will go over the built-in functions to directly read the raw accelerometer and light data, and how to quickly visualize this information.
 
@@ -129,8 +138,8 @@ Plot the light data:
 
 
 
-Example 3:  Plot the epoch1 level measurements
-----------------------------------------------------
+## Example 3:  Plot the epoch1 level measurements
+
 In this example we will expand on the skills learned in `Example 2`: we will load the sensor data, calibrate, and then calculate the ENMO and angle-z data in 5s windows (epoch 1 data).
 
 ```python
@@ -171,8 +180,8 @@ plt.show()
 ![Plot the epoch1 data](enmo_anglez_example3.png)
 
 
-Example 4: Visualize the detected non-wear times
-----------------------------------------------------
+## Example 4: Visualize the detected non-wear times
+
 In this example we will build on `Example 3` by also solving for the non-wear periods, as follows:
 
 ```python
@@ -206,8 +215,8 @@ plt.legend(['ENMO Epoch1', 'Non-wear'])
 
 
 
-Example 5: Find and filter the sleep windows
-----------------------------------------------------
+## Example 5: Find and filter the sleep windows
+
 The following script will obtain the sleep window pairs (onset,wakeup):
 
 ```python
