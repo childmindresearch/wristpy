@@ -12,9 +12,9 @@ we will cover the following topics through a few examples:
    - how to calibrate the data, computing ENMO and angle-z from the calibrated data and then plotting those metrics.
    - how to obtain non-wear windows and visualize them.
    - how to obtain sleep windows and visualize them.
-      - how we can filter sleep windows that overlap with non-wear periods.   
-  
-    
+      - how we can filter sleep windows that overlap with non-wear periods.
+
+
 
 
 ## Example 1: Running the default processor
@@ -105,7 +105,7 @@ Inactivity percent: 87.21338876269661
 > ### Configuring a custom pipeline
 >
 > A custom processing pipeline can be easily created by modifying the input arguments to the `orchestrator.run` call.
-> 
+>
 >> For example:
 >> ```python
 >> results = orchestrator.run(input = '/path/to/input/dir', output = '/path/to/output/dir', output_filetype = ".parquet", calibrator="gradient", activity_metric="ag_count", nonwear_algorithm=["detach"], epoch_length=10, thresholds=[0.05, 0.1, 0.3])
