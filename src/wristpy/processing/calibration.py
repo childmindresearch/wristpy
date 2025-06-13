@@ -61,7 +61,7 @@ class GgirCalibration(AbstractCalibrator):
 
 
     Attributes:
-        chunked: If true will preform calibration on subsets of data if false will
+        chunked: If true will perform calibration on subsets of data if false will
             calibrate on entire dataset.
         min_acceleration: Minimum acceleration for sphere criteria, in g-force.
         min_calibration_hours: Minimum hours of data required for calibration.
@@ -93,12 +93,12 @@ class GgirCalibration(AbstractCalibrator):
                 Determines if sphere is sufficiently populated to obtain meaningful
                 calibration result. Default is 0.3g.
             min_calibration_hours: The minimum amount of data in hours needed to
-                preform calibration. Default is 72. If chunked calibration is selected
+                perform calibration. Default is 72. If chunked calibration is selected
                 this will be the size of the initial subset taken for calibration. If
                 error has not been reduced below the max_calibration_error value, an
                 additional 12 hours will be taken until all data is used or calibration
                 is successful.
-            no_motion_threshold: The standard deviation critieria used to select
+            no_motion_threshold: The standard deviation criteria used to select
                 portions of the data with no movement. Rolling windows with standard
                 deviations below this value will be determined as "still". This value is
                 likely to be different between devices. Default is 0.013g. This value
@@ -227,7 +227,7 @@ class GgirCalibration(AbstractCalibrator):
 
         Returns:
             The minimum hours of accelerometer data + additional 12 hour chunks of data
-            everytime the generator function is called.
+            every time the generator function is called.
 
         """
         logger.debug("Getting chunk.")
@@ -435,7 +435,7 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
         """Initializes class.
 
         Args:
-            no_motion_threshold: The standard deviation critieria used to find
+            no_motion_threshold: The standard deviation criteria used to find
                 periods of no motion. Default is 0.013g.
             max_iterations: The maximum amount of iterations for the
                 closest_point_fit function.
@@ -485,13 +485,13 @@ class ConstrainedMinimizationCalibration(AbstractCalibrator):
         )
 
     def _closest_point_fit(self, no_motion_data: np.ndarray) -> LinearTransformation:
-        """Find linear transformation parameters that minimzes distance to unit sphere.
+        """Find linear transformation parameters that minimizes distance to unit sphere.
 
-        This function implements the scipy optimize.minimze function to find the
-        optimial scale and offset parameters that will minimze the error function,
+        This function implements the scipy optimize.minimize function to find the
+        optimal scale and offset parameters that will minimize the error function,
         which is defined as the distance of the no_motion acceleration data
         from the unit sphere (where the unit sphere represents the ideal data points
-        under 1g acceleartion due to Earth's gravity). The initial guess for the
+        under 1g acceleration due to Earth's gravity). The initial guess for the
         scale and offset are chosen as 1/0, we provide constrained bounds for the
         scale and offset parameters to avoid the case where the scale can be
         set to 0 and offset to 1/sqrt(3) (exact unit sphere).
