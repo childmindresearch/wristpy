@@ -187,7 +187,7 @@ For more details on available options, see the [orchestrator documentation](http
         doi: 10.1038/s41598-022-16003-x.
 3.  John, D., Tang, Q., Albinali, F. and Intille, S., 2019. An Open-Source
         Monitor-Independent Movement Summary for Accelerometer Data Processing. Journal
-        for the Measurement of Physical Behaviour, 2(4), pp.268-281. 
+        for the Measurement of Physical Behaviour, 2(4), pp.268-281.
 4.  Zhou S, Hill RA, Morgan K, et al, Classification of accelerometer wear and
         non-wear events in seconds for monitoring free-living physical activityBMJ
         Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447.
