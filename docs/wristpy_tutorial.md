@@ -197,7 +197,7 @@ watch_data = readers.read_watch_data('/path/to/geneactive/file.bin')
 calibrator_object = calibration.ConstrainedMinimizationCalibration()
 calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)
 
-#Find non-wear periods, using default GGIR algorithm
+#Find non-wear periods, using the DETACH algorithm
 non_wear_array = metrics.detect_nonwear(calibrated_data)
 
 ```
