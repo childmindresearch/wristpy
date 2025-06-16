@@ -36,7 +36,7 @@ def test_main_default(
         activity_metric="enmo",
         epoch_length=5,
         nonwear_algorithm=["ggir"],
-        verbosity=logging.WARNING,
+        verbosity=logging.INFO,
         output_filetype=None,
     )
 
@@ -60,7 +60,7 @@ def test_main_enmo_default(
         activity_metric="enmo",
         epoch_length=5,
         nonwear_algorithm=["ggir"],
-        verbosity=logging.WARNING,
+        verbosity=logging.INFO,
     )
 
 
@@ -83,7 +83,7 @@ def test_main_mad_default(
         activity_metric="mad",
         nonwear_algorithm=["ggir"],
         epoch_length=5,
-        verbosity=logging.WARNING,
+        verbosity=logging.INFO,
     )
 
 
@@ -106,7 +106,7 @@ def test_main_agcount_default(
         activity_metric="ag_count",
         nonwear_algorithm=["ggir"],
         epoch_length=5,
-        verbosity=logging.WARNING,
+        verbosity=logging.INFO,
     )
 
 
@@ -153,7 +153,7 @@ def test_main_with_options(
         activity_metric="mad",
         nonwear_algorithm=["cta", "ggir"],
         epoch_length=3,
-        verbosity=logging.WARNING,
+        verbosity=logging.INFO,
         output_filetype=None,
     )
 
@@ -185,24 +185,51 @@ def test_main_with_bad_epoch(
     assert result.exception is not None
 
 
-@pytest.mark.parametrize(
-    "verbosity, expected_log_level",
-    [
-        ("-v", logging.INFO),
-        ("-vv", logging.DEBUG),
-        ("-vvv", logging.DEBUG),
-    ],
-)
 def test_main_verbosity(
     mocker: pytest_mock.MockerFixture,
     sample_data_gt3x: pathlib.Path,
     create_typer_cli_runner: testing.CliRunner,
-    verbosity: str,
-    expected_log_level: int,
 ) -> None:
     """Test cli with different verbosity levels."""
     mock_run = mocker.patch.object(orchestrator, "run")
 
-    create_typer_cli_runner.invoke(cli.app, [str(sample_data_gt3x), verbosity])
+    create_typer_cli_runner.invoke(cli.app, [str(sample_data_gt3x), "-v"])
 
-    assert mock_run.call_args.kwargs["verbosity"] == expected_log_level
+    mock_run.assert_called_once_with(
+        input=sample_data_gt3x,
+        output=None,
+        thresholds=None,
+        calibrator=None,
+        activity_metric="enmo",
+        epoch_length=5,
+        nonwear_algorithm=["ggir"],
+        verbosity=logging.DEBUG,
+        output_filetype=None,
+    )
+
+
+def test_main_version(
+    create_typer_cli_runner: testing.CliRunner,
+) -> None:
+    """Test cli version output."""
+    result = create_typer_cli_runner.invoke(cli.app, ["--version"])
+
+    assert result.exit_code == 0
+    assert "Wristpy version" in result.output
+
+
+def test_main_version_with_options(
+    create_typer_cli_runner: testing.CliRunner,
+    sample_data_gt3x: pathlib.Path,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """Test other arguments and options are ignored when --version is passed."""
+    mock_run = mocker.patch.object(orchestrator, "run")
+
+    result = create_typer_cli_runner.invoke(
+        cli.app, [str(sample_data_gt3x), "-e", "5", "--version"]
+    )
+
+    assert result.exit_code == 0
+    assert "Wristpy version" in result.output
+    mock_run.assert_not_called()
