@@ -391,7 +391,7 @@ def detach_nonwear(
         return temperature_interpolator(x_acceleration)
 
     def cleanup_DETACH_nonwear(nonwear: models.Measurement) -> models.Measurement:
-        """Helper function to downsample DETACH outptut to 60s."""
+        """Helper function to downsample DETACH output to 60s."""
         nonwear_downsample = computations.moving_mean(nonwear, 60)
 
         nonwear_downsample.measurements = np.where(
