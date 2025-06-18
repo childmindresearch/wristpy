@@ -279,7 +279,7 @@ def _find_periods(
     single_one = np.nonzero(edge_detection == 3)[0]
 
     single_periods = [
-        (window_measurement.time.item(idx), window_measurement.time.item(idx))
+        (window_measurement.time.item(int(idx)), window_measurement.time.item(int(idx)))
         for idx in single_one
     ]
 
