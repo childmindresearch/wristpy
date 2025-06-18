@@ -12,7 +12,7 @@ we will cover the following topics through a few examples:
    - how to calibrate the data, computing ENMO and angle-z from the calibrated data and then plotting those metrics.
    - how to obtain non-wear windows and visualize them.
    - how to obtain sleep windows and visualize them.
-      - how we can filter sleep windows that overlap with non-wear periods.
+
 
 
 
@@ -84,7 +84,7 @@ It is also possible to do some analysis on these output variables, for example, 
 
 ```python
 inactivity_count = sum(phys_activity == 0)
-light_activity_count = sum(phys_activity== 1)
+light_activity_count = sum(phys_activity == 1)
 moderate_activity_count = sum(phys_activity == 2)
 vigorous_activity_count = sum(phys_activity == 3)
 total_activity_count = len(output_results['physical_activity_levels'])
