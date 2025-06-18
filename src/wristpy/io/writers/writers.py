@@ -1,4 +1,4 @@
-"""Module containg the output classes for writing data to files."""
+"""Module containing the output classes for writing data to files."""
 
 import datetime
 import json
