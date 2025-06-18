@@ -73,8 +73,15 @@ We can also view and process these outputs from the saved `.csv` output file:
 ```python
 import polars as pl
 import matplotlib.pyplot as plt
-output_results = pl.read_csv('path/to/save/file_name.csv', try_parse_dates=True)
-phys_activity = output_results['physical_activity_levels'].cast(pl.Categorical).to_physical()
+
+activity_mapping = {
+    "inactive": 0,
+    "light": 1,
+    "moderate": 2,
+    "vigorous": 3
+}
+
+phys_activity = output_results['physical_activity_levels'].replace(activity_mapping).cast(int)
 
 plt.plot(output_results['time'], phys_activity)
 ```
