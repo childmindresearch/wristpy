@@ -212,7 +212,7 @@
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">    Attributes:</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">        chunked: If true will preform calibration on subsets of data if false will</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">        chunked: If true will perform calibration on subsets of data if false will</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">            calibrate on entire dataset.</span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">        min_acceleration: Minimum acceleration for sphere criteria, in g-force.</span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">        min_calibration_hours: Minimum hours of data required for calibration.</span>
@@ -244,12 +244,12 @@
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">                Determines if sphere is sufficiently populated to obtain meaningful</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">                calibration result. Default is 0.3g.</span>
 </span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">            min_calibration_hours: The minimum amount of data in hours needed to</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">                preform calibration. Default is 72. If chunked calibration is selected</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">                perform calibration. Default is 72. If chunked calibration is selected</span>
 </span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">                this will be the size of the initial subset taken for calibration. If</span>
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">                error has not been reduced below the max_calibration_error value, an</span>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">                additional 12 hours will be taken until all data is used or calibration</span>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">                is successful.</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">            no_motion_threshold: The standard deviation critieria used to select</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">            no_motion_threshold: The standard deviation criteria used to select</span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">                portions of the data with no movement. Rolling windows with standard</span>
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">                deviations below this value will be determined as &quot;still&quot;. This value is</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">                likely to be different between devices. Default is 0.013g. This value</span>
@@ -378,7 +378,7 @@
 </span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>
 </span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a><span class="sd">        Returns:</span>
 </span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a><span class="sd">            The minimum hours of accelerometer data + additional 12 hour chunks of data</span>
-</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a><span class="sd">            everytime the generator function is called.</span>
+</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a><span class="sd">            every time the generator function is called.</span>
 </span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>
 </span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Getting chunk.&quot;</span><span class="p">)</span>
@@ -586,7 +586,7 @@
 </span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes class.</span>
 </span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a>
 </span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a><span class="sd">        Args:</span>
-</span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a><span class="sd">            no_motion_threshold: The standard deviation critieria used to find</span>
+</span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a><span class="sd">            no_motion_threshold: The standard deviation criteria used to find</span>
 </span><span id="L-439"><a href="#L-439"><span class="linenos">439</span></a><span class="sd">                periods of no motion. Default is 0.013g.</span>
 </span><span id="L-440"><a href="#L-440"><span class="linenos">440</span></a><span class="sd">            max_iterations: The maximum amount of iterations for the</span>
 </span><span id="L-441"><a href="#L-441"><span class="linenos">441</span></a><span class="sd">                closest_point_fit function.</span>
@@ -636,13 +636,13 @@
 </span><span id="L-485"><a href="#L-485"><span class="linenos">485</span></a>        <span class="p">)</span>
 </span><span id="L-486"><a href="#L-486"><span class="linenos">486</span></a>
 </span><span id="L-487"><a href="#L-487"><span class="linenos">487</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_closest_point_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_motion_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
-</span><span id="L-488"><a href="#L-488"><span class="linenos">488</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Find linear transformation parameters that minimzes distance to unit sphere.</span>
+</span><span id="L-488"><a href="#L-488"><span class="linenos">488</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Find linear transformation parameters that minimizes distance to unit sphere.</span>
 </span><span id="L-489"><a href="#L-489"><span class="linenos">489</span></a>
-</span><span id="L-490"><a href="#L-490"><span class="linenos">490</span></a><span class="sd">        This function implements the scipy optimize.minimze function to find the</span>
-</span><span id="L-491"><a href="#L-491"><span class="linenos">491</span></a><span class="sd">        optimial scale and offset parameters that will minimze the error function,</span>
+</span><span id="L-490"><a href="#L-490"><span class="linenos">490</span></a><span class="sd">        This function implements the scipy optimize.minimize function to find the</span>
+</span><span id="L-491"><a href="#L-491"><span class="linenos">491</span></a><span class="sd">        optimal scale and offset parameters that will minimize the error function,</span>
 </span><span id="L-492"><a href="#L-492"><span class="linenos">492</span></a><span class="sd">        which is defined as the distance of the no_motion acceleration data</span>
 </span><span id="L-493"><a href="#L-493"><span class="linenos">493</span></a><span class="sd">        from the unit sphere (where the unit sphere represents the ideal data points</span>
-</span><span id="L-494"><a href="#L-494"><span class="linenos">494</span></a><span class="sd">        under 1g acceleartion due to Earth&#39;s gravity). The initial guess for the</span>
+</span><span id="L-494"><a href="#L-494"><span class="linenos">494</span></a><span class="sd">        under 1g acceleration due to Earth&#39;s gravity). The initial guess for the</span>
 </span><span id="L-495"><a href="#L-495"><span class="linenos">495</span></a><span class="sd">        scale and offset are chosen as 1/0, we provide constrained bounds for the</span>
 </span><span id="L-496"><a href="#L-496"><span class="linenos">496</span></a><span class="sd">        scale and offset parameters to avoid the case where the scale can be</span>
 </span><span id="L-497"><a href="#L-497"><span class="linenos">497</span></a><span class="sd">        set to 0 and offset to 1/sqrt(3) (exact unit sphere).</span>
@@ -1012,7 +1012,7 @@ a measurement object that contains the calibrated acceleration data.</p>
 </span><span id="GgirCalibration-62"><a href="#GgirCalibration-62"><span class="linenos"> 62</span></a>
 </span><span id="GgirCalibration-63"><a href="#GgirCalibration-63"><span class="linenos"> 63</span></a>
 </span><span id="GgirCalibration-64"><a href="#GgirCalibration-64"><span class="linenos"> 64</span></a><span class="sd">    Attributes:</span>
-</span><span id="GgirCalibration-65"><a href="#GgirCalibration-65"><span class="linenos"> 65</span></a><span class="sd">        chunked: If true will preform calibration on subsets of data if false will</span>
+</span><span id="GgirCalibration-65"><a href="#GgirCalibration-65"><span class="linenos"> 65</span></a><span class="sd">        chunked: If true will perform calibration on subsets of data if false will</span>
 </span><span id="GgirCalibration-66"><a href="#GgirCalibration-66"><span class="linenos"> 66</span></a><span class="sd">            calibrate on entire dataset.</span>
 </span><span id="GgirCalibration-67"><a href="#GgirCalibration-67"><span class="linenos"> 67</span></a><span class="sd">        min_acceleration: Minimum acceleration for sphere criteria, in g-force.</span>
 </span><span id="GgirCalibration-68"><a href="#GgirCalibration-68"><span class="linenos"> 68</span></a><span class="sd">        min_calibration_hours: Minimum hours of data required for calibration.</span>
@@ -1044,12 +1044,12 @@ a measurement object that contains the calibrated acceleration data.</p>
 </span><span id="GgirCalibration-94"><a href="#GgirCalibration-94"><span class="linenos"> 94</span></a><span class="sd">                Determines if sphere is sufficiently populated to obtain meaningful</span>
 </span><span id="GgirCalibration-95"><a href="#GgirCalibration-95"><span class="linenos"> 95</span></a><span class="sd">                calibration result. Default is 0.3g.</span>
 </span><span id="GgirCalibration-96"><a href="#GgirCalibration-96"><span class="linenos"> 96</span></a><span class="sd">            min_calibration_hours: The minimum amount of data in hours needed to</span>
-</span><span id="GgirCalibration-97"><a href="#GgirCalibration-97"><span class="linenos"> 97</span></a><span class="sd">                preform calibration. Default is 72. If chunked calibration is selected</span>
+</span><span id="GgirCalibration-97"><a href="#GgirCalibration-97"><span class="linenos"> 97</span></a><span class="sd">                perform calibration. Default is 72. If chunked calibration is selected</span>
 </span><span id="GgirCalibration-98"><a href="#GgirCalibration-98"><span class="linenos"> 98</span></a><span class="sd">                this will be the size of the initial subset taken for calibration. If</span>
 </span><span id="GgirCalibration-99"><a href="#GgirCalibration-99"><span class="linenos"> 99</span></a><span class="sd">                error has not been reduced below the max_calibration_error value, an</span>
 </span><span id="GgirCalibration-100"><a href="#GgirCalibration-100"><span class="linenos">100</span></a><span class="sd">                additional 12 hours will be taken until all data is used or calibration</span>
 </span><span id="GgirCalibration-101"><a href="#GgirCalibration-101"><span class="linenos">101</span></a><span class="sd">                is successful.</span>
-</span><span id="GgirCalibration-102"><a href="#GgirCalibration-102"><span class="linenos">102</span></a><span class="sd">            no_motion_threshold: The standard deviation critieria used to select</span>
+</span><span id="GgirCalibration-102"><a href="#GgirCalibration-102"><span class="linenos">102</span></a><span class="sd">            no_motion_threshold: The standard deviation criteria used to select</span>
 </span><span id="GgirCalibration-103"><a href="#GgirCalibration-103"><span class="linenos">103</span></a><span class="sd">                portions of the data with no movement. Rolling windows with standard</span>
 </span><span id="GgirCalibration-104"><a href="#GgirCalibration-104"><span class="linenos">104</span></a><span class="sd">                deviations below this value will be determined as &quot;still&quot;. This value is</span>
 </span><span id="GgirCalibration-105"><a href="#GgirCalibration-105"><span class="linenos">105</span></a><span class="sd">                likely to be different between devices. Default is 0.013g. This value</span>
@@ -1178,7 +1178,7 @@ a measurement object that contains the calibrated acceleration data.</p>
 </span><span id="GgirCalibration-228"><a href="#GgirCalibration-228"><span class="linenos">228</span></a>
 </span><span id="GgirCalibration-229"><a href="#GgirCalibration-229"><span class="linenos">229</span></a><span class="sd">        Returns:</span>
 </span><span id="GgirCalibration-230"><a href="#GgirCalibration-230"><span class="linenos">230</span></a><span class="sd">            The minimum hours of accelerometer data + additional 12 hour chunks of data</span>
-</span><span id="GgirCalibration-231"><a href="#GgirCalibration-231"><span class="linenos">231</span></a><span class="sd">            everytime the generator function is called.</span>
+</span><span id="GgirCalibration-231"><a href="#GgirCalibration-231"><span class="linenos">231</span></a><span class="sd">            every time the generator function is called.</span>
 </span><span id="GgirCalibration-232"><a href="#GgirCalibration-232"><span class="linenos">232</span></a>
 </span><span id="GgirCalibration-233"><a href="#GgirCalibration-233"><span class="linenos">233</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="GgirCalibration-234"><a href="#GgirCalibration-234"><span class="linenos">234</span></a>        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Getting chunk.&quot;</span><span class="p">)</span>
@@ -1374,7 +1374,7 @@ successful, is returned to the user.</p>
 <h6 id="attributes">Attributes:</h6>
 
 <ul>
-<li><strong>chunked:</strong>  If true will preform calibration on subsets of data if false will
+<li><strong>chunked:</strong>  If true will perform calibration on subsets of data if false will
 calibrate on entire dataset.</li>
 <li><strong>min_acceleration:</strong>  Minimum acceleration for sphere criteria, in g-force.</li>
 <li><strong>min_calibration_hours:</strong>  Minimum hours of data required for calibration.</li>
@@ -1417,12 +1417,12 @@ calibrate on entire dataset.</li>
 </span><span id="GgirCalibration.__init__-94"><a href="#GgirCalibration.__init__-94"><span class="linenos"> 94</span></a><span class="sd">                Determines if sphere is sufficiently populated to obtain meaningful</span>
 </span><span id="GgirCalibration.__init__-95"><a href="#GgirCalibration.__init__-95"><span class="linenos"> 95</span></a><span class="sd">                calibration result. Default is 0.3g.</span>
 </span><span id="GgirCalibration.__init__-96"><a href="#GgirCalibration.__init__-96"><span class="linenos"> 96</span></a><span class="sd">            min_calibration_hours: The minimum amount of data in hours needed to</span>
-</span><span id="GgirCalibration.__init__-97"><a href="#GgirCalibration.__init__-97"><span class="linenos"> 97</span></a><span class="sd">                preform calibration. Default is 72. If chunked calibration is selected</span>
+</span><span id="GgirCalibration.__init__-97"><a href="#GgirCalibration.__init__-97"><span class="linenos"> 97</span></a><span class="sd">                perform calibration. Default is 72. If chunked calibration is selected</span>
 </span><span id="GgirCalibration.__init__-98"><a href="#GgirCalibration.__init__-98"><span class="linenos"> 98</span></a><span class="sd">                this will be the size of the initial subset taken for calibration. If</span>
 </span><span id="GgirCalibration.__init__-99"><a href="#GgirCalibration.__init__-99"><span class="linenos"> 99</span></a><span class="sd">                error has not been reduced below the max_calibration_error value, an</span>
 </span><span id="GgirCalibration.__init__-100"><a href="#GgirCalibration.__init__-100"><span class="linenos">100</span></a><span class="sd">                additional 12 hours will be taken until all data is used or calibration</span>
 </span><span id="GgirCalibration.__init__-101"><a href="#GgirCalibration.__init__-101"><span class="linenos">101</span></a><span class="sd">                is successful.</span>
-</span><span id="GgirCalibration.__init__-102"><a href="#GgirCalibration.__init__-102"><span class="linenos">102</span></a><span class="sd">            no_motion_threshold: The standard deviation critieria used to select</span>
+</span><span id="GgirCalibration.__init__-102"><a href="#GgirCalibration.__init__-102"><span class="linenos">102</span></a><span class="sd">            no_motion_threshold: The standard deviation criteria used to select</span>
 </span><span id="GgirCalibration.__init__-103"><a href="#GgirCalibration.__init__-103"><span class="linenos">103</span></a><span class="sd">                portions of the data with no movement. Rolling windows with standard</span>
 </span><span id="GgirCalibration.__init__-104"><a href="#GgirCalibration.__init__-104"><span class="linenos">104</span></a><span class="sd">                deviations below this value will be determined as &quot;still&quot;. This value is</span>
 </span><span id="GgirCalibration.__init__-105"><a href="#GgirCalibration.__init__-105"><span class="linenos">105</span></a><span class="sd">                likely to be different between devices. Default is 0.013g. This value</span>
@@ -1463,12 +1463,12 @@ method instead of standard _calibration.</li>
 Determines if sphere is sufficiently populated to obtain meaningful
 calibration result. Default is 0.3g.</li>
 <li><strong>min_calibration_hours:</strong>  The minimum amount of data in hours needed to
-preform calibration. Default is 72. If chunked calibration is selected
+perform calibration. Default is 72. If chunked calibration is selected
 this will be the size of the initial subset taken for calibration. If
 error has not been reduced below the max_calibration_error value, an
 additional 12 hours will be taken until all data is used or calibration
 is successful.</li>
-<li><strong>no_motion_threshold:</strong>  The standard deviation critieria used to select
+<li><strong>no_motion_threshold:</strong>  The standard deviation criteria used to select
 portions of the data with no movement. Rolling windows with standard
 deviations below this value will be determined as "still". This value is
 likely to be different between devices. Default is 0.013g. This value
@@ -1716,7 +1716,7 @@ axis does not have at least 1 value both above and below  the + and
 </span><span id="ConstrainedMinimizationCalibration-436"><a href="#ConstrainedMinimizationCalibration-436"><span class="linenos">436</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes class.</span>
 </span><span id="ConstrainedMinimizationCalibration-437"><a href="#ConstrainedMinimizationCalibration-437"><span class="linenos">437</span></a>
 </span><span id="ConstrainedMinimizationCalibration-438"><a href="#ConstrainedMinimizationCalibration-438"><span class="linenos">438</span></a><span class="sd">        Args:</span>
-</span><span id="ConstrainedMinimizationCalibration-439"><a href="#ConstrainedMinimizationCalibration-439"><span class="linenos">439</span></a><span class="sd">            no_motion_threshold: The standard deviation critieria used to find</span>
+</span><span id="ConstrainedMinimizationCalibration-439"><a href="#ConstrainedMinimizationCalibration-439"><span class="linenos">439</span></a><span class="sd">            no_motion_threshold: The standard deviation criteria used to find</span>
 </span><span id="ConstrainedMinimizationCalibration-440"><a href="#ConstrainedMinimizationCalibration-440"><span class="linenos">440</span></a><span class="sd">                periods of no motion. Default is 0.013g.</span>
 </span><span id="ConstrainedMinimizationCalibration-441"><a href="#ConstrainedMinimizationCalibration-441"><span class="linenos">441</span></a><span class="sd">            max_iterations: The maximum amount of iterations for the</span>
 </span><span id="ConstrainedMinimizationCalibration-442"><a href="#ConstrainedMinimizationCalibration-442"><span class="linenos">442</span></a><span class="sd">                closest_point_fit function.</span>
@@ -1766,13 +1766,13 @@ axis does not have at least 1 value both above and below  the + and
 </span><span id="ConstrainedMinimizationCalibration-486"><a href="#ConstrainedMinimizationCalibration-486"><span class="linenos">486</span></a>        <span class="p">)</span>
 </span><span id="ConstrainedMinimizationCalibration-487"><a href="#ConstrainedMinimizationCalibration-487"><span class="linenos">487</span></a>
 </span><span id="ConstrainedMinimizationCalibration-488"><a href="#ConstrainedMinimizationCalibration-488"><span class="linenos">488</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_closest_point_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_motion_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearTransformation</span><span class="p">:</span>
-</span><span id="ConstrainedMinimizationCalibration-489"><a href="#ConstrainedMinimizationCalibration-489"><span class="linenos">489</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Find linear transformation parameters that minimzes distance to unit sphere.</span>
+</span><span id="ConstrainedMinimizationCalibration-489"><a href="#ConstrainedMinimizationCalibration-489"><span class="linenos">489</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Find linear transformation parameters that minimizes distance to unit sphere.</span>
 </span><span id="ConstrainedMinimizationCalibration-490"><a href="#ConstrainedMinimizationCalibration-490"><span class="linenos">490</span></a>
-</span><span id="ConstrainedMinimizationCalibration-491"><a href="#ConstrainedMinimizationCalibration-491"><span class="linenos">491</span></a><span class="sd">        This function implements the scipy optimize.minimze function to find the</span>
-</span><span id="ConstrainedMinimizationCalibration-492"><a href="#ConstrainedMinimizationCalibration-492"><span class="linenos">492</span></a><span class="sd">        optimial scale and offset parameters that will minimze the error function,</span>
+</span><span id="ConstrainedMinimizationCalibration-491"><a href="#ConstrainedMinimizationCalibration-491"><span class="linenos">491</span></a><span class="sd">        This function implements the scipy optimize.minimize function to find the</span>
+</span><span id="ConstrainedMinimizationCalibration-492"><a href="#ConstrainedMinimizationCalibration-492"><span class="linenos">492</span></a><span class="sd">        optimal scale and offset parameters that will minimize the error function,</span>
 </span><span id="ConstrainedMinimizationCalibration-493"><a href="#ConstrainedMinimizationCalibration-493"><span class="linenos">493</span></a><span class="sd">        which is defined as the distance of the no_motion acceleration data</span>
 </span><span id="ConstrainedMinimizationCalibration-494"><a href="#ConstrainedMinimizationCalibration-494"><span class="linenos">494</span></a><span class="sd">        from the unit sphere (where the unit sphere represents the ideal data points</span>
-</span><span id="ConstrainedMinimizationCalibration-495"><a href="#ConstrainedMinimizationCalibration-495"><span class="linenos">495</span></a><span class="sd">        under 1g acceleartion due to Earth&#39;s gravity). The initial guess for the</span>
+</span><span id="ConstrainedMinimizationCalibration-495"><a href="#ConstrainedMinimizationCalibration-495"><span class="linenos">495</span></a><span class="sd">        under 1g acceleration due to Earth&#39;s gravity). The initial guess for the</span>
 </span><span id="ConstrainedMinimizationCalibration-496"><a href="#ConstrainedMinimizationCalibration-496"><span class="linenos">496</span></a><span class="sd">        scale and offset are chosen as 1/0, we provide constrained bounds for the</span>
 </span><span id="ConstrainedMinimizationCalibration-497"><a href="#ConstrainedMinimizationCalibration-497"><span class="linenos">497</span></a><span class="sd">        scale and offset parameters to avoid the case where the scale can be</span>
 </span><span id="ConstrainedMinimizationCalibration-498"><a href="#ConstrainedMinimizationCalibration-498"><span class="linenos">498</span></a><span class="sd">        set to 0 and offset to 1/sqrt(3) (exact unit sphere).</span>
@@ -1871,7 +1871,7 @@ no_motion_data and the unit sphere.</p>
 </span><span id="ConstrainedMinimizationCalibration.__init__-436"><a href="#ConstrainedMinimizationCalibration.__init__-436"><span class="linenos">436</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes class.</span>
 </span><span id="ConstrainedMinimizationCalibration.__init__-437"><a href="#ConstrainedMinimizationCalibration.__init__-437"><span class="linenos">437</span></a>
 </span><span id="ConstrainedMinimizationCalibration.__init__-438"><a href="#ConstrainedMinimizationCalibration.__init__-438"><span class="linenos">438</span></a><span class="sd">        Args:</span>
-</span><span id="ConstrainedMinimizationCalibration.__init__-439"><a href="#ConstrainedMinimizationCalibration.__init__-439"><span class="linenos">439</span></a><span class="sd">            no_motion_threshold: The standard deviation critieria used to find</span>
+</span><span id="ConstrainedMinimizationCalibration.__init__-439"><a href="#ConstrainedMinimizationCalibration.__init__-439"><span class="linenos">439</span></a><span class="sd">            no_motion_threshold: The standard deviation criteria used to find</span>
 </span><span id="ConstrainedMinimizationCalibration.__init__-440"><a href="#ConstrainedMinimizationCalibration.__init__-440"><span class="linenos">440</span></a><span class="sd">                periods of no motion. Default is 0.013g.</span>
 </span><span id="ConstrainedMinimizationCalibration.__init__-441"><a href="#ConstrainedMinimizationCalibration.__init__-441"><span class="linenos">441</span></a><span class="sd">            max_iterations: The maximum amount of iterations for the</span>
 </span><span id="ConstrainedMinimizationCalibration.__init__-442"><a href="#ConstrainedMinimizationCalibration.__init__-442"><span class="linenos">442</span></a><span class="sd">                closest_point_fit function.</span>
@@ -1892,7 +1892,7 @@ no_motion_data and the unit sphere.</p>
 <h6 id="arguments">Arguments:</h6>
 
 <ul>
-<li><strong>no_motion_threshold:</strong>  The standard deviation critieria used to find
+<li><strong>no_motion_threshold:</strong>  The standard deviation criteria used to find
 periods of no motion. Default is 0.013g.</li>
 <li><strong>max_iterations:</strong>  The maximum amount of iterations for the
 closest_point_fit function.</li>

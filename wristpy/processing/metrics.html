@@ -214,7 +214,7 @@
 </span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute Actigraph acitivty counts.</span>
 </span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>
 </span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="sd">    This function computes the Actigraph activity counts based on [1].</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="sd">    The acceleartion data is downsample to 30Hz, bandpass filtered, scaled,</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="sd">    The acceleration data is downsample to 30Hz, bandpass filtered, scaled,</span>
 </span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a><span class="sd">    and then thresholded. The counts are then summed along each axis for</span>
 </span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a><span class="sd">    the chosen epoch length.</span>
 </span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>
@@ -230,7 +230,7 @@
 </span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">        in ActiGraph wearable,” Sci Rep, vol. 12, no. 1, Art. no. 1, Jul. 2022,</span>
 </span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">        doi: 10.1038/s41598-022-16003-x.</span>
 </span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running activty count physical activity metric.&quot;</span><span class="p">)</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running activity count physical activity metric.&quot;</span><span class="p">)</span>
 </span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>
 </span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>    <span class="n">epoch_length_nanoseconds</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">epoch_length</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>
 </span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>
@@ -391,9 +391,9 @@
 </span><span id="L-309"><a href="#L-309"><span class="linenos">309</span></a><span class="sd">        The temporal resolutions is one minute.</span>
 </span><span id="L-310"><a href="#L-310"><span class="linenos">310</span></a>
 </span><span id="L-311"><a href="#L-311"><span class="linenos">311</span></a><span class="sd">    References:</span>
-</span><span id="L-312"><a href="#L-312"><span class="linenos">312</span></a><span class="sd">        Zhou S, Hill RA, Morgan K, et alClassification of accelerometer wear and</span>
+</span><span id="L-312"><a href="#L-312"><span class="linenos">312</span></a><span class="sd">        Zhou S, Hill RA, Morgan K, et al, Classification of accelerometer wear and</span>
 </span><span id="L-313"><a href="#L-313"><span class="linenos">313</span></a><span class="sd">        non-wear events in seconds for monitoring free-living physical activityBMJ</span>
-</span><span id="L-314"><a href="#L-314"><span class="linenos">314</span></a><span class="sd">        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447</span>
+</span><span id="L-314"><a href="#L-314"><span class="linenos">314</span></a><span class="sd">        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447.</span>
 </span><span id="L-315"><a href="#L-315"><span class="linenos">315</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-316"><a href="#L-316"><span class="linenos">316</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Combined temperature and accelereation non-wear detection algorithm.&quot;</span><span class="p">)</span>
 </span><span id="L-317"><a href="#L-317"><span class="linenos">317</span></a>
@@ -473,7 +473,7 @@
 </span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a>        <span class="k">return</span> <span class="n">temperature_interpolator</span><span class="p">(</span><span class="n">x_acceleration</span><span class="p">)</span>
 </span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a>
 </span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_DETACH_nonwear</span><span class="p">(</span><span class="n">nonwear</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
-</span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to downsample DETACH ouptut to 60s.&quot;&quot;&quot;</span>
+</span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to downsample DETACH output to 60s.&quot;&quot;&quot;</span>
 </span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a>        <span class="n">nonwear_downsample</span> <span class="o">=</span> <span class="n">computations</span><span class="o">.</span><span class="n">moving_mean</span><span class="p">(</span><span class="n">nonwear</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
 </span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>
 </span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a>        <span class="n">nonwear_downsample</span><span class="o">.</span><span class="n">measurements</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
@@ -710,13 +710,13 @@
 </span><span id="L-628"><a href="#L-628"><span class="linenos">628</span></a><span class="sd">    steps as described in  the original paper are interpolation (100Hz by default),</span>
 </span><span id="L-629"><a href="#L-629"><span class="linenos">629</span></a><span class="sd">    extrapolation of any values that went beyond the dynamic range of the device,</span>
 </span><span id="L-630"><a href="#L-630"><span class="linenos">630</span></a><span class="sd">    filtering using a 4th order butterworth filter, aggregation by calculating the area</span>
-</span><span id="L-631"><a href="#L-631"><span class="linenos">631</span></a><span class="sd">    under the curve over a given epoch, and finally trunction of small values.</span>
+</span><span id="L-631"><a href="#L-631"><span class="linenos">631</span></a><span class="sd">    under the curve over a given epoch, and finally truncation of small values.</span>
 </span><span id="L-632"><a href="#L-632"><span class="linenos">632</span></a><span class="sd">    The MIMS value per axis is then combined through a sum or vector magnitude, and</span>
 </span><span id="L-633"><a href="#L-633"><span class="linenos">633</span></a><span class="sd">    returned as a single vector.</span>
 </span><span id="L-634"><a href="#L-634"><span class="linenos">634</span></a>
 </span><span id="L-635"><a href="#L-635"><span class="linenos">635</span></a><span class="sd">    Args:</span>
 </span><span id="L-636"><a href="#L-636"><span class="linenos">636</span></a><span class="sd">        acceleration: Triaxial acceleration data to be processed.</span>
-</span><span id="L-637"><a href="#L-637"><span class="linenos">637</span></a><span class="sd">        combination_method: Method to combine MIMS values accross axes.</span>
+</span><span id="L-637"><a href="#L-637"><span class="linenos">637</span></a><span class="sd">        combination_method: Method to combine MIMS values across axes.</span>
 </span><span id="L-638"><a href="#L-638"><span class="linenos">638</span></a><span class="sd">        epoch: Duration over which each MIMS value will be calculated. Measured in</span>
 </span><span id="L-639"><a href="#L-639"><span class="linenos">639</span></a><span class="sd">            seconds.</span>
 </span><span id="L-640"><a href="#L-640"><span class="linenos">640</span></a><span class="sd">        interpolation_frequency: Frequency to interpolate acceleration data, defaults</span>
@@ -1034,7 +1034,7 @@ and the mean of those acceleration values in a 5s window.</p>
 </span><span id="actigraph_activity_counts-133"><a href="#actigraph_activity_counts-133"><span class="linenos">133</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute Actigraph acitivty counts.</span>
 </span><span id="actigraph_activity_counts-134"><a href="#actigraph_activity_counts-134"><span class="linenos">134</span></a>
 </span><span id="actigraph_activity_counts-135"><a href="#actigraph_activity_counts-135"><span class="linenos">135</span></a><span class="sd">    This function computes the Actigraph activity counts based on [1].</span>
-</span><span id="actigraph_activity_counts-136"><a href="#actigraph_activity_counts-136"><span class="linenos">136</span></a><span class="sd">    The acceleartion data is downsample to 30Hz, bandpass filtered, scaled,</span>
+</span><span id="actigraph_activity_counts-136"><a href="#actigraph_activity_counts-136"><span class="linenos">136</span></a><span class="sd">    The acceleration data is downsample to 30Hz, bandpass filtered, scaled,</span>
 </span><span id="actigraph_activity_counts-137"><a href="#actigraph_activity_counts-137"><span class="linenos">137</span></a><span class="sd">    and then thresholded. The counts are then summed along each axis for</span>
 </span><span id="actigraph_activity_counts-138"><a href="#actigraph_activity_counts-138"><span class="linenos">138</span></a><span class="sd">    the chosen epoch length.</span>
 </span><span id="actigraph_activity_counts-139"><a href="#actigraph_activity_counts-139"><span class="linenos">139</span></a>
@@ -1050,7 +1050,7 @@ and the mean of those acceleration values in a 5s window.</p>
 </span><span id="actigraph_activity_counts-149"><a href="#actigraph_activity_counts-149"><span class="linenos">149</span></a><span class="sd">        in ActiGraph wearable,” Sci Rep, vol. 12, no. 1, Art. no. 1, Jul. 2022,</span>
 </span><span id="actigraph_activity_counts-150"><a href="#actigraph_activity_counts-150"><span class="linenos">150</span></a><span class="sd">        doi: 10.1038/s41598-022-16003-x.</span>
 </span><span id="actigraph_activity_counts-151"><a href="#actigraph_activity_counts-151"><span class="linenos">151</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="actigraph_activity_counts-152"><a href="#actigraph_activity_counts-152"><span class="linenos">152</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running activty count physical activity metric.&quot;</span><span class="p">)</span>
+</span><span id="actigraph_activity_counts-152"><a href="#actigraph_activity_counts-152"><span class="linenos">152</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running activity count physical activity metric.&quot;</span><span class="p">)</span>
 </span><span id="actigraph_activity_counts-153"><a href="#actigraph_activity_counts-153"><span class="linenos">153</span></a>
 </span><span id="actigraph_activity_counts-154"><a href="#actigraph_activity_counts-154"><span class="linenos">154</span></a>    <span class="n">epoch_length_nanoseconds</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">epoch_length</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>
 </span><span id="actigraph_activity_counts-155"><a href="#actigraph_activity_counts-155"><span class="linenos">155</span></a>
@@ -1135,7 +1135,7 @@ and the mean of those acceleration values in a 5s window.</p>
             <div class="docstring"><p>Compute Actigraph acitivty counts.</p>
 
 <p>This function computes the Actigraph activity counts based on [1].
-The acceleartion data is downsample to 30Hz, bandpass filtered, scaled,
+The acceleration data is downsample to 30Hz, bandpass filtered, scaled,
 and then thresholded. The counts are then summed along each axis for
 the chosen epoch length.</p>
 
@@ -1303,9 +1303,9 @@ data.</li>
 </span><span id="combined_temp_accel_detect_nonwear-310"><a href="#combined_temp_accel_detect_nonwear-310"><span class="linenos">310</span></a><span class="sd">        The temporal resolutions is one minute.</span>
 </span><span id="combined_temp_accel_detect_nonwear-311"><a href="#combined_temp_accel_detect_nonwear-311"><span class="linenos">311</span></a>
 </span><span id="combined_temp_accel_detect_nonwear-312"><a href="#combined_temp_accel_detect_nonwear-312"><span class="linenos">312</span></a><span class="sd">    References:</span>
-</span><span id="combined_temp_accel_detect_nonwear-313"><a href="#combined_temp_accel_detect_nonwear-313"><span class="linenos">313</span></a><span class="sd">        Zhou S, Hill RA, Morgan K, et alClassification of accelerometer wear and</span>
+</span><span id="combined_temp_accel_detect_nonwear-313"><a href="#combined_temp_accel_detect_nonwear-313"><span class="linenos">313</span></a><span class="sd">        Zhou S, Hill RA, Morgan K, et al, Classification of accelerometer wear and</span>
 </span><span id="combined_temp_accel_detect_nonwear-314"><a href="#combined_temp_accel_detect_nonwear-314"><span class="linenos">314</span></a><span class="sd">        non-wear events in seconds for monitoring free-living physical activityBMJ</span>
-</span><span id="combined_temp_accel_detect_nonwear-315"><a href="#combined_temp_accel_detect_nonwear-315"><span class="linenos">315</span></a><span class="sd">        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447</span>
+</span><span id="combined_temp_accel_detect_nonwear-315"><a href="#combined_temp_accel_detect_nonwear-315"><span class="linenos">315</span></a><span class="sd">        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447.</span>
 </span><span id="combined_temp_accel_detect_nonwear-316"><a href="#combined_temp_accel_detect_nonwear-316"><span class="linenos">316</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="combined_temp_accel_detect_nonwear-317"><a href="#combined_temp_accel_detect_nonwear-317"><span class="linenos">317</span></a>    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Combined temperature and accelereation non-wear detection algorithm.&quot;</span><span class="p">)</span>
 </span><span id="combined_temp_accel_detect_nonwear-318"><a href="#combined_temp_accel_detect_nonwear-318"><span class="linenos">318</span></a>
@@ -1376,9 +1376,9 @@ data is chunked into one minute windows. Each windows is classified as "wear" or
 <h6 id="references">References:</h6>
 
 <blockquote>
-  <p>Zhou S, Hill RA, Morgan K, et alClassification of accelerometer wear and
+  <p>Zhou S, Hill RA, Morgan K, et al, Classification of accelerometer wear and
   non-wear events in seconds for monitoring free-living physical activityBMJ
-  Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447</p>
+  Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447.</p>
 </blockquote>
 </div>
 
@@ -1430,7 +1430,7 @@ data is chunked into one minute windows. Each windows is classified as "wear" or
 </span><span id="detach_nonwear-392"><a href="#detach_nonwear-392"><span class="linenos">392</span></a>        <span class="k">return</span> <span class="n">temperature_interpolator</span><span class="p">(</span><span class="n">x_acceleration</span><span class="p">)</span>
 </span><span id="detach_nonwear-393"><a href="#detach_nonwear-393"><span class="linenos">393</span></a>
 </span><span id="detach_nonwear-394"><a href="#detach_nonwear-394"><span class="linenos">394</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_DETACH_nonwear</span><span class="p">(</span><span class="n">nonwear</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
-</span><span id="detach_nonwear-395"><a href="#detach_nonwear-395"><span class="linenos">395</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to downsample DETACH ouptut to 60s.&quot;&quot;&quot;</span>
+</span><span id="detach_nonwear-395"><a href="#detach_nonwear-395"><span class="linenos">395</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to downsample DETACH output to 60s.&quot;&quot;&quot;</span>
 </span><span id="detach_nonwear-396"><a href="#detach_nonwear-396"><span class="linenos">396</span></a>        <span class="n">nonwear_downsample</span> <span class="o">=</span> <span class="n">computations</span><span class="o">.</span><span class="n">moving_mean</span><span class="p">(</span><span class="n">nonwear</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
 </span><span id="detach_nonwear-397"><a href="#detach_nonwear-397"><span class="linenos">397</span></a>
 </span><span id="detach_nonwear-398"><a href="#detach_nonwear-398"><span class="linenos">398</span></a>        <span class="n">nonwear_downsample</span><span class="o">.</span><span class="n">measurements</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
@@ -1522,13 +1522,13 @@ data is chunked into one minute windows. Each windows is classified as "wear" or
 </span><span id="monitor_independent_movement_summary_units-629"><a href="#monitor_independent_movement_summary_units-629"><span class="linenos">629</span></a><span class="sd">    steps as described in  the original paper are interpolation (100Hz by default),</span>
 </span><span id="monitor_independent_movement_summary_units-630"><a href="#monitor_independent_movement_summary_units-630"><span class="linenos">630</span></a><span class="sd">    extrapolation of any values that went beyond the dynamic range of the device,</span>
 </span><span id="monitor_independent_movement_summary_units-631"><a href="#monitor_independent_movement_summary_units-631"><span class="linenos">631</span></a><span class="sd">    filtering using a 4th order butterworth filter, aggregation by calculating the area</span>
-</span><span id="monitor_independent_movement_summary_units-632"><a href="#monitor_independent_movement_summary_units-632"><span class="linenos">632</span></a><span class="sd">    under the curve over a given epoch, and finally trunction of small values.</span>
+</span><span id="monitor_independent_movement_summary_units-632"><a href="#monitor_independent_movement_summary_units-632"><span class="linenos">632</span></a><span class="sd">    under the curve over a given epoch, and finally truncation of small values.</span>
 </span><span id="monitor_independent_movement_summary_units-633"><a href="#monitor_independent_movement_summary_units-633"><span class="linenos">633</span></a><span class="sd">    The MIMS value per axis is then combined through a sum or vector magnitude, and</span>
 </span><span id="monitor_independent_movement_summary_units-634"><a href="#monitor_independent_movement_summary_units-634"><span class="linenos">634</span></a><span class="sd">    returned as a single vector.</span>
 </span><span id="monitor_independent_movement_summary_units-635"><a href="#monitor_independent_movement_summary_units-635"><span class="linenos">635</span></a>
 </span><span id="monitor_independent_movement_summary_units-636"><a href="#monitor_independent_movement_summary_units-636"><span class="linenos">636</span></a><span class="sd">    Args:</span>
 </span><span id="monitor_independent_movement_summary_units-637"><a href="#monitor_independent_movement_summary_units-637"><span class="linenos">637</span></a><span class="sd">        acceleration: Triaxial acceleration data to be processed.</span>
-</span><span id="monitor_independent_movement_summary_units-638"><a href="#monitor_independent_movement_summary_units-638"><span class="linenos">638</span></a><span class="sd">        combination_method: Method to combine MIMS values accross axes.</span>
+</span><span id="monitor_independent_movement_summary_units-638"><a href="#monitor_independent_movement_summary_units-638"><span class="linenos">638</span></a><span class="sd">        combination_method: Method to combine MIMS values across axes.</span>
 </span><span id="monitor_independent_movement_summary_units-639"><a href="#monitor_independent_movement_summary_units-639"><span class="linenos">639</span></a><span class="sd">        epoch: Duration over which each MIMS value will be calculated. Measured in</span>
 </span><span id="monitor_independent_movement_summary_units-640"><a href="#monitor_independent_movement_summary_units-640"><span class="linenos">640</span></a><span class="sd">            seconds.</span>
 </span><span id="monitor_independent_movement_summary_units-641"><a href="#monitor_independent_movement_summary_units-641"><span class="linenos">641</span></a><span class="sd">        interpolation_frequency: Frequency to interpolate acceleration data, defaults</span>
@@ -1588,7 +1588,7 @@ based on the original R implementation by John et al.(2019). The main processing
 steps as described in  the original paper are interpolation (100Hz by default),
 extrapolation of any values that went beyond the dynamic range of the device,
 filtering using a 4th order butterworth filter, aggregation by calculating the area
-under the curve over a given epoch, and finally trunction of small values.
+under the curve over a given epoch, and finally truncation of small values.
 The MIMS value per axis is then combined through a sum or vector magnitude, and
 returned as a single vector.</p>
 
@@ -1596,7 +1596,7 @@ returned as a single vector.</p>
 
 <ul>
 <li><strong>acceleration:</strong>  Triaxial acceleration data to be processed.</li>
-<li><strong>combination_method:</strong>  Method to combine MIMS values accross axes.</li>
+<li><strong>combination_method:</strong>  Method to combine MIMS values across axes.</li>
 <li><strong>epoch:</strong>  Duration over which each MIMS value will be calculated. Measured in
 seconds.</li>
 <li><strong>interpolation_frequency:</strong>  Frequency to interpolate acceleration data, defaults
