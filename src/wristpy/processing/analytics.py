@@ -118,7 +118,7 @@ class GgirSleepDetection(AbstractSleepDetector):
         References:
             van Hees, V.T., et al. Estimating sleep parameters using an
                 accelerometer without sleep diary. Sci Rep 8, 12975 (2018).
-                https://doi.org/10.1038/s41598-018-31266-z.
+                https://doi.org/10.1038/s41598-018-31266-z
         """
         logger.debug("Finding spt windows, Threshold: %s", threshold)
         long_epoch_median = 300
@@ -162,7 +162,7 @@ class GgirSleepDetection(AbstractSleepDetector):
         References:
             van Hees, V. T. et al. A Novel, Open Access Method to Assess Sleep
                 Duration Using a Wrist-Worn Accelerometer. PLoS One 10, e0142533 (2015).
-                https://doi.org/10.1371/journal.pone.0142533.
+                https://doi.org/10.1371/journal.pone.0142533
         """
         logger.debug("Calculating SIB period threshold: %s degrees", threshold_degrees)
         anglez_abs_diff = self._compute_abs_diff_mean_anglez(anglez_data)
@@ -214,6 +214,11 @@ class GgirSleepDetection(AbstractSleepDetector):
             If there is no overlap between spt_windows and sib_periods,
             the onset and wakeup lists will be empty.
         """
+        logger.debug(
+            "Finding SIB periods within SPT windows. SPT periods:%s, SIB periods: %s",
+            spt_periods,
+            sib_periods,
+        )
         sleep_windows = []
         for sleep_guide in spt_periods:
             min_onset = None
@@ -310,7 +315,7 @@ def _fill_false_blocks(boolean_array: np.ndarray, gap_block: int) -> np.ndarray:
         gap_block: the length of the gap that needs to be filled.
 
     Returns:
-        A booelan numpy array where true, typically, indicates the SPT windows.
+        A booelan numpy array where true, typically, idicates the SPT windows.
     """
     n_zeros = 0
     first_one_idx = next(
@@ -364,7 +369,7 @@ def compute_physical_activty_categories(
         Hildebrand, M., et al. Age group comparability of raw accelerometer output
             from wrist- and hip-worn monitors. Medicine and Science in
             Sports and Exercise, 46(9), 1816-1824 (2014).
-            https://doi.org/10.1249/mss.0000000000000289.
+            https://doi.org/10.1249/mss.0000000000000289
     """
     logger.debug("Computing physical activity levels, thresholds: %s", thresholds)
     if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):

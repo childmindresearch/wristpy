@@ -132,7 +132,7 @@ def actigraph_activity_counts(
     """Compute Actigraph acitivty counts.
 
     This function computes the Actigraph activity counts based on [1].
-    The acceleration data is downsample to 30Hz, bandpass filtered, scaled,
+    The acceleartion data is downsample to 30Hz, bandpass filtered, scaled,
     and then thresholded. The counts are then summed along each axis for
     the chosen epoch length.
 
@@ -148,7 +148,7 @@ def actigraph_activity_counts(
         in ActiGraph wearable,” Sci Rep, vol. 12, no. 1, Art. no. 1, Jul. 2022,
         doi: 10.1038/s41598-022-16003-x.
     """
-    logger.debug("Running activity count physical activity metric.")
+    logger.debug("Running activty count physical activity metric.")
 
     epoch_length_nanoseconds = round(epoch_length * 1e9)
 
@@ -309,9 +309,9 @@ def combined_temp_accel_detect_nonwear(
         The temporal resolutions is one minute.
 
     References:
-        Zhou S, Hill RA, Morgan K, et al, Classification of accelerometer wear and
+        Zhou S, Hill RA, Morgan K, et alClassification of accelerometer wear and
         non-wear events in seconds for monitoring free-living physical activityBMJ
-        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447.
+        Open 2015; 5:e007447. doi: 10.1136/bmjopen-2014-007447
     """
     logger.debug("Combined temperature and accelereation non-wear detection algorithm.")
 
@@ -391,7 +391,7 @@ def detach_nonwear(
         return temperature_interpolator(x_acceleration)
 
     def cleanup_DETACH_nonwear(nonwear: models.Measurement) -> models.Measurement:
-        """Helper function to downsample DETACH output to 60s."""
+        """Helper function to downsample DETACH ouptut to 60s."""
         nonwear_downsample = computations.moving_mean(nonwear, 60)
 
         nonwear_downsample.measurements = np.where(
@@ -628,13 +628,13 @@ def monitor_independent_movement_summary_units(
     steps as described in  the original paper are interpolation (100Hz by default),
     extrapolation of any values that went beyond the dynamic range of the device,
     filtering using a 4th order butterworth filter, aggregation by calculating the area
-    under the curve over a given epoch, and finally truncation of small values.
+    under the curve over a given epoch, and finally trunction of small values.
     The MIMS value per axis is then combined through a sum or vector magnitude, and
     returned as a single vector.
 
     Args:
         acceleration: Triaxial acceleration data to be processed.
-        combination_method: Method to combine MIMS values across axes.
+        combination_method: Method to combine MIMS values accross axes.
         epoch: Duration over which each MIMS value will be calculated. Measured in
             seconds.
         interpolation_frequency: Frequency to interpolate acceleration data, defaults

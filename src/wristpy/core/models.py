@@ -74,7 +74,7 @@ class Measurement(BaseModel):
     def validate_time(cls, v: pl.Series) -> pl.Series:
         """Validate the time series.
 
-        Check that the time series is a datetime series, contains only unique entries,
+        Check that the time series is a datetime series, contains only unque entries,
         and is sorted.
 
         Args:

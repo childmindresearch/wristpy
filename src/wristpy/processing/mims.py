@@ -1,4 +1,4 @@
-"""Calculate Monitor Independent Movement Summary Units."""
+"""Calculate Monitor Indepdent Movement Summary Units."""
 
 from typing import List, Literal, Optional, Tuple
 
@@ -145,7 +145,7 @@ def _find_markers(
             information can be gathered from watch metadata.
         noise: Typical noise value for device.
         scale: Scale value (theta) for gamma distribution. Typically set at 1.
-        target_probability: Threshold used in determining the shape parameter (k) of the
+        target_probability: Threshold used in determing the shape parameter (k) of the
             gamma distribution. Probability that a value 3 standard deviations from the
             buffer zone is maxed-out.
 
