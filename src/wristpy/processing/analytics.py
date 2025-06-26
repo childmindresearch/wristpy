@@ -95,7 +95,7 @@ class GgirSleepDetection(AbstractSleepDetector):
         logger.debug(
             "Sleep detection complete. Windows detected: %s", len(sleep_onset_wakeup)
         )
-        return [sleep_onset_wakeup, spt_window, sib_periods]
+        return sleep_onset_wakeup, spt_window, sib_periods
 
     def _spt_window(
         self, anglez_data: models.Measurement, threshold: float = 0.2

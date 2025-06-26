@@ -372,7 +372,7 @@ def _run_file(
     )
 
     sleep_array = analytics.sleep_cleanup(
-        sleep_windows=sleep_windows, nonwear_measurement=nonwear_epoch
+        sleep_windows=sleep_windows[0], nonwear_measurement=nonwear_epoch
     )
     results = writers.OrchestratorResults(
         physical_activity_metric=activity_measurement,
