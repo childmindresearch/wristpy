@@ -395,3 +395,21 @@ def test_monitor_independent_movement_summary_units(
     )
 
     assert np.allclose(results.measurements[:-1], expected_values, atol=0.005)
+
+
+def test_monitor_independent_movement_summary_units_with_truncation(
+    sample_data_gt3x: pathlib.Path, mims_r_version: pathlib.Path
+) -> None:
+    """Tests that small values are truncated in the same way."""
+    watch_data = readers.read_watch_data(sample_data_gt3x)
+    acceleration_test_data = watch_data.acceleration
+    acceleration_test_data.measurements[:500] = 0.01
+    expected_results = pl.read_csv(
+        "/Users/freymon.perez/Projects/Github/wristpy/tests/sample_data/mims_with_truncated_values.csv"
+    )
+    expected_values = expected_results["MIMS_UNIT"].to_numpy()
+    results = metrics.monitor_independent_movement_summary_units(
+        acceleration=acceleration_test_data, epoch=1
+    )
+
+    assert np.allclose(results.measurements[:-1], expected_values, atol=0.005)
