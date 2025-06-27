@@ -33,7 +33,7 @@ def run(
     activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
-    output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
+    directory_save_type: Literal[".csv", ".parquet"] = ".csv",
 ) -> Union[writers.OrchestratorResults, Dict[str, writers.OrchestratorResults]]:
     """Runs main processing steps for wristpy on single files, or directories.
 
@@ -59,8 +59,11 @@ def run(
         activity_metric: The metric to be used for physical activity categorization.
         nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
-        output_filetype: Specifies the data format for the save files. Must be None when
-            processing files, must be a valid file type when processing directories.
+        directory_save_type: Specifies the data format for the save files when
+            processing directories. Must be a valid file type (".csv" or ".parquet").
+            This argument is ignored when processing single files; in those cases, the
+            file type is determined by the output path.
+
 
     Returns:
         All calculated data in a save ready format as a Results object or as a
@@ -86,7 +89,6 @@ def run(
         2022;10(7):e38077 URL: https://mhealth.jmir.org/2022/7/e38077 DOI: 10.2196/38077
     """
     logger.setLevel(verbosity)
-
     input = pathlib.Path(input)
     output = pathlib.Path(output) if output is not None else None
 
@@ -99,19 +101,12 @@ def run(
     elif activity_metric == "mims":
         thresholds = thresholds or (10.558, 15.047, 19.614)
 
-    if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):  # type: ignore
+    if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):
         message = "Threshold values must be >=0, unique, and in ascending order."
         logger.error(message)
         raise ValueError(message)
 
     if input.is_file():
-        if output_filetype is not None:
-            raise ValueError(
-                "When processing single files, output_filetype should be None - "
-                "the file type will be determined from the output path."
-            )
-        logger.debug("Input is file, forwarding to run_file with output=%s", output)
-
         return _run_file(
             input=input,
             output=output,
@@ -131,7 +126,7 @@ def run(
         epoch_length=epoch_length,
         activity_metric=activity_metric,
         verbosity=verbosity,
-        output_filetype=output_filetype,
+        directory_save_type=directory_save_type,
         nonwear_algorithm=nonwear_algorithm,
     )
 
@@ -147,7 +142,7 @@ def _run_directory(
     epoch_length: float = 5,
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
-    output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
+    directory_save_type: Literal[".csv", ".parquet"] = ".csv",
     activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
 ) -> Dict[str, writers.OrchestratorResults]:
     """Runs main processing steps for wristpy on  directories.
@@ -170,7 +165,7 @@ def _run_directory(
             to. It must be > 0.0.
         nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
-        output_filetype: Specifies the data format for the save files.
+        directory_save_type: Specifies the data format for the save files.
         activity_metric: The metric to be used for physical activity categorization.
 
     Returns:
@@ -192,18 +187,15 @@ def _run_directory(
         Activity: Retrospective Observational Data Analysis Study JMIR Mhealth Uhealth
         2022;10(7):e38077 URL: https://mhealth.jmir.org/2022/7/e38077 DOI: 10.2196/38077
     """
-    if output is None and output_filetype is not None:
-        raise ValueError("If no output is given, output_filetype must be None.")
-
     if output is not None:
         if output.is_file():
             raise ValueError(
                 "Output is a file, but must be a directory when input is a directory."
             )
-        if output_filetype not in VALID_FILE_TYPES:
+        if directory_save_type not in VALID_FILE_TYPES:
             raise ValueError(
                 "Invalid output_filetype: "
-                f"{output_filetype}. Valid options are: {VALID_FILE_TYPES}."
+                f"{directory_save_type}. Valid options are: {VALID_FILE_TYPES}."
             )
 
     file_names = list(itertools.chain(input.glob("*.gt3x"), input.glob("*.bin")))
@@ -214,7 +206,7 @@ def _run_directory(
     results_dict = {}
     for file in file_names:
         output_file_path = (
-            output / pathlib.Path(file.stem).with_suffix(output_filetype)  # type: ignore[arg-type] # if output is defined, so is output_filetype
+            output / pathlib.Path(file.stem).with_suffix(directory_save_type)
             if output
             else None
         )
