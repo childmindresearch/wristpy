@@ -7,7 +7,7 @@ import polars as pl
 import pytest
 
 from wristpy.core import models
-from wristpy.processing import nonwear_utils
+from wristpy.processing import processing_utils
 
 
 def test_nonwear_majority_vote() -> None:
@@ -32,7 +32,7 @@ def test_nonwear_majority_vote() -> None:
         time=pl.Series("time", time3, dtype=pl.Datetime("ns")),
     )
 
-    nonwear = nonwear_utils._majority_vote_non_wear(
+    nonwear = processing_utils._majority_vote_non_wear(
         [nonwear1, nonwear2, nonwear3],
         temporal_resolution=5,
     )
@@ -54,7 +54,7 @@ def test_nonwear_majority_vote_even() -> None:
         time=pl.Series("time", time1, dtype=pl.Datetime("ns")),
     )
 
-    nonwear = nonwear_utils._majority_vote_non_wear(
+    nonwear = processing_utils._majority_vote_non_wear(
         [nonwear1, nonwear2],
         temporal_resolution=5,
     )
@@ -65,7 +65,7 @@ def test_nonwear_majority_vote_even() -> None:
 def test_nonwear_majority_vote_empty() -> None:
     """Tests the majority vote function for nonwear when no inputs provided."""
     with pytest.raises(ValueError):
-        nonwear_utils._majority_vote_non_wear(
+        processing_utils._majority_vote_non_wear(
             nonwear_measurements=[],
             temporal_resolution=5,
         )
@@ -84,7 +84,7 @@ def test_nonwear_dispatcher_default() -> None:
         measurements=np.random.randint(low=22, high=32, size=num_samples), time=time
     )
 
-    nonwear_array = nonwear_utils.get_nonwear_measurements(acceleration, temperature)
+    nonwear_array = processing_utils.get_nonwear_measurements(acceleration, temperature)
 
     assert isinstance(nonwear_array, models.Measurement)
 
@@ -102,7 +102,7 @@ def test_nonwear_dispatcher_multiple() -> None:
         measurements=np.random.randint(low=22, high=32, size=num_samples), time=time
     )
 
-    nonwear_array = nonwear_utils.get_nonwear_measurements(
+    nonwear_array = processing_utils.get_nonwear_measurements(
         acceleration, temperature, ["cta", "detach", "ggir"]
     )
 
@@ -123,7 +123,11 @@ def test_nonwear_dispatcher_unknown_algo() -> None:
     )
 
     with pytest.raises(ValueError):
-        nonwear_utils.get_nonwear_measurements(acceleration, temperature, ["unknown"])  # type: ignore [list-item] #Violating Literal to raise ValueError
+        processing_utils.get_nonwear_measurements(
+            acceleration,
+            temperature,
+            ["unknown"],  # type: ignore [list-item] #Violating Literal to raise ValueError
+        )
 
 
 def test_nonwear_dispatcher_missing_temperature() -> None:
@@ -137,6 +141,6 @@ def test_nonwear_dispatcher_missing_temperature() -> None:
     acceleration = models.Measurement(measurements=np.ones((num_samples, 3)), time=time)
 
     with pytest.raises(ValueError):
-        nonwear_utils.get_nonwear_measurements(
+        processing_utils.get_nonwear_measurements(
             acceleration, non_wear_algorithms=["cta"]
         )

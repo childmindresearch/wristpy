@@ -1,4 +1,4 @@
-"""This module contains helper functions for aggregated nonwear detection outputs."""
+"""This module contains helper functions for general processing of timeseries data."""
 
 import datetime
 from typing import Literal, Sequence, Union

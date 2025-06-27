@@ -13,7 +13,7 @@ from wristpy.processing import (
     calibration,
     idle_sleep_mode_imputation,
     metrics,
-    nonwear_utils,
+    processing_utils,
 )
 
 logger = config.get_logger()
@@ -355,13 +355,13 @@ def _run_file(
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
 
-    nonwear_array = nonwear_utils.get_nonwear_measurements(
+    nonwear_array = processing_utils.get_nonwear_measurements(
         calibrated_acceleration=calibrated_acceleration,
         temperature=watch_data.temperature,
         non_wear_algorithms=nonwear_algorithm,
     )
 
-    nonwear_epoch = nonwear_utils.synchronize_measurements(
+    nonwear_epoch = processing_utils.synchronize_measurements(
         data_measurement=nonwear_array,
         reference_measurement=activity_measurement,
         epoch_length=epoch_length,

@@ -9,7 +9,7 @@ import numpy as np
 import polars as pl
 
 from wristpy.core import computations, config, models
-from wristpy.processing import nonwear_utils
+from wristpy.processing import processing_utils
 
 logger = config.get_logger()
 
@@ -460,7 +460,7 @@ def sleep_bouts_cleanup(
         A tuple of two Measurement instances with the cleaned SPT and SIB data.
     """
     logger.debug("Starting the sleep bouts cleanup.")
-    spt_windows_sync = nonwear_utils.synchronize_measurements(
+    spt_windows_sync = processing_utils.synchronize_measurements(
         data_measurement=spt_windows,
         reference_measurement=time_reference_measurement,
         epoch_length=epoch_length,
@@ -469,7 +469,7 @@ def sleep_bouts_cleanup(
         spt_windows.measurements,
         np.logical_not(nonwear_measurement.measurements.astype(bool)),
     )
-    sib_windows_sync = nonwear_utils.synchronize_measurements(
+    sib_windows_sync = processing_utils.synchronize_measurements(
         data_measurement=sib_windows,
         reference_measurement=time_reference_measurement,
         epoch_length=epoch_length,
