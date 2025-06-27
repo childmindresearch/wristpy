@@ -374,14 +374,11 @@ def _run_file(
     sleep_array = analytics.sleep_cleanup(
         sleep_windows=sleep_windows[0], nonwear_measurement=nonwear_epoch
     )
-    spt_windows = nonwear_utils.synchronize_measurements(
-        data_measurement=sleep_windows[1],
-        reference_measurement=activity_measurement,
-        epoch_length=epoch_length,
-    )
-    sib_periods = nonwear_utils.synchronize_measurements(
-        data_measurement=sleep_windows[2],
-        reference_measurement=activity_measurement,
+    spt_windows, sib_periods = analytics.sleep_bouts_cleanup(
+        spt_windows=sleep_windows[1],
+        sib_windows=sleep_windows[2],
+        nonwear_measurement=nonwear_epoch,
+        time_reference_measurement=activity_measurement,
         epoch_length=epoch_length,
     )
 
