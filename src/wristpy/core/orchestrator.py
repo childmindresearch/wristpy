@@ -13,7 +13,7 @@ from wristpy.processing import (
     calibration,
     idle_sleep_mode_imputation,
     metrics,
-    nonwear_utils,
+    processing_utils,
 )
 
 logger = config.get_logger()
@@ -355,14 +355,14 @@ def _run_file(
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
 
-    nonwear_array = nonwear_utils.get_nonwear_measurements(
+    nonwear_array = processing_utils.get_nonwear_measurements(
         calibrated_acceleration=calibrated_acceleration,
         temperature=watch_data.temperature,
         non_wear_algorithms=nonwear_algorithm,
     )
 
-    nonwear_epoch = nonwear_utils.nonwear_array_cleanup(
-        nonwear_array=nonwear_array,
+    nonwear_epoch = processing_utils.synchronize_measurements(
+        data_measurement=nonwear_array,
         reference_measurement=activity_measurement,
         epoch_length=epoch_length,
     )
@@ -372,13 +372,23 @@ def _run_file(
     )
 
     sleep_array = analytics.sleep_cleanup(
-        sleep_windows=sleep_windows, nonwear_measurement=nonwear_epoch
+        sleep_windows=sleep_windows[0], nonwear_measurement=nonwear_epoch
     )
+    spt_windows, sib_periods = analytics.sleep_bouts_cleanup(
+        spt_windows=sleep_windows[1],
+        sib_windows=sleep_windows[2],
+        nonwear_measurement=nonwear_epoch,
+        time_reference_measurement=activity_measurement,
+        epoch_length=epoch_length,
+    )
+
     results = writers.OrchestratorResults(
         physical_activity_metric=activity_measurement,
         anglez=anglez,
         physical_activity_levels=physical_activity_levels,
         sleep_status=sleep_array,
+        sib_periods=sib_periods,
+        spt_periods=spt_windows,
         nonwear_status=nonwear_epoch,
         processing_params=parameters_dictionary,
     )

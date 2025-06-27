@@ -160,8 +160,10 @@ def test_run_sleep_detection(sleep_detection: analytics.GgirSleepDetection) -> N
     """Test the full sleep detection process."""
     result = sleep_detection.run_sleep_detection()
 
-    assert result == []
-    assert isinstance(result, List)
+    assert result[0] == []
+    assert isinstance(result[0], List)
+    assert isinstance(result[1], models.Measurement)
+    assert isinstance(result[2], models.Measurement)
 
 
 def test_physical_activity_thresholds() -> None:

@@ -9,6 +9,7 @@ import numpy as np
 import polars as pl
 
 from wristpy.core import computations, config, models
+from wristpy.processing import processing_utils
 
 logger = config.get_logger()
 
@@ -38,10 +39,15 @@ class AbstractSleepDetector(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def run_sleep_detection(self) -> List[SleepWindow]:
+    def run_sleep_detection(
+        self,
+    ) -> Tuple[List[SleepWindow], models.Measurement, models.Measurement]:
         """Sleep Detector must contain a run_sleep_detection function.
 
-        The function must return a list of SleepWindow objects.
+        The function must return a tuple that contains key sleep information, namely:
+            - a list of SleepWindow objects.
+            - a Measurement object with the SPT windows.
+            - a Measurement object with the SIB periods.
         """
         pass
 
@@ -68,7 +74,9 @@ class GgirSleepDetection(AbstractSleepDetector):
         """
         self.anglez = anglez
 
-    def run_sleep_detection(self) -> List[SleepWindow]:
+    def run_sleep_detection(
+        self,
+    ) -> Tuple[List[SleepWindow], models.Measurement, models.Measurement]:
         """Run the GGIR sleep detection.
 
         This algorithm uses the angle-z data to first find potential sleep periods
@@ -77,8 +85,11 @@ class GgirSleepDetection(AbstractSleepDetector):
         the SPT windows and SIB periods.
 
         Returns:
-            A list of SleepWindow instances, each instance contains a sleep onset/wakeup
-            time pair.
+            A tuple that contains:
+                - a list of SleepWindow instances, each instance contains a sleep
+                    onset/wakeup time pair.
+                - a Measurement object with the SPT windows.
+                - a Measurement object with the SIB periods.
         """
         logger.debug("Beginning sleep detection.")
         spt_window = self._spt_window(self.anglez)
@@ -91,7 +102,7 @@ class GgirSleepDetection(AbstractSleepDetector):
         logger.debug(
             "Sleep detection complete. Windows detected: %s", len(sleep_onset_wakeup)
         )
-        return sleep_onset_wakeup
+        return sleep_onset_wakeup, spt_window, sib_periods
 
     def _spt_window(
         self, anglez_data: models.Measurement, threshold: float = 0.2
@@ -422,6 +433,56 @@ def sleep_cleanup(
     )
 
     return models.Measurement(time=sleep.time, measurements=cleaned_sleep)
+
+
+def sleep_bouts_cleanup(
+    spt_windows: models.Measurement,
+    sib_windows: models.Measurement,
+    nonwear_measurement: models.Measurement,
+    time_reference_measurement: models.Measurement,
+    epoch_length: float,
+) -> Tuple[models.Measurement, models.Measurement]:
+    """This function will synchronize and filter the SPT and SIB windows.
+
+    The time sychrnoization is based on the time_reference_measurement, while the
+    filtering is based on the nonwear_measurement.
+
+    Args:
+        spt_windows: The SPT windows data used for reference time stamps.
+        sib_windows: The SIB windows data used for reference time stamps.
+        nonwear_measurement: The nonwear measurement data used for reference time
+            stamps and to remove overlaps with periods of sleep.
+        time_reference_measurement: The time reference measurement data used for
+            reference time stamps.
+        epoch_length: The epoch length in seconds, used for resampling the data.
+
+    Returns:
+        A tuple of two Measurement instances with the cleaned SPT and SIB data.
+    """
+    logger.debug("Starting the sleep bouts cleanup.")
+    spt_windows_sync = processing_utils.synchronize_measurements(
+        data_measurement=spt_windows,
+        reference_measurement=time_reference_measurement,
+        epoch_length=epoch_length,
+    )
+    spt_windows_sync.measurements = np.logical_and(
+        spt_windows.measurements,
+        np.logical_not(nonwear_measurement.measurements.astype(bool)),
+    )
+    sib_windows_sync = processing_utils.synchronize_measurements(
+        data_measurement=sib_windows,
+        reference_measurement=time_reference_measurement,
+        epoch_length=epoch_length,
+    )
+    sib_windows_sync.measurements = np.logical_and(
+        sib_windows_sync.measurements,
+        np.logical_not(nonwear_measurement.measurements.astype(bool)),
+    )
+
+    return (
+        spt_windows_sync,
+        sib_windows_sync,
+    )
 
 
 def _sleep_windows_as_measurement(
