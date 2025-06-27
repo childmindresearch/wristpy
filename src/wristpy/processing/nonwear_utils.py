@@ -160,22 +160,23 @@ def get_nonwear_measurements(
     return results[0]
 
 
-def nonwear_array_cleanup(
-    nonwear_array: models.Measurement,
+def synchronize_measurements(
+    data_measurement: models.Measurement,
     reference_measurement: models.Measurement,
     epoch_length: float = 5.0,
 ) -> models.Measurement:
-    """This function is used to match the nonwear array to a reference Measurement.
+    """This function is used to match a Measurement object to a reference Measurement.
 
-    This function ensures that the nonwear array and reference Measurement times
-    are synced up. This is accomplished by first resampling the nonwear array to
+    This function ensures that a Measurement object and reference Measurement times
+    are synced up. This is accomplished by first resampling a Measurement object to
     the specified temporal resolution.
-    It also ensures that the nonwear array is a binary array, where 1 indicates
+    It also ensures that a Measurement object is a binary array, where 1 indicates
     nonwear and 0 indicates wear.
-    It then truncates the nonwear array to match the reference Measurement time points.
+    It then truncates a Measurement object to match the reference
+    Measurement time points.
 
     Args:
-        nonwear_array: The nonwear array to clean up.
+        data_measurement: The nonwear array to clean up.
         reference_measurement: The reference measurement to use for resampling.
         epoch_length: The temporal resolution of the output, in seconds.
             Defaults to 5.0.
@@ -185,7 +186,7 @@ def nonwear_array_cleanup(
         returned as a boolean (True == nonwear).
     """
     time_fix_nonwear = _time_fix(
-        nonwear_array, reference_measurement.time[-1], reference_measurement.time[0]
+        data_measurement, reference_measurement.time[-1], reference_measurement.time[0]
     )
     resampled_nonwear = computations.resample(time_fix_nonwear, epoch_length)
     binary_nonwear = np.where(resampled_nonwear.measurements >= 0.5, 1, 0)

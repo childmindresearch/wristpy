@@ -361,8 +361,8 @@ def _run_file(
         non_wear_algorithms=nonwear_algorithm,
     )
 
-    nonwear_epoch = nonwear_utils.nonwear_array_cleanup(
-        nonwear_array=nonwear_array,
+    nonwear_epoch = nonwear_utils.synchronize_measurements(
+        data_measurement=nonwear_array,
         reference_measurement=activity_measurement,
         epoch_length=epoch_length,
     )
@@ -374,11 +374,24 @@ def _run_file(
     sleep_array = analytics.sleep_cleanup(
         sleep_windows=sleep_windows[0], nonwear_measurement=nonwear_epoch
     )
+    spt_windows = nonwear_utils.synchronize_measurements(
+        data_measurement=sleep_windows[1],
+        reference_measurement=activity_measurement,
+        epoch_length=epoch_length,
+    )
+    sib_periods = nonwear_utils.synchronize_measurements(
+        data_measurement=sleep_windows[2],
+        reference_measurement=activity_measurement,
+        epoch_length=epoch_length,
+    )
+
     results = writers.OrchestratorResults(
         physical_activity_metric=activity_measurement,
         anglez=anglez,
         physical_activity_levels=physical_activity_levels,
         sleep_status=sleep_array,
+        sib_periods=sib_periods,
+        spt_periods=spt_windows,
         nonwear_status=nonwear_epoch,
         processing_params=parameters_dictionary,
     )

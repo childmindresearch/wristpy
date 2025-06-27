@@ -43,7 +43,10 @@ class AbstractSleepDetector(abc.ABC):
     ) -> Tuple[List[SleepWindow], models.Measurement, models.Measurement]:
         """Sleep Detector must contain a run_sleep_detection function.
 
-        The function must return a list of SleepWindow objects.
+        The function must return a tuple that contains key sleep information, namely:
+            - a list of SleepWindow objects.
+            - a Measurement object with the SPT windows.
+            - a Measurement object with the SIB periods.
         """
         pass
 
@@ -81,8 +84,11 @@ class GgirSleepDetection(AbstractSleepDetector):
         the SPT windows and SIB periods.
 
         Returns:
-            A list of SleepWindow instances, each instance contains a sleep onset/wakeup
-            time pair.
+            A tuple that contains:
+                - a list of SleepWindow instances, each instance contains a sleep
+                    onset/wakeup time pair.
+                - a Measurement object with the SPT windows.
+                - a Measurement object with the SIB periods.
         """
         logger.debug("Beginning sleep detection.")
         spt_window = self._spt_window(self.anglez)
