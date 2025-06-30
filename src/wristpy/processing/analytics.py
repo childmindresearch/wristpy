@@ -274,7 +274,7 @@ def _find_periods(
 
     This is a helper function to return the periods in the format of
     List [start_of_period, end_of_period], it is used in the
-    GGIRSleepDetection class and when removing non-wear periods from sleep windows.
+    GGIRSleepDetection class.
 
     Args:
         window_measurement: the Measurement instance, intended to be
