@@ -69,6 +69,14 @@ def mims_r_version() -> pathlib.Path:
 
 
 @pytest.fixture
+def mims_truncation_r_version() -> pathlib.Path:
+    """The actigraphy sample data processed by the mims function in R."""
+    return (
+        pathlib.Path(__file__).parent / "sample_data" / "mims_with_truncated_values.csv"
+    )
+
+
+@pytest.fixture
 def create_acceleration() -> pl.DataFrame:
     """Fixture to create a dummy acceleration DataFrame to be used in multiple tests."""
     dummy_date = datetime(2024, 5, 2)

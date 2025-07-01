@@ -390,6 +390,7 @@ def test_monitor_independent_movement_summary_units(
     acceleration_test_data = watch_data.acceleration
     expected_results = pl.read_csv(mims_r_version)
     expected_values = expected_results["MIMS_UNIT"].to_numpy()
+
     results = metrics.monitor_independent_movement_summary_units(
         acceleration=acceleration_test_data, epoch=1
     )
@@ -398,16 +399,15 @@ def test_monitor_independent_movement_summary_units(
 
 
 def test_monitor_independent_movement_summary_units_with_truncation(
-    sample_data_gt3x: pathlib.Path, mims_r_version: pathlib.Path
+    sample_data_gt3x: pathlib.Path, mims_truncated_r_version: pathlib.Path
 ) -> None:
-    """Tests that small values are truncated in the same way."""
+    """Tests that small values are truncated appropriately."""
     watch_data = readers.read_watch_data(sample_data_gt3x)
     acceleration_test_data = watch_data.acceleration
     acceleration_test_data.measurements[:500] = 0.01
-    expected_results = pl.read_csv(
-        "/Users/freymon.perez/Projects/Github/wristpy/tests/sample_data/mims_with_truncated_values.csv"
-    )
+    expected_results = pl.read_csv(mims_truncated_r_version)
     expected_values = expected_results["MIMS_UNIT"].to_numpy()
+
     results = metrics.monitor_independent_movement_summary_units(
         acceleration=acceleration_test_data, epoch=1
     )
