@@ -69,7 +69,7 @@ def mims_r_version() -> pathlib.Path:
 
 
 @pytest.fixture
-def mims_truncation_r_version() -> pathlib.Path:
+def mims_truncated_r_version() -> pathlib.Path:
     """The actigraphy sample data processed by the mims function in R."""
     return (
         pathlib.Path(__file__).parent / "sample_data" / "mims_with_truncated_values.csv"
