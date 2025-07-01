@@ -78,6 +78,19 @@ output_file <- "~/Documents/mims_example_full_run.csv"
 write.csv(mims_unit_one_sec, file = output_file, row.names = FALSE)
 ```
 
+### 5. Full Run Truncated Test Data.
+
+The test data was generated using the following R script and then saved as 'mims_with_truncated_values.csv' :
+
+```r
+library(MIMSunit)
+raw_data <- read.gt3x("~/Github/wristpy/tests/sample_data/example_actigraph.gt3x")
+accel_df <- as.data.frame(raw_data)
+accel_df[1:500,2:4]<- 0.01
+mims_unit_one_sec <- MIMSunit::mims_unit(df = accel_df, dynamic_range = c(-8, 8), epoch = "1 sec")
+output_file <- "~/Documents/mims_with_truncated_values.csv"
+write.csv(mims_unit_one_sec, file = output_file, row.names = FALSE)
+
 
 ## References
 [1] John D, Tang Q, Albinali F, Intille S. An Open-Source Monitor-Independent Movement Summary for Accelerometer Data Processing. J Meas Phys Behav. 2019 Dec;2(4):268-281. doi: 10.1123/jmpb.2018-0068. PMID: 34308270; PMCID: PMC8301210.
