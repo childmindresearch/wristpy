@@ -37,6 +37,7 @@ def test_main_default(
         epoch_length=5,
         nonwear_algorithm=["ggir"],
         verbosity=logging.INFO,
+        output_filetype=".csv",
     )
 
 

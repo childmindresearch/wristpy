@@ -159,7 +159,7 @@ def main(
             epoch_length=epoch_length,
             nonwear_algorithm=nonwear_algorithms,  # type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class
             verbosity=log_level,
-            output_filetype=output_filetype.value if output_filetype else None,  # type: ignore[arg-type] # Covered by OutputFileType Enum class
+            output_filetype=output_filetype.value,
         )
     except FileNotFoundError as e:
         typer.echo(f"Error: {e}", err=True)
