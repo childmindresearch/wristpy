@@ -49,7 +49,7 @@ If users would prefer to process specific files instead of entire directories we
 
 ```python
 from wristpy.core import orchestrator
-import pathlib 
+import pathlib
 
 file_path = pathlib.Path("/path/to/data/")
 output_dir = pathlib.Path("/path/to/save/dir/")
