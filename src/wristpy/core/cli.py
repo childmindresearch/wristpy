@@ -6,7 +6,7 @@ from enum import Enum
 
 import typer
 
-from wristpy.core import config
+from wristpy.core import config, exceptions
 
 logger = config.get_logger()
 app = typer.Typer(
@@ -161,7 +161,7 @@ def main(
             verbosity=log_level,
             output_filetype=output_filetype.value,
         )
-    except FileNotFoundError as e:
+    except exceptions.EmptyDirectoryError as e:
         typer.echo(f"Error: {e}", err=True)
         raise typer.Exit(1)
 

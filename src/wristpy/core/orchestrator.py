@@ -197,7 +197,9 @@ def _run_directory(
     file_names = list(itertools.chain(input.glob("*.gt3x"), input.glob("*.bin")))
 
     if not file_names:
-        raise FileNotFoundError(f"Directory {input} contains no .gt3x or .bin files.")
+        raise exceptions.EmptyDirectoryError(
+            f"Directory {input} contains no .gt3x or .bin files."
+        )
 
     results_dict = {}
     for file in file_names:

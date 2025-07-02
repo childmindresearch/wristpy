@@ -40,3 +40,9 @@ class InvalidFileTypeError(LoggedException):
     """Wristpy did not expect this file extension."""
 
     pass
+
+
+class EmptyDirectoryError(LoggedException):
+    """No .gt3x or .bin files were found in the directory."""
+
+    pass
