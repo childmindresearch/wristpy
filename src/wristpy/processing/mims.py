@@ -686,10 +686,10 @@ def aggregate_mims(
     )
 
     if truncate:
-        aggregated_measure.measurements = np.where(
-            aggregated_measure.measurements <= 0.001, 0, aggregated_measure.measurements
-        )
-
+        truncate_threshold = 1e-4 * epoch * sampling_rate
+        aggregated_measure.measurements[
+            aggregated_measure.measurements <= truncate_threshold
+        ] = 0
     return aggregated_measure
 
 
