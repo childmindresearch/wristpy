@@ -685,8 +685,8 @@ def aggregate_mims(
         time=result["time"].cast(pl.Datetime("ns")),
     )
 
-    truncate_threshold = 1e-4 * epoch * sampling_rate
     if truncate:
+        truncate_threshold = 1e-4 * epoch * sampling_rate
         aggregated_measure.measurements = np.where(
             aggregated_measure.measurements <= truncate_threshold,
             0,
