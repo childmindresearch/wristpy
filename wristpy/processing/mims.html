@@ -759,10 +759,10 @@
 </span><span id="L-686"><a href="#L-686"><span class="linenos">686</span></a>    <span class="p">)</span>
 </span><span id="L-687"><a href="#L-687"><span class="linenos">687</span></a>
 </span><span id="L-688"><a href="#L-688"><span class="linenos">688</span></a>    <span class="k">if</span> <span class="n">truncate</span><span class="p">:</span>
-</span><span id="L-689"><a href="#L-689"><span class="linenos">689</span></a>        <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
-</span><span id="L-690"><a href="#L-690"><span class="linenos">690</span></a>            <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span>
-</span><span id="L-691"><a href="#L-691"><span class="linenos">691</span></a>        <span class="p">)</span>
-</span><span id="L-692"><a href="#L-692"><span class="linenos">692</span></a>
+</span><span id="L-689"><a href="#L-689"><span class="linenos">689</span></a>        <span class="n">truncate_threshold</span> <span class="o">=</span> <span class="mf">1e-4</span> <span class="o">*</span> <span class="n">epoch</span> <span class="o">*</span> <span class="n">sampling_rate</span>
+</span><span id="L-690"><a href="#L-690"><span class="linenos">690</span></a>        <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span><span class="p">[</span>
+</span><span id="L-691"><a href="#L-691"><span class="linenos">691</span></a>            <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">truncate_threshold</span>
+</span><span id="L-692"><a href="#L-692"><span class="linenos">692</span></a>        <span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 </span><span id="L-693"><a href="#L-693"><span class="linenos">693</span></a>    <span class="k">return</span> <span class="n">aggregated_measure</span>
 </span><span id="L-694"><a href="#L-694"><span class="linenos">694</span></a>
 </span><span id="L-695"><a href="#L-695"><span class="linenos">695</span></a>
@@ -1216,10 +1216,10 @@ interpolation so it will typically be 100.</li>
 </span><span id="aggregate_mims-687"><a href="#aggregate_mims-687"><span class="linenos">687</span></a>    <span class="p">)</span>
 </span><span id="aggregate_mims-688"><a href="#aggregate_mims-688"><span class="linenos">688</span></a>
 </span><span id="aggregate_mims-689"><a href="#aggregate_mims-689"><span class="linenos">689</span></a>    <span class="k">if</span> <span class="n">truncate</span><span class="p">:</span>
-</span><span id="aggregate_mims-690"><a href="#aggregate_mims-690"><span class="linenos">690</span></a>        <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
-</span><span id="aggregate_mims-691"><a href="#aggregate_mims-691"><span class="linenos">691</span></a>            <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span>
-</span><span id="aggregate_mims-692"><a href="#aggregate_mims-692"><span class="linenos">692</span></a>        <span class="p">)</span>
-</span><span id="aggregate_mims-693"><a href="#aggregate_mims-693"><span class="linenos">693</span></a>
+</span><span id="aggregate_mims-690"><a href="#aggregate_mims-690"><span class="linenos">690</span></a>        <span class="n">truncate_threshold</span> <span class="o">=</span> <span class="mf">1e-4</span> <span class="o">*</span> <span class="n">epoch</span> <span class="o">*</span> <span class="n">sampling_rate</span>
+</span><span id="aggregate_mims-691"><a href="#aggregate_mims-691"><span class="linenos">691</span></a>        <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span><span class="p">[</span>
+</span><span id="aggregate_mims-692"><a href="#aggregate_mims-692"><span class="linenos">692</span></a>            <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">truncate_threshold</span>
+</span><span id="aggregate_mims-693"><a href="#aggregate_mims-693"><span class="linenos">693</span></a>        <span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 </span><span id="aggregate_mims-694"><a href="#aggregate_mims-694"><span class="linenos">694</span></a>    <span class="k">return</span> <span class="n">aggregated_measure</span>
 </span></pre></div>
 
