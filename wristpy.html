@@ -23,7 +23,7 @@
 
             <h2>Contents</h2>
             <ul>
-  <li><a href="#wristpy-img-srchttpsmediagithubusercontentcommediachildmindresearchwristpymaindocswristpy_logopng-alignright-width25"><code>md5-564835ee9c1e1e4b43d0565ae201d688</code>"></a></li>
+  <li><a href="#wristpy-img-srchttpsmediagithubusercontentcommediachildmindresearchwristpymaindocswristpy_logopng-alignright-width25"><code>md5-2df864f09b8a5db5aaaa6574ecd72b00</code>"></a></li>
   <li><a href="#wristpy-img-srchttpsmediagithubusercontentcommediachildmindresearchwristpymaindocswristpy_logopng-alignright-width25"><code>wristpy</code> <img src="https://media.githubusercontent.com/media/childmindresearch/wristpy/main/docs/wristpy_logo.png" align="right" width="25%"/></a>
   <ul>
     <li><a href="#supported-formats-devices">Supported formats &amp; devices</a></li>
@@ -351,7 +351,7 @@ we will cover the following topics through a few examples:</p>
 
 <p>This runs the processing pipeline with all the default arguments, creates an output <code>.csv</code> file, a <code>.json</code> file with the pipeline configuration parameters, and will create a <code>results</code> object that contains the various output metrics (namely; the specified physical activity metric, angle-z, physical activity classification values, non-wear status, and sleep status).</p>
 
-<p>The orchestrator can also process entire directories. The call to the orchestrator remains largely the same but now output is expected to be a directory and the desired filetype for the saved files <strong>must</strong> be specified:</p>
+<p>The orchestrator can also process entire directories. The call to the orchestrator remains largely the same but now output is expected to be a directory and the desired filetype for the saved files can be specified through the output_filetype arguement(default value is ".csv"):</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/core.html">wristpy.core</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">orchestrator</span>
@@ -361,6 +361,28 @@ we will cover the following topics through a few examples:</p>
     <span class="n">output</span> <span class="o">=</span> <span class="s1">&#39;/path/to/output/dir&#39;</span><span class="p">,</span>
     <span class="n">output_filetype</span> <span class="o">=</span> <span class="s2">&quot;.csv&quot;</span>
 <span class="p">)</span>
+</code></pre>
+</div>
+
+<p>If users would prefer to process specific files instead of entire directories we recommend looping through a list of file names. The following code snipet will save results objects into a dictionary, and the output files into the desired directory:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn"><a href="wristpy/core.html">wristpy.core</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">orchestrator</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+
+<span class="n">file_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/data/&quot;</span><span class="p">)</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/save/dir/&quot;</span><span class="p">)</span>
+<span class="n">file_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;file1.gt3x&quot;</span><span class="p">),</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;file2.gt3x&quot;</span><span class="p">),</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;file3.gt3x&quot;</span><span class="p">)]</span>
+<span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">file_names</span><span class="p">:</span>
+    <span class="n">input_path</span> <span class="o">=</span> <span class="n">file_path</span> <span class="o">/</span> <span class="n">file</span>
+    <span class="n">output_path</span> <span class="o">=</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="n">file</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">input_path</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">output_path</span>
+    <span class="p">)</span>
+    <span class="n">results_dict</span><span class="p">[</span><span class="n">file</span><span class="o">.</span><span class="n">stem</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
 </code></pre>
 </div>
 
