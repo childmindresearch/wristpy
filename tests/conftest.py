@@ -70,7 +70,7 @@ def mims_r_version() -> pathlib.Path:
 
 @pytest.fixture
 def mims_truncated_r_version() -> pathlib.Path:
-    """MIMS sample with first 500 entries set to 0.01."""
+    """MIMS sample data processed in R with first 500 entries set to 0.01."""
     return (
         pathlib.Path(__file__).parent / "sample_data" / "mims_with_truncated_values.csv"
     )
