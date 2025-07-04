@@ -36,7 +36,7 @@ The main processing pipeline of the wristpy module can be described as follows:
 - ***Data imputation*** In the special case when dealing with the Actigraph `idle_sleep_mode == enabled`, the gaps in acceleration are filled in after calibration, to avoid biasing the calibration phase.
 - **Metrics Calculation**: Calculates various activity metrics on the calibrated data, namely ENMO (Euclidean norm, minus one), MAD (mean amplitude deviation) <sup>1</sup>, Actigraph activity counts<sup>2</sup>, MIMS (monitor-independent movement summary) unit <sup>3</sup>, and angle-Z (angle of acceleration relative to the *x-y* axis).
 - **Non-wear detection**: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide `wear` or `not wear`. Additionally, we can use the temperature sensor, when avaia\lable, to augment the acceleration data. This is used in the CTA (combined temperature and acceleration) algorithm <sup>4</sup>, and in the `skdh` DETACH algorithm <sup>5</sup>. Furthermore, ensemble classification of non-wear periods is possible by providing a list (of any length) of non-wear algorithm options.
-- **Sleep Detection**: Using the HDCZ<sup>6</sup> and HSPT<sup>7</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected. Any sleep periods that overlap with detected non-wear times are removed, and any remaining sleep periods shorter than 15 minutes (default value) are removed.
+- **Sleep Detection**: Using the HDCZ<sup>6</sup> and HSPT<sup>7</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected. Any sleep periods that overlap with detected non-wear times are removed, and any remaining sleep periods shorter than 15 minutes (default value) are removed. Additionally, the SIB (sustained inactivity bouts) and the SPT (sleep period time) windows are provided as part of the output to aid in sleep metric post-processing.
 - **Physical activity levels**: Using the chosen physical activity metric (aggregated into time bins, 5 second default) we compute activity levels into the following categories: [`inactive`, `light`, `moderate`, `vigorous`]. The threshold values can be defined by the user, while the default values are chosen based on the specific activity metric and the values found in the literature  <sup>8-10</sup>.
 - **Data output**: The output results can be saved in `.csv` or `.parquet` data formats, with the run-time configuration parameters saved in a `.json` dictionary.
 
@@ -102,8 +102,11 @@ results = orchestrator.run(
 physical_activity_metric = results.physical_activity_metric
 anglez = results.anglez
 physical_activity_levels = results.physical_activity_levels
-nonwear_array = results.nonwear_epoch
-sleep_windows = results.sleep_windows_epoch
+nonwear_array = results.nonwear_status
+sleep_windows = results.sleep_status
+sib_periods = results.sib_periods
+spt_periods = results.spt_periods
+
 ```
 #### Running entire directories:
 ```Python
@@ -131,8 +134,11 @@ subject1 = results_dict['subject1']
 physical_activity_metric = subject1.physical_activity_metric
 anglez = subject1.anglez
 physical_activity_levels = subject1.physical_activity_levels
-nonwear_array = subject1.nonwear_epoch
-sleep_windows = subject1.sleep_windows_epoch
+nonwear_array = subject1.nonwear_status
+sleep_windows = subject1.sleep_status
+sib_periods = subject1.sib_periods
+spt_periods = subject1.spt_periods
+
 ```
 
 ### Using Wristpy Through Docker

@@ -96,6 +96,8 @@ We can also view and process these outputs from the saved `.csv` output file:
 import polars as pl
 import matplotlib.pyplot as plt
 
+output_results = pl.read_csv('path/to/save/file_name.csv', try_parse_dates=True)
+
 activity_mapping = {
     "inactive": 0,
     "light": 1,
