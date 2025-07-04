@@ -429,20 +429,19 @@ def sleep_cleanup(
 
 
 def sleep_bouts_cleanup(
-    spt_windows: models.Measurement,
-    sib_windows: models.Measurement,
+    sleep_parameter: models.Measurement,
     nonwear_measurement: models.Measurement,
     time_reference_measurement: models.Measurement,
     epoch_length: float,
-) -> Tuple[models.Measurement, models.Measurement]:
+) -> models.Measurement:
     """This function will synchronize and filter the SPT and SIB windows.
 
     The time sychrnoization is based on the time_reference_measurement, while the
     filtering is based on the nonwear_measurement.
 
     Args:
-        spt_windows: The SPT windows data used for reference time stamps.
-        sib_windows: The SIB windows data used for reference time stamps.
+        sleep_parameter: The sleep parameter measurement data, which contains
+            either the SPT and SIB windows.
         nonwear_measurement: The nonwear measurement data used for reference time
             stamps and to remove overlaps with periods of sleep.
         time_reference_measurement: The time reference measurement data used for
@@ -453,29 +452,17 @@ def sleep_bouts_cleanup(
         A tuple of two Measurement instances with the cleaned SPT and SIB data.
     """
     logger.debug("Starting the sleep bouts cleanup.")
-    spt_windows_sync = processing_utils.synchronize_measurements(
-        data_measurement=spt_windows,
+    sleep_parameter_sync = processing_utils.synchronize_measurements(
+        data_measurement=sleep_parameter,
         reference_measurement=time_reference_measurement,
         epoch_length=epoch_length,
     )
-    spt_windows_sync.measurements = np.logical_and(
-        spt_windows.measurements,
-        np.logical_not(nonwear_measurement.measurements.astype(bool)),
-    )
-    sib_windows_sync = processing_utils.synchronize_measurements(
-        data_measurement=sib_windows,
-        reference_measurement=time_reference_measurement,
-        epoch_length=epoch_length,
-    )
-    sib_windows_sync.measurements = np.logical_and(
-        sib_windows_sync.measurements,
+    sleep_parameter_sync.measurements = np.logical_and(
+        sleep_parameter_sync.measurements,
         np.logical_not(nonwear_measurement.measurements.astype(bool)),
     )
 
-    return (
-        spt_windows_sync,
-        sib_windows_sync,
-    )
+    return sleep_parameter_sync
 
 
 def _sleep_windows_as_measurement(

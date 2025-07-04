@@ -176,7 +176,7 @@ def synchronize_measurements(
     Measurement time points.
 
     Args:
-        data_measurement: The nonwear array to clean up.
+        data_measurement: The Measurement object that requires time syncing.
         reference_measurement: The reference measurement to use for resampling.
         epoch_length: The temporal resolution of the output, in seconds.
             Defaults to 5.0.

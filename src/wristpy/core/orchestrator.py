@@ -354,9 +354,14 @@ def _run_file(
     sleep_array = analytics.sleep_cleanup(
         sleep_windows=sleep_parameters.sleep_windows, nonwear_measurement=nonwear_epoch
     )
-    spt_windows, sib_periods = analytics.sleep_bouts_cleanup(
-        spt_windows=sleep_parameters.spt_windows,
-        sib_windows=sleep_parameters.sib_periods,
+    spt_windows = analytics.sleep_bouts_cleanup(
+        sleep_parameter=sleep_parameters.spt_windows,
+        nonwear_measurement=nonwear_epoch,
+        time_reference_measurement=activity_measurement,
+        epoch_length=epoch_length,
+    )
+    sib_periods = analytics.sleep_bouts_cleanup(
+        sleep_parameter=sleep_parameters.sib_periods,
         nonwear_measurement=nonwear_epoch,
         time_reference_measurement=activity_measurement,
         epoch_length=epoch_length,
