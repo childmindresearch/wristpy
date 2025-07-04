@@ -292,15 +292,6 @@ def _run_file(
     if output is not None:
         writers.OrchestratorResults.validate_output(output=output)
 
-    parameters_dictionary = {
-        "thresholds": list(thresholds),
-        "calibrator": calibrator,
-        "epoch_length": epoch_length,
-        "activity_metric": activity_metric,
-        "nonwear_algorithm": list(nonwear_algorithm),
-        "input_file": str(input),
-    }
-
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
         msg = (
             f"Invalid calibrator: {calibrator}. Choose: 'ggir', 'gradient'. "
@@ -342,9 +333,6 @@ def _run_file(
         dynamic_range=watch_data.dynamic_range,
     )
 
-    sleep_detector = analytics.GgirSleepDetection(anglez)
-    sleep_windows = sleep_detector.run_sleep_detection()
-
     nonwear_array = processing_utils.get_nonwear_measurements(
         calibrated_acceleration=calibrated_acceleration,
         temperature=watch_data.temperature,
@@ -361,16 +349,27 @@ def _run_file(
         activity_measurement, thresholds
     )
 
+    sleep_detector = analytics.GgirSleepDetection(anglez)
+    sleep_parameters = sleep_detector.run_sleep_detection()
     sleep_array = analytics.sleep_cleanup(
-        sleep_windows=sleep_windows[0], nonwear_measurement=nonwear_epoch
+        sleep_windows=sleep_parameters.sleep_windows, nonwear_measurement=nonwear_epoch
     )
     spt_windows, sib_periods = analytics.sleep_bouts_cleanup(
-        spt_windows=sleep_windows[1],
-        sib_windows=sleep_windows[2],
+        spt_windows=sleep_parameters.spt_windows,
+        sib_windows=sleep_parameters.sib_periods,
         nonwear_measurement=nonwear_epoch,
         time_reference_measurement=activity_measurement,
         epoch_length=epoch_length,
     )
+
+    parameters_dictionary = {
+        "thresholds": list(thresholds),
+        "calibrator": calibrator,
+        "epoch_length": epoch_length,
+        "activity_metric": activity_metric,
+        "nonwear_algorithm": list(nonwear_algorithm),
+        "input_file": str(input),
+    }
 
     results = writers.OrchestratorResults(
         physical_activity_metric=activity_measurement,

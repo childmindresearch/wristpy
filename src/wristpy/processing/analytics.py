@@ -1,6 +1,5 @@
 """Calculate sleep onset and wake up times."""
 
-import abc
 import datetime
 from dataclasses import dataclass
 from typing import List, Tuple, Union
@@ -27,32 +26,23 @@ class SleepWindow:
     wakeup: Union[datetime.datetime, List]
 
 
-class AbstractSleepDetector(abc.ABC):
-    """Abstract class defining the interface for sleep detection algorithms."""
+@dataclass
+class SleepParameters:
+    """Dataclass to store sleep parameters used to compute sleep metrics.
 
-    @abc.abstractmethod
-    def __init__(self, anglez: models.Measurement) -> None:
-        """Initialization function for the sleep detection algorithm.
+    Attributes:
+        sleep_windows: a list of SleepWindow objects, each representing a sleep period
+            with an onset and wakeup time.
+        spt_windows: a Measurement object with the sleep period guider windows.
+        sib_periods: a Measurement object with the sustained inactivity bouts.
+    """
 
-        Must contain the anglez data as an input.
-        """
-        pass
-
-    @abc.abstractmethod
-    def run_sleep_detection(
-        self,
-    ) -> Tuple[List[SleepWindow], models.Measurement, models.Measurement]:
-        """Sleep Detector must contain a run_sleep_detection function.
-
-        The function must return a tuple that contains key sleep information, namely:
-            - a list of SleepWindow objects.
-            - a Measurement object with the SPT windows.
-            - a Measurement object with the SIB periods.
-        """
-        pass
+    sleep_windows: List[SleepWindow]
+    spt_windows: models.Measurement
+    sib_periods: models.Measurement
 
 
-class GgirSleepDetection(AbstractSleepDetector):
+class GgirSleepDetection:
     """Sleep Detection algorithm based on the GGIR method.
 
     This class implements the GGIR method for sleep detection. The method uses the
@@ -76,7 +66,7 @@ class GgirSleepDetection(AbstractSleepDetector):
 
     def run_sleep_detection(
         self,
-    ) -> Tuple[List[SleepWindow], models.Measurement, models.Measurement]:
+    ) -> SleepParameters:
         """Run the GGIR sleep detection.
 
         This algorithm uses the angle-z data to first find potential sleep periods
@@ -85,11 +75,10 @@ class GgirSleepDetection(AbstractSleepDetector):
         the SPT windows and SIB periods.
 
         Returns:
-            A tuple that contains:
-                - a list of SleepWindow instances, each instance contains a sleep
-                    onset/wakeup time pair.
-                - a Measurement object with the SPT windows.
-                - a Measurement object with the SIB periods.
+            A SleepParameters instance containing the underlying sleep parameters:
+                - sleep_windows
+                - spt_window
+                - sib_periods
         """
         logger.debug("Beginning sleep detection.")
         spt_window = self._spt_window(self.anglez)
@@ -102,7 +91,11 @@ class GgirSleepDetection(AbstractSleepDetector):
         logger.debug(
             "Sleep detection complete. Windows detected: %s", len(sleep_onset_wakeup)
         )
-        return sleep_onset_wakeup, spt_window, sib_periods
+        return SleepParameters(
+            sleep_windows=sleep_onset_wakeup,
+            spt_windows=spt_window,
+            sib_periods=sib_periods,
+        )
 
     def _spt_window(
         self, anglez_data: models.Measurement, threshold: float = 0.2
