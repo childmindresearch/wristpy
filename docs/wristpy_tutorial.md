@@ -33,7 +33,7 @@ results = orchestrator.run(
 This runs the processing pipeline with all the default arguments, creates an output `.csv` file, a `.json` file with the pipeline configuration parameters, and will create a `results` object that contains the various output metrics (namely; the specified physical activity metric, angle-z, physical activity classification values, non-wear status, and sleep status).
 
 
-The orchestrator can also process entire directories. The call to the orchestrator remains largely the same but now output is expected to be a directory and the desired filetype for the saved files **must** be specified:
+The orchestrator can also process entire directories. The call to the orchestrator remains largely the same but now output is expected to be a directory and the desired filetype for the saved files can be specified through the output_filetype arguement(default value is ".csv"):
 
 ```python
 from wristpy.core import orchestrator
@@ -44,6 +44,28 @@ results = orchestrator.run(
     output_filetype = ".csv"
 )
 ```
+
+If users would prefer to process specific files instead of entire directories we recommend looping through a list of file names. The following code snipet will save results objects into a dictionary, and the output files into the desired directory:
+
+```python
+from wristpy.core import orchestrator
+import pathlib
+
+file_path = pathlib.Path("/path/to/data/")
+output_dir = pathlib.Path("/path/to/save/dir/")
+file_names = [pathlib.Path("file1.gt3x"), pathlib.Path("file2.gt3x"), pathlib.Path("file3.gt3x")]
+results_dict = {}
+
+for file in file_names:
+    input_path = file_path / file
+    output_path = output_dir / file.stem + ".csv"
+    result = orchestrator.run(
+        input = input_path
+        output = output_path
+    )
+    results_dict[file.stem] = result
+```
+
 
 
 

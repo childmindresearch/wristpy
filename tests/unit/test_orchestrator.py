@@ -136,23 +136,6 @@ def test_run_single_file_nonwear_options(
     assert isinstance(results, writers.OrchestratorResults)
 
 
-def test_run_single_file_bad_output_filetype(
-    sample_data_gt3x: pathlib.Path,
-    tmp_path: pathlib.Path,
-) -> None:
-    """Testing running a single file."""
-    output_file_path = tmp_path / "file_name.csv"
-
-    with pytest.raises(
-        ValueError,
-        match="When processing single files, output_filetype should be None - "
-        "the file type will be determined from the output path.",
-    ):
-        orchestrator.run(
-            input=sample_data_gt3x, output=output_file_path, output_filetype=".csv"
-        )
-
-
 def test_run_dir(tmp_path: pathlib.Path) -> None:
     """Test run function when pointed at a directory."""
     input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
