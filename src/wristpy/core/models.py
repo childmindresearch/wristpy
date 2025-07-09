@@ -16,18 +16,23 @@ logger = config.get_logger()
 class Measurement(BaseModel):
     """A single measurement of a sensor and its corresponding time."""
 
+    name: str | None
     measurements: np.ndarray
     time: pl.Series
 
     @classmethod
-    def from_data_frame(cls, data_frame: pl.DataFrame) -> "Measurement":
+    def from_data_frame(
+        cls, data_frame: pl.DataFrame, name: str | None
+    ) -> "Measurement":
         """Creates a measurement from a Polars DataFrame.
 
         Args:
             data_frame: The Polars DataFrame, must have a time column. All
                 non-time columns will be used as the 'measurements' input.
+            name: Optional name describing the type of measurement.
         """
         return Measurement(
+            name=name,
             measurements=data_frame.drop("time").to_numpy().squeeze(),
             time=data_frame["time"],
         )

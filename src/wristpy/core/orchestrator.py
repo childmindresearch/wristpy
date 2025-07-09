@@ -20,17 +20,24 @@ logger = config.get_logger()
 
 VALID_FILE_TYPES = (".csv", ".parquet")
 
+DEFAULT_ACTIVITY_THRESHOLDS = {
+    "enmo": (0.0563, 0.1916, 0.6958),
+    "mad": (0.029, 0.338, 0.604),
+    "ag_count": (100, 3000, 5200),
+    "mims": (10.558, 15.047, 19.614),
+}
+
 
 def run(
     input: Union[pathlib.Path, str],
     output: Optional[Union[pathlib.Path, str]] = None,
-    thresholds: Optional[Tuple[float, float, float]] = None,
+    thresholds: Optional[Sequence[Tuple[float, float, float]]] = None,
     calibrator: Union[
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: float = 5,
-    activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
+    activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ("enmo",),
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Literal[".csv", ".parquet"] = ".csv",
@@ -89,19 +96,27 @@ def run(
     input = pathlib.Path(input)
     output = pathlib.Path(output) if output is not None else None
 
-    if activity_metric == "enmo":
-        thresholds = thresholds or (0.0563, 0.1916, 0.6958)
-    elif activity_metric == "mad":
-        thresholds = thresholds or (0.029, 0.338, 0.604)
-    elif activity_metric == "ag_count":
-        thresholds = thresholds or (100, 3000, 5200)
-    elif activity_metric == "mims":
-        thresholds = thresholds or (10.558, 15.047, 19.614)
+    if thresholds is not None:
+        if len(activity_metric) != len(thresholds):
+            raise ValueError(
+                "Number of thresholds did not match the number of activity metrics. "
+                "Provide one threshold tuple per metric or use None for defaults."
+            )
+        metrics_dict = dict(zip(activity_metric, thresholds))
 
-    if not (0 <= thresholds[0] < thresholds[1] < thresholds[2]):  # type: ignore
-        message = "Threshold values must be >=0, unique, and in ascending order."
-        logger.error(message)
-        raise ValueError(message)
+    else:
+        metrics_dict = {
+            metric: DEFAULT_ACTIVITY_THRESHOLDS[metric] for metric in activity_metric
+        }
+
+    for metric, thresh in metrics_dict.items():
+        if not (0 <= thresh[0] < thresh[1] < thresh[2]):
+            message = (
+                f"Invalid thresholds for {metric}."
+                f" Threshold values must be >=0, unique, and in ascending order."
+            )
+            logger.error(message)
+            raise ValueError(message)
 
     if input.is_file():
         return _run_file(
@@ -131,7 +146,7 @@ def run(
 def _run_directory(
     input: pathlib.Path,
     output: Optional[pathlib.Path] = None,
-    thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
+    thresholds: Optional[Sequence[Tuple[float, float, float]]] = None,
     calibrator: Union[
         None,
         Literal["ggir", "gradient"],
@@ -140,7 +155,7 @@ def _run_directory(
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Literal[".csv", ".parquet"] = ".csv",
-    activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
+    activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ("enmo",),
 ) -> Dict[str, writers.OrchestratorResults]:
     """Runs main processing steps for wristpy on  directories.
 
@@ -234,13 +249,13 @@ def _run_directory(
 def _run_file(
     input: pathlib.Path,
     output: Optional[pathlib.Path] = None,
-    thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
+    thresholds: Optional[Sequence[Tuple[float, float, float]]] = None,
     calibrator: Union[
         None,
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: float = 5.0,
-    activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
+    activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ("enmo",),
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
 ) -> writers.OrchestratorResults:
@@ -293,10 +308,10 @@ def _run_file(
         writers.OrchestratorResults.validate_output(output=output)
 
     parameters_dictionary = {
-        "thresholds": list(thresholds),
+        "thresholds": list(thresholds) if thresholds is not None else None,
         "calibrator": calibrator,
         "epoch_length": epoch_length,
-        "activity_metric": activity_metric,
+        "activity_metric": list(activity_metric),
         "nonwear_algorithm": list(nonwear_algorithm),
         "input_file": str(input),
     }
@@ -335,12 +350,15 @@ def _run_file(
     anglez = metrics.angle_relative_to_horizontal(
         calibrated_acceleration, epoch_length=epoch_length
     )
-    activity_measurement = _compute_activity(
-        calibrated_acceleration,
-        activity_metric,
-        epoch_length,
-        dynamic_range=watch_data.dynamic_range,
-    )
+
+    activity_measurements = {}
+    for metric in activity_metric:
+        activity_measurements[metric] = _compute_activity(
+            calibrated_acceleration,
+            activity_metric,
+            epoch_length,
+            dynamic_range=watch_data.dynamic_range,
+        )
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_windows = sleep_detector.run_sleep_detection()
@@ -353,10 +371,11 @@ def _run_file(
 
     nonwear_epoch = nonwear_utils.nonwear_array_cleanup(
         nonwear_array=nonwear_array,
-        reference_measurement=activity_measurement,
+        reference_measurement=anglez,
         epoch_length=epoch_length,
     )
 
+    # seperate thresholds and levels for each metric
     physical_activity_levels = analytics.compute_physical_activty_categories(
         activity_measurement, thresholds
     )
