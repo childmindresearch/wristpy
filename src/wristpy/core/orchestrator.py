@@ -355,7 +355,7 @@ def _run_file(
     for metric in activity_metric:
         activity_measurements[metric] = _compute_activity(
             calibrated_acceleration,
-            activity_metric,
+            metric,
             epoch_length,
             dynamic_range=watch_data.dynamic_range,
         )
@@ -375,7 +375,6 @@ def _run_file(
         epoch_length=epoch_length,
     )
 
-    # seperate thresholds and levels for each metric
     physical_activity_levels = analytics.compute_physical_activty_categories(
         activity_measurement, thresholds
     )
