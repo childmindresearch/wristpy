@@ -335,6 +335,7 @@ def _fill_false_blocks(boolean_array: np.ndarray, gap_block: int) -> np.ndarray:
 def compute_physical_activty_categories(
     activity_metric_epoch1: models.Measurement,
     thresholds: Tuple[float, float, float] = (0.0563, 0.1916, 0.6958),
+    name: str | None = None,
 ) -> models.Measurement:
     """Compute the physical activity categories based on the specific activity metric.
 
@@ -350,6 +351,7 @@ def compute_physical_activty_categories(
         thresholds: The threshold values for the physical activity categories.
             The default values are:
             (light_threshold, moderate_threshold, vigorous_threshold).
+        name: The name of the Measurement object
 
     Returns:
         A Measurement instance with the physical activity categories. Categories are
@@ -385,7 +387,7 @@ def compute_physical_activty_categories(
         default="unknown",
     )
     return models.Measurement(
-        measurements=activity_levels, time=activity_metric_epoch1.time
+        measurements=activity_levels, time=activity_metric_epoch1.time, name=name
     )
 
 

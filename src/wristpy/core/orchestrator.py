@@ -375,9 +375,11 @@ def _run_file(
         epoch_length=epoch_length,
     )
 
-    physical_activity_levels = analytics.compute_physical_activty_categories(
-        activity_measurement, thresholds
-    )
+    physical_activity_levels = {}
+    for metric_name, measurement in activity_measurements:
+        physical_activity_levels = analytics.compute_physical_activty_categories(
+            activity_measurement, thresholds
+        )
 
     sleep_array = analytics.sleep_cleanup(
         sleep_windows=sleep_windows, nonwear_measurement=nonwear_epoch
@@ -437,19 +439,24 @@ def _compute_activity(
     """
     if activity_metric == "ag_count":
         return metrics.actigraph_activity_counts(
-            acceleration,
-            epoch_length=epoch_length,
+            acceleration, epoch_length=epoch_length, name=activity_metric
         )
     elif activity_metric == "mad":
-        return metrics.mean_amplitude_deviation(acceleration, epoch_length=epoch_length)
+        return metrics.mean_amplitude_deviation(
+            acceleration, epoch_length=epoch_length, name=activity_metric
+        )
     elif activity_metric == "mims":
         if dynamic_range is None:
             return metrics.monitor_independent_movement_summary_units(
-                acceleration,
-                epoch=epoch_length,
+                acceleration, epoch=epoch_length, name=activity_metric
             )
         return metrics.monitor_independent_movement_summary_units(
-            acceleration, epoch=epoch_length, dynamic_range=dynamic_range
+            acceleration,
+            epoch=epoch_length,
+            dynamic_range=dynamic_range,
+            name=activity_metric,
         )
 
-    return metrics.euclidean_norm_minus_one(acceleration, epoch_length=epoch_length)
+    return metrics.euclidean_norm_minus_one(
+        acceleration, epoch_length=epoch_length, name=activity_metric
+    )

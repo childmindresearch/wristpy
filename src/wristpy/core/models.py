@@ -16,13 +16,13 @@ logger = config.get_logger()
 class Measurement(BaseModel):
     """A single measurement of a sensor and its corresponding time."""
 
-    name: str | None
+    name: str | None = None
     measurements: np.ndarray
     time: pl.Series
 
     @classmethod
     def from_data_frame(
-        cls, data_frame: pl.DataFrame, name: str | None
+        cls, data_frame: pl.DataFrame, name: str | None = None
     ) -> "Measurement":
         """Creates a measurement from a Polars DataFrame.
 

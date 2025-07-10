@@ -15,7 +15,7 @@ logger = config.get_logger()
 
 
 def euclidean_norm_minus_one(
-    acceleration: models.Measurement, epoch_length: float = 5.0
+    acceleration: models.Measurement, epoch_length: float = 5.0, name: str | None = None
 ) -> models.Measurement:
     """Compute ENMO, the Euclidean Norm Minus One (1 standard gravity unit).
 
@@ -33,6 +33,7 @@ def euclidean_norm_minus_one(
         datetime.datetime objects.
         epoch_length: The temporal resolution of the downsampled enmo, in seconds.
             Must be greater than 0. Defaults to 5.0s.
+        name: The name of the Measurement object.
 
     Returns:
         A Measurement object containing the calculated ENMO values and the
@@ -43,12 +44,14 @@ def euclidean_norm_minus_one(
     enmo = np.maximum(enmo, 0)
 
     return computations.moving_mean(
-        models.Measurement(measurements=enmo, time=acceleration.time), epoch_length
+        models.Measurement(measurements=enmo, time=acceleration.time, name=name),
+        epoch_length,
     )
 
 
 def angle_relative_to_horizontal(
-    acceleration: models.Measurement, epoch_length: float = 5.0
+    acceleration: models.Measurement,
+    epoch_length: float = 5.0,
 ) -> models.Measurement:
     """Calculate the angle of the acceleration vector relative to the horizontal plane.
 
@@ -62,6 +65,7 @@ def angle_relative_to_horizontal(
         epoch_length: The temporal resolution of the downsampled anglez, in seconds.
             Must be greater than 0. Defaults to 5.0s.
 
+
     Returns:
         A Measurement instance containing the values of the angle relative to the
         horizontal plane and the associated timestamps taken from the input unaltered.
@@ -74,13 +78,16 @@ def angle_relative_to_horizontal(
     angle_degrees = np.degrees(angle_radians)
 
     return computations.moving_mean(
-        models.Measurement(measurements=angle_degrees, time=acceleration.time),
+        models.Measurement(
+            measurements=angle_degrees,
+            time=acceleration.time,
+        ),
         epoch_length,
     )
 
 
 def mean_amplitude_deviation(
-    acceleration: models.Measurement, epoch_length: float = 5.0
+    acceleration: models.Measurement, epoch_length: float = 5.0, name: str | None = None
 ) -> models.Measurement:
     """Calculate the mean amplitude deviation of the acceleration data.
 
@@ -91,6 +98,7 @@ def mean_amplitude_deviation(
     Args:
         acceleration: the calibrated acceleration data.
         epoch_length: The length of the window in seconds.
+        name: The name of the Measurement object
 
     Returns:
         A new Measurement object containing the MAD values.
@@ -123,11 +131,11 @@ def mean_amplitude_deviation(
         .collect()
     )
 
-    return models.Measurement.from_data_frame(mad_df)
+    return models.Measurement.from_data_frame(mad_df, name=name)
 
 
 def actigraph_activity_counts(
-    acceleration: models.Measurement, epoch_length: float = 5.0
+    acceleration: models.Measurement, epoch_length: float = 5.0, name: str | None = None
 ) -> models.Measurement:
     """Compute Actigraph acitivty counts.
 
@@ -139,6 +147,7 @@ def actigraph_activity_counts(
     Args:
         acceleration: The calibrated acceleration data.
         epoch_length: The length of the epoch in seconds, defaults to 60s.
+        name: the name of the Measurement object
 
     Returns:
         The activity counts as a Measurement object.
@@ -226,7 +235,7 @@ def actigraph_activity_counts(
     )
     ag_counts = ag_counts.drop(["column_0", "column_1", "column_2"])
 
-    return models.Measurement.from_data_frame(ag_counts)
+    return models.Measurement.from_data_frame(ag_counts, name=name)
 
 
 def detect_nonwear(
@@ -620,6 +629,7 @@ def monitor_independent_movement_summary_units(
     order: int = 4,
     *,
     rectify: bool = True,
+    name: str | None = None,
 ) -> models.Measurement:
     """Calculates monitor independent movement summary units (MIMS).
 
@@ -648,6 +658,7 @@ def monitor_independent_movement_summary_units(
             value below -150 will assign the value of that axis to -1 for that epoch.
             Additionally the absolute value of accelerometer data will be used for
             integration.
+        name: The name of the Measurement object.
 
     Returns:
         Processed MIMS values after combining the values of each axis with the provided
