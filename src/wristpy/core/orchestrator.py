@@ -28,6 +28,19 @@ DEFAULT_ACTIVITY_THRESHOLDS = {
 }
 
 
+def _get_default_thresholds(
+    metric: Literal["enmo", "mad", "ag_count", "mims"],
+) -> Tuple[float, float, float]:
+    """Get default thresholds for a given activity metric."""
+    defaults = {
+        "enmo": (0.0563, 0.1916, 0.6958),
+        "mad": (0.029, 0.338, 0.604),
+        "ag_count": (100, 3000, 5200),
+        "mims": (10.558, 15.047, 19.614),
+    }
+    return defaults[metric]
+
+
 def run(
     input: Union[pathlib.Path, str],
     output: Optional[Union[pathlib.Path, str]] = None,
@@ -351,13 +364,35 @@ def _run_file(
         calibrated_acceleration, epoch_length=epoch_length
     )
 
-    activity_measurements = {}
-    for metric in activity_metric:
-        activity_measurements[metric] = _compute_activity(
+    if thresholds is not None:
+        if len(activity_metric) != len(thresholds):
+            raise ValueError(
+                "Number of thresholds did not match the number of activity metrics. "
+                "Provide one threshold tuple per metric or use None for defaults."
+            )
+        metrics_dict = dict(zip(activity_metric, thresholds))
+
+    else:
+        metrics_dict: Dict[
+            Literal["enmo", "mad", "ag_count", "mims"], Tuple[float, float, float]
+        ] = {metric: DEFAULT_ACTIVITY_THRESHOLDS[metric] for metric in activity_metric}
+
+    activity_measurements_list = []
+    physical_activity_levels_list = []
+    for metric_name, thresh in metrics_dict.items():
+        metric_measurement = _compute_activity(
             calibrated_acceleration,
-            metric,
+            metric_name,
             epoch_length,
             dynamic_range=watch_data.dynamic_range,
+        )
+        activity_measurements_list.append(metric_measurement)
+        physical_activity_levels_list.append(
+            analytics.compute_physical_activty_categories(
+                metric_measurement,
+                thresh,
+                name=f"{metric_name} physical activity levels",
+            )
         )
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
@@ -375,19 +410,13 @@ def _run_file(
         epoch_length=epoch_length,
     )
 
-    physical_activity_levels = {}
-    for metric_name, measurement in activity_measurements:
-        physical_activity_levels = analytics.compute_physical_activty_categories(
-            activity_measurement, thresholds
-        )
-
     sleep_array = analytics.sleep_cleanup(
         sleep_windows=sleep_windows, nonwear_measurement=nonwear_epoch
     )
     results = writers.OrchestratorResults(
-        physical_activity_metric=activity_measurement,
+        physical_activity_metric=activity_measurements_list,
         anglez=anglez,
-        physical_activity_levels=physical_activity_levels,
+        physical_activity_levels=physical_activity_levels_list,
         sleep_status=sleep_array,
         nonwear_status=nonwear_epoch,
         processing_params=parameters_dictionary,

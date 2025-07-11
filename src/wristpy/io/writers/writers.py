@@ -3,7 +3,7 @@
 import datetime
 import json
 import pathlib
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Sequence
 
 import polars as pl
 import pydantic
@@ -18,9 +18,9 @@ logger = config.get_logger()
 class OrchestratorResults(pydantic.BaseModel):
     """Dataclass containing results of orchestrator.run()."""
 
-    physical_activity_metric: models.Measurement
+    physical_activity_metric: Sequence[models.Measurement]
     anglez: models.Measurement
-    physical_activity_levels: models.Measurement
+    physical_activity_levels: Sequence[models.Measurement]
     nonwear_status: models.Measurement
     sleep_status: models.Measurement
     processing_params: Optional[Dict[str, Any]] = None
@@ -38,7 +38,7 @@ class OrchestratorResults(pydantic.BaseModel):
         output.parent.mkdir(parents=True, exist_ok=True)
 
         results_dataframe = pl.DataFrame(
-            {"time": self.physical_activity_metric.time}
+            {"time": self.anglez.time}
             | {
                 name: value.measurements
                 for name, value in self
