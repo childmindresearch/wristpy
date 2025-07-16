@@ -486,6 +486,8 @@ def _compute_activity(
             name=activity_metric,
         )
 
-    return metrics.euclidean_norm_minus_one(
+    enmo_return = metrics.euclidean_norm_minus_one(
         acceleration, epoch_length=epoch_length, name=activity_metric
     )
+
+    return enmo_return

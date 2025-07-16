@@ -37,19 +37,40 @@ class OrchestratorResults(pydantic.BaseModel):
         self.validate_output(output=output)
         output.parent.mkdir(parents=True, exist_ok=True)
 
+        activity_metric_df = pl.DataFrame(
+            {
+                measurement.name: measurement.measurements
+                for measurement in self.physical_activity_metric
+            }
+        )
+
+        physical_activity_levels_df = pl.DataFrame(
+            {
+                measurement.name: measurement.measurements
+                for measurement in self.physical_activity_levels
+            }
+        )
         results_dataframe = pl.DataFrame(
             {"time": self.anglez.time}
             | {
                 name: value.measurements
                 for name, value in self
-                if name not in "processing_params"
+                if name
+                not in [
+                    "processing_params",
+                    "physical_activity_metric",
+                    "physical_activity_levels",
+                ]
             }
         )
-
+        full_df = pl.concat(
+            [activity_metric_df, physical_activity_levels_df, results_dataframe],
+            how="horizontal",
+        )
         if output.suffix == ".csv":
-            results_dataframe.write_csv(output, separator=",")
+            full_df.write_csv(output, separator=",")
         elif output.suffix == ".parquet":
-            results_dataframe.write_parquet(output)
+            full_df.write_parquet(output)
 
         logger.info("Results saved in: %s", output)
 

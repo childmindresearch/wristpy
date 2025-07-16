@@ -44,8 +44,12 @@ def euclidean_norm_minus_one(
     enmo = np.maximum(enmo, 0)
 
     return computations.moving_mean(
-        models.Measurement(measurements=enmo, time=acceleration.time, name=name),
+        models.Measurement(
+            measurements=enmo,
+            time=acceleration.time,
+        ),
         epoch_length,
+        name=name,
     )
 
 
