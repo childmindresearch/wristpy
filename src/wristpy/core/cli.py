@@ -62,6 +62,22 @@ def version_check(version: bool) -> None:
         raise typer.Exit()
 
 
+def _parse_thresholds(thresholds: list[str]) -> list[tuple[float, float, float]]:
+    """Parse the threshold strings into a list of tuples."""
+    parsed = []
+    for triplet_str in thresholds:
+        parts = triplet_str.strip().split()
+        if len(parts) != 3:
+            raise typer.BadParameter(
+                f"Threshold triplet must have exactly 3 floats: {triplet_str}"
+            )
+        try:
+            parsed.append(tuple(map(float, parts)))
+        except ValueError:
+            raise typer.BadParameter(f"Invalid float in threshold: {triplet_str}")
+    return parsed
+
+
 @app.command()
 def main(
     input: pathlib.Path = typer.Argument(
@@ -147,6 +163,7 @@ def main(
 
     nonwear_algorithms = [algo.value for algo in nonwear_algorithm]
     calibrator_value = None if calibrator == Calibrator.none else calibrator.value
+    parsed_thresholds = _parse_thresholds(thresholds) if thresholds else None
 
     logger.debug("Running wristpy. arguments given: %s", locals())
     try:
@@ -155,7 +172,7 @@ def main(
             output=output,
             calibrator=calibrator_value,
             activity_metric=activity_metric,  # type: ignore[arg-type] # Covered by ActivityMetric Enum class
-            thresholds=None if thresholds is None else thresholds,
+            thresholds=parsed_thresholds,
             epoch_length=epoch_length,
             nonwear_algorithm=nonwear_algorithms,  # type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class
             verbosity=log_level,
