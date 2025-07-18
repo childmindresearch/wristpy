@@ -95,7 +95,7 @@ def main(
         "Choose from 'enmo', 'mad', 'ag_count', or 'mims'.  ",
         case_sensitive=False,
     ),
-    thresholds: list[tuple[float, float, float]] = typer.Option(
+    thresholds: list[str] = typer.Option(
         None,
         "-t",
         "--thresholds",
