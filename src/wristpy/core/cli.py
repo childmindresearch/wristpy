@@ -87,15 +87,15 @@ def main(
         "Must choose one of 'none', 'ggir', or 'gradient'.",
         case_sensitive=False,
     ),
-    activity_metric: ActivityMetric = typer.Option(
-        ActivityMetric.enmo,
+    activity_metric: list[ActivityMetric] = typer.Option(
+        [ActivityMetric.enmo],
         "-a",
         "--activity-metric",
         help="Metric used for physical activity categorization. "
         "Choose from 'enmo', 'mad', 'ag_count', or 'mims'.  ",
         case_sensitive=False,
     ),
-    thresholds: tuple[float, float, float] = typer.Option(
+    thresholds: list[tuple[float, float, float]] = typer.Option(
         None,
         "-t",
         "--thresholds",
@@ -154,7 +154,7 @@ def main(
             input=input,
             output=output,
             calibrator=calibrator_value,
-            activity_metric=activity_metric.value,
+            activity_metric=activity_metric,  # type: ignore[arg-type] # Covered by ActivityMetric Enum class
             thresholds=None if thresholds is None else thresholds,
             epoch_length=epoch_length,
             nonwear_algorithm=nonwear_algorithms,  # type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class

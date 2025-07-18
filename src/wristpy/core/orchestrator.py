@@ -28,19 +28,6 @@ DEFAULT_ACTIVITY_THRESHOLDS = {
 }
 
 
-def _get_default_thresholds(
-    metric: Literal["enmo", "mad", "ag_count", "mims"],
-) -> Tuple[float, float, float]:
-    """Get default thresholds for a given activity metric."""
-    defaults = {
-        "enmo": (0.0563, 0.1916, 0.6958),
-        "mad": (0.029, 0.338, 0.604),
-        "ag_count": (100, 3000, 5200),
-        "mims": (10.558, 15.047, 19.614),
-    }
-    return defaults[metric]
-
-
 def run(
     input: Union[pathlib.Path, str],
     output: Optional[Union[pathlib.Path, str]] = None,
@@ -228,7 +215,6 @@ def _run_directory(
         raise exceptions.EmptyDirectoryError(
             f"Directory {input} contains no .gt3x or .bin files."
         )
-
     results_dict = {}
     for file in file_names:
         output_file_path = (
