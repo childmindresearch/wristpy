@@ -162,8 +162,9 @@ def main(
     logger.setLevel(log_level)
 
     nonwear_algorithms = [algo.value for algo in nonwear_algorithm]
-    calibrator_value = None if calibrator == Calibrator.none else calibrator.value
+    activity_metrics = [metric.value for metric in activity_metric]
     parsed_thresholds = _parse_thresholds(thresholds) if thresholds else None
+    calibrator_value = None if calibrator == Calibrator.none else calibrator.value
 
     logger.debug("Running wristpy. arguments given: %s", locals())
     try:
@@ -171,7 +172,7 @@ def main(
             input=input,
             output=output,
             calibrator=calibrator_value,
-            activity_metric=activity_metric,  # type: ignore[arg-type] # Covered by ActivityMetric Enum class
+            activity_metric=activity_metrics,  # type: ignore[arg-type] # Covered by ActivityMetric Enum class
             thresholds=parsed_thresholds,
             epoch_length=epoch_length,
             nonwear_algorithm=nonwear_algorithms,  # type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class

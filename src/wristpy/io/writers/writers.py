@@ -50,6 +50,7 @@ class OrchestratorResults(pydantic.BaseModel):
                 for measurement in self.physical_activity_levels
             }
         )
+
         results_dataframe = pl.DataFrame(
             {"time": self.anglez.time}
             | {
