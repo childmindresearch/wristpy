@@ -23,7 +23,7 @@
 
             <h2>Contents</h2>
             <ul>
-  <li><a href="#wristpy-img-srchttpsmediagithubusercontentcommediachildmindresearchwristpymaindocswristpy_logopng-alignright-width25"><code>md5-581b85a073a010529204b75ea332a988</code>"></a></li>
+  <li><a href="#wristpy-img-srchttpsmediagithubusercontentcommediachildmindresearchwristpymaindocswristpy_logopng-alignright-width25"><code>md5-b5b23e3935cbb94ad71f8d71eba721d9</code>"></a></li>
   <li><a href="#wristpy-img-srchttpsmediagithubusercontentcommediachildmindresearchwristpymaindocswristpy_logopng-alignright-width25"><code>wristpy</code> <img src="https://media.githubusercontent.com/media/childmindresearch/wristpy/main/docs/wristpy_logo.png" align="right" width="25%"/></a>
   <ul>
     <li><a href="#supported-formats-devices">Supported formats &amp; devices</a></li>
@@ -122,7 +122,7 @@ wristpy    </h1>
 <li><strong><em>Data imputation</em></strong> In the special case when dealing with the Actigraph <code>idle_sleep_mode == enabled</code>, the gaps in acceleration are filled in after calibration, to avoid biasing the calibration phase.</li>
 <li><strong>Metrics Calculation</strong>: Calculates various activity metrics on the calibrated data, namely ENMO (Euclidean norm, minus one), MAD (mean amplitude deviation) <sup>1</sup>, Actigraph activity counts<sup>2</sup>, MIMS (monitor-independent movement summary) unit <sup>3</sup>, and angle-Z (angle of acceleration relative to the <em>x-y</em> axis).</li>
 <li><strong>Non-wear detection</strong>: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide <code>wear</code> or <code>not wear</code>. Additionally, we can use the temperature sensor, when avaia\lable, to augment the acceleration data. This is used in the CTA (combined temperature and acceleration) algorithm <sup>4</sup>, and in the <code>skdh</code> DETACH algorithm <sup>5</sup>. Furthermore, ensemble classification of non-wear periods is possible by providing a list (of any length) of non-wear algorithm options.</li>
-<li><strong>Sleep Detection</strong>: Using the HDCZ<sup>6</sup> and HSPT<sup>7</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected. Any sleep periods that overlap with detected non-wear times are removed, and any remaining sleep periods shorter than 15 minutes (default value) are removed.</li>
+<li><strong>Sleep Detection</strong>: Using the HDCZ<sup>6</sup> and HSPT<sup>7</sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset-wakeup times for all sleep windows detected. Any sleep periods that overlap with detected non-wear times are removed, and any remaining sleep periods shorter than 15 minutes (default value) are removed. Additionally, the SIB (sustained inactivity bouts) and the SPT (sleep period time) windows are provided as part of the output to aid in sleep metric post-processing.</li>
 <li><strong>Physical activity levels</strong>: Using the chosen physical activity metric (aggregated into time bins, 5 second default) we compute activity levels into the following categories: [<code>inactive</code>, <code>light</code>, <code>moderate</code>, <code>vigorous</code>]. The threshold values can be defined by the user, while the default values are chosen based on the specific activity metric and the values found in the literature  <sup>8-10</sup>.</li>
 <li><strong>Data output</strong>: The output results can be saved in <code>.csv</code> or <code>.parquet</code> data formats, with the run-time configuration parameters saved in a <code>.json</code> dictionary.</li>
 </ul>
@@ -197,8 +197,10 @@ wristpy    </h1>
 <span class="n">physical_activity_metric</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">physical_activity_metric</span>
 <span class="n">anglez</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">anglez</span>
 <span class="n">physical_activity_levels</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">physical_activity_levels</span>
-<span class="n">nonwear_array</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">nonwear_epoch</span>
-<span class="n">sleep_windows</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">sleep_windows_epoch</span>
+<span class="n">nonwear_array</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">nonwear_status</span>
+<span class="n">sleep_windows</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">sleep_status</span>
+<span class="n">sib_periods</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">sib_periods</span>
+<span class="n">spt_periods</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">spt_periods</span>
 </code></pre>
 </div>
 
@@ -228,8 +230,10 @@ wristpy    </h1>
 <span class="n">physical_activity_metric</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">physical_activity_metric</span>
 <span class="n">anglez</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">anglez</span>
 <span class="n">physical_activity_levels</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">physical_activity_levels</span>
-<span class="n">nonwear_array</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">nonwear_epoch</span>
-<span class="n">sleep_windows</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">sleep_windows_epoch</span>
+<span class="n">nonwear_array</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">nonwear_status</span>
+<span class="n">sleep_windows</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">sleep_status</span>
+<span class="n">sib_periods</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">sib_periods</span>
+<span class="n">spt_periods</span> <span class="o">=</span> <span class="n">subject1</span><span class="o">.</span><span class="n">spt_periods</span>
 </code></pre>
 </div>
 
@@ -417,6 +421,8 @@ we will cover the following topics through a few examples:</p>
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">output_results</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;path/to/save/file_name.csv&#39;</span><span class="p">,</span> <span class="n">try_parse_dates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">activity_mapping</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;inactive&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
