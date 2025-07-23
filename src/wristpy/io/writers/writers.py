@@ -39,15 +39,16 @@ class OrchestratorResults(pydantic.BaseModel):
 
         activity_metric_df = pl.DataFrame(
             {
-                measurement.name: measurement.measurements
-                for measurement in self.physical_activity_metric
+                measurement.name or f"metric_{i}": measurement.measurements
+                for i, measurement in enumerate(self.physical_activity_metric)
             }
         )
 
         physical_activity_levels_df = pl.DataFrame(
             {
-                measurement.name: measurement.measurements
-                for measurement in self.physical_activity_levels
+                measurement.name
+                or f"metric_{i} physical activity levels": measurement.measurements
+                for i, measurement in enumerate(self.physical_activity_levels)
             }
         )
 

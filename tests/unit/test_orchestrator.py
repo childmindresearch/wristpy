@@ -24,9 +24,9 @@ def dummy_results() -> writers.OrchestratorResults:
         ),
     )
     dummy_results = writers.OrchestratorResults(
-        physical_activity_metric=dummy_measure,
+        physical_activity_metric=[dummy_measure],
         anglez=dummy_measure,
-        physical_activity_levels=dummy_measure,
+        physical_activity_levels=[dummy_measure],
         nonwear_status=dummy_measure,
         sleep_status=dummy_measure,
     )
@@ -91,7 +91,7 @@ def test_run_single_file(
     results = orchestrator.run(
         input=sample_data_bin,
         output=output_file_path,
-        activity_metric="mad",
+        activity_metric=["mad"],
         calibrator="ggir",
     )
 
@@ -108,7 +108,7 @@ def test_run_single_file_agcount_default(
     results = orchestrator.run(
         input=sample_data_bin,
         output=output_file_path,
-        activity_metric="ag_count",
+        activity_metric=["ag_count"],
         nonwear_algorithm=["detach"],
     )
 
@@ -189,7 +189,7 @@ def test_run_single_file_mims(
     results = orchestrator.run(
         input=sample_data_bin,
         output=output_file_path,
-        activity_metric="mims",
+        activity_metric=["mims"],
     )
 
     assert output_file_path.exists()

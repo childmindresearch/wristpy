@@ -698,4 +698,5 @@ def monitor_independent_movement_summary_units(
     combined_mims = mims.combine_mims(
         acceleration=aggregated_measure, combination_method=combination_method
     )
+    combined_mims.name = name
     return combined_mims

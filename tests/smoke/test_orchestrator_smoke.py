@@ -1,6 +1,7 @@
 """Tests the main workflow of wristpy orchestrator."""
 
 import pathlib
+from typing import Sequence
 
 import pytest
 
@@ -23,11 +24,17 @@ def test_orchestrator_happy_path(
 
     assert output_path.exists()
     assert isinstance(results, writers.OrchestratorResults)
-    assert isinstance(results.physical_activity_metric, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
     assert isinstance(results.nonwear_status, models.Measurement)
     assert isinstance(results.sleep_status, models.Measurement)
-    assert isinstance(results.physical_activity_levels, models.Measurement)
+    assert all(
+        isinstance(pa_metric, models.Measurement)
+        for pa_metric in results.physical_activity_metric
+    )
+    assert all(
+        isinstance(pa_level, models.Measurement)
+        for pa_level in results.physical_activity_levels
+    )
 
 
 def test_orchestrator_idle_sleep_mode_run(
@@ -41,12 +48,18 @@ def test_orchestrator_idle_sleep_mode_run(
 
     assert (tmp_path / "good_file.csv").exists()
     assert isinstance(results, writers.OrchestratorResults)
-    assert isinstance(results.physical_activity_metric, models.Measurement)
     assert isinstance(results.anglez, models.Measurement)
     assert isinstance(results.nonwear_status, models.Measurement)
     assert isinstance(results.sleep_status, models.Measurement)
-    assert isinstance(results.physical_activity_levels, models.Measurement)
     assert isinstance(results.processing_params, dict)
     assert results.processing_params["calibrator"] == "gradient"
     assert results.processing_params["nonwear_algorithm"] == ["ggir"]
-    assert results.processing_params["activity_metric"] == "enmo"
+    assert results.processing_params["activity_metric"] == ["enmo"]
+    assert all(
+        isinstance(pa_metric, models.Measurement)
+        for pa_metric in results.physical_activity_metric
+    )
+    assert all(
+        isinstance(pa_level, models.Measurement)
+        for pa_level in results.physical_activity_levels
+    )
