@@ -37,7 +37,7 @@ def run(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: float = 5,
-    activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ("enmo",),
+    activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ["enmo"],
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Literal[".csv", ".parquet"] = ".csv",
@@ -60,7 +60,8 @@ def run(
             given in that order. One threshold tuple must be provided for each activity
             metric, in the same order the metrics were specified. To use default values
             for all metrics, leave thresholds as None. Values must be ascending, unique,
-            and greater than 0. Default values are optimized for subjects ages 7-11 [1][3].
+            and greater than 0. Default values are optimized for subjects ages 7-11 [1]
+            [3].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. It must be > 0.0.
@@ -158,7 +159,7 @@ def _run_directory(
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
     output_filetype: Literal[".csv", ".parquet"] = ".csv",
-    activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ("enmo",),
+    activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ["enmo"],
 ) -> Dict[str, writers.OrchestratorResults]:
     """Runs main processing steps for wristpy on directories.
 
@@ -259,17 +260,17 @@ def _run_file(
         Literal["ggir", "gradient"],
     ] = "gradient",
     epoch_length: float = 5.0,
-    activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ("enmo",),
+    activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ["enmo"],
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
 ) -> writers.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
 
     The run_file() function will provide the user with the specified physical activity
-    metric(s), anglez, physical activity levels, detected sleep periods, and nonwear data.
-    All measures will be in the same temporal resolution.
-    Users may choose from 'ggir' and 'gradient' calibration methods,
-    or enter None to proceed without calibration.
+    metric(s), anglez, physical activity levels, detected sleep periods, and nonwear
+    data. All measures will be in the same temporal resolution. Users may choose from
+    'ggir' and 'gradient' calibration methods, or enter None to proceed without
+    calibration.
 
     Args:
         input: Path to the input file to be read. Currently, this supports .bin and
@@ -416,7 +417,7 @@ def _run_file(
     )
 
     parameters_dictionary = {
-        "thresholds": physical_activity_levels_list,
+        "thresholds": list(thresholds) if thresholds is not None else None,
         "calibrator": calibrator,
         "epoch_length": epoch_length,
         "activity_metric": activity_metric,
