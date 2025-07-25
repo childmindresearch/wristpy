@@ -63,7 +63,18 @@ def version_check(version: bool) -> None:
 
 
 def _parse_thresholds(thresholds: list[str]) -> list[tuple[float, float, float]]:
-    """Parse the threshold strings into a list of tuples."""
+    """Parse the threshold strings into a list of tuples.
+
+    Args:
+        thresholds: List of threshold strings, each containing three space-separated
+            floats.
+
+    Returns:
+        List of tuple float triplets containing the parsed threshold values.
+
+    Raises:
+        typer.BadParameter: If threshold format is invalid or values cannot be parsed.
+    """
     parsed = []
     for triplet_str in thresholds:
         parts = triplet_str.strip().split()
@@ -107,8 +118,9 @@ def main(
         [ActivityMetric.enmo],
         "-a",
         "--activity-metric",
-        help="Metric used for physical activity categorization. "
-        "Choose from 'enmo', 'mad', 'ag_count', or 'mims'.  ",
+        help="Metric(s) used for physical activity categorization. "
+        "Choose from 'enmo', 'mad', 'ag_count', or 'mims'. "
+        "Use multiple times for multiple metrics: '-a enmo -a mad' etc.",
         case_sensitive=False,
     ),
     thresholds: list[str] = typer.Option(
@@ -116,9 +128,9 @@ def main(
         "-t",
         "--thresholds",
         help="Provide three thresholds for light, moderate, and vigorous activity. "
-        "Exactly three values must be >= 0, given in ascending order, "
-        "and separated by a space. (e.g. '-t 0.1 1.0 1.5').",
-        min=0,
+        "One threshold set per activity metric, in the same order as metrics. "
+        "Format: three space-separated values >= 0 in ascending order. "
+        "Example: -t '0.1 1.0 1.5' or -a enmo -a mad -t '0.1 1.0 1.5' -t '0.2 2.0 3.0'",
     ),
     nonwear_algorithm: list[NonwearAlgorithms] = typer.Option(
         [NonwearAlgorithms.ggir],

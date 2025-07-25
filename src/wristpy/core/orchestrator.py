@@ -51,19 +51,21 @@ def run(
     Output file names will be derived from original file names in the case of directory
     processing.
 
-
     Args:
         input: Path to the input file or directory of files to be read. Currently,
             this supports .bin and .gt3x
         output: Path to directory data will be saved to. If processing a single file the
             path should end in the save file name in either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
-            given in that order. Values must be asscending, unique, and greater than 0.
-            Default values are optimized for subjects ages 7-11 [1][3].
+            given in that order. One threshold tuple must be provided for each activity
+            metric, in the same order the metrics were specified. To use default values
+            for all metrics, leave thresholds as None. Values must be ascending, unique,
+            and greater than 0. Default values are optimized for subjects ages 7-11 [1][3].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. It must be > 0.0.
-        activity_metric: The metric to be used for physical activity categorization.
+        activity_metric: The metric(s) to be used for physical activity categorization.
+            Multiple metrics can be specified as a sequence.
         nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files. Only used when
@@ -74,9 +76,10 @@ def run(
         dictionary of OrchestratorResults objects.
 
     Raises:
+        ValueError: If the number of physical activity thresholds does not match the
+            number of provided activity metrics.
         ValueError: If the physical activity thresholds are not unique or not in
             ascending order.
-
 
     References:
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
@@ -157,37 +160,39 @@ def _run_directory(
     output_filetype: Literal[".csv", ".parquet"] = ".csv",
     activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ("enmo",),
 ) -> Dict[str, writers.OrchestratorResults]:
-    """Runs main processing steps for wristpy on  directories.
+    """Runs main processing steps for wristpy on directories.
 
-    The run_directory() function will execute the run_file() function on entire
-    directories. The input and output (if any) paths must directories. Output file
+    The _run_directory() function will execute the _run_file() function on entire
+    directories. The input and output (if any) paths must be directories. Output file
     names will be derived from input file names.
-
 
     Args:
         input: Path to the input directory of files to be read. Currently,
             this supports .bin and .gt3x
         output: Path to directory data will be saved to.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
-            given in that order. Values must be asscending, unique, and greater than 0.
-            Default values are optimized for subjects ages 7-11 [1][2].
+            given in that order. One threshold tuple must be provided for each activity
+            metric, in the same order the metrics were specified. To use default values
+            for all metrics, leave thresholds as None. Values must be ascending, unique,
+            and greater than 0. Default values are optimized for subjects ages 7-11
+            [1][2].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. It must be > 0.0.
         nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files.
-        activity_metric: The metric to be used for physical activity categorization.
+        activity_metric: The metric(s) to be used for physical activity categorization.
+            Multiple metrics can be specified as a sequence.
 
     Returns:
         All calculated data in a save ready format as a dictionary of
         OrchestratorResults objects.
 
     Raises:
-        ValueError: The output given is not a directory.
-        ValueError: The output_filetype is not a valid type.
+        ValueError: If the output given is not a directory.
+        ValueError: If the output_filetype is not a valid type.
         FileNotFoundError: If the input directory contained no files of a valid type.
-
 
     References:
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
@@ -261,7 +266,7 @@ def _run_file(
     """Runs main processing steps for wristpy and returns data for analysis.
 
     The run_file() function will provide the user with the specified physical activity
-    metric, anglez, physical activity levels, detected sleep periods, and nonwear data.
+    metric(s), anglez, physical activity levels, detected sleep periods, and nonwear data.
     All measures will be in the same temporal resolution.
     Users may choose from 'ggir' and 'gradient' calibration methods,
     or enter None to proceed without calibration.
@@ -272,12 +277,16 @@ def _run_file(
         output: Path to save data to. The path should end in the save file name in
             either .csv or .parquet formats.
         thresholds: The cut points for the light, moderate, and vigorous thresholds,
-            given in that order. Values must be ascending, unique, and greater than 0.
-            Default values are optimized for subjects ages 7-11 [1] - [3].
+            given in that order. One threshold tuple must be provided for each activity
+            metric, in the same order the metrics were specified. To use default values
+            for all metrics, leave thresholds as None. Values must be ascending, unique,
+            and greater than 0. Default values are optimized for subjects ages 7-11
+            [1]-[3].
         calibrator: The calibrator to be used on the input data.
         epoch_length: The temporal resolution in seconds, the data will be down sampled
             to. It must be > 0.0.
-        activity_metric: The metric to be used for physical activity categorization.
+        activity_metric: The metric(s) to be used for physical activity categorization.
+            Multiple metrics can be specified as a sequence.
         nonwear_algorithm: The algorithm to be used for nonwear detection. A sequence of
             algorithms can be provided. If so, a majority vote will be taken.
         verbosity: The logging level for the logger.
@@ -286,6 +295,10 @@ def _run_file(
         All calculated data in a save ready format as a OrchestratorResults object.
 
     Raises:
+        ValueError: If the number of physical activity thresholds does not match the
+            number of provided activity metrics.
+        ValueError: If the physical activity thresholds are not unique or not in
+            ascending order.
         ValueError: If an invalid Calibrator is chosen.
         ValueError: If epoch_length is not greater than 0.
 
