@@ -78,10 +78,6 @@ def _parse_thresholds(thresholds: list[str]) -> list[tuple[float, float, float]]
     parsed = []
     for triplet_str in thresholds:
         parts = triplet_str.strip().split()
-        if len(parts) != 3:
-            raise typer.BadParameter(
-                f"Threshold triplet must have exactly 3 floats: {triplet_str}"
-            )
         try:
             values = [float(part) for part in parts]
             parsed.append((values[0], values[1], values[2]))
@@ -124,7 +120,7 @@ def main(
         "Use multiple times for multiple metrics: '-a enmo -a mad' etc.",
         case_sensitive=False,
     ),
-    thresholds=typer.Option(  # noqa: ANN001
+    thresholds: list[str] = typer.Option(
         None,
         "-t",
         "--thresholds",
