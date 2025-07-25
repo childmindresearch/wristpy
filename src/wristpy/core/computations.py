@@ -25,6 +25,7 @@ def _moving(
         centered: If true, centers the window. Defaults to False.
         continuous: If true, applies the window to every measurement. If false,
             groups measurements into chunks of epoch_length. Defaults to False.
+        name: The name of the Measurement object.
 
     Returns:
         The measurement with the rolling function applied to it.
@@ -66,6 +67,7 @@ def moving_mean(
     Args:
         array: The Measurement object with the sensor data we want to take the mean of
         epoch_length: The length, in seconds, of the window.
+        name: The name of the Measurement object.
 
     Returns:
         The moving mean of the array in a new Measurement instance.

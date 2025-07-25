@@ -1,7 +1,6 @@
 """Tests the main workflow of wristpy orchestrator."""
 
 import pathlib
-from typing import Sequence
 
 import pytest
 
