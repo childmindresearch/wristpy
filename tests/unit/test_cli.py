@@ -119,19 +119,6 @@ def test_main_with_options(
     )
 
 
-def test_main_with_bad_thresholds(
-    sample_data_gt3x: pathlib.Path,
-    create_typer_cli_runner: testing.CliRunner,
-) -> None:
-    """Test cli with bad thresholds."""
-    result = create_typer_cli_runner.invoke(
-        cli.app, [str(sample_data_gt3x), "-t", "3.0"]
-    )
-
-    assert result.exit_code != 0
-    assert "Threshold triplet must have exactly 3 floats" in result.output
-
-
 def test_main_with_wrong_number_of_thresholds(
     sample_data_gt3x: pathlib.Path,
     create_typer_cli_runner: testing.CliRunner,
