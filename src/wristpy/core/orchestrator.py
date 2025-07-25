@@ -355,6 +355,9 @@ def _run_file(
         calibrated_acceleration, epoch_length=epoch_length
     )
 
+    metrics_dict: Dict[
+        Literal["enmo", "mad", "ag_count", "mims"], Tuple[float, float, float]
+    ]
     if thresholds is not None:
         if len(activity_metric) != len(thresholds):
             raise ValueError(
@@ -362,11 +365,10 @@ def _run_file(
                 "Provide one threshold tuple per metric or use None for defaults."
             )
         metrics_dict = dict(zip(activity_metric, thresholds))
-
     else:
-        metrics_dict: Dict[
-            Literal["enmo", "mad", "ag_count", "mims"], Tuple[float, float, float]
-        ] = {metric: DEFAULT_ACTIVITY_THRESHOLDS[metric] for metric in activity_metric}
+        metrics_dict = {
+            metric: DEFAULT_ACTIVITY_THRESHOLDS[metric] for metric in activity_metric
+        }
 
     activity_measurements_list = []
     physical_activity_levels_list = []

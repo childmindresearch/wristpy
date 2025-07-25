@@ -83,7 +83,8 @@ def _parse_thresholds(thresholds: list[str]) -> list[tuple[float, float, float]]
                 f"Threshold triplet must have exactly 3 floats: {triplet_str}"
             )
         try:
-            parsed.append(tuple(map(float, parts)))
+            values = [float(part) for part in parts]
+            parsed.append((values[0], values[1], values[2]))
         except ValueError:
             raise typer.BadParameter(f"Invalid float in threshold: {triplet_str}")
     return parsed
