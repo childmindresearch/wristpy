@@ -393,12 +393,8 @@ def _run_file(
 
     nonwear_epoch = processing_utils.synchronize_measurements(
         data_measurement=nonwear_array,
-        reference_measurement=activity_measurement,
+        reference_measurement=anglez,
         epoch_length=epoch_length,
-    )
-
-    physical_activity_levels = analytics.compute_physical_activty_categories(
-        activity_measurement, thresholds
     )
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
@@ -409,18 +405,18 @@ def _run_file(
     spt_windows = analytics.sleep_bouts_cleanup(
         sleep_parameter=sleep_parameters.spt_windows,
         nonwear_measurement=nonwear_epoch,
-        time_reference_measurement=activity_measurement,
+        time_reference_measurement=anglez,
         epoch_length=epoch_length,
     )
     sib_periods = analytics.sleep_bouts_cleanup(
         sleep_parameter=sleep_parameters.sib_periods,
         nonwear_measurement=nonwear_epoch,
-        time_reference_measurement=activity_measurement,
+        time_reference_measurement=anglez,
         epoch_length=epoch_length,
     )
 
     parameters_dictionary = {
-        "thresholds": list(thresholds),
+        "thresholds": physical_activity_levels_list,
         "calibrator": calibrator,
         "epoch_length": epoch_length,
         "activity_metric": activity_metric,
