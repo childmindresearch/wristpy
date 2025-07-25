@@ -3,7 +3,7 @@
 import datetime
 import json
 import pathlib
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Sequence
 
 import polars as pl
 import pydantic
@@ -18,9 +18,9 @@ logger = config.get_logger()
 class OrchestratorResults(pydantic.BaseModel):
     """Dataclass containing results of orchestrator.run()."""
 
-    physical_activity_metric: models.Measurement
+    physical_activity_metric: Sequence[models.Measurement]
     anglez: models.Measurement
-    physical_activity_levels: models.Measurement
+    physical_activity_levels: Sequence[models.Measurement]
     nonwear_status: models.Measurement
     sleep_status: models.Measurement
     sib_periods: models.Measurement
@@ -39,19 +39,42 @@ class OrchestratorResults(pydantic.BaseModel):
         self.validate_output(output=output)
         output.parent.mkdir(parents=True, exist_ok=True)
 
-        results_dataframe = pl.DataFrame(
-            {"time": self.physical_activity_metric.time}
-            | {
-                name: value.measurements
-                for name, value in self
-                if name not in "processing_params"
+        activity_metric_df = pl.DataFrame(
+            {
+                measurement.name or f"metric_{i}": measurement.measurements
+                for i, measurement in enumerate(self.physical_activity_metric)
             }
         )
 
+        physical_activity_levels_df = pl.DataFrame(
+            {
+                measurement.name
+                or f"metric_{i} physical activity levels": measurement.measurements
+                for i, measurement in enumerate(self.physical_activity_levels)
+            }
+        )
+
+        results_dataframe = pl.DataFrame(
+            {"time": self.anglez.time}
+            | {
+                name: value.measurements
+                for name, value in self
+                if name
+                not in [
+                    "processing_params",
+                    "physical_activity_metric",
+                    "physical_activity_levels",
+                ]
+            }
+        )
+        full_df = pl.concat(
+            [activity_metric_df, physical_activity_levels_df, results_dataframe],
+            how="horizontal",
+        )
         if output.suffix == ".csv":
-            results_dataframe.write_csv(output, separator=",")
+            full_df.write_csv(output, separator=",")
         elif output.suffix == ".parquet":
-            results_dataframe.write_parquet(output)
+            full_df.write_parquet(output)
 
         logger.info("Results saved in: %s", output)
 

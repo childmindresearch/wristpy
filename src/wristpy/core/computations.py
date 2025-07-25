@@ -14,6 +14,7 @@ def _moving(
     *,
     centered: bool = False,
     continuous: bool = False,
+    name: str | None = None,
 ) -> models.Measurement:
     """Internal handler of rolling window functions.
 
@@ -24,6 +25,7 @@ def _moving(
         centered: If true, centers the window. Defaults to False.
         continuous: If true, applies the window to every measurement. If false,
             groups measurements into chunks of epoch_length. Defaults to False.
+        name: The name of the Measurement object.
 
     Returns:
         The measurement with the rolling function applied to it.
@@ -54,17 +56,18 @@ def _moving(
             .agg(aggregator())
         )
 
-    return models.Measurement.from_data_frame(aggregated_df.collect())
+    return models.Measurement.from_data_frame(aggregated_df.collect(), name=name)
 
 
 def moving_mean(
-    array: models.Measurement, epoch_length: float = 5
+    array: models.Measurement, epoch_length: float = 5, name: str | None = None
 ) -> models.Measurement:
     """Calculate the moving mean of the sensor data in array.
 
     Args:
         array: The Measurement object with the sensor data we want to take the mean of
         epoch_length: The length, in seconds, of the window.
+        name: The name of the Measurement object.
 
     Returns:
         The moving mean of the array in a new Measurement instance.
@@ -72,7 +75,7 @@ def moving_mean(
     Raises:
         ValueError: If the epoch length is not an integer or is less than 1.
     """
-    return _moving(array, epoch_length, "mean")
+    return _moving(array, epoch_length, "mean", name=name)
 
 
 def moving_std(

@@ -23,9 +23,9 @@ def dummy_results() -> writers.OrchestratorResults:
         ),
     )
     dummy_results = writers.OrchestratorResults(
-        physical_activity_metric=dummy_measure,
+        physical_activity_metric=[dummy_measure],
         anglez=dummy_measure,
-        physical_activity_levels=dummy_measure,
+        physical_activity_levels=[dummy_measure],
         nonwear_status=dummy_measure,
         sleep_status=dummy_measure,
         sib_periods=dummy_measure,
