@@ -124,7 +124,7 @@ def main(
         "Use multiple times for multiple metrics: '-a enmo -a mad' etc.",
         case_sensitive=False,
     ),
-    thresholds: list[str] = typer.Option(
+    thresholds=typer.Option(  # noqa: ANN001
         None,
         "-t",
         "--thresholds",
