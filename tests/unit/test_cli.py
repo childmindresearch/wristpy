@@ -129,7 +129,8 @@ def test_main_with_bad_thresholds(
     )
 
     assert result.exit_code != 0
-    assert "Threshold triplet must have exactly 3 floats" in result.output
+    # partial matching due to ANSI escape sequences in Github Actions
+    assert "requires 3 arguments." in result.output
 
 
 def test_main_with_wrong_number_of_thresholds(
