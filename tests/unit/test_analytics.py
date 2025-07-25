@@ -2,7 +2,6 @@
 
 import datetime
 import math
-from typing import List
 
 import numpy as np
 import polars as pl
@@ -160,8 +159,10 @@ def test_run_sleep_detection(sleep_detection: analytics.GgirSleepDetection) -> N
     """Test the full sleep detection process."""
     result = sleep_detection.run_sleep_detection()
 
-    assert result == []
-    assert isinstance(result, List)
+    assert result.sleep_windows == []
+    assert isinstance(result.sleep_windows, list)
+    assert isinstance(result.spt_windows, models.Measurement)
+    assert isinstance(result.sib_periods, models.Measurement)
 
 
 def test_physical_activity_thresholds() -> None:

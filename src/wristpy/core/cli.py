@@ -6,7 +6,7 @@ from enum import Enum
 
 import typer
 
-from wristpy.core import config
+from wristpy.core import config, exceptions
 
 logger = config.get_logger()
 app = typer.Typer(
@@ -74,11 +74,10 @@ def main(
         help="Path where data will be saved. Supports .csv and .parquet formats.",
     ),
     output_filetype: OutputFileType = typer.Option(
-        None,
+        ".csv",
         "-O",
         "--output-filetype",
-        help="Format for save files when processing directories. "
-        "Leave as None when processing single files.",
+        help="Format for save files when processing directories. ",
     ),
     calibrator: Calibrator = typer.Option(
         Calibrator.none,
@@ -150,17 +149,21 @@ def main(
     calibrator_value = None if calibrator == Calibrator.none else calibrator.value
 
     logger.debug("Running wristpy. arguments given: %s", locals())
-    orchestrator.run(
-        input=input,
-        output=output,
-        calibrator=calibrator_value,
-        activity_metric=activity_metric.value,
-        thresholds=None if thresholds is None else thresholds,
-        epoch_length=epoch_length,
-        nonwear_algorithm=nonwear_algorithms,  # type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class
-        verbosity=log_level,
-        output_filetype=output_filetype.value if output_filetype else None,  # type: ignore[arg-type] # Covered by OutputFileType Enum class
-    )
+    try:
+        orchestrator.run(
+            input=input,
+            output=output,
+            calibrator=calibrator_value,
+            activity_metric=activity_metric.value,
+            thresholds=None if thresholds is None else thresholds,
+            epoch_length=epoch_length,
+            nonwear_algorithm=nonwear_algorithms,  # type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class
+            verbosity=log_level,
+            output_filetype=output_filetype.value,
+        )
+    except exceptions.EmptyDirectoryError as e:
+        typer.echo(f"Error: {e}", err=True)
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":

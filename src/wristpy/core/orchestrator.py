@@ -13,7 +13,7 @@ from wristpy.processing import (
     calibration,
     idle_sleep_mode_imputation,
     metrics,
-    nonwear_utils,
+    processing_utils,
 )
 
 logger = config.get_logger()
@@ -33,7 +33,7 @@ def run(
     activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
-    output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
+    output_filetype: Literal[".csv", ".parquet"] = ".csv",
 ) -> Union[writers.OrchestratorResults, Dict[str, writers.OrchestratorResults]]:
     """Runs main processing steps for wristpy on single files, or directories.
 
@@ -59,8 +59,8 @@ def run(
         activity_metric: The metric to be used for physical activity categorization.
         nonwear_algorithm: The algorithm to be used for nonwear detection.
         verbosity: The logging level for the logger.
-        output_filetype: Specifies the data format for the save files. Must be None when
-            processing files, must be a valid file type when processing directories.
+        output_filetype: Specifies the data format for the save files. Only used when
+            processing directories.
 
     Returns:
         All calculated data in a save ready format as a Results object or as a
@@ -69,8 +69,7 @@ def run(
     Raises:
         ValueError: If the physical activity thresholds are not unique or not in
             ascending order.
-        ValueError: If processing a file and the output_filetype is not None
-        ValueError: If output is None but output_filetype is not None.
+
 
     References:
         [1] Hildebrand, M., et al. (2014). Age group comparability of raw accelerometer
@@ -105,13 +104,6 @@ def run(
         raise ValueError(message)
 
     if input.is_file():
-        if output_filetype is not None:
-            raise ValueError(
-                "When processing single files, output_filetype should be None - "
-                "the file type will be determined from the output path."
-            )
-        logger.debug("Input is file, forwarding to run_file with output=%s", output)
-
         return _run_file(
             input=input,
             output=output,
@@ -147,14 +139,13 @@ def _run_directory(
     epoch_length: float = 5,
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     verbosity: int = logging.WARNING,
-    output_filetype: Optional[Literal[".csv", ".parquet"]] = None,
+    output_filetype: Literal[".csv", ".parquet"] = ".csv",
     activity_metric: Literal["enmo", "mad", "ag_count", "mims"] = "enmo",
 ) -> Dict[str, writers.OrchestratorResults]:
     """Runs main processing steps for wristpy on  directories.
 
     The run_directory() function will execute the run_file() function on entire
-    directories. The input and output (if any) paths must directories. An
-    output_filetype must be specified if and only if an output is given. Output file
+    directories. The input and output (if any) paths must directories. Output file
     names will be derived from input file names.
 
 
@@ -192,9 +183,6 @@ def _run_directory(
         Activity: Retrospective Observational Data Analysis Study JMIR Mhealth Uhealth
         2022;10(7):e38077 URL: https://mhealth.jmir.org/2022/7/e38077 DOI: 10.2196/38077
     """
-    if output is None and output_filetype is not None:
-        raise ValueError("If no output is given, output_filetype must be None.")
-
     if output is not None:
         if output.is_file():
             raise ValueError(
@@ -209,12 +197,14 @@ def _run_directory(
     file_names = list(itertools.chain(input.glob("*.gt3x"), input.glob("*.bin")))
 
     if not file_names:
-        raise FileNotFoundError(f"Directory {input} contains no .gt3x or .bin files.")
+        raise exceptions.EmptyDirectoryError(
+            f"Directory {input} contains no .gt3x or .bin files."
+        )
 
     results_dict = {}
     for file in file_names:
         output_file_path = (
-            output / pathlib.Path(file.stem).with_suffix(output_filetype)  # type: ignore[arg-type] # if output is defined, so is output_filetype
+            output / pathlib.Path(file.stem).with_suffix(output_filetype)
             if output
             else None
         )
@@ -302,15 +292,6 @@ def _run_file(
     if output is not None:
         writers.OrchestratorResults.validate_output(output=output)
 
-    parameters_dictionary = {
-        "thresholds": list(thresholds),
-        "calibrator": calibrator,
-        "epoch_length": epoch_length,
-        "activity_metric": activity_metric,
-        "nonwear_algorithm": list(nonwear_algorithm),
-        "input_file": str(input),
-    }
-
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
         msg = (
             f"Invalid calibrator: {calibrator}. Choose: 'ggir', 'gradient'. "
@@ -352,17 +333,14 @@ def _run_file(
         dynamic_range=watch_data.dynamic_range,
     )
 
-    sleep_detector = analytics.GgirSleepDetection(anglez)
-    sleep_windows = sleep_detector.run_sleep_detection()
-
-    nonwear_array = nonwear_utils.get_nonwear_measurements(
+    nonwear_array = processing_utils.get_nonwear_measurements(
         calibrated_acceleration=calibrated_acceleration,
         temperature=watch_data.temperature,
         non_wear_algorithms=nonwear_algorithm,
     )
 
-    nonwear_epoch = nonwear_utils.nonwear_array_cleanup(
-        nonwear_array=nonwear_array,
+    nonwear_epoch = processing_utils.synchronize_measurements(
+        data_measurement=nonwear_array,
         reference_measurement=activity_measurement,
         epoch_length=epoch_length,
     )
@@ -371,14 +349,40 @@ def _run_file(
         activity_measurement, thresholds
     )
 
+    sleep_detector = analytics.GgirSleepDetection(anglez)
+    sleep_parameters = sleep_detector.run_sleep_detection()
     sleep_array = analytics.sleep_cleanup(
-        sleep_windows=sleep_windows, nonwear_measurement=nonwear_epoch
+        sleep_windows=sleep_parameters.sleep_windows, nonwear_measurement=nonwear_epoch
     )
+    spt_windows = analytics.sleep_bouts_cleanup(
+        sleep_parameter=sleep_parameters.spt_windows,
+        nonwear_measurement=nonwear_epoch,
+        time_reference_measurement=activity_measurement,
+        epoch_length=epoch_length,
+    )
+    sib_periods = analytics.sleep_bouts_cleanup(
+        sleep_parameter=sleep_parameters.sib_periods,
+        nonwear_measurement=nonwear_epoch,
+        time_reference_measurement=activity_measurement,
+        epoch_length=epoch_length,
+    )
+
+    parameters_dictionary = {
+        "thresholds": list(thresholds),
+        "calibrator": calibrator,
+        "epoch_length": epoch_length,
+        "activity_metric": activity_metric,
+        "nonwear_algorithm": list(nonwear_algorithm),
+        "input_file": str(input),
+    }
+
     results = writers.OrchestratorResults(
         physical_activity_metric=activity_measurement,
         anglez=anglez,
         physical_activity_levels=physical_activity_levels,
         sleep_status=sleep_array,
+        sib_periods=sib_periods,
+        spt_periods=spt_windows,
         nonwear_status=nonwear_epoch,
         processing_params=parameters_dictionary,
     )

@@ -29,6 +29,8 @@ def dummy_results() -> writers.OrchestratorResults:
         physical_activity_levels=dummy_measure,
         nonwear_status=dummy_measure,
         sleep_status=dummy_measure,
+        sib_periods=dummy_measure,
+        spt_periods=dummy_measure,
     )
 
     return dummy_results
@@ -132,23 +134,6 @@ def test_run_single_file_nonwear_options(
 
     assert output_file_path.exists()
     assert isinstance(results, writers.OrchestratorResults)
-
-
-def test_run_single_file_bad_output_filetype(
-    sample_data_gt3x: pathlib.Path,
-    tmp_path: pathlib.Path,
-) -> None:
-    """Testing running a single file."""
-    output_file_path = tmp_path / "file_name.csv"
-
-    with pytest.raises(
-        ValueError,
-        match="When processing single files, output_filetype should be None - "
-        "the file type will be determined from the output path.",
-    ):
-        orchestrator.run(
-            input=sample_data_gt3x, output=output_file_path, output_filetype=".csv"
-        )
 
 
 def test_run_dir(tmp_path: pathlib.Path) -> None:

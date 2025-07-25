@@ -37,7 +37,7 @@ def test_main_default(
         epoch_length=5,
         nonwear_algorithm=["ggir"],
         verbosity=logging.INFO,
-        output_filetype=None,
+        output_filetype=".csv",
     )
 
 
@@ -154,7 +154,7 @@ def test_main_with_options(
         nonwear_algorithm=["cta", "ggir"],
         epoch_length=3,
         verbosity=logging.INFO,
-        output_filetype=None,
+        output_filetype=".csv",
     )
 
 
@@ -204,7 +204,7 @@ def test_main_verbosity(
         epoch_length=5,
         nonwear_algorithm=["ggir"],
         verbosity=logging.DEBUG,
-        output_filetype=None,
+        output_filetype=".csv",
     )
 
 
