@@ -23,6 +23,8 @@ class OrchestratorResults(pydantic.BaseModel):
     physical_activity_levels: Sequence[models.Measurement]
     nonwear_status: models.Measurement
     sleep_status: models.Measurement
+    sib_periods: models.Measurement
+    spt_periods: models.Measurement
     processing_params: Optional[Dict[str, Any]] = None
 
     def save_results(self, output: pathlib.Path) -> None:

@@ -13,7 +13,7 @@ from wristpy.processing import (
     calibration,
     idle_sleep_mode_imputation,
     metrics,
-    nonwear_utils,
+    processing_utils,
 )
 
 logger = config.get_logger()
@@ -319,15 +319,6 @@ def _run_file(
     if output is not None:
         writers.OrchestratorResults.validate_output(output=output)
 
-    parameters_dictionary = {
-        "thresholds": list(thresholds) if thresholds is not None else None,
-        "calibrator": calibrator,
-        "epoch_length": epoch_length,
-        "activity_metric": list(activity_metric),
-        "nonwear_algorithm": list(nonwear_algorithm),
-        "input_file": str(input),
-    }
-
     if calibrator is not None and calibrator not in ["ggir", "gradient"]:
         msg = (
             f"Invalid calibrator: {calibrator}. Choose: 'ggir', 'gradient'. "
@@ -394,29 +385,56 @@ def _run_file(
             )
         )
 
-    sleep_detector = analytics.GgirSleepDetection(anglez)
-    sleep_windows = sleep_detector.run_sleep_detection()
-
-    nonwear_array = nonwear_utils.get_nonwear_measurements(
+    nonwear_array = processing_utils.get_nonwear_measurements(
         calibrated_acceleration=calibrated_acceleration,
         temperature=watch_data.temperature,
         non_wear_algorithms=nonwear_algorithm,
     )
 
-    nonwear_epoch = nonwear_utils.nonwear_array_cleanup(
-        nonwear_array=nonwear_array,
-        reference_measurement=anglez,
+    nonwear_epoch = processing_utils.synchronize_measurements(
+        data_measurement=nonwear_array,
+        reference_measurement=activity_measurement,
         epoch_length=epoch_length,
     )
 
-    sleep_array = analytics.sleep_cleanup(
-        sleep_windows=sleep_windows, nonwear_measurement=nonwear_epoch
+    physical_activity_levels = analytics.compute_physical_activty_categories(
+        activity_measurement, thresholds
     )
+
+    sleep_detector = analytics.GgirSleepDetection(anglez)
+    sleep_parameters = sleep_detector.run_sleep_detection()
+    sleep_array = analytics.sleep_cleanup(
+        sleep_windows=sleep_parameters.sleep_windows, nonwear_measurement=nonwear_epoch
+    )
+    spt_windows = analytics.sleep_bouts_cleanup(
+        sleep_parameter=sleep_parameters.spt_windows,
+        nonwear_measurement=nonwear_epoch,
+        time_reference_measurement=activity_measurement,
+        epoch_length=epoch_length,
+    )
+    sib_periods = analytics.sleep_bouts_cleanup(
+        sleep_parameter=sleep_parameters.sib_periods,
+        nonwear_measurement=nonwear_epoch,
+        time_reference_measurement=activity_measurement,
+        epoch_length=epoch_length,
+    )
+
+    parameters_dictionary = {
+        "thresholds": list(thresholds),
+        "calibrator": calibrator,
+        "epoch_length": epoch_length,
+        "activity_metric": activity_metric,
+        "nonwear_algorithm": list(nonwear_algorithm),
+        "input_file": str(input),
+    }
+
     results = writers.OrchestratorResults(
         physical_activity_metric=activity_measurements_list,
         anglez=anglez,
         physical_activity_levels=physical_activity_levels_list,
         sleep_status=sleep_array,
+        sib_periods=sib_periods,
+        spt_periods=spt_windows,
         nonwear_status=nonwear_epoch,
         processing_params=parameters_dictionary,
     )

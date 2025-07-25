@@ -1,6 +1,5 @@
 """Calculate sleep onset and wake up times."""
 
-import abc
 import datetime
 from dataclasses import dataclass
 from typing import List, Tuple, Union
@@ -9,6 +8,7 @@ import numpy as np
 import polars as pl
 
 from wristpy.core import computations, config, models
+from wristpy.processing import processing_utils
 
 logger = config.get_logger()
 
@@ -26,27 +26,23 @@ class SleepWindow:
     wakeup: Union[datetime.datetime, List]
 
 
-class AbstractSleepDetector(abc.ABC):
-    """Abstract class defining the interface for sleep detection algorithms."""
+@dataclass
+class SleepParameters:
+    """Dataclass to store sleep parameters used to compute sleep metrics.
 
-    @abc.abstractmethod
-    def __init__(self, anglez: models.Measurement) -> None:
-        """Initialization function for the sleep detection algorithm.
+    Attributes:
+        sleep_windows: a list of SleepWindow objects, each representing a sleep period
+            with an onset and wakeup time.
+        spt_windows: a Measurement object with the sleep period guider windows.
+        sib_periods: a Measurement object with the sustained inactivity bouts.
+    """
 
-        Must contain the anglez data as an input.
-        """
-        pass
-
-    @abc.abstractmethod
-    def run_sleep_detection(self) -> List[SleepWindow]:
-        """Sleep Detector must contain a run_sleep_detection function.
-
-        The function must return a list of SleepWindow objects.
-        """
-        pass
+    sleep_windows: List[SleepWindow]
+    spt_windows: models.Measurement
+    sib_periods: models.Measurement
 
 
-class GgirSleepDetection(AbstractSleepDetector):
+class GgirSleepDetection:
     """Sleep Detection algorithm based on the GGIR method.
 
     This class implements the GGIR method for sleep detection. The method uses the
@@ -68,7 +64,9 @@ class GgirSleepDetection(AbstractSleepDetector):
         """
         self.anglez = anglez
 
-    def run_sleep_detection(self) -> List[SleepWindow]:
+    def run_sleep_detection(
+        self,
+    ) -> SleepParameters:
         """Run the GGIR sleep detection.
 
         This algorithm uses the angle-z data to first find potential sleep periods
@@ -77,8 +75,10 @@ class GgirSleepDetection(AbstractSleepDetector):
         the SPT windows and SIB periods.
 
         Returns:
-            A list of SleepWindow instances, each instance contains a sleep onset/wakeup
-            time pair.
+            A SleepParameters instance containing the underlying sleep parameters:
+                - sleep_windows
+                - spt_window
+                - sib_periods
         """
         logger.debug("Beginning sleep detection.")
         spt_window = self._spt_window(self.anglez)
@@ -91,7 +91,11 @@ class GgirSleepDetection(AbstractSleepDetector):
         logger.debug(
             "Sleep detection complete. Windows detected: %s", len(sleep_onset_wakeup)
         )
-        return sleep_onset_wakeup
+        return SleepParameters(
+            sleep_windows=sleep_onset_wakeup,
+            spt_windows=spt_window,
+            sib_periods=sib_periods,
+        )
 
     def _spt_window(
         self, anglez_data: models.Measurement, threshold: float = 0.2
@@ -263,7 +267,7 @@ def _find_periods(
 
     This is a helper function to return the periods in the format of
     List [start_of_period, end_of_period], it is used in the
-    GGIRSleepDetection class and when removing non-wear periods from sleep windows.
+    GGIRSleepDetection class.
 
     Args:
         window_measurement: the Measurement instance, intended to be
@@ -424,6 +428,43 @@ def sleep_cleanup(
     )
 
     return models.Measurement(time=sleep.time, measurements=cleaned_sleep)
+
+
+def sleep_bouts_cleanup(
+    sleep_parameter: models.Measurement,
+    nonwear_measurement: models.Measurement,
+    time_reference_measurement: models.Measurement,
+    epoch_length: float,
+) -> models.Measurement:
+    """This function will synchronize and filter the SPT and SIB windows.
+
+    The time sychrnoization is based on the time_reference_measurement, while the
+    filtering is based on the nonwear_measurement.
+
+    Args:
+        sleep_parameter: The sleep parameter measurement data, which contains
+            either the SPT and SIB windows.
+        nonwear_measurement: The nonwear measurement data used for reference time
+            stamps and to remove overlaps with periods of sleep.
+        time_reference_measurement: The time reference measurement data used for
+            reference time stamps.
+        epoch_length: The epoch length in seconds, used for resampling the data.
+
+    Returns:
+        A tuple of two Measurement instances with the cleaned SPT and SIB data.
+    """
+    logger.debug("Starting the sleep bouts cleanup.")
+    sleep_parameter_sync = processing_utils.synchronize_measurements(
+        data_measurement=sleep_parameter,
+        reference_measurement=time_reference_measurement,
+        epoch_length=epoch_length,
+    )
+    sleep_parameter_sync.measurements = np.logical_and(
+        sleep_parameter_sync.measurements,
+        np.logical_not(nonwear_measurement.measurements.astype(bool)),
+    )
+
+    return sleep_parameter_sync
 
 
 def _sleep_windows_as_measurement(
