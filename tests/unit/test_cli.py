@@ -56,7 +56,7 @@ def test_main_with_metrics(
     create_typer_cli_runner: testing.CliRunner,
     metric: str,
 ) -> None:
-    """Test that correct ag_count default thresholds are pulled."""
+    """Test that cli works with metrics."""
     mock_run = mocker.patch.object(orchestrator, "_run_file")
 
     create_typer_cli_runner.invoke(cli.app, ([str(sample_data_gt3x), "-a", metric]))
@@ -67,6 +67,29 @@ def test_main_with_metrics(
         thresholds=None,
         calibrator=None,
         activity_metric=[metric],
+        nonwear_algorithm=["ggir"],
+        epoch_length=5,
+        verbosity=logging.INFO,
+    )
+
+
+def test_main_with_multiple_metrics(
+    mocker: pytest_mock.MockerFixture,
+    sample_data_gt3x: pathlib.Path,
+    create_typer_cli_runner: testing.CliRunner,
+) -> None:
+    """Tests cli with multiple activity metrics."""
+    mock_run = mocker.patch.object(orchestrator, "_run_file")
+
+    create_typer_cli_runner.invoke(
+        cli.app, ([str(sample_data_gt3x), "-a", "enmo", "-a", "mad"])
+    )
+    mock_run.assert_called_once_with(
+        input=sample_data_gt3x,
+        output=None,
+        thresholds=None,
+        calibrator=None,
+        activity_metric=["enmo", "mad"],
         nonwear_algorithm=["ggir"],
         epoch_length=5,
         verbosity=logging.INFO,

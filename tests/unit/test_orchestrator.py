@@ -196,3 +196,24 @@ def test_run_single_file_mims(
 
     assert output_file_path.exists()
     assert isinstance(results, writers.OrchestratorResults)
+
+
+def test_multiple_metrics(
+    sample_data_bin: pathlib.Path, tmp_path: pathlib.Path
+) -> None:
+    """Testing running a single file with multiple metrics."""
+    output_file_path = tmp_path / "file_name.csv"
+    results = orchestrator.run(
+        input=sample_data_bin,
+        output=output_file_path,
+        activity_metric=["enmo", "mad", "ag_count"],
+    )
+
+    assert output_file_path.exists()
+    assert isinstance(results, writers.OrchestratorResults)
+    assert len(results.physical_activity_metric) == 3
+    assert len(results.physical_activity_levels) == 3
+    assert all(
+        isinstance(metric, models.Measurement)
+        for metric in results.physical_activity_metric
+    )
