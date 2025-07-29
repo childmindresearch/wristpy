@@ -217,3 +217,21 @@ def test_multiple_metrics(
         isinstance(metric, models.Measurement)
         for metric in results.physical_activity_metric
     )
+
+
+def test_metrics_thresholds_mismatch(
+    sample_data_bin: pathlib.Path, tmp_path: pathlib.Path
+) -> None:
+    """Test running a single file with mismatched number of metrics and thresholds."""
+    output_file_path = tmp_path / "file_name.csv"
+    with pytest.raises(
+        ValueError,
+        match="Number of thresholds did not match the number of activity metrics."
+        " Provide one threshold tuple per metric or use None for defaults.",
+    ):
+        orchestrator.run(
+            input=sample_data_bin,
+            output=output_file_path,
+            activity_metric=["enmo", "mad"],
+            thresholds=[(1, 2, 3)],
+        )
