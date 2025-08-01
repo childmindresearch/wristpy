@@ -86,9 +86,9 @@ def _parse_thresholds(thresholds: list[str]) -> list[tuple[float, float, float]]
             )
         try:
             values = [float(part) for part in parts]
-            parsed.append((values[0], values[1], values[2]))
         except ValueError:
             raise typer.BadParameter(f"Invalid float in threshold: {triplet_str}")
+        parsed.append(tuple(values))
     return parsed
 
 
@@ -126,6 +126,7 @@ def main(
         "Use multiple times for multiple metrics: '-a enmo -a mad' etc.",
         case_sensitive=False,
     ),
+    # Typer does not support list[tuple[...]]
     thresholds: list[str] = typer.Option(
         None,
         "-t",

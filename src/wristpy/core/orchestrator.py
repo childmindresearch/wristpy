@@ -107,7 +107,6 @@ def run(
                 "Provide one threshold tuple per metric or use None for defaults."
             )
         metrics_dict = dict(zip(activity_metric, thresholds))
-
     else:
         metrics_dict = {
             metric: DEFAULT_ACTIVITY_THRESHOLDS[metric] for metric in activity_metric
@@ -359,11 +358,6 @@ def _run_file(
         Literal["enmo", "mad", "ag_count", "mims"], Tuple[float, float, float]
     ]
     if thresholds is not None:
-        if len(activity_metric) != len(thresholds):
-            raise ValueError(
-                "Number of thresholds did not match the number of activity metrics. "
-                "Provide one threshold tuple per metric or use None for defaults."
-            )
         metrics_dict = dict(zip(activity_metric, thresholds))
     else:
         metrics_dict = {
