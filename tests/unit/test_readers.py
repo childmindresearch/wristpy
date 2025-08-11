@@ -56,9 +56,9 @@ def test_extract_dynamic_range_bin(sample_data_bin: pathlib.Path) -> None:
         metadata=data["metadata"], file_type=file_type
     )
 
-    assert (
-        result == expected_dynamic_range
-    ), f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
+    assert result == expected_dynamic_range, (
+        f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
+    )
 
 
 def test_extract_dynamic_range_gt3x(sample_data_gt3x: pathlib.Path) -> None:
@@ -71,6 +71,6 @@ def test_extract_dynamic_range_gt3x(sample_data_gt3x: pathlib.Path) -> None:
         metadata=data["metadata"], file_type=file_type
     )
 
-    assert (
-        result == expected_dynamic_range
-    ), f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
+    assert result == expected_dynamic_range, (
+        f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
+    )
