@@ -33,9 +33,10 @@ jobs:
 
       - name: Build Sphinx docs
         run: |
-          poetry run sphinx-build -b html docs/source docs/_build/html
-          touch docs/_build/html/.nojekyll
+          cd docs
+          poetry run make html
+          touch build/html/.nojekyll
 
       - uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: docs/_build/html
+          folder: docs/build/html  
