@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Wristpy Tutorial" href="tutorial.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="wristpy.processing.processing_utils" href="api/wristpy.processing.processing_utils.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>wristpy 0.2.0 documentation</title>
+        <title>Development Guide - wristpy 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -168,7 +168,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">wristpy 0.2.0 documentation</div></a>
+      <a href="index.html"><div class="brand">wristpy 0.2.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -189,7 +189,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   <div class="sidebar-logo-container">
     <img class="sidebar-logo only-light" src="_static/images/wristpy_logo.png" alt="Light Logo"/>
@@ -241,8 +241,8 @@
 </li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="development.html">Development Guide</a></li>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Development Guide</a></li>
 </ul>
 
 </div>
@@ -263,7 +263,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/index.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/development.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -283,129 +283,16 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="wristpy-documentation">
-<h1>wristpy Documentation<a class="headerlink" href="#wristpy-documentation" title="Link to this heading">¶</a></h1>
-<a class="reference internal image-reference" href="_images/wristpy_logo.png"><img alt="wristpy logo" class="align-center" src="_images/wristpy_logo.png" style="width: 200px;" /></a>
-<p><a class="reference external" href="https://doi.org/10.5281/zenodo.13883190"><img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.13883190.svg" /></a> <a class="reference external" href="https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml?query=branch%3Amain"><img alt="Build" src="https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml/badge.svg?branch=main" /></a> <a class="reference external" href="https://codecov.io/gh/childmindresearch/wristpy"><img alt="codecov" src="https://codecov.io/gh/childmindresearch/wristpy/branch/main/graph/badge.svg?token=22HWWFWPW5" /></a> <a class="reference external" href="https://github.com/astral-sh/ruff"><img alt="Ruff" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" /></a> <img alt="stability" src="https://img.shields.io/badge/stability-experimental-orange.svg" /> <a class="reference external" href="https://github.com/childmindresearch/wristpy/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-LGPL--2.1-blue.svg" /></a> <a class="reference external" href="https://childmindresearch.github.io/wristpy"><img alt="docs" src="https://img.shields.io/badge/api-docs-blue" /></a></p>
-<p>Welcome to wristpy, a Python library designed for processing and analyzing wrist-worn accelerometer data.</p>
-<p>This library provides a set of tools for loading sensor information, calibrating raw accelerometer data, calculating various physical activity metrics, finding non-wear periods, and detecting sleep periods (onset and wakeup times). Additionally, we provide access to other sensor data that may be recorded by the watch, including; temperature, luminosity, capacitive sensing, battery voltage, and all metadata.</p>
-<section id="quick-start">
-<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
-<p><strong>Installation</strong></p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><strong>macOS users</strong>: Install <code class="docutils literal notranslate"><span class="pre">libomp</span></code> first via <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">libomp</span></code></p>
-</div>
-<p>Install wristpy from PyPI:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">wristpy</span>
-</pre></div>
-</div>
-<p><strong>Basic Usage</strong></p>
-<p>Single file processing:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">wristpy.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">orchestrator</span>
-
-<span class="n">results</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-    <span class="nb">input</span><span class="o">=</span><span class="s1">&#39;/path/to/your/file.gt3x&#39;</span><span class="p">,</span>
-    <span class="n">output</span><span class="o">=</span><span class="s1">&#39;/path/to/save/file_name.csv&#39;</span><span class="p">,</span>
-    <span class="n">calibrator</span><span class="o">=</span><span class="s1">&#39;gradient&#39;</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>For detailed examples and usage patterns, see the <a class="reference internal" href="tutorial.html"><span class="doc">Wristpy Tutorial</span></a>.</p>
-</section>
-<section id="supported-devices-formats">
-<h2>Supported Devices &amp; Formats<a class="headerlink" href="#supported-devices-formats" title="Link to this heading">¶</a></h2>
-<p>wristpy currently supports:</p>
-<div class="table-wrapper colwidths-given docutils container">
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 25.0%" />
-<col style="width: 25.0%" />
-<col style="width: 30.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Format</p></th>
-<th class="head"><p>Manufacturer</p></th>
-<th class="head"><p>Device</p></th>
-<th class="head"><p>Status</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>GT3X</p></td>
-<td><p>Actigraph</p></td>
-<td><p>wGT3X-BT</p></td>
-<td><p>✅ Supported</p></td>
-</tr>
-<tr class="row-odd"><td><p>BIN</p></td>
-<td><p>GENEActiv</p></td>
-<td><p>GENEActiv</p></td>
-<td><p>✅ Supported</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="processing-pipeline">
-<h2>Processing Pipeline<a class="headerlink" href="#processing-pipeline" title="Link to this heading">¶</a></h2>
-<p>The wristpy processing pipeline includes:</p>
+          <section id="development-guide">
+<h1>Development Guide<a class="headerlink" href="#development-guide" title="Link to this heading">¶</a></h1>
+<section id="project-governance">
+<h2>Project Governance<a class="headerlink" href="#project-governance" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Data Loading</strong> - Sensor data loaded via <a class="reference external" href="https://github.com/childmindresearch/actfast">actfast</a></p></li>
-<li><p><strong>Data Calibration</strong> - Post-manufacturer calibration (None, gradient, ggir options)</p></li>
-<li><p><strong>Metrics Calculation</strong> - ENMO, MAD, Actigraph counts, MIMS, angle-Z</p></li>
-<li><p><strong>Non-wear Detection</strong> - Multiple algorithms including CTA and DETACH</p></li>
-<li><p><strong>Sleep Detection</strong> - HDCZ and HSPT algorithms for sleep onset/wakeup detection</p></li>
-<li><p><strong>Physical Activity Levels</strong> - Classification into inactive, light, moderate, vigorous categories</p></li>
-</ul>
-<p>For complete details, see the <a class="reference internal" href="tutorial.html"><span class="doc">Wristpy Tutorial</span></a>.</p>
-</section>
-<section id="getting-help">
-<h2>Getting Help<a class="headerlink" href="#getting-help" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><strong>GitHub Repository</strong>: <a class="reference external" href="https://github.com/childmindresearch/wristpy">childmindresearch/wristpy</a></p></li>
-<li><p><strong>Issues &amp; Bug Reports</strong>: <a class="reference external" href="https://github.com/childmindresearch/wristpy/issues">GitHub Issues</a></p></li>
-<li><p><strong>Contributing</strong>: See our <a class="reference internal" href="development.html"><span class="doc">Development Guide</span></a> guide</p></li>
+<li><p><a class="reference external" href="https://github.com/childmindresearch/wristpy/blob/main/CONTRIBUTING.md">Contributing Guidelines</a> - How to contribute to wristpy</p></li>
+<li><p><a class="reference external" href="https://github.com/childmindresearch/wristpy/blob/main/SECURITY.md">Security Policy</a> - How to report security issues</p></li>
+<li><p><a class="reference external" href="https://github.com/childmindresearch/wristpy/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a> - Community standards</p></li>
 </ul>
 </section>
-<section id="documentation-contents">
-<h2>Documentation Contents<a class="headerlink" href="#documentation-contents" title="Link to this heading">¶</a></h2>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Wristpy Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-1-running-the-default-processor">Example 1: Running the default processor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-2-loading-data-and-plotting-the-raw-signals">Example 2: Loading data and plotting the raw signals</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-3-plot-the-epoch-level-measurements">Example 3:  Plot the epoch-level measurements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-4-visualize-the-detected-non-wear-times">Example 4: Visualize the detected non-wear times</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-5-compute-and-plot-the-sleep-windows">Example 5: Compute and plot the sleep windows</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="api/wristpy.core.html">core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/wristpy.io.html">io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/wristpy.processing.html">processing</a></li>
-</ul>
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Development</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="development.html">Development Guide</a></li>
-</ul>
-</div>
-</section>
-</section>
-<section id="indices-and-tables">
-<h1>Indices and Tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
 </section>
 
         </article>
@@ -413,16 +300,18 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="tutorial.html">
+          
+          <a class="prev-page" href="api/wristpy.processing.processing_utils.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
-                  <span>Next</span>
+                  <span>Previous</span>
                 </div>
-                <div class="title">Wristpy Tutorial</div>
+                
+                <div class="title">wristpy.processing.processing_utils</div>
+                
               </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -453,17 +342,10 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">wristpy Documentation</a><ul>
-<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
-<li><a class="reference internal" href="#supported-devices-formats">Supported Devices &amp; Formats</a></li>
-<li><a class="reference internal" href="#processing-pipeline">Processing Pipeline</a></li>
-<li><a class="reference internal" href="#getting-help">Getting Help</a></li>
-<li><a class="reference internal" href="#documentation-contents">Documentation Contents</a><ul>
+<li><a class="reference internal" href="#">Development Guide</a><ul>
+<li><a class="reference internal" href="#project-governance">Project Governance</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and Tables</a></li>
 </ul>
 
           </div>
