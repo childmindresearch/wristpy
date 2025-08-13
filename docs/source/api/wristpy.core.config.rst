@@ -1,7 +1,13 @@
-config
-==========================
+wristpy.core.config
+===================
 
 .. automodule:: wristpy.core.config
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_logger
+      get_version
+   

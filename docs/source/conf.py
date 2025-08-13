@@ -17,6 +17,7 @@ release = "0.2.0"
 
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "myst_parser",
@@ -24,7 +25,8 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx_copybutton",
 ]
-
+autosummary_generate = True
+autosummary_imported_members = True
 
 exclude_patterns = []
 

@@ -1,15 +1,13 @@
-Readers
-==========================
+wristpy.io.readers
+==================
 
 .. automodule:: wristpy.io.readers
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
-Submodules
-----------
+   
+.. rubric:: Modules
 
-.. toctree::
-   :maxdepth: 4
+.. autosummary::
+   :toctree:
+   :recursive:
 
-   wristpy.io.readers.readers
+   readers

@@ -1,20 +1,18 @@
-Core Module
-====================
+﻿wristpy.core
+============
 
 .. automodule:: wristpy.core
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
-Submodules
-----------
+   
+.. rubric:: Modules
 
-.. toctree::
-   :maxdepth: 2
+.. autosummary::
+   :toctree:
+   :recursive:
 
-   wristpy.core.cli
-   wristpy.core.computations
-   wristpy.core.config
-   wristpy.core.exceptions
-   wristpy.core.models
-   wristpy.core.orchestrator
+   cli
+   computations
+   config
+   exceptions
+   models
+   orchestrator

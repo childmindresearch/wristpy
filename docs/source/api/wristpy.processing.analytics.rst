@@ -1,7 +1,23 @@
-analytics
-===================================
+wristpy.processing.analytics
+============================
 
 .. automodule:: wristpy.processing.analytics
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      compute_physical_activty_categories
+      dataclass
+      sleep_bouts_cleanup
+      sleep_cleanup
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      GgirSleepDetection
+      SleepParameters
+      SleepWindow
+   

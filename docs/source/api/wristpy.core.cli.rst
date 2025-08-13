@@ -1,7 +1,23 @@
-CLI
-=======================
+wristpy.core.cli
+================
 
 .. automodule:: wristpy.core.cli
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      main
+      version_check
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ActivityMetric
+      Calibrator
+      Enum
+      NonwearAlgorithms
+      OutputFileType
+   

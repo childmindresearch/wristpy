@@ -1,7 +1,17 @@
-exceptions
-==============================
+wristpy.core.exceptions
+=======================
 
 .. automodule:: wristpy.core.exceptions
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      CalibrationError
+      EmptyDirectoryError
+      InvalidFileTypeError
+      LoggedException
+      NoMotionError
+      SphereCriteriaError
+   

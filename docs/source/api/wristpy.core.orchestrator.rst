@@ -1,7 +1,12 @@
-orchestrator
-================================
+wristpy.core.orchestrator
+=========================
 
 .. automodule:: wristpy.core.orchestrator
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      run
+   

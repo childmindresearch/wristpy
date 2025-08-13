@@ -1,7 +1,12 @@
-idle\_sleep\_mode\_imputation 
-=======================================================
+wristpy.processing.idle\_sleep\_mode\_imputation
+================================================
 
 .. automodule:: wristpy.processing.idle_sleep_mode_imputation
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      impute_idle_sleep_mode_gaps
+   

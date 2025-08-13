@@ -113,10 +113,12 @@ Documentation Contents
 .. toctree::
    :maxdepth: 1
    :caption: API Reference
-   
+
    api/wristpy.core
    api/wristpy.io
    api/wristpy.processing
+
+
 
 .. toctree::
    :maxdepth: 1

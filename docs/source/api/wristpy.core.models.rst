@@ -1,7 +1,20 @@
-models
-==========================
+wristpy.core.models
+===================
 
 .. automodule:: wristpy.core.models
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      field_validator
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      BaseModel
+      Measurement
+      WatchData
+   

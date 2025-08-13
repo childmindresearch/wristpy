@@ -1,16 +1,14 @@
-IO Module
-==================
+﻿wristpy.io
+==========
 
 .. automodule:: wristpy.io
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
-Submodules
------------
+   
+.. rubric:: Modules
 
-.. toctree::
-   :maxdepth: 4
+.. autosummary::
+   :toctree:
+   :recursive:
 
-   wristpy.io.readers
-   wristpy.io.writers
+   readers
+   writers

@@ -1,15 +1,13 @@
-writers
-==========================
+wristpy.io.writers
+==================
 
 .. automodule:: wristpy.io.writers
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
-Submodules
-----------
+   
+.. rubric:: Modules
 
-.. toctree::
-   :maxdepth: 4
+.. autosummary::
+   :toctree:
+   :recursive:
 
-   wristpy.io.writers.writers
+   writers

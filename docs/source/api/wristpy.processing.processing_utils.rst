@@ -1,7 +1,13 @@
-processing\_utils 
-===========================================
+wristpy.processing.processing\_utils
+====================================
 
 .. automodule:: wristpy.processing.processing_utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_nonwear_measurements
+      synchronize_measurements
+   
