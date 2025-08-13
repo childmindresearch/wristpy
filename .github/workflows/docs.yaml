@@ -4,24 +4,14 @@ permissions:
   contents: write
 
 on:
-  workflow_run:
-    workflows: [Python Tests]
-    types:
-      - completed
-    branches:
-      - main
-      - feature/issue-218/sphinx
   push:
     branches:
       - feature/issue-218/sphinx
+      - main
   workflow_dispatch:
 
 jobs:
   build-and-publish-docs:
-    if: >
-      (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion == 'success') ||
-      (github.event_name != 'workflow_run')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,12 +29,14 @@ jobs:
           poetry install --with docs
 
       - name: Build Sphinx docs
+        working-directory: docs
         run: |
-          cd docs
           poetry run make html
           touch build/html/.nojekyll
+          ls -la build/html | sed 's/^/BUILD: /'   # sanity check in logs
 
-      - uses: JamesIves/github-pages-deploy-action@v4
+      - name: Deploy to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: docs/build/html
