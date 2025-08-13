@@ -41,3 +41,4 @@ jobs:
           branch: gh-pages
           folder: docs/build/html
           clean: true
+          single-commit: true
