@@ -1,4 +1,4 @@
-wristpy.io.readers
+﻿wristpy.io.readers
 ==================
 
 .. automodule:: wristpy.io.readers

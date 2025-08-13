@@ -1,4 +1,4 @@
-wristpy.io.writers
+﻿wristpy.io.writers
 ==================
 
 .. automodule:: wristpy.io.writers

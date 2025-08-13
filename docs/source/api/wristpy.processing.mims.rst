@@ -1,4 +1,4 @@
-wristpy.processing.mims
+﻿wristpy.processing.mims
 =======================
 
 .. automodule:: wristpy.processing.mims

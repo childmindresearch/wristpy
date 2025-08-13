@@ -1,4 +1,4 @@
-wristpy.core.models
+﻿wristpy.core.models
 ===================
 
 .. automodule:: wristpy.core.models

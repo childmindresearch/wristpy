@@ -1,4 +1,4 @@
-wristpy.processing.calibration
+﻿wristpy.processing.calibration
 ==============================
 
 .. automodule:: wristpy.processing.calibration

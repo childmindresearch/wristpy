@@ -1,4 +1,4 @@
-wristpy.core.computations
+﻿wristpy.core.computations
 =========================
 
 .. automodule:: wristpy.core.computations

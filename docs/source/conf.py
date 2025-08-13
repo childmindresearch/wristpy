@@ -45,6 +45,8 @@ html_css_files = [
     "custom.css",
 ]
 
+html_domain_indices = ["py-modindex"]
+modindex_common_prefix = ["wristpy."]
 
 html_theme_options = {
     "sidebar_hide_name": False,

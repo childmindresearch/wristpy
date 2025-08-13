@@ -1,13 +1,16 @@
-﻿wristpy.processing
+processing
 ==================
 
 .. automodule:: wristpy.processing
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-   
-.. rubric:: Modules
+Submodules
+----------
 
 .. autosummary::
-   :toctree:
+   :toctree: .
    :recursive:
 
    analytics

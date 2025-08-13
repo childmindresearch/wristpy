@@ -1,4 +1,4 @@
-wristpy.processing.metrics
+﻿wristpy.processing.metrics
 ==========================
 
 .. automodule:: wristpy.processing.metrics

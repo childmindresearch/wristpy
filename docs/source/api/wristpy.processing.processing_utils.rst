@@ -1,4 +1,4 @@
-wristpy.processing.processing\_utils
+﻿wristpy.processing.processing\_utils
 ====================================
 
 .. automodule:: wristpy.processing.processing_utils

@@ -1,13 +1,16 @@
-﻿wristpy.core
+core
 ============
 
 .. automodule:: wristpy.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-   
-.. rubric:: Modules
+Submodules
+----------
 
 .. autosummary::
-   :toctree:
+   :toctree: .
    :recursive:
 
    cli

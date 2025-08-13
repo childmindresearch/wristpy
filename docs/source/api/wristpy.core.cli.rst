@@ -1,4 +1,4 @@
-wristpy.core.cli
+﻿wristpy.core.cli
 ================
 
 .. automodule:: wristpy.core.cli

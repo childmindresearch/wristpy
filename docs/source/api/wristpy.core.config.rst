@@ -1,4 +1,4 @@
-wristpy.core.config
+﻿wristpy.core.config
 ===================
 
 .. automodule:: wristpy.core.config

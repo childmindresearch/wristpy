@@ -1,13 +1,16 @@
-﻿wristpy.io
+io
 ==========
 
 .. automodule:: wristpy.io
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-   
-.. rubric:: Modules
+Submodules
+----------
 
 .. autosummary::
-   :toctree:
+   :toctree: .
    :recursive:
 
    readers

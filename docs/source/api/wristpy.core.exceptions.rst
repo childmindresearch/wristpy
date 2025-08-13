@@ -1,4 +1,4 @@
-wristpy.core.exceptions
+﻿wristpy.core.exceptions
 =======================
 
 .. automodule:: wristpy.core.exceptions
