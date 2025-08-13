@@ -77,7 +77,7 @@ from matplotlib import pyplot as plt
 plt.plot(results.physical_activity_metric.time, results.physical_activity_metric.measurements)
 ```
 
-![Example of the ENMO result](enmo_example1.png)
+![Example of the ENMO result](_static/images/enmo_example1.png)
 
 Plot the sleep windows with normalized angle-z data:
 ```python
@@ -88,7 +88,7 @@ plt.plot(results.sleep_status.time, results.sleep_status.measurements)
 plt.legend(['Angle Z', 'Sleep Windows'])
 plt.show()
 ```
-![Example of the Sleep and Anglez](sleep_anglez_example1.png)
+![Example of the Sleep and Anglez](_static/images/sleep_anglez_example1.png)
 
 We can also view and process these outputs from the saved `.csv` output file:
 
@@ -109,7 +109,7 @@ phys_activity = output_results['physical_activity_levels'].replace(activity_mapp
 
 plt.plot(output_results['time'], phys_activity)
 ```
-![Example of plotting physical activity levels from csv](phys_levels_example1.png)
+![Example of plotting physical activity levels from csv](_static/images/phys_levels_example1.png)
 
 It is also possible to do some analysis on these output variables, for example, if we want to find the percent of time spent inactive, or in light, moderate, or vigorous physical activity:
 
@@ -163,13 +163,13 @@ Plot the raw acceleration along the *x*-axis:
 
 `plt.plot(watch_data.acceleration.time, watch_data.acceleration.measurements[:,0])`
 
-![Plot raw acceleration data from watch_data](raw_accel_example2.png)
+![Plot raw acceleration data from watch_data](_static/images/raw_accel_example2.png)
 
 Plot the light data:
 
 `plt.plot(watch_data.lux.time, watch_data.lux.measurements)`
 
-![Plot the light data](light_example2.png)
+![Plot the light data](_static/images/light_example2.png)
 
 
 
@@ -212,7 +212,7 @@ ax2.set_ylabel('Anglez', color='red')
 
 plt.show()
 ```
-![Plot the epoch1 data](enmo_anglez_example3.png)
+![Plot the epoch1 data](_static/images/enmo_anglez_example3.png)
 
 
 ## Example 4: Visualize the detected non-wear times
@@ -246,7 +246,7 @@ plt.plot(non_wear_array.time, non_wear_array.measurements)
 
 plt.legend(['ENMO Epoch1', 'Non-wear'])
 ```
-![Plot the nonwear periods compared to the ENMO data](nonwear_example4.png)
+![Plot the nonwear periods compared to the ENMO data](_static/images/nonwear_example4.png)
 
 
 
@@ -272,4 +272,4 @@ ax1.set_ylim(0, 1.5)
 
 plt.show()
 ```
-![Plot the filtered sleep windows.](filtered_sleep_windows.png)
+![Plot the filtered sleep windows.](_static/images/filtered_sleep_windows.png)
