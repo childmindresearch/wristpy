@@ -11,10 +11,17 @@ on:
     branches:
       - main
       - feature/issue-218/sphinx
+  push:
+    branches:
+      - feature/issue-218/sphinx
+  workflow_dispatch:
 
 jobs:
   build-and-publish-docs:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: >
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name != 'workflow_run')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +46,6 @@ jobs:
 
       - uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages         
-          folder: docs/build/html   
-          clean: true               
- 
+          branch: gh-pages
+          folder: docs/build/html
+          clean: true
