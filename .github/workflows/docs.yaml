@@ -10,6 +10,7 @@ on:
       - completed
     branches:
       - main
+      - feature/issue-218/sphinx
 
 jobs:
   build-and-publish-docs:
