@@ -19,6 +19,8 @@ we will cover the following topics through a few examples:
 
 ## Example 1: Running the default processor
 
+### Running files and directories
+
 
 The `orchestrator` module of wristpy contains the default processor that will run the entire wristpy processing pipeline. This can be called as simply as:
 
@@ -66,15 +68,43 @@ for file in file_names:
     results_dict[file.stem] = result
 ```
 
+### Physical Activity Metrics & Results
 
+Wristpy is capable of calculating the following physical activity metrics from actigraphy data: 
+1. [Euclidean Norm Minus-One (ENMO)](https://childmindresearch.github.io/wristpy/api/wristpy.processing.metrics.html#wristpy.processing.metrics.euclidean_norm_minus_one)
+2. [Activity Counts (ag_count)](https://childmindresearch.github.io/wristpy/api/wristpy.processing.metrics.html#wristpy.processing.metrics.actigraph_activity_counts)
+3. [Mean Amplitude Deviation (MAD)](https://childmindresearch.github.io/wristpy/api/wristpy.processing.metrics.html#wristpy.processing.metrics.mean_amplitude_deviation)
+4. [Monitor Independent Movement Summary Units (MIMS)](https://childmindresearch.github.io/wristpy/api/wristpy.processing.metrics.html#wristpy.processing.metrics.monitor_independent_movement_summary_units)
 
+The default metric is ENMO, but you can pass any combination of supported metrics as a list to the orchestrator:
+
+```python
+from wristpy.core import orchestrator
+
+results = orchestrator.run(
+   input = '/path/to/your/file.gt3x',
+   output = 'path/to/save/file_name.csv'
+   activity_metric = ['enmo', 'mad',]
+)
+```
+
+The resulting [OrchestratorResults](https://childmindresearch.github.io/wristpy/api/wristpy.io.writers.writers.html#wristpy.io.writers.writers.OrchestratorResults) object will contain the outputs for each metric in the order they were provided. The same applies to the physical activity levels associated with each metric.
+
+```python
+
+enmo = results.physical_activity_metric[0]
+mad = results.physical_activity_metric[1]
+
+enmo_levels = results.physical_activity_levels[0]
+mad_levels = results.physical_actiity_levels[1]
+```
 
 We can visualize some of the outputs within the `results` object, directly, with the following scripts:
 
 Plot the default physical activity metrics (ENMO) across the entire data set:
 ```python
 from matplotlib import pyplot as plt
-plt.plot(results.physical_activity_metric.time, results.physical_activity_metric.measurements)
+plt.plot(results.physical_activity_metric[0].time, results.physical_activity_metric[0].measurements)
 ```
 
 ![Example of the ENMO result](_static/images/enmo_example1.png)
@@ -105,7 +135,7 @@ activity_mapping = {
     "vigorous": 3
 }
 
-phys_activity = output_results['physical_activity_levels'].replace(activity_mapping).cast(int)
+phys_activity = output_results['enmo physical_activity_levels'].replace(activity_mapping).cast(int)
 
 plt.plot(output_results['time'], phys_activity)
 ```
@@ -118,7 +148,7 @@ inactivity_count = sum(phys_activity == 0)
 light_activity_count = sum(phys_activity == 1)
 moderate_activity_count = sum(phys_activity == 2)
 vigorous_activity_count = sum(phys_activity == 3)
-total_activity_count = len(output_results['physical_activity_levels'])
+total_activity_count = len(output_results['enmo physical_activity_levels'])
 
 print(f'Light activity percent: {light_activity_count*100/total_activity_count}')
 print(f'Moderate activity percent: {moderate_activity_count*100/total_activity_count}')
