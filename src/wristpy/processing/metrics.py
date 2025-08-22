@@ -348,7 +348,8 @@ def combined_temp_accel_detect_nonwear(
                     lambda df: _compute_nonwear_value_per_axis(
                         df,
                         std_criteria,
-                    )
+                    ),
+                    returns_scalar=True,
                 )
             )
             .sum_horizontal()
@@ -501,7 +502,8 @@ def _compute_nonwear_value_array(
                 lambda df: _compute_nonwear_value_per_axis(
                     df,
                     std_criteria,
-                )
+                ),
+                returns_scalar=True,
             )
         ).sum_horizontal()
 
