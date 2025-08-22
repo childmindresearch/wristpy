@@ -38,7 +38,7 @@ Quick Start
 .. note::
    **⚠️ Important Note for macOS Users**
 
-   **wristpy** depends on ``libomp``, a system-level dependency that is not always installed by default on macOS.  
+   **wristpy** depends on ``libomp``, a system-level dependency that is not always installed by default on macOS.
    Install it via:
 
    .. code-block:: bash
@@ -88,7 +88,7 @@ Process a single file:
 .. code-block:: python
 
    from wristpy.core import orchestrator
-   
+
    results = orchestrator.run(
        input='/path/to/your/file.gt3x',
        output='/path/to/save/file_name.csv',
@@ -107,7 +107,7 @@ wristpy currently supports:
    :widths: 20 25 25 30
 
    * - Format
-     - Manufacturer  
+     - Manufacturer
      - Device
      - Status
    * - GT3X

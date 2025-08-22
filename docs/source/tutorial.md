@@ -70,7 +70,7 @@ for file in file_names:
 
 ### Physical Activity Metrics & Results
 
-Wristpy is capable of calculating the following physical activity metrics from actigraphy data: 
+Wristpy is capable of calculating the following physical activity metrics from actigraphy data:
 1. [Euclidean Norm Minus-One (ENMO)](https://childmindresearch.github.io/wristpy/api/wristpy.processing.metrics.html#wristpy.processing.metrics.euclidean_norm_minus_one)
 2. [Activity Counts (ag_count)](https://childmindresearch.github.io/wristpy/api/wristpy.processing.metrics.html#wristpy.processing.metrics.actigraph_activity_counts)
 3. [Mean Amplitude Deviation (MAD)](https://childmindresearch.github.io/wristpy/api/wristpy.processing.metrics.html#wristpy.processing.metrics.mean_amplitude_deviation)
