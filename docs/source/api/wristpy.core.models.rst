@@ -17,4 +17,3 @@
       BaseModel
       Measurement
       WatchData
-

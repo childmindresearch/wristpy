@@ -14,4 +14,3 @@
       LoggedException
       NoMotionError
       SphereCriteriaError
-

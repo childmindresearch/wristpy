@@ -10,4 +10,3 @@
 
       get_logger
       get_version
-
