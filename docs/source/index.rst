@@ -35,18 +35,57 @@ This library provides a set of tools for loading sensor information, calibrating
 Quick Start
 -----------
 
+.. note::
+   **⚠️ Important Note for macOS Users**
+
+   **wristpy** depends on ``libomp``, a system-level dependency that is not always installed by default on macOS.  
+   Install it via:
+
+   .. code-block:: bash
+
+      brew install libomp
+
 **Installation**
 
-.. note::
-   **macOS users**: Install ``libomp`` first via ``brew install libomp``
+Install wristpy from PyPI:
 
-Install wristpy from PyPI::
+.. code-block:: bash
 
    pip install wristpy
 
-**Basic Usage**
+**Interfaces**
 
-Single file processing::
+``wristpy`` provides three flexible interfaces:
+
+- **Command-line tool** for direct execution
+- **Python library** importable in scripts or notebooks
+- **Docker image** for containerized deployment
+
+**Using the Command-Line Interface**
+
+Run a single file:
+
+.. code-block:: bash
+
+   wristpy /input/file/path.gt3x -o /save/path/file_name.csv -c gradient
+
+Run an entire directory:
+
+.. code-block:: bash
+
+   wristpy /path/to/files/input_dir -o /path/to/files/output_dir -c gradient -O .csv
+
+See all available command-line arguments:
+
+.. code-block:: bash
+
+   wristpy --help
+
+**Using Python (script or notebook)**
+
+Process a single file:
+
+.. code-block:: python
 
    from wristpy.core import orchestrator
    
@@ -117,8 +156,6 @@ Documentation Contents
    api/wristpy.core
    api/wristpy.io
    api/wristpy.processing
-
-
 
 .. toctree::
    :maxdepth: 1
