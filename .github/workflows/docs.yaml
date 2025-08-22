@@ -15,32 +15,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Fetch LFS files
-        run: git lfs pull
+    - name: Fetch LFS files
+      run: git lfs pull
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install poetry
-          poetry install --with docs
+    - name: Install dependencies
+      run: |
+        python -m pip install poetry
+        poetry install --with docs
 
-      - name: Build Sphinx docs
-        working-directory: docs
-        run: |
-          # Fail on warnings to catch broken refs; drop -W if you prefer lenient builds
-          poetry run make html SPHINXOPTS="-W"
-          touch build/html/.nojekyll
-          ls -la build/html | sed 's/^/BUILD: /'
+    - name: Build Sphinx docs
+      working-directory: docs
+      run: |
+        # Fail on warnings to catch broken refs; drop -W if you prefer lenient builds
+        poetry run make html SPHINXOPTS="-W"
+        touch build/html/.nojekyll
+        ls -la build/html | sed 's/^/BUILD: /'
 
-      - name: Deploy to gh-pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: gh-pages
-          folder: docs/build/html
-          clean: true
-          single-commit: true
+    - name: Deploy to gh-pages
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: gh-pages
+        folder: docs/build/html
+        clean: true
+        single-commit: true
