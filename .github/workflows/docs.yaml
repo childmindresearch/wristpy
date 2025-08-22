@@ -25,11 +25,11 @@ jobs:
         python -m pip install poetry
         poetry install --with docs
     - name: Build Sphinx docs
-        working-directory: docs
-        run: |
-          poetry run make html
-          touch build/html/.nojekyll
-          ls -la build/html | sed 's/^/BUILD: /'
+      working-directory: docs
+      run: |
+        poetry run make html
+        touch build/html/.nojekyll
+        ls -la build/html | sed 's/^/BUILD: /'
     - name: Deploy to gh-pages
       uses: JamesIves/github-pages-deploy-action@v4
       with:
