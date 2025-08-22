@@ -28,7 +28,6 @@ extensions = [
 autosummary_generate = True
 autosummary_imported_members = True
 
-exclude_patterns = []
 
 source_suffix = {
     ".rst": None,
