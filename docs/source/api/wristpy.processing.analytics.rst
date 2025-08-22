@@ -20,4 +20,3 @@
       GgirSleepDetection
       SleepParameters
       SleepWindow
-

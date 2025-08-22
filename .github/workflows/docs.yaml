@@ -34,7 +34,7 @@ jobs:
         run: |
           poetry run make html
           touch build/html/.nojekyll
-          ls -la build/html | sed 's/^/BUILD: /'   
+          ls -la build/html | sed 's/^/BUILD: /'
 
     - name: Deploy to gh-pages
       uses: JamesIves/github-pages-deploy-action@v4

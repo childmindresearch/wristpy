@@ -20,4 +20,3 @@
       Enum
       NonwearAlgorithms
       OutputFileType
-

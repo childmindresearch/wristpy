@@ -16,4 +16,3 @@
       euclidean_norm_minus_one
       mean_amplitude_deviation
       monitor_independent_movement_summary_units
-
