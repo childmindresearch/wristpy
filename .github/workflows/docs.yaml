@@ -6,8 +6,8 @@ permissions:
 on:
   push:
     branches:
-      - feature/issue-218/sphinx
-      - main
+    - feature/issue-218/sphinx
+    - main
   workflow_dispatch:
 
 jobs:
