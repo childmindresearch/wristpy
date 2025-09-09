@@ -2,27 +2,27 @@
 
 [[package]]
 name = "actfast"
-version = "1.1.2"
+version = "1.1.3"
 description = ""
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "actfast-1.1.2-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:cc80c248a260fd98ad2ca116812b398c78e6bb293c0a4a2a9d219f9746c85721"},
-    {file = "actfast-1.1.2-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:9400e3f32caf0753042830bdb11be806959b7e90a653dbe1dc5fdc0d74d1a49e"},
-    {file = "actfast-1.1.2-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c829b32c22876704dd751a5e0082a1d6e23863859d7dcb6f9fd78819177e25dd"},
-    {file = "actfast-1.1.2-cp38-abi3-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:6afa0e8f78a049adf5db70ee8a6fdcb9d3f3770caac8a49f33a7dbfa0c61ecda"},
-    {file = "actfast-1.1.2-cp38-abi3-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:5bcb1219f733ecb01d44a56d07399146becdf1c9e7f7b48cd8fc913aedc07aa2"},
-    {file = "actfast-1.1.2-cp38-abi3-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:82a39572510605726298bb11fd21ff8a0c8d370b144577d0647331c577438091"},
-    {file = "actfast-1.1.2-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:364adb792f7f85a8941c994adbddc9405f0aaa2bd80b4568f87bebcab0d4e202"},
-    {file = "actfast-1.1.2-cp38-abi3-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:aac80e41fa67a01d5193be6358a5120444bc63925a6183bc345797799a91f076"},
-    {file = "actfast-1.1.2-cp38-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:7fec12f8d69d012f88cef8c928b7d5875fc425495d6a6774f0330a0dbedf0431"},
-    {file = "actfast-1.1.2-cp38-abi3-musllinux_1_2_armv7l.whl", hash = "sha256:ae395b88bbdddfd66eea50e7efb8c2234124f25243ff9c3a172ee28522e3455b"},
-    {file = "actfast-1.1.2-cp38-abi3-musllinux_1_2_i686.whl", hash = "sha256:af2db66c7232e2d08b577f58f0bd3d65a6b58a37e5b781306ea9a82a7783ba23"},
-    {file = "actfast-1.1.2-cp38-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:c9a4e31fa5e72f9562f90ae6983b932ada1bd6bd3f106b04c78e21a694f014b1"},
-    {file = "actfast-1.1.2-cp38-abi3-win32.whl", hash = "sha256:38eed2ea59fc7ebaa51e430576e4a190196d40bdeb84106b966e75869549f3f9"},
-    {file = "actfast-1.1.2-cp38-abi3-win_amd64.whl", hash = "sha256:2929a74afc6bef3f680bd5b7a3b2f88062dd961173e24882558b7482ea64fd76"},
-    {file = "actfast-1.1.2.tar.gz", hash = "sha256:cc7d2c52343cbe11f16f8535c09e147094f0e5c718a159b15b3e78d285e5da87"},
+    {file = "actfast-1.1.3-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:1707a2d8f493dc5f76a729655a24e59900b79b8ca2169f31082ca9023e0031cf"},
+    {file = "actfast-1.1.3-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:09f1178f039c3c368a94dd7d6c915fed1c8d311926e46e6bd026264f749e0cd5"},
+    {file = "actfast-1.1.3-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f7e06690c27726822e02dc556d9bb73b5bf68008781548d1871b5296876097ab"},
+    {file = "actfast-1.1.3-cp38-abi3-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:38c0d55da282aee2adde61cfee43b1f73a5854773ce5d505cbe682ed706f7c5a"},
+    {file = "actfast-1.1.3-cp38-abi3-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:5f8b20dc18fa68db671227089b4f1107246a958b7db8df5d1673c3f0cfb340af"},
+    {file = "actfast-1.1.3-cp38-abi3-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:a978806cb963ce50be62bce618fffa4dfc7e28caa211f964001eebfe657950bc"},
+    {file = "actfast-1.1.3-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:54b1ad76fda2c1bdad59054971b90f3f3846c6bb3c43c1a8b7008512690e61f3"},
+    {file = "actfast-1.1.3-cp38-abi3-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:f0bcdd09ed8ae1c3be79598859eb14bf237ffd30b2dc20051dc230a79846bb98"},
+    {file = "actfast-1.1.3-cp38-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:314c79d69c3c3144b7a97f38474dbed1c8030a0125afaec60ddfde6a5d67160e"},
+    {file = "actfast-1.1.3-cp38-abi3-musllinux_1_2_armv7l.whl", hash = "sha256:dba0d754d87d71ef5087517d9555b3db3d2831c8107fa03d9189029839e9ae39"},
+    {file = "actfast-1.1.3-cp38-abi3-musllinux_1_2_i686.whl", hash = "sha256:597933233d31cefcdf59ccd6bccea85c53de6fe6c1289e6a5971136fc6db1325"},
+    {file = "actfast-1.1.3-cp38-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:1a836be67920bb9067ae1cd9ccdc36174ca6348d6af97733d03a067e964d9ab2"},
+    {file = "actfast-1.1.3-cp38-abi3-win32.whl", hash = "sha256:71a12b1dd724469561040f9e8585d767a7c8cdbafd8d23c06d8a0265732f4bb1"},
+    {file = "actfast-1.1.3-cp38-abi3-win_amd64.whl", hash = "sha256:7c9ce576d6e9093271d41c9690f53c0b25fbf8ef4f76e5e0201f00e8cbf135e4"},
+    {file = "actfast-1.1.3.tar.gz", hash = "sha256:6f0e0db9b3b03d8c9e835dddb93a0f50747c049eccf94096c5619ab3ba292429"},
 ]
 
 [package.dependencies]
@@ -2487,4 +2487,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10, <3.14"
-content-hash = "9ba350be0b2035700d562be99d61d7225debce9bc882dcf6adfbd103ad2553e5"
+content-hash = "d9c4822b61014a892076436860efc2ccfbcd1f1aa11636cb16e1a3c3bbfcb54c"
