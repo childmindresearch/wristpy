@@ -22,7 +22,7 @@ actfast = "^1.1.2"
 numpy = ">=1.26.0, <3.0.0"
 pydantic = "^2.11.1"
 pydantic-settings = "^2.3.4"
-scipy = "^1.13.0"
+scipy = "^1.14.1"
 scikit-digital-health = "^0.17.9"
 typer = "^0.15.2"
 
