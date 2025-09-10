@@ -418,7 +418,7 @@ def detach_nonwear(
         temperature.measurements, acceleration.measurements
     )
     sampling_rate = round(
-        1 / ((acceleration.time[1:] - acceleration.time[:-1]).median()).total_seconds()
+        1 / ((acceleration.time[1:] - acceleration.time[:-1]).median()).total_seconds()  # type: ignore[union-attr] #Guarded by Measurement validation for .time attribute
     )
 
     [deatch_wear, nonwear_array] = nimbaldetach.nimbaldetach(
@@ -428,6 +428,7 @@ def detach_nonwear(
         temperature_values=upsample_temp,
         accel_freq=sampling_rate,
         temperature_freq=sampling_rate,
+        std_thresh=std_criteria,
     )
 
     nonwear = models.Measurement(measurements=nonwear_array, time=acceleration.time)

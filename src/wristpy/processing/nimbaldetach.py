@@ -46,7 +46,6 @@ def nimbaldetach(
     temp_dec_roc: float = -0.2,
     temp_inc_roc: float = 0.1,
     num_axes: int = 2,
-    quiet: bool = False,
 ) -> tuple[pd.DataFrame, np.ndarray]:
     """Adam Vert's implementation of the DETACH algorithm.
 
@@ -71,7 +70,7 @@ def nimbaldetach(
             wear classification.
         num_axes: The number of axes that must be below the std threshold
             to be considered nonwear.
-        quiet: Whether or not to quiet print statements.
+
 
     Returns:
         A tuple with (start_stop_df, vert_nonwear_array) as defined below:
@@ -80,25 +79,19 @@ def nimbaldetach(
         vert_nonwear_array: numpy array with length of the accelerometer data marked as
             either wear (0) or non-wear (1).
     """
-    if not quiet:
-        print("Starting DETACH Calculation...")
 
-    def filter_signal(
+    def lowpass_filter_signal(
         data: np.ndarray,
-        filt_type: str,
         sample_f: float,
         low_f: Optional[float] = None,
-        high_f: Optional[float] = None,
         filter_order: int = 2,
     ) -> np.ndarray:
-        """Function that fiters temperature data.
+        """Function that low pass fiters temperature data.
 
         Args:
             data: 1D numpy array of data to be filtered
-            filt_type: type of filter to be applied. One of 'lowpass', 'highpass', or 'bandpass'
-            sample_f: sampling frequency of data in Hz.
-            low_f: low frequency cutoff for filter in Hz.
-            high_f: high frequency cutoff for filter in Hz.
+            sample_f: Sampling rate, in Hz.
+            low_f: Low frequency cutoff for filter, in Hz.
             filter_order: order of the filter.
 
         Returns:
@@ -106,32 +99,20 @@ def nimbaldetach(
         """
         nyquist_freq = 0.5 * sample_f
         low = (low_f / nyquist_freq) if low_f is not None else None
-        high = (high_f / nyquist_freq) if high_f is not None else None
-        if filt_type == "lowpass":
-            wn = low
-        elif filt_type == "highpass":
-            wn = high
-        elif filt_type == "bandpass":
-            wn = [low, high]
-        b, a = signal.butter(N=filter_order, Wn=wn, btype=filt_type)
+        wn = low
+        b, a = signal.butter(N=filter_order, Wn=wn, btype="lowpass")
         filtered_data = signal.filtfilt(b, a, x=data)
         return filtered_data
 
-    vert_nonwear_array = np.zeros(
-        len(x_values)
-    )  # This array will contain 0 for wear and 1 for non-wear
+    vert_nonwear_array = np.zeros(len(x_values))
     vert_nonwear_start_datapoints = []
     vert_nonwear_end_datapoints = []
 
-    # Create seies of 1 minute rolling std
-    x_std_fwd = (
-        pd.Series(x_values)[::-1].rolling(round(accel_freq * 60)).std()[::-1]
-    )  # 1 minute forward looking STD
+    x_std_fwd = pd.Series(x_values)[::-1].rolling(round(accel_freq * 60)).std()[::-1]
     y_std_fwd = pd.Series(y_values)[::-1].rolling(round(accel_freq * 60)).std()[::-1]
     z_std_fwd = pd.Series(z_values)[::-1].rolling(round(accel_freq * 60)).std()[::-1]
-    x_std_back = (
-        pd.Series(x_values).rolling(round(accel_freq * 60)).std()
-    )  # 1 minute backward looking STD
+
+    x_std_back = pd.Series(x_values).rolling(round(accel_freq * 60)).std()
     y_std_back = pd.Series(y_values).rolling(round(accel_freq * 60)).std()
     z_std_back = pd.Series(z_values).rolling(round(accel_freq * 60)).std()
 
@@ -146,17 +127,13 @@ def nimbaldetach(
         }
     )
 
-    # Create Smoothed Temperature array
-    smoothed_temperature = filter_signal(
-        temperature_values, "lowpass", low_f=0.005, sample_f=temperature_freq
+    smoothed_temperature = lowpass_filter_signal(
+        temperature_values, low_f=0.005, sample_f=temperature_freq
     )
     smoothed_temp_deg_per_min = (
         np.diff(smoothed_temperature, prepend=1) * 60 * temperature_freq
     )
 
-    # Create a constant which converts accel datapoint to temp_datapoint
-
-    # Create DF column counting number of axes below std_thresh
     std_df["Num Axes Fwd"] = np.sum(
         np.array(
             [
@@ -181,7 +158,6 @@ def nimbaldetach(
         axis=0,
     )
 
-    # Find spots where at least num_axes are below the STD threshold for 90% of the next 5 minutes
     std_df["Perc Num Axes >= num_axes for Next 5 Mins (fwd looking)"] = (
         (std_df["Num Axes Fwd"][::-1] >= num_axes)
         .rolling(int(accel_freq * 60 * 5))
@@ -193,7 +169,6 @@ def nimbaldetach(
         .mean()[::-1]
     )
 
-    # Make Accelerometer Datapoints have the same number of datapoints as the temperature values
     full_df = std_df[:: int(accel_freq / temperature_freq)]
     full_df = full_df[: len(temperature_values)]
     full_df = full_df.reset_index()
@@ -218,14 +193,10 @@ def nimbaldetach(
         .mean()[::-1]
     )
 
-    # Get Candidate NW Start Times
     candidate_nw_starts = np.where(
         (full_df["Num Axes Fwd"] >= num_axes)
         & (full_df["Perc Num Axes >= num_axes for Next 5 Mins (fwd looking)"] >= 0.9)
     )
-
-    # Construct Arrays that will find indexs where a NW bout would end
-    # First End Criteria: Rate of Change Path
 
     end_crit_1 = np.array(
         np.where(
@@ -238,7 +209,6 @@ def nimbaldetach(
         )
     )[0]
 
-    # Second End Criteria: Absolute Temperature Path
     end_crit_2 = np.array(
         np.where(
             (full_df["Num Axes Backwards"] == 0)
@@ -252,30 +222,24 @@ def nimbaldetach(
 
     end_crit_combined = np.sort(np.unique(np.concatenate((end_crit_1, end_crit_2))))
 
-    # Loop through Candidate NW starts to find bouts
     previous_end = 0
     for ind in candidate_nw_starts[0]:
         if ind < previous_end:
-            continue  # Skip if previous bout is already past it
-
+            continue
         valid_start = False
         start_ind = int(ind)
         end_ind = int(ind + temperature_freq * 60 * 5)
 
-        # Start Criteria 1: Rate of Change Path
         if (
             full_df["Max Temp in next five mins"][start_ind] < high_temperature_cutoff
         ) & (full_df["Mean Five minute Temp Change"][start_ind] < temp_dec_roc):
             valid_start = True
-
-        # Start Criteria 2: Absolute Temperature Path
         elif full_df["Max Temp in next five mins"][start_ind] < low_temperature_cutoff:
             valid_start = True
 
         if not valid_start:
             continue
 
-        # If you get to this point its a valid bout, now we find the nearest end_time
         end_crit = end_crit_combined[end_crit_combined > end_ind]
 
         if len(end_crit) > 0:
@@ -299,10 +263,5 @@ def nimbaldetach(
         },
         index=range(1, len(vert_nonwear_start_datapoints) + 1),
     )
-
-    vert_nonwear_array = np.array(vert_nonwear_array, bool)
-
-    if not quiet:
-        print("Finished DETACH Calculation.")
 
     return start_stop_df, vert_nonwear_array
