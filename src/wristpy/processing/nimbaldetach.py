@@ -55,26 +55,30 @@ def nimbaldetach(
     3 axes to detect start and stop times of non-wear periods.
 
     Args:
-        x_values: accelerometer x values
-        y_values: accelerometer y values
-        z_values: accelerometer z values
-        temperature_values: temperature values
-        accel_freq: frequency of accelerometer in Hz
-        temperature_freq: frequency of temperature sensor in Hz
+        x_values: Accelerometer x values.
+        y_values: Accelerometer y values.
+        z_values: Accelerometer z values.
+        temperature_values: temperature values.
+        accel_freq: frequency of accelerometer in Hz.
+        temperature_freq: frequency of temperature sensor in Hz.
         std_thresh: the value which the std of an axis in the window must be below
             to trigger non-wear.
         low_temperature_cutoff: Low temperature for non-wear classification.
         high_temperature_cutoff: High temperature cut off for wear classification.
-        temp_dec_roc: Decreasing temperature rate of change threshold for non-wear classification.
-        temp_inc_roc: Increasing temperature rate of change threshold for wear classification.
-        num_axes: the number of axes that must be below the std threshold to be considered nonwear.
-        quiet: Whether or not to quiet print statements
+        temp_dec_roc: Decreasing temperature rate of change threshold for
+            non-wear classification.
+        temp_inc_roc: Increasing temperature rate of change threshold for
+            wear classification.
+        num_axes: The number of axes that must be below the std threshold
+            to be considered nonwear.
+        quiet: Whether or not to quiet print statements.
 
     Returns:
         A tuple with (start_stop_df, vert_nonwear_array) as defined below:
 
-        start_stop_df: A dataframe with the start and end datapoints of the non-wear bouts.
-        vert_nonwear_array: numpy array with length of the accelerometer data marked as either wear (0) or non-wear (1)
+        start_stop_df: A dataframe with the start and end datapoints of non-wear.
+        vert_nonwear_array: numpy array with length of the accelerometer data marked as
+            either wear (0) or non-wear (1).
     """
     if not quiet:
         print("Starting DETACH Calculation...")
@@ -92,9 +96,9 @@ def nimbaldetach(
         Args:
             data: 1D numpy array of data to be filtered
             filt_type: type of filter to be applied. One of 'lowpass', 'highpass', or 'bandpass'
-            sample_f: sampling frequency of data (Hz)
-            low_f: low frequency cutoff for filter (Hz).
-            high_f: high frequency cutoff for filter (Hz).
+            sample_f: sampling frequency of data in Hz.
+            low_f: low frequency cutoff for filter in Hz.
+            high_f: high frequency cutoff for filter in Hz.
             filter_order: order of the filter.
 
         Returns:

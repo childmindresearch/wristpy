@@ -5,10 +5,8 @@ from typing import Literal, Tuple
 import numpy as np
 import polars as pl
 from scipy import interpolate, signal
-from skdh.preprocessing import wear_detection
 
 from wristpy.core import computations, config, models
-from wristpy.io.readers import readers
 from wristpy.processing import mims, nimbaldetach
 
 logger = config.get_logger()
