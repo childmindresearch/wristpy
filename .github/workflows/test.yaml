@@ -1,5 +1,8 @@
 name: Python Tests
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -10,10 +13,7 @@ on:
 jobs:
   unit:
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: read
-      checks: write
-      pull-requests: write
+
     strategy:
       fail-fast: false
       matrix:
@@ -60,8 +60,6 @@ jobs:
 
   ruff:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
     - uses: actions/checkout@v4
     - name: Install poetry
@@ -80,8 +78,6 @@ jobs:
 
   mypy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
     - uses: actions/checkout@v4
     - name: Install poetry
