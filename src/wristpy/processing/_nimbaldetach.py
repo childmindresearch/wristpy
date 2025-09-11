@@ -33,7 +33,7 @@ import pandas as pd
 from scipy import signal
 
 
-def nimbaldetach(
+def detach(
     x_values: np.ndarray,
     y_values: np.ndarray,
     z_values: np.ndarray,
@@ -73,16 +73,9 @@ def nimbaldetach(
 
 
     Returns:
-        A tuple with (start_stop_df, vert_nonwear_array) as defined below:
-
-        start_stop_df: A dataframe with the start and end datapoints of non-wear.
-        vert_nonwear_array: numpy array with length of the accelerometer data marked as
+        A numpy array with length of the accelerometer data marked as
             either wear (0) or non-wear (1).
     """
-    vert_nonwear_array = np.zeros(len(x_values))
-    vert_nonwear_start_datapoints = []
-    vert_nonwear_end_datapoints = []
-
     x_std_fwd = pd.Series(x_values)[::-1].rolling(round(accel_freq * 60)).std()[::-1]
     y_std_fwd = pd.Series(y_values)[::-1].rolling(round(accel_freq * 60)).std()[::-1]
     z_std_fwd = pd.Series(z_values)[::-1].rolling(round(accel_freq * 60)).std()[::-1]
@@ -197,6 +190,7 @@ def nimbaldetach(
 
     end_crit_combined = np.sort(np.unique(np.concatenate((end_crit_1, end_crit_2))))
 
+    vert_nonwear_array = np.zeros(len(x_values))
     previous_end = 0
     for ind in candidate_nw_starts[0]:
         if ind < previous_end:
@@ -226,20 +220,10 @@ def nimbaldetach(
         accel_start_dp = int(start_ind * accel_freq / temperature_freq)
         accel_end_dp = int(bout_end_index * accel_freq / temperature_freq)
         vert_nonwear_array[accel_start_dp:accel_end_dp] = 1
-        vert_nonwear_start_datapoints.append(accel_start_dp)
-        vert_nonwear_end_datapoints.append(accel_end_dp)
 
         previous_end = bout_end_index
 
-    start_stop_df = pd.DataFrame(
-        {
-            "Start Datapoint": vert_nonwear_start_datapoints,
-            "End Datapoint": vert_nonwear_end_datapoints,
-        },
-        index=range(1, len(vert_nonwear_start_datapoints) + 1),
-    )
-
-    return start_stop_df, vert_nonwear_array
+    return vert_nonwear_array
 
 
 def _lowpass_filter_signal(
