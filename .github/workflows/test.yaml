@@ -1,5 +1,8 @@
 name: Python Tests
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -13,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python_version: ['3.10', '3.11', '3.12', '3.13']
+        python_version: ['3.10', '3.11', '3.12']
         resolution: [lowest-direct, highest]
     steps:
     - uses: actions/checkout@v4
@@ -48,7 +51,7 @@ jobs:
           --verbose
       shell: bash
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         verbose: true
