@@ -46,7 +46,7 @@ def detach(
     temp_dec_roc: float = -0.2,
     temp_inc_roc: float = 0.1,
     num_axes: int = 2,
-) -> tuple[pd.DataFrame, np.ndarray]:
+) -> np.ndarray:
     """Adam Vert's implementation of the DETACH algorithm.
 
     Non-wear algorithm with a 5 minute minimum non-wear duration using absolute

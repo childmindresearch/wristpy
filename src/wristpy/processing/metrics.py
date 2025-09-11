@@ -421,7 +421,7 @@ def detach_nonwear(
         1 / ((acceleration.time[1:] - acceleration.time[:-1]).median()).total_seconds()  # type: ignore[union-attr] #Guarded by Measurement validation for .time attribute
     )
 
-    [deatch_wear, nonwear_array] = _nimbaldetach.detach(
+    nonwear_array = _nimbaldetach.detach(
         x_values=acceleration.measurements[:, 0],
         y_values=acceleration.measurements[:, 1],
         z_values=acceleration.measurements[:, 2],
