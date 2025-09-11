@@ -79,31 +79,6 @@ def nimbaldetach(
         vert_nonwear_array: numpy array with length of the accelerometer data marked as
             either wear (0) or non-wear (1).
     """
-
-    def lowpass_filter_signal(
-        data: np.ndarray,
-        sample_f: float,
-        low_f: Optional[float] = None,
-        filter_order: int = 2,
-    ) -> np.ndarray:
-        """Function that low pass fiters temperature data.
-
-        Args:
-            data: 1D numpy array of data to be filtered
-            sample_f: Sampling rate, in Hz.
-            low_f: Low frequency cutoff for filter, in Hz.
-            filter_order: order of the filter.
-
-        Returns:
-            filtered_data: 1D numpy array of filtered data
-        """
-        nyquist_freq = 0.5 * sample_f
-        low = (low_f / nyquist_freq) if low_f is not None else None
-        wn = low
-        b, a = signal.butter(N=filter_order, Wn=wn, btype="lowpass")
-        filtered_data = signal.filtfilt(b, a, x=data)
-        return filtered_data
-
     vert_nonwear_array = np.zeros(len(x_values))
     vert_nonwear_start_datapoints = []
     vert_nonwear_end_datapoints = []
@@ -127,7 +102,7 @@ def nimbaldetach(
         }
     )
 
-    smoothed_temperature = lowpass_filter_signal(
+    smoothed_temperature = _lowpass_filter_signal(
         temperature_values, low_f=0.005, sample_f=temperature_freq
     )
     smoothed_temp_deg_per_min = (
@@ -265,3 +240,28 @@ def nimbaldetach(
     )
 
     return start_stop_df, vert_nonwear_array
+
+
+def _lowpass_filter_signal(
+    data: np.ndarray,
+    sample_f: float,
+    low_f: Optional[float] = None,
+    filter_order: int = 2,
+) -> np.ndarray:
+    """Function that low pass fiters temperature data.
+
+    Args:
+        data: 1D numpy array of data to be filtered
+        sample_f: Sampling rate, in Hz.
+        low_f: Low frequency cutoff for filter, in Hz.
+        filter_order: order of the filter.
+
+    Returns:
+        filtered_data: 1D numpy array of filtered data
+    """
+    nyquist_freq = 0.5 * sample_f
+    low = (low_f / nyquist_freq) if low_f is not None else None
+    wn = low
+    b, a = signal.butter(N=filter_order, Wn=wn, btype="lowpass")
+    filtered_data = signal.filtfilt(b, a, x=data)
+    return filtered_data
