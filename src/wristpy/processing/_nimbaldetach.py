@@ -74,7 +74,7 @@ def detach(
     """
     window_size_1min = int(sampling_rate * 60)
 
-    std_df = calculate_rolling_std_polars(
+    std_df = calculate_rolling_features(
         acceleration=acceleration_values,
         sampling_rate=sampling_rate,
         num_axes=num_axes,
@@ -187,7 +187,7 @@ def lowpass_filter_signal(
     return filtered_data
 
 
-def calculate_rolling_std_polars(
+def calculate_rolling_features(
     acceleration: np.ndarray,
     sampling_rate: float,
     window_size_1min: int,
