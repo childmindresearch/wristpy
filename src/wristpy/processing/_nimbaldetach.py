@@ -1,6 +1,7 @@
 """Module for DETACH non-wear algorithm.
 
-This module is taken from Adam Vert https://github.com/nimbal/nimbaldetach
+This module is taken, and then edited, from Adam Vert:
+https://github.com/nimbal/nimbaldetach
 and is licensed under the MIT License:
 
 MIT License
@@ -26,20 +27,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from typing import Optional
-
 import numpy as np
-import pandas as pd
+import polars as pl
 from scipy import signal
 
 
 def detach(
-    x_values: np.ndarray,
-    y_values: np.ndarray,
-    z_values: np.ndarray,
+    acceleration_values: np.ndarray,
     temperature_values: np.ndarray,
-    accel_freq: float = 75,
-    temperature_freq: float = 0.25,
+    sampling_rate: float,
     std_thresh: float = 0.008,
     low_temperature_cutoff: float = 26,
     high_temperature_cutoff: float = 30,
@@ -53,13 +49,13 @@ def detach(
     temperature, temperature rate of change and accelerometer standard deviation of
     3 axes to detect start and stop times of non-wear periods.
 
+    The temperature data should be upsampled to match the accelerometer data
+    sampling rate before running this function.
+
     Args:
-        x_values: Accelerometer x values.
-        y_values: Accelerometer y values.
-        z_values: Accelerometer z values.
+        acceleration_values: 3 column numpy array with x, y, and z acceleration values.
         temperature_values: temperature values.
-        accel_freq: frequency of accelerometer in Hz.
-        temperature_freq: frequency of temperature sensor in Hz.
+        sampling_rate: sampling rate for the accelerometer data, in Hz.
         std_thresh: the value which the std of an axis in the window must be below
             to trigger non-wear.
         low_temperature_cutoff: Low temperature for non-wear classification.
@@ -76,134 +72,88 @@ def detach(
         A numpy array with length of the accelerometer data marked as
             either wear (0) or non-wear (1).
     """
-    x_std_fwd = pd.Series(x_values)[::-1].rolling(round(accel_freq * 60)).std()[::-1]
-    y_std_fwd = pd.Series(y_values)[::-1].rolling(round(accel_freq * 60)).std()[::-1]
-    z_std_fwd = pd.Series(z_values)[::-1].rolling(round(accel_freq * 60)).std()[::-1]
+    window_size_1min = int(sampling_rate * 60)
 
-    x_std_back = pd.Series(x_values).rolling(round(accel_freq * 60)).std()
-    y_std_back = pd.Series(y_values).rolling(round(accel_freq * 60)).std()
-    z_std_back = pd.Series(z_values).rolling(round(accel_freq * 60)).std()
-
-    std_df = pd.DataFrame(
-        {
-            "x_std_fwd": x_std_fwd,
-            "y_std_fwd": y_std_fwd,
-            "z_std_fwd": z_std_fwd,
-            "x_std_back": x_std_back,
-            "y_std_back": y_std_back,
-            "z_std_back": z_std_back,
-        }
+    std_df = calculate_rolling_std_polars(
+        acceleration=acceleration_values,
+        sampling_rate=sampling_rate,
+        num_axes=num_axes,
+        std_thresh=std_thresh,
+        window_size_1min=window_size_1min,
     )
 
-    smoothed_temperature = _lowpass_filter_signal(
-        temperature_values, low_f=0.005, sample_f=temperature_freq
+    smoothed_temperature = lowpass_filter_signal(
+        temperature_values, low_f=0.005, sample_f=sampling_rate
     )
     smoothed_temp_deg_per_min = (
-        np.diff(smoothed_temperature, prepend=1) * 60 * temperature_freq
+        np.diff(smoothed_temperature, prepend=1) * 60 * sampling_rate
     )
 
-    std_df["Num Axes Fwd"] = np.sum(
-        np.array(
-            [
-                std_df["x_std_fwd"] < std_thresh,
-                std_df["y_std_fwd"] < std_thresh,
-                std_df["z_std_fwd"] < std_thresh,
-            ],
-            int,
-        ),
-        axis=0,
+    accel_temp_df = std_df.with_columns(
+        [
+            pl.Series("Temp_lpf", smoothed_temperature),
+            pl.Series("Temp_per_min", smoothed_temp_deg_per_min),
+        ]
+    ).with_columns(
+        [
+            pl.col("Temp_lpf")
+            .reverse()
+            .rolling_max(window_size_1min * 5)
+            .reverse()
+            .alias("Max_temp_5min"),
+            pl.col("Temp_lpf")
+            .reverse()
+            .rolling_min(window_size_1min * 5)
+            .reverse()
+            .alias("Min_temp_5min"),
+            pl.col("Temp_per_min")
+            .reverse()
+            .rolling_mean(window_size_1min * 5)
+            .reverse()
+            .alias("Mean_temp_5min"),
+        ]
     )
 
-    std_df["Num Axes Backwards"] = np.sum(
-        np.array(
-            [
-                std_df["x_std_back"] < std_thresh,
-                std_df["y_std_back"] < std_thresh,
-                std_df["z_std_back"] < std_thresh,
-            ],
-            int,
-        ),
-        axis=0,
-    )
-
-    std_df["Perc Num Axes >= num_axes for Next 5 Mins (fwd looking)"] = (
-        (std_df["Num Axes Fwd"][::-1] >= num_axes)
-        .rolling(int(accel_freq * 60 * 5))
-        .mean()[::-1]
-    )
-    std_df["Perc Num Axes >= num_axes for Next 5 Mins (backward looking)"] = (
-        (std_df["Num Axes Backwards"][::-1] >= num_axes)
-        .rolling(int(accel_freq * 60 * 5))
-        .mean()[::-1]
-    )
-
-    full_df = std_df[:: int(accel_freq / temperature_freq)]
-    full_df = full_df[: len(temperature_values)]
-    full_df = full_df.reset_index()
-    if len(full_df) != len(smoothed_temperature):
-        smoothed_temperature = smoothed_temperature[: len(full_df)]
-        smoothed_temp_deg_per_min = smoothed_temp_deg_per_min[: len(full_df)]
-    full_df["smoothed temperature values"] = smoothed_temperature
-    full_df["Max Temp in next five mins"] = (
-        full_df["smoothed temperature values"][::-1]
-        .rolling(int(5 * 60 * temperature_freq))
-        .max()[::-1]
-    )
-    full_df["Min Temp in next five mins"] = (
-        full_df["smoothed temperature values"][::-1]
-        .rolling(int(5 * 60 * temperature_freq))
-        .min()[::-1]
-    )
-    full_df["smoothed temperature deg per min"] = smoothed_temp_deg_per_min
-    full_df["Mean Five minute Temp Change"] = (
-        full_df["smoothed temperature deg per min"][::-1]
-        .rolling(int(5 * 60 * temperature_freq))
-        .mean()[::-1]
-    )
+    ##### set up criteria for nonwear times #####
 
     candidate_nw_starts = np.where(
-        (full_df["Num Axes Fwd"] >= num_axes)
-        & (full_df["Perc Num Axes >= num_axes for Next 5 Mins (fwd looking)"] >= 0.9)
+        (accel_temp_df["Num_axes_fwd"] >= num_axes)
+        & (accel_temp_df["Percent_above_threshold_5min"] >= 0.9)
     )
 
     end_crit_1 = np.array(
         np.where(
-            (full_df["Num Axes Backwards"] == 0)
-            & (
-                full_df["Perc Num Axes >= num_axes for Next 5 Mins (backward looking)"]
-                <= 0.50
-            )
-            & (full_df["Mean Five minute Temp Change"] > temp_inc_roc)
+            (accel_temp_df["Num_axes_bwd"] == 0)
+            & (accel_temp_df["Percent_above_threshold_5min_bwd"] <= 0.50)
+            & (accel_temp_df["Mean_temp_5min"] > temp_inc_roc)
         )
     )[0]
 
     end_crit_2 = np.array(
         np.where(
-            (full_df["Num Axes Backwards"] == 0)
-            & (
-                full_df["Perc Num Axes >= num_axes for Next 5 Mins (backward looking)"]
-                <= 0.50
-            )
-            & (full_df["Min Temp in next five mins"] > low_temperature_cutoff)
+            (accel_temp_df["Num_axes_bwd"] == 0)
+            & (accel_temp_df["Percent_above_threshold_5min_bwd"] <= 0.50)
+            & (accel_temp_df["Min_temp_5min"] > low_temperature_cutoff)
         )
     )[0]
 
     end_crit_combined = np.sort(np.unique(np.concatenate((end_crit_1, end_crit_2))))
 
-    vert_nonwear_array = np.zeros(len(x_values))
+    #### assign nonwear times#####
+    vert_nonwear_array = np.zeros(len(acceleration_values))
     previous_end = 0
     for ind in candidate_nw_starts[0]:
         if ind < previous_end:
             continue
         valid_start = False
         start_ind = int(ind)
-        end_ind = int(ind + temperature_freq * 60 * 5)
+        end_ind = int(ind + sampling_rate * 60 * 5)
 
-        if (
-            full_df["Max Temp in next five mins"][start_ind] < high_temperature_cutoff
-        ) & (full_df["Mean Five minute Temp Change"][start_ind] < temp_dec_roc):
+        if (accel_temp_df["Max_temp_5min"][start_ind] < high_temperature_cutoff) & (
+            accel_temp_df["Mean_temp_5min"][start_ind] < temp_dec_roc
+        ):
             valid_start = True
-        elif full_df["Max Temp in next five mins"][start_ind] < low_temperature_cutoff:
+        elif accel_temp_df["Max_temp_5min"][start_ind] < low_temperature_cutoff:
             valid_start = True
 
         if not valid_start:
@@ -215,10 +165,10 @@ def detach(
             bout_end_index = end_crit[0]
 
         else:
-            bout_end_index = full_df.last_valid_index()
+            bout_end_index = len(accel_temp_df) - 1
 
-        accel_start_dp = int(start_ind * accel_freq / temperature_freq)
-        accel_end_dp = int(bout_end_index * accel_freq / temperature_freq)
+        accel_start_dp = int(start_ind)
+        accel_end_dp = int(bout_end_index)
         vert_nonwear_array[accel_start_dp:accel_end_dp] = 1
 
         previous_end = bout_end_index
@@ -226,10 +176,10 @@ def detach(
     return vert_nonwear_array
 
 
-def _lowpass_filter_signal(
+def lowpass_filter_signal(
     data: np.ndarray,
     sample_f: float,
-    low_f: Optional[float] = None,
+    low_f: float,
     filter_order: int = 2,
 ) -> np.ndarray:
     """Function that low pass fiters temperature data.
@@ -244,8 +194,81 @@ def _lowpass_filter_signal(
         filtered_data: 1D numpy array of filtered data
     """
     nyquist_freq = 0.5 * sample_f
-    low = (low_f / nyquist_freq) if low_f is not None else None
-    wn = low
+    wn = low_f / nyquist_freq
     b, a = signal.butter(N=filter_order, Wn=wn, btype="lowpass")
     filtered_data = signal.filtfilt(b, a, x=data)
     return filtered_data
+
+
+def calculate_rolling_std_polars(
+    acceleration: np.ndarray,
+    sampling_rate: float,
+    window_size_1min: int,
+    num_axes: int = 2,
+    std_thresh: float = 0.008,
+) -> pl.DataFrame:
+    """Calculate rolling standard deviation for each axis of acceleration data.
+
+    It will also calculate the number of axes below the std threshold, both forward and
+    backward looking, as well as the percentage of time in the next 5 minutes that the
+    number of axes below the std threshold is greater than or equal to num_axes,
+    both forward and backward looking.
+
+    Args:
+        acceleration: Array containing x, y, z acceleration data.
+        sampling_rate: Sampling rate of the accelerometer data in Hz.
+        window_size_1min: Window size for 1 minute, in data points.
+        num_axes: The number of axes that must be below the std threshold
+            to be considered nonwear.
+        std_thresh: the value which the std of an axis in the window must be below
+
+    Returns:
+        DataFrame with rolling standard deviations for each axis,
+            both forward and backward looking.
+    """
+    window_size_1min = round(sampling_rate * 60)
+    window_size_5min = 5 * window_size_1min
+
+    df = pl.DataFrame(acceleration, schema=["x", "y", "z"])
+
+    df = df.select(
+        [
+            pl.all().rolling_std(window_size_1min).name.suffix("_std_back"),
+            pl.all()
+            .reverse()
+            .rolling_std(window_size_1min)
+            .reverse()
+            .name.suffix("_std_fwd"),
+        ]
+    )
+    df = df.with_columns(
+        [
+            (
+                (pl.col("x_std_fwd") < std_thresh).cast(pl.Int8)
+                + (pl.col("y_std_fwd") < std_thresh).cast(pl.Int8)
+                + (pl.col("z_std_fwd") < std_thresh).cast(pl.Int8)
+            ).alias("Num_axes_fwd"),
+            (
+                (pl.col("x_std_back") < std_thresh).cast(pl.Int8)
+                + (pl.col("y_std_back") < std_thresh).cast(pl.Int8)
+                + (pl.col("z_std_back") < std_thresh).cast(pl.Int8)
+            ).alias("Num_axes_bwd"),
+        ]
+    )
+
+    return df.with_columns(
+        [
+            (pl.col("Num_axes_fwd") >= num_axes)
+            .cast(pl.Float32)
+            .reverse()
+            .rolling_mean(window_size_5min)
+            .reverse()
+            .alias("Percent_above_threshold_5min"),
+            (pl.col("Num_axes_bwd") >= num_axes)
+            .cast(pl.Float32)
+            .reverse()
+            .rolling_mean(window_size_5min)
+            .reverse()
+            .alias("Percent_above_threshold_5min_bwd"),
+        ]
+    )

@@ -422,12 +422,9 @@ def detach_nonwear(
     )
 
     nonwear_array = _nimbaldetach.detach(
-        x_values=acceleration.measurements[:, 0],
-        y_values=acceleration.measurements[:, 1],
-        z_values=acceleration.measurements[:, 2],
+        acceleration_values=acceleration.measurements,
         temperature_values=upsample_temp,
-        accel_freq=sampling_rate,
-        temperature_freq=sampling_rate,
+        sampling_rate=sampling_rate,
         std_thresh=std_criteria,
     )
 
