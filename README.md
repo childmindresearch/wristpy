@@ -43,15 +43,6 @@ The main processing pipeline of the wristpy module can be described as follows:
 
 ## Installation
 
-> ### ⚠️ Important Note for macOS Users
->
-> **wristpy** depends on `libomp`, a system-level dependency that is not always installed by default on macOS. Install it via:
->
-> ```bash
-> brew install libomp
-> ```
-
-
 Install the `wristpy` package from PyPI via:
 
 ```sh
