@@ -25,10 +25,6 @@ jobs:
     - name: Install poetry
       run: pipx install poetry
 
-    - name: Install dependencies on macOS
-      if: runner.os == 'macOS'
-      run: |
-        brew install libomp gfortran
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python_version }}
