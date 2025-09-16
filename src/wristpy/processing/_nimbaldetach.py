@@ -114,63 +114,50 @@ def detach(
         ]
     )
 
-    ##### set up criteria for nonwear times #####
-
-    candidate_nw_starts = np.where(
+    candidate_nw_starts = np.flatnonzero(
         (accel_temp_df["Num_axes_fwd"] >= num_axes)
         & (accel_temp_df["Percent_above_threshold_5min"] >= 0.9)
     )
 
-    end_crit_1 = np.array(
-        np.where(
-            (accel_temp_df["Num_axes_bwd"] == 0)
-            & (accel_temp_df["Percent_above_threshold_5min_bwd"] <= 0.50)
-            & (accel_temp_df["Mean_temp_5min"] > temp_inc_roc)
-        )
-    )[0]
+    end_crit_1 = np.flatnonzero(
+        (accel_temp_df["Num_axes_bwd"] == 0)
+        & (accel_temp_df["Percent_above_threshold_5min_bwd"] <= 0.50)
+        & (accel_temp_df["Mean_temp_5min"] > temp_inc_roc)
+    )
 
-    end_crit_2 = np.array(
-        np.where(
-            (accel_temp_df["Num_axes_bwd"] == 0)
-            & (accel_temp_df["Percent_above_threshold_5min_bwd"] <= 0.50)
-            & (accel_temp_df["Min_temp_5min"] > low_temperature_cutoff)
-        )
-    )[0]
+    end_crit_2 = np.flatnonzero(
+        (accel_temp_df["Num_axes_bwd"] == 0)
+        & (accel_temp_df["Percent_above_threshold_5min_bwd"] <= 0.50)
+        & (accel_temp_df["Min_temp_5min"] > low_temperature_cutoff)
+    )
 
     end_crit_combined = np.sort(np.unique(np.concatenate((end_crit_1, end_crit_2))))
 
-    #### assign nonwear times#####
+    max_temp_5min = accel_temp_df["Max_temp_5min"].to_numpy()
+    mean_temp_5min = accel_temp_df["Mean_temp_5min"].to_numpy()
     vert_nonwear_array = np.zeros(len(acceleration_values))
     previous_end = 0
-    for ind in candidate_nw_starts[0]:
-        if ind < previous_end:
-            continue
-        valid_start = False
-        start_ind = int(ind)
-        end_ind = int(ind + sampling_rate * 60 * 5)
 
-        if (accel_temp_df["Max_temp_5min"][start_ind] < high_temperature_cutoff) & (
-            accel_temp_df["Mean_temp_5min"][start_ind] < temp_dec_roc
-        ):
-            valid_start = True
-        elif accel_temp_df["Max_temp_5min"][start_ind] < low_temperature_cutoff:
-            valid_start = True
+    for start_ind in candidate_nw_starts:
+        if start_ind < previous_end:
+            continue
+
+        end_ind = start_ind + window_size_1min * 5
+
+        valid_start = (
+            max_temp_5min[start_ind] < high_temperature_cutoff
+            and mean_temp_5min[start_ind] < temp_dec_roc
+        ) or max_temp_5min[start_ind] < low_temperature_cutoff
 
         if not valid_start:
             continue
 
-        end_crit = end_crit_combined[end_crit_combined > end_ind]
+        end_nw_indices = end_crit_combined[end_crit_combined > end_ind]
+        bout_end_index = (
+            end_nw_indices[0] if len(end_nw_indices) > 0 else accel_temp_df.height - 1
+        )
 
-        if len(end_crit) > 0:
-            bout_end_index = end_crit[0]
-
-        else:
-            bout_end_index = len(accel_temp_df) - 1
-
-        accel_start_dp = int(start_ind)
-        accel_end_dp = int(bout_end_index)
-        vert_nonwear_array[accel_start_dp:accel_end_dp] = 1
-
+        vert_nonwear_array[start_ind:bout_end_index] = 1
         previous_end = bout_end_index
 
     return vert_nonwear_array
@@ -182,7 +169,7 @@ def lowpass_filter_signal(
     low_f: float,
     filter_order: int = 2,
 ) -> np.ndarray:
-    """Function that low pass fiters temperature data.
+    """Function that low pass filters temperature data.
 
     Args:
         data: 1D numpy array of data to be filtered
