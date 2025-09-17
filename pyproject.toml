@@ -81,7 +81,8 @@ exclude = [
   "build",
   "dist",
   "node_modules",
-  "venv"
+  "venv",
+  ".ipynb"
 ]
 line-length = 88
 indent-width = 4
