@@ -43,9 +43,10 @@ def detach(
     temp_inc_roc: float = 0.1,
     num_axes: int = 2,
 ) -> np.ndarray:
-    """Adam Vert's implementation of the DETACH algorithm.
+    """Re-factor of Adam Vert's implementation of the DETACH algorithm.
 
-    Non-wear algorithm with a 5 minute minimum non-wear duration using absolute
+    Non-wear algorithm detection algorithm that uses accelerometer and temperature data.
+    It uses rolling standard deviation of acceleration on each axis, smoothed
     temperature, temperature rate of change and accelerometer standard deviation of
     3 axes to detect start and stop times of non-wear periods.
 
@@ -54,11 +55,11 @@ def detach(
 
     Args:
         acceleration_values: 3 column numpy array with x, y, and z acceleration values.
-        temperature_values: temperature values.
-        sampling_rate: sampling rate for the accelerometer data, in Hz.
-        std_thresh: the value which the std of an axis in the window must be below
+        temperature_values: Temperature values.
+        sampling_rate: Sampling rate for the accelerometer data, in Hz.
+        std_thresh: The value which the std of an axis in the window must be below
             to trigger non-wear.
-        low_temperature_cutoff: Low temperature for non-wear classification.
+        low_temperature_cutoff: Low temperature cut off for non-wear classification.
         high_temperature_cutoff: High temperature cut off for wear classification.
         temp_dec_roc: Decreasing temperature rate of change threshold for
             non-wear classification.
@@ -116,7 +117,7 @@ def detach(
 
     candidate_nw_starts = np.flatnonzero(
         (accel_temp_df["Num_axes_fwd"] >= num_axes)
-        & (accel_temp_df["Percent_above_threshold_5min"] >= 0.9)
+        & (accel_temp_df["Percent_above_threshold_5min_fwd"] >= 0.9)
     )
 
     end_crit_1 = np.flatnonzero(
@@ -135,7 +136,7 @@ def detach(
 
     max_temp_5min = accel_temp_df["Max_temp_5min"].to_numpy()
     mean_temp_5min = accel_temp_df["Mean_temp_5min"].to_numpy()
-    vert_nonwear_array = np.zeros(len(acceleration_values))
+    nonwear_array = np.zeros(len(acceleration_values))
     previous_end = 0
 
     for start_ind in candidate_nw_starts:
@@ -157,10 +158,10 @@ def detach(
             end_nw_indices[0] if len(end_nw_indices) > 0 else accel_temp_df.height - 1
         )
 
-        vert_nonwear_array[start_ind:bout_end_index] = 1
+        nonwear_array[start_ind:bout_end_index] = 1
         previous_end = bout_end_index
 
-    return vert_nonwear_array
+    return nonwear_array
 
 
 def lowpass_filter_signal(
@@ -172,7 +173,7 @@ def lowpass_filter_signal(
     """Function that low pass filters temperature data.
 
     Args:
-        data: 1D numpy array of data to be filtered
+        data: 1D numpy array of data to be filtered.
         sample_f: Sampling rate, in Hz.
         low_f: Low frequency cutoff for filter, in Hz.
         filter_order: order of the filter.
@@ -207,11 +208,11 @@ def calculate_rolling_features(
         window_size_1min: Window size for 1 minute, in data points.
         num_axes: The number of axes that must be below the std threshold
             to be considered nonwear.
-        std_thresh: the value which the std of an axis in the window must be below
+        std_thresh: The value which the std of an axis in the window must be below
 
     Returns:
         DataFrame with rolling standard deviations for each axis,
-            both forward and backward looking.
+            both forward and backward looking and other rolling features.
     """
     window_size_1min = round(sampling_rate * 60)
     window_size_5min = 5 * window_size_1min
@@ -250,7 +251,7 @@ def calculate_rolling_features(
             .reverse()
             .rolling_mean(window_size_5min)
             .reverse()
-            .alias("Percent_above_threshold_5min"),
+            .alias("Percent_above_threshold_5min_fwd"),
             (pl.col("Num_axes_bwd") >= num_axes)
             .cast(pl.Float32)
             .reverse()
