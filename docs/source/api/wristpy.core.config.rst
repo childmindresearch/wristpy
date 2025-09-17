@@ -3,10 +3,11 @@
 
 .. automodule:: wristpy.core.config
 
-
+   
    .. rubric:: Functions
 
    .. autosummary::
-
+   
       get_logger
       get_version
+   

@@ -20,7 +20,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "myst_parser",
+    "myst_nb",
     "sphinx.ext.intersphinx",
     "sphinx.ext.githubpages",
     "sphinx_copybutton",
@@ -28,10 +28,10 @@ extensions = [
 autosummary_generate = True
 autosummary_imported_members = True
 
-
 source_suffix = {
-    ".rst": None,
-    ".md": None,
+    ".rst": "restructuredtext",
+    ".md": "myst-nb",
+    ".ipynb": "myst-nb",
 }
 
 html_theme = "furo"
@@ -49,8 +49,8 @@ modindex_common_prefix = ["wristpy."]
 
 html_theme_options = {
     "sidebar_hide_name": False,
-    "light_logo": "images/wristpy_logo.png",
-    "dark_logo": "images/wristpy_logo.png",
+    "light_logo": "images/wristpy_logo_light.png",
+    "dark_logo": "images/wristpy_logo_dark.png",
 }
 
 
@@ -65,7 +65,8 @@ autodoc_default_options = {
     "show-inheritance": True,
 }
 
-
+nb_execution_mode = "force"
+nb_execution_timeout = 60
 myst_enable_extensions = [
     "colon_fence",
     "deflist",
