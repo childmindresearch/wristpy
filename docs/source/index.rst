@@ -46,11 +46,11 @@ Wristpy provides tools for:
 
 For installation instructions and a quick introduction, see :doc:`getting_started`.
 
-How To Cite 
+How To Cite
 --------------
 If you use wristpy in your research, please cite the following paper:
 
-Santorelli A, Perez F, Vos de Wael R, Rupprecht F, d'Antonio-Bertagnolli JV,  
+Santorelli A, Perez F, Vos de Wael R, Rupprecht F, d'Antonio-Bertagnolli JV,
 Franco A, Kiar G. *wristpy: Fast, User-Friendly Python Processing of Wrist-worn Accelerometer Data*. 2025. Under review. DOI: https://doi.org/10.5281/zenodo.13883190
 
 Reference
