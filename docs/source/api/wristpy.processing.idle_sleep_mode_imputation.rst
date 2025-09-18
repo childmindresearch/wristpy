@@ -9,4 +9,3 @@
    .. autosummary::
 
       impute_idle_sleep_mode_gaps
-

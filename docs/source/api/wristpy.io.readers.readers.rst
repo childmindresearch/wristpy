@@ -10,4 +10,3 @@ wristpy.io.readers.readers
 
       read_watch_data
       unix_epoch_time_to_polars_datetime
-

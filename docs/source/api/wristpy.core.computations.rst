@@ -12,4 +12,3 @@
       moving_median
       moving_std
       resample
-
