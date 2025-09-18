@@ -80,7 +80,7 @@ exclude = [
   "dist",
   "node_modules",
   "venv",
-  ".ipynb"
+  "*.ipynb"
 ]
 line-length = 88
 indent-width = 4
