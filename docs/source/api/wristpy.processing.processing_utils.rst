@@ -10,4 +10,3 @@
 
       get_nonwear_measurements
       synchronize_measurements
-
