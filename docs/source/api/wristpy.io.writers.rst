@@ -3,7 +3,7 @@
 
 .. automodule:: wristpy.io.writers
 
-   
+
 .. rubric:: Modules
 
 .. autosummary::

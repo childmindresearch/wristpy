@@ -35,7 +35,6 @@ pytest-mock = "^3.14.0"
 sphinx-autobuild = "^2024.2.4"
 ipykernel = "^6.29.0"
 
-
 [tool.poetry.group.docs.dependencies]
 sphinx = "^7.0.0"
 furo = "^2024.1.0"
