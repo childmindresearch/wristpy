@@ -5,11 +5,9 @@ from typing import Literal, Tuple
 import numpy as np
 import polars as pl
 from scipy import interpolate, signal
-from skdh.preprocessing import wear_detection
 
 from wristpy.core import computations, config, models
-from wristpy.io.readers import readers
-from wristpy.processing import mims
+from wristpy.processing import _nimbaldetach, mims
 
 logger = config.get_logger()
 
@@ -375,7 +373,7 @@ def detach_nonwear(
     temperature: models.Measurement,
     std_criteria: float = 0.013,
 ) -> models.Measurement:
-    """This function implements the scikit DETACH algorithm for non-wear detection.
+    """This function implements the DETACH algorithm for non-wear detection.
 
     The nonwear array is downsampled to 60 second resolution.
 
@@ -414,24 +412,23 @@ def detach_nonwear(
 
         return nonwear_downsample
 
-    logger.debug("Running scikit DETACH algorithm.")
-    time = acceleration.time.dt.timestamp(time_unit="ns").to_numpy()
+    logger.debug("Running Adam Vert's DETACH algorithm.")
+
     upsample_temp = upsample_temperature(
         temperature.measurements, acceleration.measurements
     )
-
-    detach_class = wear_detection.DETACH(sd_thresh=std_criteria)
-    nonwear_array = np.ones(len(time), dtype=np.float32)
-    detach_wear = detach_class.predict(
-        time=time / 1e9, accel=acceleration.measurements, temperature=upsample_temp
+    sampling_rate = round(
+        1 / ((acceleration.time[1:] - acceleration.time[:-1]).median()).total_seconds()  # type: ignore[union-attr] #Guarded by Measurement validation for .time attribute
     )
 
-    for start, stop in detach_wear["wear"]:
-        nonwear_array[start:stop] = 0
+    nonwear_array = _nimbaldetach.detach(
+        acceleration_values=acceleration.measurements,
+        temperature_values=upsample_temp,
+        sampling_rate=sampling_rate,
+        std_thresh=std_criteria,
+    )
 
-    non_wear_time = readers.unix_epoch_time_to_polars_datetime(time)
-
-    nonwear = models.Measurement(measurements=nonwear_array, time=non_wear_time)
+    nonwear = models.Measurement(measurements=nonwear_array, time=acceleration.time)
 
     return cleanup_DETACH_nonwear(nonwear)
 
