@@ -24,9 +24,9 @@ def dummy_results() -> writers.OrchestratorResults:
         ),
     )
     dummy_results = writers.OrchestratorResults(
-        physical_activity_metric=dummy_measure,
+        physical_activity_metric=[dummy_measure],
         anglez=dummy_measure,
-        physical_activity_levels=dummy_measure,
+        physical_activity_levels=[dummy_measure],
         nonwear_status=dummy_measure,
         sleep_status=dummy_measure,
         sib_periods=dummy_measure,
@@ -93,7 +93,7 @@ def test_run_single_file(
     results = orchestrator.run(
         input=sample_data_bin,
         output=output_file_path,
-        activity_metric="mad",
+        activity_metric=["mad"],
         calibrator="ggir",
     )
 
@@ -110,7 +110,7 @@ def test_run_single_file_agcount_default(
     results = orchestrator.run(
         input=sample_data_bin,
         output=output_file_path,
-        activity_metric="ag_count",
+        activity_metric=["ag_count"],
         nonwear_algorithm=["detach"],
     )
 
@@ -191,8 +191,47 @@ def test_run_single_file_mims(
     results = orchestrator.run(
         input=sample_data_bin,
         output=output_file_path,
-        activity_metric="mims",
+        activity_metric=["mims"],
     )
 
     assert output_file_path.exists()
     assert isinstance(results, writers.OrchestratorResults)
+
+
+def test_multiple_metrics(
+    sample_data_bin: pathlib.Path, tmp_path: pathlib.Path
+) -> None:
+    """Testing running a single file with multiple metrics."""
+    output_file_path = tmp_path / "file_name.csv"
+    results = orchestrator.run(
+        input=sample_data_bin,
+        output=output_file_path,
+        activity_metric=["enmo", "mad", "ag_count"],
+    )
+
+    assert output_file_path.exists()
+    assert isinstance(results, writers.OrchestratorResults)
+    assert len(results.physical_activity_metric) == 3
+    assert len(results.physical_activity_levels) == 3
+    assert all(
+        isinstance(metric, models.Measurement)
+        for metric in results.physical_activity_metric
+    )
+
+
+def test_metrics_thresholds_mismatch(
+    sample_data_bin: pathlib.Path, tmp_path: pathlib.Path
+) -> None:
+    """Test running a single file with mismatched number of metrics and thresholds."""
+    output_file_path = tmp_path / "file_name.csv"
+    with pytest.raises(
+        ValueError,
+        match="Number of thresholds did not match the number of activity metrics."
+        " Provide one threshold tuple per metric or use None for defaults.",
+    ):
+        orchestrator.run(
+            input=sample_data_bin,
+            output=output_file_path,
+            activity_metric=["enmo", "mad"],
+            thresholds=[(1, 2, 3)],
+        )

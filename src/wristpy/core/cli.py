@@ -62,6 +62,36 @@ def version_check(version: bool) -> None:
         raise typer.Exit()
 
 
+def _parse_thresholds(thresholds: list[str]) -> list[tuple[float, float, float]]:
+    """Parse the threshold strings into a list of tuples.
+
+    Args:
+        thresholds: List of threshold strings, each containing three space-separated
+            floats.
+
+    Returns:
+        List of tuple float triplets containing the parsed threshold values.
+
+    Raises:
+        typer.BadParameter: If any threshold triplet does not contain exactly three
+            floats
+        typer.BadParameter: If threshold format is invalid or values cannot be parsed.
+    """
+    parsed = []
+    for triplet_str in thresholds:
+        parts = triplet_str.strip().split()
+        if len(parts) != 3:
+            raise typer.BadParameter(
+                f"Threshold triplet must have exactly 3 floats: {triplet_str}"
+            )
+        try:
+            values = [float(part) for part in parts]
+        except ValueError:
+            raise typer.BadParameter(f"Invalid float in threshold: {triplet_str}")
+        parsed.append((values[0], values[1], values[2]))
+    return parsed
+
+
 @app.command()
 def main(
     input: pathlib.Path = typer.Argument(
@@ -87,22 +117,24 @@ def main(
         "Must choose one of 'none', 'ggir', or 'gradient'.",
         case_sensitive=False,
     ),
-    activity_metric: ActivityMetric = typer.Option(
-        ActivityMetric.enmo,
+    activity_metric: list[ActivityMetric] = typer.Option(
+        [ActivityMetric.enmo],
         "-a",
         "--activity-metric",
-        help="Metric used for physical activity categorization. "
-        "Choose from 'enmo', 'mad', 'ag_count', or 'mims'.  ",
+        help="Metric(s) used for physical activity categorization. "
+        "Choose from 'enmo', 'mad', 'ag_count', or 'mims'. "
+        "Use multiple times for multiple metrics: '-a enmo -a mad' etc.",
         case_sensitive=False,
     ),
-    thresholds: tuple[float, float, float] = typer.Option(
+    # Typer does not support list[tuple[...]]
+    thresholds: list[str] = typer.Option(
         None,
         "-t",
         "--thresholds",
         help="Provide three thresholds for light, moderate, and vigorous activity. "
-        "Exactly three values must be >= 0, given in ascending order, "
-        "and separated by a space. (e.g. '-t 0.1 1.0 1.5').",
-        min=0,
+        "One threshold set per activity metric, in the same order as metrics. "
+        "Format: three space-separated values >= 0 in ascending order. "
+        "Example: -t '0.1 1.0 1.5' or -a enmo -a mad -t '0.1 1.0 1.5' -t '0.2 2.0 3.0'",
     ),
     nonwear_algorithm: list[NonwearAlgorithms] = typer.Option(
         [NonwearAlgorithms.ggir],
@@ -146,6 +178,8 @@ def main(
     logger.setLevel(log_level)
 
     nonwear_algorithms = [algo.value for algo in nonwear_algorithm]
+    activity_metrics = [metric.value for metric in activity_metric]
+    parsed_thresholds = _parse_thresholds(thresholds) if thresholds else None
     calibrator_value = None if calibrator == Calibrator.none else calibrator.value
 
     logger.debug("Running wristpy. arguments given: %s", locals())
@@ -154,8 +188,8 @@ def main(
             input=input,
             output=output,
             calibrator=calibrator_value,
-            activity_metric=activity_metric.value,
-            thresholds=None if thresholds is None else thresholds,
+            activity_metric=activity_metrics,  # type: ignore[arg-type] # Covered by ActivityMetric Enum class
+            thresholds=parsed_thresholds,
             epoch_length=epoch_length,
             nonwear_algorithm=nonwear_algorithms,  # type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class
             verbosity=log_level,

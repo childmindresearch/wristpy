@@ -5,17 +5,15 @@ from typing import Literal, Tuple
 import numpy as np
 import polars as pl
 from scipy import interpolate, signal
-from skdh.preprocessing import wear_detection
 
 from wristpy.core import computations, config, models
-from wristpy.io.readers import readers
-from wristpy.processing import mims
+from wristpy.processing import _nimbaldetach, mims
 
 logger = config.get_logger()
 
 
 def euclidean_norm_minus_one(
-    acceleration: models.Measurement, epoch_length: float = 5.0
+    acceleration: models.Measurement, epoch_length: float = 5.0, name: str | None = None
 ) -> models.Measurement:
     """Compute ENMO, the Euclidean Norm Minus One (1 standard gravity unit).
 
@@ -33,6 +31,7 @@ def euclidean_norm_minus_one(
         datetime.datetime objects.
         epoch_length: The temporal resolution of the downsampled enmo, in seconds.
             Must be greater than 0. Defaults to 5.0s.
+        name: The name of the Measurement object.
 
     Returns:
         A Measurement object containing the calculated ENMO values and the
@@ -43,12 +42,18 @@ def euclidean_norm_minus_one(
     enmo = np.maximum(enmo, 0)
 
     return computations.moving_mean(
-        models.Measurement(measurements=enmo, time=acceleration.time), epoch_length
+        models.Measurement(
+            measurements=enmo,
+            time=acceleration.time,
+        ),
+        epoch_length,
+        name=name,
     )
 
 
 def angle_relative_to_horizontal(
-    acceleration: models.Measurement, epoch_length: float = 5.0
+    acceleration: models.Measurement,
+    epoch_length: float = 5.0,
 ) -> models.Measurement:
     """Calculate the angle of the acceleration vector relative to the horizontal plane.
 
@@ -62,6 +67,7 @@ def angle_relative_to_horizontal(
         epoch_length: The temporal resolution of the downsampled anglez, in seconds.
             Must be greater than 0. Defaults to 5.0s.
 
+
     Returns:
         A Measurement instance containing the values of the angle relative to the
         horizontal plane and the associated timestamps taken from the input unaltered.
@@ -74,13 +80,16 @@ def angle_relative_to_horizontal(
     angle_degrees = np.degrees(angle_radians)
 
     return computations.moving_mean(
-        models.Measurement(measurements=angle_degrees, time=acceleration.time),
+        models.Measurement(
+            measurements=angle_degrees,
+            time=acceleration.time,
+        ),
         epoch_length,
     )
 
 
 def mean_amplitude_deviation(
-    acceleration: models.Measurement, epoch_length: float = 5.0
+    acceleration: models.Measurement, epoch_length: float = 5.0, name: str | None = None
 ) -> models.Measurement:
     """Calculate the mean amplitude deviation of the acceleration data.
 
@@ -91,6 +100,7 @@ def mean_amplitude_deviation(
     Args:
         acceleration: the calibrated acceleration data.
         epoch_length: The length of the window in seconds.
+        name: The name of the Measurement object
 
     Returns:
         A new Measurement object containing the MAD values.
@@ -123,11 +133,11 @@ def mean_amplitude_deviation(
         .collect()
     )
 
-    return models.Measurement.from_data_frame(mad_df)
+    return models.Measurement.from_data_frame(mad_df, name=name)
 
 
 def actigraph_activity_counts(
-    acceleration: models.Measurement, epoch_length: float = 5.0
+    acceleration: models.Measurement, epoch_length: float = 5.0, name: str | None = None
 ) -> models.Measurement:
     """Compute Actigraph acitivty counts.
 
@@ -139,6 +149,7 @@ def actigraph_activity_counts(
     Args:
         acceleration: The calibrated acceleration data.
         epoch_length: The length of the epoch in seconds, defaults to 60s.
+        name: the name of the Measurement object
 
     Returns:
         The activity counts as a Measurement object.
@@ -226,7 +237,7 @@ def actigraph_activity_counts(
     )
     ag_counts = ag_counts.drop(["column_0", "column_1", "column_2"])
 
-    return models.Measurement.from_data_frame(ag_counts)
+    return models.Measurement.from_data_frame(ag_counts, name=name)
 
 
 def detect_nonwear(
@@ -335,7 +346,8 @@ def combined_temp_accel_detect_nonwear(
                     lambda df: _compute_nonwear_value_per_axis(
                         df,
                         std_criteria,
-                    )
+                    ),
+                    returns_scalar=True,
                 )
             )
             .sum_horizontal()
@@ -361,7 +373,7 @@ def detach_nonwear(
     temperature: models.Measurement,
     std_criteria: float = 0.013,
 ) -> models.Measurement:
-    """This function implements the scikit DETACH algorithm for non-wear detection.
+    """This function implements the DETACH algorithm for non-wear detection.
 
     The nonwear array is downsampled to 60 second resolution.
 
@@ -400,24 +412,23 @@ def detach_nonwear(
 
         return nonwear_downsample
 
-    logger.debug("Running scikit DETACH algorithm.")
-    time = acceleration.time.dt.timestamp(time_unit="ns").to_numpy()
+    logger.debug("Running Adam Vert's DETACH algorithm.")
+
     upsample_temp = upsample_temperature(
         temperature.measurements, acceleration.measurements
     )
-
-    detach_class = wear_detection.DETACH(sd_thresh=std_criteria)
-    nonwear_array = np.ones(len(time), dtype=np.float32)
-    detach_wear = detach_class.predict(
-        time=time / 1e9, accel=acceleration.measurements, temperature=upsample_temp
+    sampling_rate = round(
+        1 / ((acceleration.time[1:] - acceleration.time[:-1]).median()).total_seconds()  # type: ignore[union-attr] #Guarded by Measurement validation for .time attribute
     )
 
-    for start, stop in detach_wear["wear"]:
-        nonwear_array[start:stop] = 0
+    nonwear_array = _nimbaldetach.detach(
+        acceleration_values=acceleration.measurements,
+        temperature_values=upsample_temp,
+        sampling_rate=sampling_rate,
+        std_thresh=std_criteria,
+    )
 
-    non_wear_time = readers.unix_epoch_time_to_polars_datetime(time)
-
-    nonwear = models.Measurement(measurements=nonwear_array, time=non_wear_time)
+    nonwear = models.Measurement(measurements=nonwear_array, time=acceleration.time)
 
     return cleanup_DETACH_nonwear(nonwear)
 
@@ -488,7 +499,8 @@ def _compute_nonwear_value_array(
                 lambda df: _compute_nonwear_value_per_axis(
                     df,
                     std_criteria,
-                )
+                ),
+                returns_scalar=True,
             )
         ).sum_horizontal()
 
@@ -620,6 +632,7 @@ def monitor_independent_movement_summary_units(
     order: int = 4,
     *,
     rectify: bool = True,
+    name: str | None = None,
 ) -> models.Measurement:
     """Calculates monitor independent movement summary units (MIMS).
 
@@ -648,6 +661,7 @@ def monitor_independent_movement_summary_units(
             value below -150 will assign the value of that axis to -1 for that epoch.
             Additionally the absolute value of accelerometer data will be used for
             integration.
+        name: The name of the Measurement object.
 
     Returns:
         Processed MIMS values after combining the values of each axis with the provided
@@ -683,4 +697,5 @@ def monitor_independent_movement_summary_units(
     combined_mims = mims.combine_mims(
         acceleration=aggregated_measure, combination_method=combination_method
     )
+    combined_mims.name = name
     return combined_mims

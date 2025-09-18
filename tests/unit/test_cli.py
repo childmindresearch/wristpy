@@ -5,6 +5,7 @@ import pathlib
 
 import pytest
 import pytest_mock
+import typer
 from typer import testing
 
 from wristpy.core import cli, orchestrator
@@ -23,7 +24,6 @@ def test_main_default(
 ) -> None:
     """Test cli with only necessary arguments."""
     mock_run = mocker.patch.object(orchestrator, "run")
-    default_thresholds = None
 
     result = create_typer_cli_runner.invoke(cli.app, [str(sample_data_gt3x)])
 
@@ -31,9 +31,9 @@ def test_main_default(
     mock_run.assert_called_once_with(
         input=sample_data_gt3x,
         output=None,
-        thresholds=default_thresholds,
+        thresholds=None,
         calibrator=None,
-        activity_metric="enmo",
+        activity_metric=["enmo"],
         epoch_length=5,
         nonwear_algorithm=["ggir"],
         verbosity=logging.INFO,
@@ -41,69 +41,55 @@ def test_main_default(
     )
 
 
-def test_main_enmo_default(
+@pytest.mark.parametrize(
+    "metric",
+    [
+        "enmo",
+        "mad",
+        "ag_count",
+        "mims",
+    ],
+)
+def test_main_with_metrics(
     mocker: pytest_mock.MockerFixture,
     sample_data_gt3x: pathlib.Path,
     create_typer_cli_runner: testing.CliRunner,
+    metric: str,
 ) -> None:
-    """Test that correct enmo default thresholds are pulled."""
+    """Test that cli works with metrics."""
     mock_run = mocker.patch.object(orchestrator, "_run_file")
-    default_thresholds = (0.0563, 0.1916, 0.6958)
 
-    create_typer_cli_runner.invoke(cli.app, ([str(sample_data_gt3x), "-a", "enmo"]))
+    create_typer_cli_runner.invoke(cli.app, ([str(sample_data_gt3x), "-a", metric]))
 
     mock_run.assert_called_once_with(
         input=sample_data_gt3x,
         output=None,
-        thresholds=default_thresholds,
+        thresholds=None,
         calibrator=None,
-        activity_metric="enmo",
-        epoch_length=5,
-        nonwear_algorithm=["ggir"],
-        verbosity=logging.INFO,
-    )
-
-
-def test_main_mad_default(
-    mocker: pytest_mock.MockerFixture,
-    sample_data_gt3x: pathlib.Path,
-    create_typer_cli_runner: testing.CliRunner,
-) -> None:
-    """Test that correct mad default thresholds are pulled."""
-    mock_run = mocker.patch.object(orchestrator, "_run_file")
-    default_thresholds = (0.029, 0.338, 0.604)
-
-    create_typer_cli_runner.invoke(cli.app, ([str(sample_data_gt3x), "-a", "mad"]))
-
-    mock_run.assert_called_once_with(
-        input=sample_data_gt3x,
-        output=None,
-        thresholds=default_thresholds,
-        calibrator=None,
-        activity_metric="mad",
+        activity_metric=[metric],
         nonwear_algorithm=["ggir"],
         epoch_length=5,
         verbosity=logging.INFO,
     )
 
 
-def test_main_agcount_default(
+def test_main_with_multiple_metrics(
     mocker: pytest_mock.MockerFixture,
     sample_data_gt3x: pathlib.Path,
     create_typer_cli_runner: testing.CliRunner,
 ) -> None:
-    """Test that correct ag_count default thresholds are pulled."""
+    """Tests cli with multiple activity metrics."""
     mock_run = mocker.patch.object(orchestrator, "_run_file")
-    default_thresholds = (100, 3000, 5200)
 
-    create_typer_cli_runner.invoke(cli.app, ([str(sample_data_gt3x), "-a", "ag_count"]))
-
+    create_typer_cli_runner.invoke(
+        cli.app, ([str(sample_data_gt3x), "-a", "enmo", "-a", "mad"])
+    )
     mock_run.assert_called_once_with(
         input=sample_data_gt3x,
         output=None,
-        thresholds=default_thresholds,
+        thresholds=None,
         calibrator=None,
-        activity_metric="ag_count",
+        activity_metric=["enmo", "mad"],
         nonwear_algorithm=["ggir"],
         epoch_length=5,
         verbosity=logging.INFO,
@@ -130,9 +116,7 @@ def test_main_with_options(
                 "-c",
                 "gradient",
                 "-t",
-                "0.1",
-                "1.0",
-                "1.5",
+                "0.1 1.0 1.5",
                 "-e",
                 "3",
                 "-a",
@@ -148,9 +132,9 @@ def test_main_with_options(
     mock_run.assert_called_once_with(
         input=sample_data_gt3x,
         output=test_output,
-        thresholds=(0.1, 1.0, 1.5),
+        thresholds=[(0.1, 1.0, 1.5)],
         calibrator="gradient",
-        activity_metric="mad",
+        activity_metric=["mad"],
         nonwear_algorithm=["cta", "ggir"],
         epoch_length=3,
         verbosity=logging.INFO,
@@ -158,18 +142,20 @@ def test_main_with_options(
     )
 
 
-def test_main_with_bad_thresholds(
+def test_main_with_wrong_number_of_thresholds(
     sample_data_gt3x: pathlib.Path,
     create_typer_cli_runner: testing.CliRunner,
 ) -> None:
     """Test cli with bad thresholds."""
     result = create_typer_cli_runner.invoke(
-        cli.app, [str(sample_data_gt3x), "-t", "3.0"]
+        cli.app, [str(sample_data_gt3x), "-a", "enmo", "-a", "mad", "-t", "1 2 3"]
     )
 
     assert result.exit_code != 0
-    # partial matching due to ANSI escape sequences in Github Actions
-    assert "requires 3 arguments." in result.output
+    assert isinstance(result.exception, ValueError)
+    assert "Number of thresholds did not match the number of activity metrics." in str(
+        result.exception
+    )
 
 
 def test_main_with_bad_epoch(
@@ -200,7 +186,7 @@ def test_main_verbosity(
         output=None,
         thresholds=None,
         calibrator=None,
-        activity_metric="enmo",
+        activity_metric=["enmo"],
         epoch_length=5,
         nonwear_algorithm=["ggir"],
         verbosity=logging.DEBUG,
@@ -233,3 +219,37 @@ def test_main_version_with_options(
     assert result.exit_code == 0
     assert "Wristpy version" in result.output
     mock_run.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "thresholds_str_lst, threshold_flt_lst",
+    [
+        (["0.1 0.5 1.0"], [(0.1, 0.5, 1.0)]),
+        (["0.2 0.4 0.6", "0.3 0.5 0.7"], [(0.2, 0.4, 0.6), (0.3, 0.5, 0.7)]),
+    ],
+)
+def test_parse_thresholds_valid(
+    thresholds_str_lst: list[str], threshold_flt_lst: list[float]
+) -> None:
+    """Test that valid thresholds are parsed correctly."""
+    parsed = cli._parse_thresholds(thresholds_str_lst)
+
+    assert parsed == threshold_flt_lst
+
+
+def test_parse_thresholds_invalid_triplet() -> None:
+    """Tests that giving less than 3 numbers will error."""
+    thresholds = ["1"]
+    with pytest.raises(
+        typer.BadParameter, match="Threshold triplet must have exactly 3 floats: 1"
+    ):
+        cli._parse_thresholds(thresholds)
+
+
+def test_parse_thresholds_invalid_flt() -> None:
+    """Tests that giving a non float will error."""
+    thresholds = ["1 2 not_a_float"]
+    with pytest.raises(
+        typer.BadParameter, match="Invalid float in threshold: 1 2 not_a_float"
+    ):
+        cli._parse_thresholds(thresholds)
