@@ -235,7 +235,7 @@ def _run_directory(
         )
         try:
             results_dict[str(file)] = _run_file(
-                input=input / file,
+                input=file,
                 output=output_file_path,
                 thresholds=thresholds,
                 calibrator=calibrator,
