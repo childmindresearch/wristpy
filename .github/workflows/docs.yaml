@@ -13,7 +13,6 @@ on:
 
 jobs:
   build-and-publish-docs:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -26,10 +25,16 @@ jobs:
       run: |
         python -m pip install poetry
         poetry install --with docs
-    - name: Build docs
+    - name: Build Sphinx docs
+      working-directory: docs
       run: |
-        poetry run pdoc src/wristpy -o docs_build -t docs/pdoc-theme --docformat google
-        touch docs_build/.nojekyll
-    - uses: JamesIves/github-pages-deploy-action@6c2d9db40f9296374acc17b90404b6e8864128c8
+        poetry run make html
+        touch build/html/.nojekyll
+        ls -la build/html | sed 's/^/BUILD: /'
+    - name: Deploy to gh-pages
+      uses: JamesIves/github-pages-deploy-action@6c2d9db40f9296374acc17b90404b6e8864128c8
       with:
-        folder: docs_build
+        branch: gh-pages
+        folder: docs/build/html
+        clean: true
+        single-commit: true
