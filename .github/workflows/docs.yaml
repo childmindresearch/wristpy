@@ -31,7 +31,7 @@ jobs:
         touch build/html/.nojekyll
         ls -la build/html | sed 's/^/BUILD: /'
     - name: Deploy to gh-pages
-      uses: JamesIves/github-pages-deploy-action@v4
+      uses: JamesIves/github-pages-deploy-action@c2d9db40f9296374acc17b90404b6e8864128c8
       with:
         branch: gh-pages
         folder: docs/build/html
