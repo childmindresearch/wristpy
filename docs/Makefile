@@ -17,11 +17,11 @@ help:
 
 
 clean:
-	 @if [ -z "$(BUILDDIR)" ]; then \
-        echo "Error: BUILDDIR is not set."; \
-        exit 1; \
-    fi
-    rm -rf $(BUILDDIR)/*
+	@if [ -z "$(BUILDDIR)" ]; then \
+		echo "Error: BUILDDIR is not set."; \
+		exit 1; \
+	fi
+	rm -rf $(BUILDDIR)/*
 
 livehtml:
 	sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
