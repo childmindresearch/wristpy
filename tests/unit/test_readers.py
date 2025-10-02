@@ -74,3 +74,23 @@ def test_extract_dynamic_range_gt3x(sample_data_gt3x: pathlib.Path) -> None:
     assert (
         result == expected_dynamic_range
     ), f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
+
+
+def test_timezone_extraction_gt3x(sample_data_gt3x: pathlib.Path) -> None:
+    """Test extracting timezone metadata from .gt3x files."""
+    expected_timezone = "GMT -05:00:00"
+    watch_data = readers.read_watch_data(sample_data_gt3x)
+
+    assert (
+        watch_data.time_zone == expected_timezone
+    ), f"Expected timezone of: {expected_timezone}, result was: {watch_data.time_zone}"
+
+
+def test_timezone_extraction_bin(sample_data_bin: pathlib.Path) -> None:
+    """Test extracting timezone metadata from .bin files."""
+    expected_timezone = "GMT -05:00"
+    watch_data = readers.read_watch_data(sample_data_bin)
+
+    assert (
+        watch_data.time_zone == expected_timezone
+    ), f"Expected timezone of: {expected_timezone}, result was: {watch_data.time_zone}"

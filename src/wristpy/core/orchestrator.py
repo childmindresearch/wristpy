@@ -419,6 +419,7 @@ def _run_file(
         "activity_metric": activity_metric,
         "nonwear_algorithm": list(nonwear_algorithm),
         "input_file": str(input),
+        "time_zone": watch_data.time_zone,
     }
 
     results = writers.OrchestratorResults(

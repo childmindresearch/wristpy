@@ -118,6 +118,7 @@ class WatchData(BaseModel):
     temperature: Optional[Measurement] = None
     idle_sleep_mode_flag: Optional[bool] = None
     dynamic_range: Optional[tuple[float, float]] = None
+    time_zone: Optional[str] = None
 
     @field_validator("acceleration")
     def validate_acceleration(cls, v: Measurement) -> Measurement:

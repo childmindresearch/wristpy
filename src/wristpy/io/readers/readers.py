@@ -45,6 +45,9 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
         idle_sleep_mode_flag = (
             data["metadata"]["device_feature_enabled"]["sleep_mode"].lower() == "true"
         )
+        time_zone = f"GMT {data['metadata']['info']['TimeZone']}"
+    elif file_type == ".bin":
+        time_zone = data["metadata"]["Configuration Info"]["Time Zone"]
 
     dynamic_range = _extract_dynamic_range(
         metadata=data["metadata"],
@@ -59,6 +62,7 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
         temperature=measurements.get("temperature"),
         idle_sleep_mode_flag=idle_sleep_mode_flag,
         dynamic_range=dynamic_range,
+        time_zone=str(time_zone),
     )
 
 
