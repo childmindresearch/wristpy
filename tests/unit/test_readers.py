@@ -12,7 +12,7 @@ from wristpy.io.readers import readers
 
 def test_read_invalid_extenstion(sample_data_txt: pathlib.Path) -> None:
     """Test the read_watch_data function with an invalid file extension."""
-    with pytest.raises(IOError, match="File type .txt is not supported."):
+    with pytest.raises(ValueError, match="File type .txt is not supported."):
         readers.read_watch_data(sample_data_txt)
 
 

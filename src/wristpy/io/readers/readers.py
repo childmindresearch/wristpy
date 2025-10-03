@@ -24,12 +24,12 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
         WatchData class
 
     Raises:
-        IOError if the file extension is not supported.
+        ValueError if the file extension is not supported.
         IOError if the file cannot be read using actfast.
     """
     file_type = pathlib.Path(file_name).suffix
     if file_type not in (".gt3x", ".bin"):
-        raise IOError(f"File type {file_type} is not supported.")
+        raise ValueError(f"File type {file_type} is not supported.")
     try:
         data = actfast.read(file_name)
     except Exception as e:
