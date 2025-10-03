@@ -23,8 +23,13 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
     Returns:
         WatchData class
 
-    Raises: IOError if the file extension is not supported or doesn't exist.
+    Raises:
+        ValueError if the file extension is not supported.
+        IOError if the file cannot be read using actfast.
     """
+    file_type = pathlib.Path(file_name).suffix
+    if file_type not in (".gt3x", ".bin"):
+        raise ValueError(f"File type {file_type} is not supported.")
     try:
         data = actfast.read(file_name)
     except Exception as e:
@@ -39,12 +44,14 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
                 measurements=sensor_values, time=time
             )
 
-    file_type = pathlib.Path(file_name).suffix
     idle_sleep_mode_flag = False
     if file_type == ".gt3x":
         idle_sleep_mode_flag = (
             data["metadata"]["device_feature_enabled"]["sleep_mode"].lower() == "true"
         )
+        time_zone = data["metadata"]["info"]["TimeZone"]
+    elif file_type == ".bin":
+        time_zone = data["metadata"]["Configuration Info"]["Time Zone"][4:]
 
     dynamic_range = _extract_dynamic_range(
         metadata=data["metadata"],
@@ -59,6 +66,7 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
         temperature=measurements.get("temperature"),
         idle_sleep_mode_flag=idle_sleep_mode_flag,
         dynamic_range=dynamic_range,
+        time_zone=str(time_zone),
     )
 
 

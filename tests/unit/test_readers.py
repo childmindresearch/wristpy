@@ -12,7 +12,7 @@ from wristpy.io.readers import readers
 
 def test_read_invalid_extenstion(sample_data_txt: pathlib.Path) -> None:
     """Test the read_watch_data function with an invalid file extension."""
-    with pytest.raises(IOError):
+    with pytest.raises(ValueError, match="File type .txt is not supported."):
         readers.read_watch_data(sample_data_txt)
 
 
@@ -42,7 +42,7 @@ def test_geneactiv_bin_loader(sample_data_bin: pathlib.Path) -> None:
 
 def test_nonexistent_file() -> None:
     """Test the correct error is raised for nonexistent file."""
-    with pytest.raises(IOError):
+    with pytest.raises(IOError, match="Error reading file:"):
         readers.read_watch_data("nonexistent_file.gt3x")
 
 
@@ -74,3 +74,23 @@ def test_extract_dynamic_range_gt3x(sample_data_gt3x: pathlib.Path) -> None:
     assert (
         result == expected_dynamic_range
     ), f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
+
+
+def test_timezone_extraction_gt3x(sample_data_gt3x: pathlib.Path) -> None:
+    """Test extracting timezone metadata from .gt3x files."""
+    expected_timezone = "-05:00:00"
+    watch_data = readers.read_watch_data(sample_data_gt3x)
+
+    assert (
+        watch_data.time_zone == expected_timezone
+    ), f"Expected timezone of: {expected_timezone}, result was: {watch_data.time_zone}"
+
+
+def test_timezone_extraction_bin(sample_data_bin: pathlib.Path) -> None:
+    """Test extracting timezone metadata from .bin files."""
+    expected_timezone = "-05:00"
+    watch_data = readers.read_watch_data(sample_data_bin)
+
+    assert (
+        watch_data.time_zone == expected_timezone
+    ), f"Expected timezone of: {expected_timezone}, result was: {watch_data.time_zone}"
