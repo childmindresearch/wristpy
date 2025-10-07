@@ -5,13 +5,7 @@ import logging
 import pathlib
 from typing import Dict, Literal, Optional, Sequence, Tuple, Union
 
-from rich.progress import (
-    BarColumn,
-    Progress,
-    SpinnerColumn,
-    TaskProgressColumn,
-    TextColumn,
-)
+from rich import progress
 
 from wristpy.core import config, exceptions, models
 from wristpy.io.readers import readers
@@ -229,14 +223,14 @@ def _run_directory(
             f"Directory {input} contains no .gt3x or .bin files."
         )
     results_dict = {}
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TaskProgressColumn(),
+    with progress.Progress(
+        progress.SpinnerColumn(),
+        progress.TextColumn("[progress.description]{task.description}"),
+        progress.BarColumn(),
+        progress.TaskProgressColumn(),
         console=None,
-    ) as progress:
-        task = progress.add_task(
+    ) as progress_bar:
+        task = progress_bar.add_task(
             f"[cyan]Processing files in {input.name}...", total=len(file_names)
         )
 
@@ -265,7 +259,7 @@ def _run_directory(
                 )
             except Exception as e:
                 logger.error("Did not run file: %s, Error: %s", file, e)
-            progress.update(task, advance=1)
+            progress_bar.update(task, advance=1)
     logger.info("Processing for directory %s completed successfully.", input)
     return results_dict
 
