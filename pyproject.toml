@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wristpy"
-version = "0.2.1"
+version = "0.2.2"
 description = "wristpy is a Python package designed for processing and analyzing wrist-worn accelerometer data."
 authors = [
   "Adam Santorelli <adam.santorelli@childmind.org>",
@@ -24,6 +24,7 @@ pydantic = "^2.11.1"
 pydantic-settings = "^2.3.4"
 scipy = "^1.14.1"
 typer = "^0.15.2"
+rich = "^14.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
