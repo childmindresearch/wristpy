@@ -5,6 +5,14 @@ import logging
 import pathlib
 from typing import Dict, Literal, Optional, Sequence, Tuple, Union
 
+from rich.progress import (
+    BarColumn,
+    Progress,
+    SpinnerColumn,
+    TaskProgressColumn,
+    TextColumn,
+)
+
 from wristpy.core import config, exceptions, models
 from wristpy.io.readers import readers
 from wristpy.io.writers import writers
@@ -221,32 +229,44 @@ def _run_directory(
             f"Directory {input} contains no .gt3x or .bin files."
         )
     results_dict = {}
-    for file in file_names:
-        output_file_path = (
-            output / pathlib.Path(file.stem).with_suffix(output_filetype)
-            if output
-            else None
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        console=None,
+    ) as progress:
+        task = progress.add_task(
+            f"[cyan]Processing files in {input.name}...", total=len(file_names)
         )
-        logger.debug(
-            "Processing directory: %s, current file: %s, save path: %s",
-            input,
-            file,
-            output_file_path,
-        )
-        try:
-            results_dict[str(file)] = _run_file(
-                input=file,
-                output=output_file_path,
-                thresholds=thresholds,
-                calibrator=calibrator,
-                epoch_length=epoch_length,
-                verbosity=verbosity,
-                nonwear_algorithm=nonwear_algorithm,
-                activity_metric=activity_metric,
+
+        for file in file_names:
+            output_file_path = (
+                output / pathlib.Path(file.stem).with_suffix(output_filetype)
+                if output
+                else None
             )
-        except Exception as e:
-            logger.error("Did not run file: %s, Error: %s", file, e)
-    logger.info("Processing for directory %s completed successfully.", output)
+            logger.debug(
+                "Processing directory: %s, current file: %s, save path: %s",
+                input,
+                file,
+                output_file_path,
+            )
+            try:
+                results_dict[str(file)] = _run_file(
+                    input=file,
+                    output=output_file_path,
+                    thresholds=thresholds,
+                    calibrator=calibrator,
+                    epoch_length=epoch_length,
+                    verbosity=verbosity,
+                    nonwear_algorithm=nonwear_algorithm,
+                    activity_metric=activity_metric,
+                )
+            except Exception as e:
+                logger.error("Did not run file: %s, Error: %s", file, e)
+            progress.update(task, advance=1)
+    logger.info("Processing for directory %s completed successfully.", input)
     return results_dict
 
 
