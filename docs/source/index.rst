@@ -66,6 +66,9 @@ Reference
    :hidden:
 
    getting_started.ipynb
+   cli_tutorial.ipynb
+   python_tutorial.ipynb
+   docker_tutorial.ipynb
 
 .. toctree::
    :caption: API Reference
