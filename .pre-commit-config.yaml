@@ -41,6 +41,7 @@ repos:
     - --fix=lf
   - id: trailing-whitespace
   - id: pretty-format-json
+    exclude: ^docs/source/.*\.ipynb$
     args:
     - --autofix
     - --indent=4
@@ -48,6 +49,7 @@ repos:
   - id: check-merge-conflict
   - id: check-yaml
   - id: check-json
+    exclude: ^docs/source/.*\.ipynb$
   - id: check-toml
 
 - repo: local

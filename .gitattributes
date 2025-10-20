@@ -1,0 +1,2 @@
+docs/source/tutorial_data/three_nights.bin filter=lfs diff=lfs merge=lfs -text
+*.ipynb filter=lfs diff=lfs merge=lfs -text
