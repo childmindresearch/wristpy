@@ -21,7 +21,7 @@ authors:
   - name: Alexandre Franco
     affiliation: "1, 2, 3"
   - name: Gregory Kiar
-  - orcid: 0000-0001-8915-496X
+    orcid: 0000-0001-8915-496X
     affiliation: 1
 
 affiliations:
