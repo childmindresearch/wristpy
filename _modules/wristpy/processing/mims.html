@@ -1,0 +1,1144 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+        <title>wristpy.processing.mims - wristpy 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">wristpy 0.2.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../../../_static/images/wristpy_logo_light.png" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../../../_static/images/wristpy_logo_dark.png" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">wristpy 0.2.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli_tutorial.html">Command Line Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_tutorial.html">Python Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker_tutorial.html">Docker Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api/wristpy.core.html">core</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of core</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.core.cli.html">wristpy.core.cli</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.core.computations.html">wristpy.core.computations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.core.config.html">wristpy.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.core.exceptions.html">wristpy.core.exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.core.models.html">wristpy.core.models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.core.orchestrator.html">wristpy.core.orchestrator</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api/wristpy.io.html">io</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of io</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../api/wristpy.io.readers.html">wristpy.io.readers</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of wristpy.io.readers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/wristpy.io.readers.readers.html">wristpy.io.readers.readers</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../api/wristpy.io.writers.html">wristpy.io.writers</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of wristpy.io.writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/wristpy.io.writers.writers.html">wristpy.io.writers.writers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api/wristpy.processing.html">processing</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of processing</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.processing.analytics.html">wristpy.processing.analytics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.processing.calibration.html">wristpy.processing.calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.processing.idle_sleep_mode_imputation.html">wristpy.processing.idle_sleep_mode_imputation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.processing.metrics.html">wristpy.processing.metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.processing.mims.html">wristpy.processing.mims</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/wristpy.processing.processing_utils.html">wristpy.processing.processing_utils</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Development Guide</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for wristpy.processing.mims</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Calculate Monitor Independent Movement Summary Units.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">integrate</span><span class="p">,</span> <span class="n">interpolate</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">stats</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">wristpy.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">models</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="interpolate_measure">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims.interpolate_measure">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">interpolate_measure</span><span class="p">(</span>
+    <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span> <span class="n">new_frequency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolate the measure to a new sampling rate using natural cubic spline.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        acceleration: Accelerometer data and associated timestamps.</span>
+<span class="sd">        new_frequency: The new frequency the measure will be interpolated to in Hz. For</span>
+<span class="sd">            the purposes of the MIMS algorithm defaults to 100Hz.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A Measurement object with interpolated acceleration data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">epoch_time_seconds</span> <span class="o">=</span> <span class="n">acceleration</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">epoch</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;ns&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">/</span> <span class="mf">1e9</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">epoch_time_seconds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">end_time</span> <span class="o">=</span> <span class="n">epoch_time_seconds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">duration_s</span> <span class="o">=</span> <span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">duration_s</span> <span class="o">*</span> <span class="n">new_frequency</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">interpolated_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">interpolated_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">interpolated_time</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">cubic_spline</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">CubicSpline</span><span class="p">(</span>
+            <span class="n">epoch_time_seconds</span><span class="p">,</span> <span class="n">acceleration</span><span class="o">.</span><span class="n">measurements</span><span class="p">[:,</span> <span class="n">axis</span><span class="p">],</span> <span class="n">bc_type</span><span class="o">=</span><span class="s2">&quot;natural&quot;</span>
+        <span class="p">)</span>
+        <span class="n">interpolated_data</span><span class="p">[:,</span> <span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="n">cubic_spline</span><span class="p">(</span><span class="n">interpolated_time</span><span class="p">)</span>
+
+    <span class="n">new_time_ns</span> <span class="o">=</span> <span class="p">(</span><span class="n">interpolated_time</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">new_time_series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+        <span class="s2">&quot;interpolated_time&quot;</span><span class="p">,</span> <span class="n">new_time_ns</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">pl</span><span class="o">.</span><span class="n">Datetime</span><span class="p">(</span><span class="s2">&quot;ns&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span><span class="n">measurements</span><span class="o">=</span><span class="n">interpolated_data</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">new_time_series</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="extrapolate_points">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims.extrapolate_points">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extrapolate_points</span><span class="p">(</span>
+    <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span>
+    <span class="n">dynamic_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">),</span>
+    <span class="n">noise</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.03</span><span class="p">,</span>
+    <span class="n">smoothing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">,</span>
+    <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">target_probability</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">,</span>
+    <span class="n">confidence_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">neighborhood_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Identify maxed out values, and extrapolate points.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        acceleration: Acceleration data that has been interpolated to 100Hz.</span>
+<span class="sd">        dynamic_range: Dynamic range of device used. This information can be gathered</span>
+<span class="sd">            from device metadata.</span>
+<span class="sd">        noise: Device noise level.</span>
+<span class="sd">        smoothing: Smoothing parameter for spline function. A value of 0 fits the data</span>
+<span class="sd">            exactly, higher values will fit the data more smoothly.</span>
+<span class="sd">        scale: Theta value, scale parameter for gamma distribution.</span>
+<span class="sd">        target_probability: Threshold used in determining the shape parameter (k) of the</span>
+<span class="sd">            gamma distribution. Probability that a value 3 standard deviations from the</span>
+<span class="sd">            buffer zone is maxed-out.</span>
+<span class="sd">        confidence_threshold: Threshold for what constitutes a major jump or drop in</span>
+<span class="sd">            value.</span>
+<span class="sd">        neighborhood_size: Duration of neighborhood in seconds. This parameter</span>
+<span class="sd">            determines how much data on each side of the maxed-out region is used</span>
+<span class="sd">            for fitting the local regression model. The parameter is used to calculate</span>
+<span class="sd">            the number of points to create in the oversampled data (n_over).</span>
+<span class="sd">        sampling_rate: The sampling rate in Hz. Assumed to take place after</span>
+<span class="sd">            interpolation so it will typically be 100.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A Measurement object with maxed out regions replaced with extrapolated values.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        John, D., Tang, Q., Albinali, F. and Intille, S., 2019. An Open-Source</span>
+<span class="sd">            Monitor-Independent Movement Summary for Accelerometer Data Processing.</span>
+<span class="sd">            Journal for the Measurement of Physical Behaviour, 2(4), pp.268-281.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time_numeric</span> <span class="o">=</span> <span class="n">acceleration</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">epoch</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;ns&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">extrapolated_axes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">acceleration</span><span class="o">.</span><span class="n">measurements</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
+        <span class="n">marker</span> <span class="o">=</span> <span class="n">_find_markers</span><span class="p">(</span>
+            <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+            <span class="n">dynamic_range</span><span class="o">=</span><span class="n">dynamic_range</span><span class="p">,</span>
+            <span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span>
+            <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+            <span class="n">target_probability</span><span class="o">=</span><span class="n">target_probability</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">neighbors</span> <span class="o">=</span> <span class="n">_extrapolate_neighbors</span><span class="p">(</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
+            <span class="n">confidence_threshold</span><span class="o">=</span><span class="n">confidence_threshold</span><span class="p">,</span>
+            <span class="n">neighborhood_size</span><span class="o">=</span><span class="n">neighborhood_size</span><span class="p">,</span>
+            <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">_extrapolate_fit</span><span class="p">(</span>
+            <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+            <span class="n">time_numeric</span><span class="o">=</span><span class="n">time_numeric</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
+            <span class="n">neighbors</span><span class="o">=</span><span class="n">neighbors</span><span class="p">,</span>
+            <span class="n">smoothing</span><span class="o">=</span><span class="n">smoothing</span><span class="p">,</span>
+            <span class="n">neighborhood_size</span><span class="o">=</span><span class="n">neighborhood_size</span><span class="p">,</span>
+            <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">extrapolated_values</span> <span class="o">=</span> <span class="n">_extrapolate_interpolate</span><span class="p">(</span>
+            <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+            <span class="n">time_numeric</span><span class="o">=</span><span class="n">time_numeric</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
+            <span class="n">points</span><span class="o">=</span><span class="n">points</span><span class="p">,</span>
+            <span class="n">confidence_threshold</span><span class="o">=</span><span class="n">confidence_threshold</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">extrapolated_axes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extrapolated_values</span><span class="p">)</span>
+
+    <span class="n">extrapolated_acceleration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">extrapolated_axes</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span>
+        <span class="n">measurements</span><span class="o">=</span><span class="n">extrapolated_acceleration</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">acceleration</span><span class="o">.</span><span class="n">time</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_find_markers">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims._find_markers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_find_markers</span><span class="p">(</span>
+    <span class="n">axis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">dynamic_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">noise</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.03</span><span class="p">,</span>
+    <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">target_probability</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine the likelihood that each sample is near the limits of the device range.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        axis: Acceleration data along one axis.</span>
+<span class="sd">        dynamic_range: Tuple of floats indicating the device&#39;s value range. This</span>
+<span class="sd">            information can be gathered from watch metadata.</span>
+<span class="sd">        noise: Typical noise value for device.</span>
+<span class="sd">        scale: Scale value (theta) for gamma distribution. Typically set at 1.</span>
+<span class="sd">        target_probability: Threshold used in determining the shape parameter (k) of the</span>
+<span class="sd">            gamma distribution. Probability that a value 3 standard deviations from the</span>
+<span class="sd">            buffer zone is maxed-out.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array indicating the likelihood that corresponding value in the axis data is</span>
+<span class="sd">        &#39;maxed-out&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">positive_buffer_zone</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dynamic_range</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">noise</span> <span class="o">+</span> <span class="mf">1e-5</span><span class="p">)</span>
+    <span class="n">negative_buffer_zone</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">dynamic_range</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">noise</span> <span class="o">+</span> <span class="mf">1e-5</span><span class="p">)</span>
+    <span class="n">shape_k</span> <span class="o">=</span> <span class="n">_brute_force_k</span><span class="p">(</span>
+        <span class="n">standard_deviation</span><span class="o">=</span><span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">noise</span> <span class="o">+</span> <span class="mf">1e-5</span><span class="p">),</span>
+        <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+        <span class="n">target_probability</span><span class="o">=</span><span class="n">target_probability</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">marker</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">axis</span><span class="p">))</span>
+    <span class="n">positive_idx</span> <span class="o">=</span> <span class="n">axis</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="n">negative_idx</span> <span class="o">=</span> <span class="n">axis</span> <span class="o">&lt;</span> <span class="mi">0</span>
+
+    <span class="n">marker</span><span class="p">[</span><span class="n">positive_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">gamma</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span>
+        <span class="n">axis</span><span class="p">[</span><span class="n">positive_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">positive_buffer_zone</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">shape_k</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span>
+    <span class="p">)</span>
+    <span class="n">marker</span><span class="p">[</span><span class="n">negative_idx</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">stats</span><span class="o">.</span><span class="n">gamma</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span>
+        <span class="o">-</span><span class="n">axis</span><span class="p">[</span><span class="n">negative_idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">negative_buffer_zone</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">shape_k</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">marker</span></div>
+
+
+
+<div class="viewcode-block" id="_brute_force_k">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims._brute_force_k">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_brute_force_k</span><span class="p">(</span>
+    <span class="n">standard_deviation</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">k_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">k_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">k_step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">target_probability</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the shape parameter(k) for the gamma distribution.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        standard_deviation: The point at which to evaluate the gamma cumulative</span>
+<span class="sd">            distribution function, should be 3 times the noise.</span>
+<span class="sd">        k_max: Maximum value for the shape parameter search range.</span>
+<span class="sd">            Default is 0.5.</span>
+<span class="sd">        k_min: Minimum value for the shape parameter search range.</span>
+<span class="sd">            Default is 0.001.</span>
+<span class="sd">        k_step: Step size for the shape parameter search.</span>
+<span class="sd">        scale: Scale value (theta) for gamma distribution. Typically set at 1.</span>
+<span class="sd">        target_probability: Threshold used in determining the shape parameter (k) of the</span>
+<span class="sd">            gamma distribution. Probability that a value 3 standard deviations from the</span>
+<span class="sd">            buffer zone is maxed-out.</span>
+<span class="sd">        scale: Scale value (theta) for gamma distribution. Typically set at 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The optimal shape parameter that makes the gamma CDF at the given standard</span>
+<span class="sd">        deviation approximately equal to the target probability.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">k_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">k_max</span><span class="p">,</span> <span class="n">k_min</span><span class="p">,</span> <span class="o">-</span><span class="n">k_step</span><span class="p">)</span>
+    <span class="n">previous_probability</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">previous_k</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">k_values</span><span class="p">:</span>
+        <span class="n">current_probability</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">gamma</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">standard_deviation</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">previous_probability</span> <span class="o">&lt;</span> <span class="n">target_probability</span>
+            <span class="ow">and</span> <span class="n">current_probability</span> <span class="o">&gt;=</span> <span class="n">target_probability</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">target_probability</span> <span class="o">-</span> <span class="n">previous_probability</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span>
+                <span class="n">current_probability</span> <span class="o">-</span> <span class="n">target_probability</span>
+            <span class="p">):</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">previous_k</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="n">previous_probability</span> <span class="o">=</span> <span class="n">current_probability</span>
+        <span class="n">previous_k</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="_extrapolate_neighbors">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims._extrapolate_neighbors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_extrapolate_neighbors</span><span class="p">(</span>
+    <span class="n">marker</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">confidence_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">neighborhood_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find neighborhoods around maxed-out regions for regression fitting.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        marker: Array containing values that mark the probability that each sample is</span>
+<span class="sd">            maxed-out. Values close to ±1 indicate high likelihood that the value is</span>
+<span class="sd">            near the limit of the dynamic range, with the sign indicating if it&#39;s near</span>
+<span class="sd">            the upper bound, or lower bound. Values close to zero indicate low</span>
+<span class="sd">            likelihood of being near range limit.</span>
+<span class="sd">        confidence_threshold: Threshold for what constitutes a significant change in</span>
+<span class="sd">            marker values.</span>
+<span class="sd">        neighborhood_size: Duration of neighborhood in seconds to use around each</span>
+<span class="sd">            maxed-out region for regression fitting. Default is 0.05 (50ms).</span>
+<span class="sd">        sampling_rate: The sampling rate of the data in Hz. Default is 100Hz as data</span>
+<span class="sd">            should be interpolated to 100hz prior to this step.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame containing the indices of maxed-out regions (start, end) and</span>
+<span class="sd">        their expanded neighborhoods (left_neighborhood, right_neighborhood). A</span>
+<span class="sd">        value of -1 indicates a boundary case where the region extends to the</span>
+<span class="sd">        beginning or end of the data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_neighbor</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sampling_rate</span> <span class="o">*</span> <span class="n">neighborhood_size</span><span class="p">)</span>
+    <span class="n">edges_indices</span> <span class="o">=</span> <span class="n">_extrapolate_edges</span><span class="p">(</span>
+        <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
+        <span class="n">confidence_threshold</span><span class="o">=</span><span class="n">confidence_threshold</span><span class="p">,</span>
+        <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">marker_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
+
+    <span class="n">expanded</span> <span class="o">=</span> <span class="n">edges_indices</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">)</span> <span class="o">-</span> <span class="n">n_neighbor</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;left_neighborhood&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;end&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">n_neighbor</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;right_neighborhood&quot;</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">neighborhoods</span> <span class="o">=</span> <span class="n">expanded</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">when</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">otherwise</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;left_neighborhood&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">marker_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;left_neighborhood&quot;</span><span class="p">),</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">when</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;end&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">otherwise</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;right_neighborhood&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">marker_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;right_neighborhood&quot;</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">neighborhoods</span></div>
+
+
+
+<div class="viewcode-block" id="_extrapolate_edges">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims._extrapolate_edges">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_extrapolate_edges</span><span class="p">(</span>
+    <span class="n">marker</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">confidence_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find edges of maxed out regions and identify them as hills(+) or valleys (-).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        marker: Array containing values that mark the probability that each sample is</span>
+<span class="sd">            maxed-out. Values close to ±1 indicate high likelihood that the value is</span>
+<span class="sd">            near the limit of the dynamic range, with the sign indicating if it&#39;s near</span>
+<span class="sd">            the upper bound, or lower bound. Values close to zero indicate low</span>
+<span class="sd">            likelihood of being near range limit.</span>
+<span class="sd">        confidence_threshold: Threshold for what constitutes a significant change in</span>
+<span class="sd">            marker values.</span>
+<span class="sd">        sampling_rate: Sampling rate of acceleration data, typically 100hz following</span>
+<span class="sd">            interpolation.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame containing indices for hills and valleys.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">marker_diff_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">marker</span><span class="p">)))</span>
+    <span class="n">marker_diff_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">marker</span><span class="p">),</span> <span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="n">out_of_range_threshold</span> <span class="o">=</span> <span class="n">sampling_rate</span> <span class="o">*</span> <span class="mi">5</span>
+
+    <span class="n">positive_left_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">marker_diff_left</span> <span class="o">&gt;</span> <span class="n">confidence_threshold</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">marker</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">positive_right_start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">marker_diff_right</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">confidence_threshold</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">marker</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">hills_df</span> <span class="o">=</span> <span class="n">_align_edges</span><span class="p">(</span>
+        <span class="n">marker_length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">marker</span><span class="p">),</span>
+        <span class="n">left</span><span class="o">=</span><span class="n">positive_left_end</span><span class="p">,</span>
+        <span class="n">right</span><span class="o">=</span><span class="n">positive_right_start</span><span class="p">,</span>
+        <span class="n">out_of_range_threshold</span><span class="o">=</span><span class="n">out_of_range_threshold</span><span class="p">,</span>
+        <span class="n">sign</span><span class="o">=</span><span class="s2">&quot;hill&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">negative_left_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">marker_diff_left</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">confidence_threshold</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">marker</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">negative_right_start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">marker_diff_right</span> <span class="o">&gt;</span> <span class="n">confidence_threshold</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">marker</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">valleys_df</span> <span class="o">=</span> <span class="n">_align_edges</span><span class="p">(</span>
+        <span class="n">marker_length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">marker</span><span class="p">),</span>
+        <span class="n">left</span><span class="o">=</span><span class="n">negative_left_end</span><span class="p">,</span>
+        <span class="n">right</span><span class="o">=</span><span class="n">negative_right_start</span><span class="p">,</span>
+        <span class="n">out_of_range_threshold</span><span class="o">=</span><span class="n">out_of_range_threshold</span><span class="p">,</span>
+        <span class="n">sign</span><span class="o">=</span><span class="s2">&quot;valley&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">hills_df</span><span class="p">,</span> <span class="n">valleys_df</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;vertical&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_align_edges">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims._align_edges">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_align_edges</span><span class="p">(</span>
+    <span class="n">marker_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">left</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">out_of_range_threshold</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">sign</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hill&quot;</span><span class="p">,</span> <span class="s2">&quot;valley&quot;</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Aligns left and right edges of maxed-out regions and handles edge cases.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        marker_length: Length of marker array.</span>
+<span class="sd">        left: 1D vector of indices indicating the left edge of a potential maxed-out</span>
+<span class="sd">            region.</span>
+<span class="sd">        right: 1D vector of indices indicating the right edge of a potential maxed-out</span>
+<span class="sd">            region.</span>
+<span class="sd">        out_of_range_threshold: The number of samples that determines if an un matched</span>
+<span class="sd">            edge extends beyond the data range, or if the edge is spurious. Typically 5</span>
+<span class="sd">            seconds worth of data.</span>
+<span class="sd">        sign: Indicates if maxed out region is a hill or valley.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A DataFrame with the left and right edges of each maxed-out region.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the difference in length between the left and right arrays is</span>
+<span class="sd">        greater than 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">left</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">right</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Mismatch in </span><span class="si">{</span><span class="n">sign</span><span class="si">}</span><span class="s2"> edges. # left: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">left</span><span class="p">)</span><span class="si">}</span><span class="s2">, # right: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">right</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">left</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">right</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">marker_length</span> <span class="o">-</span> <span class="n">left</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">out_of_range_threshold</span><span class="p">:</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">right</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">left</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">left</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">right</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">right</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">out_of_range_threshold</span><span class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">left</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">right</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">right</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">valid_indices</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">right</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">((</span><span class="n">right</span><span class="p">[</span><span class="n">valid_indices</span><span class="p">]</span> <span class="o">-</span> <span class="n">left</span><span class="p">[</span><span class="n">valid_indices</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">right</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="n">right</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">maxed_out_areas</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="n">left</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="n">right</span><span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">maxed_out_areas</span></div>
+
+
+
+<div class="viewcode-block" id="_extrapolate_fit">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims._extrapolate_fit">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_extrapolate_fit</span><span class="p">(</span>
+    <span class="n">axis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">time_numeric</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">marker</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">neighbors</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">smoothing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">,</span>
+    <span class="n">neighborhood_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extrapolate peak of maxed regions by fitting weighted splines on nearby points.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        axis: Original acceleration data along one axis.</span>
+<span class="sd">        time_numeric: Time series data given in epoch time (ns).</span>
+<span class="sd">        marker: Array the same size as axis, containing values that mark the</span>
+<span class="sd">            probability that each sample is maxed-out. Values close to ±1 indicate</span>
+<span class="sd">            high likelihood that the value is near the limit of the dynamic range, with</span>
+<span class="sd">            the sign indicating if it&#39;s near the upper bound, or lower bound. Values</span>
+<span class="sd">            close to zero indicate low likelihood of being near range limit.</span>
+<span class="sd">        neighbors: A polars DataFrame containing the start and end indices for the</span>
+<span class="sd">            maxed out regions, as well as the neighborhoods to the left and right of</span>
+<span class="sd">            regions.</span>
+<span class="sd">        smoothing: Smoothing value for UniveriateSpline. Determines how closely the</span>
+<span class="sd">            spline adheres to the data points. Higher values will give a smoother</span>
+<span class="sd">            result.</span>
+<span class="sd">        neighborhood_size: Duration of neighborhood in seconds to use around each</span>
+<span class="sd">            maxed-out region for regression fitting. Default is 0.05 (50ms).</span>
+<span class="sd">        sampling_rate: Sampling rate, default is 100Hz</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A List of Tuples representing the peaks of maxed out regions as</span>
+<span class="sd">        (timestamp, value) pairs. Times are given in epoch time (ns).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">extrapolate_points</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="o">.</span><span class="n">iter_rows</span><span class="p">(</span><span class="n">named</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">left_start</span><span class="p">,</span> <span class="n">left_end</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;left_neighborhood&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span>
+        <span class="n">right_start</span><span class="p">,</span> <span class="n">right_end</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;end&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;right_neighborhood&quot;</span><span class="p">]</span>
+
+        <span class="n">fitted_left</span> <span class="o">=</span> <span class="n">_fit_weighted</span><span class="p">(</span>
+            <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+            <span class="n">time_numeric</span><span class="o">=</span><span class="n">time_numeric</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
+            <span class="n">start</span><span class="o">=</span><span class="n">left_start</span><span class="p">,</span>
+            <span class="n">end</span><span class="o">=</span><span class="n">left_end</span><span class="p">,</span>
+            <span class="n">smoothing</span><span class="o">=</span><span class="n">smoothing</span><span class="p">,</span>
+            <span class="n">neighborhood_size</span><span class="o">=</span><span class="n">neighborhood_size</span><span class="p">,</span>
+            <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">fitted_right</span> <span class="o">=</span> <span class="n">_fit_weighted</span><span class="p">(</span>
+            <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+            <span class="n">time_numeric</span><span class="o">=</span><span class="n">time_numeric</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
+            <span class="n">start</span><span class="o">=</span><span class="n">right_start</span><span class="p">,</span>
+            <span class="n">end</span><span class="o">=</span><span class="n">right_end</span><span class="p">,</span>
+            <span class="n">smoothing</span><span class="o">=</span><span class="n">smoothing</span><span class="p">,</span>
+            <span class="n">neighborhood_size</span><span class="o">=</span><span class="n">neighborhood_size</span><span class="p">,</span>
+            <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fitted_left</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">fitted_right</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">middle_t</span> <span class="o">=</span> <span class="p">(</span><span class="n">time_numeric</span><span class="p">[</span><span class="n">left_end</span><span class="p">]</span> <span class="o">+</span> <span class="n">time_numeric</span><span class="p">[</span><span class="n">right_start</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="n">left_extrapolated</span> <span class="o">=</span> <span class="n">fitted_left</span><span class="p">(</span><span class="n">middle_t</span><span class="p">)</span>
+        <span class="n">right_extrapolated</span> <span class="o">=</span> <span class="n">fitted_right</span><span class="p">(</span><span class="n">middle_t</span><span class="p">)</span>
+
+        <span class="n">extrapolated_value</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">left_extrapolated</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">right_extrapolated</span><span class="p">)</span>
+        <span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="n">extrapolate_points</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">middle_t</span><span class="p">,</span> <span class="n">extrapolated_value</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">extrapolate_points</span></div>
+
+
+
+<div class="viewcode-block" id="_fit_weighted">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims._fit_weighted">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fit_weighted</span><span class="p">(</span>
+    <span class="n">axis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">time_numeric</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">marker</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">smoothing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">,</span>
+    <span class="n">neighborhood_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">interpolate</span><span class="o">.</span><span class="n">UnivariateSpline</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fit weighted spline regression model to a section of the data.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        axis: Original acceleration data along one axis.</span>
+<span class="sd">        time_numeric: Time series data given in epoch time (ns).</span>
+<span class="sd">        marker: Array the same size as axis, containing values that mark the</span>
+<span class="sd">            probability that each sample is maxed-out. Values close to ±1 indicate</span>
+<span class="sd">            high likelihood that the value is near the limit of the dynamic range, with</span>
+<span class="sd">            the sign indicating if it&#39;s near the upper bound, or lower bound. Values</span>
+<span class="sd">            close to zero indicate low likelihood of being near range limit.</span>
+<span class="sd">        start: Index marking the beginning of the maxed out zone.</span>
+<span class="sd">        end: Index marking end of maxed out zone.</span>
+<span class="sd">        smoothing: Smoothing value for UniveriateSpline. Determines how closely the</span>
+<span class="sd">            spline adheres to the data points. Higher values will give a smoother</span>
+<span class="sd">            result. Default is 0.6 as optimized in the MIMS-unit paper.</span>
+<span class="sd">        neighborhood_size: Duration of neighborhood in seconds to use around each</span>
+<span class="sd">            maxed-out region for regression fitting. Default is 0.05 (50ms).</span>
+<span class="sd">        sampling_rate: Sampling rate, default is 100Hz</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A UnivariateSpline function fitted to the data segment with weights based on</span>
+<span class="sd">        the probability of not being maxed-out. Returns None if the input data is</span>
+<span class="sd">        insufficient or invalid (-1).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_over</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sampling_rate</span> <span class="o">*</span> <span class="n">neighborhood_size</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_over</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">sub_t</span> <span class="o">=</span> <span class="n">time_numeric</span><span class="p">[</span><span class="n">start</span> <span class="p">:</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">sub_value</span> <span class="o">=</span> <span class="n">axis</span><span class="p">[</span><span class="n">start</span> <span class="p">:</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">marker</span><span class="p">[</span><span class="n">start</span> <span class="p">:</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sub_t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">over_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">sub_t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sub_t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_over</span><span class="p">)</span>
+    <span class="n">over_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">over_t</span><span class="p">,</span> <span class="n">sub_t</span><span class="p">,</span> <span class="n">sub_value</span><span class="p">)</span>
+    <span class="n">over_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">over_t</span><span class="p">,</span> <span class="n">sub_t</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
+
+    <span class="n">fitted</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">UnivariateSpline</span><span class="p">(</span>
+        <span class="n">over_t</span><span class="p">,</span> <span class="n">over_value</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="n">over_weight</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">smoothing</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fitted</span></div>
+
+
+
+<div class="viewcode-block" id="_extrapolate_interpolate">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims._extrapolate_interpolate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_extrapolate_interpolate</span><span class="p">(</span>
+    <span class="n">axis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">time_numeric</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">marker</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">points</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">confidence_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolate the original signal with extrapolated points.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        axis: Original acceleration data along one axis.</span>
+<span class="sd">        time_numeric: Time series data given in epoch time (ns).</span>
+<span class="sd">        marker: Array the same size as axis, containing values that mark the</span>
+<span class="sd">            probability that each sample is maxed-out. Values close to ±1 indicate</span>
+<span class="sd">            high likelihood that the value is near the limit of the dynamic range, with</span>
+<span class="sd">            the sign indicating if it&#39;s near the upper bound, or lower bound. Values</span>
+<span class="sd">            close to zero indicate low likelihood of being near range limit.</span>
+<span class="sd">        points: List of tuples with extrapolated points (time, value). Times are given</span>
+<span class="sd">            in epoch time (ns).</span>
+<span class="sd">        confidence_threshold: Threshold for maxed-out identification.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray of axis data, with extrapolated values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">non_maxed_out_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">confidence_threshold</span>
+    <span class="n">num_non_maxed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">non_maxed_out_mask</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">num_non_maxed</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.3</span><span class="p">:</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">time_numeric</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">axis</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">time_numeric</span><span class="p">[</span><span class="n">non_maxed_out_mask</span><span class="p">]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">axis</span><span class="p">[</span><span class="n">non_maxed_out_mask</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">points</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">points_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">])</span>
+            <span class="n">points_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">])</span>
+
+            <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">times</span><span class="p">,</span> <span class="n">points_time</span><span class="p">])</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">values</span><span class="p">,</span> <span class="n">points_value</span><span class="p">])</span>
+
+            <span class="n">sort_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+            <span class="n">times</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="n">sort_idx</span><span class="p">]</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">sort_idx</span><span class="p">]</span>
+
+    <span class="n">interp_function</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">CubicSpline</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">bc_type</span><span class="o">=</span><span class="s2">&quot;natural&quot;</span><span class="p">)</span>
+    <span class="n">interp_values</span> <span class="o">=</span> <span class="n">interp_function</span><span class="p">(</span><span class="n">time_numeric</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">interp_values</span></div>
+
+
+
+<div class="viewcode-block" id="butterworth_filter">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims.butterworth_filter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">butterworth_filter</span><span class="p">(</span>
+    <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span>
+    <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">cutoffs</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+    <span class="n">order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply butterworth IIR filter to acceleration data.</span>
+
+<span class="sd">    Implements third portion of MIMS algorithm following interpolate, and extrapolation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        acceleration: Acceleration data to be filtered.</span>
+<span class="sd">        sampling_rate: Sampling rate of acceleration data in Hz.</span>
+<span class="sd">        cutoffs: Cutoff values for bandpass filter.</span>
+<span class="sd">        order: Order of the filter, defaults to 4th order.</span>
+
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Acceleration Measurement of filtered data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">normalized_cutoffs</span> <span class="o">=</span> <span class="p">[</span><span class="n">cutoff</span> <span class="o">/</span> <span class="p">(</span><span class="n">sampling_rate</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">cutoff</span> <span class="ow">in</span> <span class="n">cutoffs</span><span class="p">]</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">Wn</span><span class="o">=</span><span class="n">normalized_cutoffs</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="s2">&quot;bandpass&quot;</span><span class="p">)</span>
+
+    <span class="n">filtered_data</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">column</span><span class="p">)</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">acceleration</span><span class="o">.</span><span class="n">measurements</span><span class="o">.</span><span class="n">T</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span>
+        <span class="n">measurements</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">filtered_data</span><span class="p">),</span> <span class="n">time</span><span class="o">=</span><span class="n">acceleration</span><span class="o">.</span><span class="n">time</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="aggregate_mims">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims.aggregate_mims">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">aggregate_mims</span><span class="p">(</span>
+    <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span>
+    <span class="n">epoch</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span><span class="p">,</span>
+    <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">rectify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">truncate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the area under the curve(AUC), per epoch, per axis.</span>
+
+<span class="sd">    When an epoch has less than 90% of the expected values (based on the sampling rate</span>
+<span class="sd">    and epoch length), the AUC for that epoch is given as -1 for each axis. If rectify</span>
+<span class="sd">    is True, any axis with values below -150 will have the AUC value for that axis</span>
+<span class="sd">    be -1 for that epoch. Finally, following integration, any value greater than (16 *</span>
+<span class="sd">    sampling_rate * epoch) will be set to -1.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        acceleration: Acceleration data to be aggregated.</span>
+<span class="sd">        epoch: The desired epoch length in seconds that data will be aggregated over.</span>
+<span class="sd">        sampling_rate: The sampling rate of the accelerometer data in Hz.</span>
+<span class="sd">        rectify: Specifies if data should be rectified before integration. If True any</span>
+<span class="sd">            value below -150 will assign the value of that axis to -1 for that epoch.</span>
+<span class="sd">            Additionally the absolute value of accelerometer data will be used for</span>
+<span class="sd">            integration.</span>
+<span class="sd">        truncate: Specifies if data &lt;= 0.001 should be truncated to 0.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A models.Measurement instance with the area under the curve values for each</span>
+<span class="sd">        epoch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">epoch</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Epoch length must be greater than 0.&quot;</span><span class="p">)</span>
+
+    <span class="n">epoch_ns</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">epoch</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>
+    <span class="n">acceleration_df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">acceleration</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">acceleration</span><span class="o">.</span><span class="n">measurements</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">acceleration</span><span class="o">.</span><span class="n">measurements</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">acceleration</span><span class="o">.</span><span class="n">measurements</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">}</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">set_sorted</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">acceleration_df</span><span class="o">.</span><span class="n">group_by_dynamic</span><span class="p">(</span>
+        <span class="s2">&quot;time&quot;</span><span class="p">,</span>
+        <span class="n">every</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">epoch_ns</span><span class="si">}</span><span class="s2">ns&quot;</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">map_groups</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">group</span><span class="p">:</span> <span class="n">_aggregate_epoch</span><span class="p">(</span>
+            <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span>
+            <span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">,</span>
+            <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
+            <span class="n">rectify</span><span class="o">=</span><span class="n">rectify</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">schema</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Datetime</span><span class="p">(</span><span class="s2">&quot;ns&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Float64</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Float64</span><span class="p">,</span>
+            <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Float64</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">truncate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">))</span>
+
+    <span class="n">aggregated_measure</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span>
+        <span class="n">measurements</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+        <span class="n">time</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">Datetime</span><span class="p">(</span><span class="s2">&quot;ns&quot;</span><span class="p">)),</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">truncate</span><span class="p">:</span>
+        <span class="n">truncate_threshold</span> <span class="o">=</span> <span class="mf">1e-4</span> <span class="o">*</span> <span class="n">epoch</span> <span class="o">*</span> <span class="n">sampling_rate</span>
+        <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span><span class="p">[</span>
+            <span class="n">aggregated_measure</span><span class="o">.</span><span class="n">measurements</span> <span class="o">&lt;=</span> <span class="n">truncate_threshold</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">aggregated_measure</span></div>
+
+
+
+<div class="viewcode-block" id="_aggregate_epoch">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims._aggregate_epoch">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_aggregate_epoch</span><span class="p">(</span>
+    <span class="n">group</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">epoch</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span><span class="p">,</span>
+    <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">rectify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the area under the curve(AUC), per epoch.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        group: The epoch given by .map_groups()</span>
+<span class="sd">        epoch: The desired epoch length in seconds that data will be aggregated over.</span>
+<span class="sd">            Defaults to 1 minute as per MIMS-unit paper.</span>
+<span class="sd">        sampling_rate: The sampling rate of the accelerometer data in Hz.</span>
+<span class="sd">        rectify: Specifies if data should be rectified before integration. If True any</span>
+<span class="sd">            value below -150 will assign the value of that axis to -1 for that epoch.</span>
+<span class="sd">            Additionally the absolute value of accelerometer data will be used for</span>
+<span class="sd">            integration.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A polars DataFrame containing the XYZ AUC values for one epoch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">timestamps</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="n">sampling_rate</span> <span class="o">*</span> <span class="n">epoch</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Not enough data to calculate AUC&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()],</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">],</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">]}</span>
+        <span class="p">)</span>
+
+    <span class="n">values</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+    <span class="n">times_sec</span> <span class="o">=</span> <span class="n">timestamps</span> <span class="o">/</span> <span class="mf">1e9</span>
+
+    <span class="k">if</span> <span class="n">rectify</span><span class="p">:</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">values</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="n">times_sec</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">low_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">values</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">150</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">low_values</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Values below -150 detected. Consider checking your data.&quot;</span><span class="p">)</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">low_values</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">area</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">times_sec</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">max_value</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">*</span> <span class="n">sampling_rate</span> <span class="o">*</span> <span class="n">epoch</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">area</span> <span class="o">&gt;=</span> <span class="n">max_value</span><span class="p">,</span> <span class="n">area</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">),</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">area</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()],</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">area</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">area</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">area</span><span class="p">[</span><span class="mi">2</span><span class="p">]]}</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="combine_mims">
+<a class="viewcode-back" href="../../../api/wristpy.processing.mims.html#wristpy.processing.mims.combine_mims">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">combine_mims</span><span class="p">(</span>
+    <span class="n">acceleration</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">,</span>
+    <span class="n">combination_method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="s2">&quot;vector_magnitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Combine MIMS values of xyz axis into one MIMS value.</span>
+
+<span class="sd">    If any value in an epoch is -1, the &#39;combined_mims&#39; value for that epoch will</span>
+<span class="sd">    be set to -1 to flag it as an invalid epoch.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        acceleration: An object containing per-axis MIMS measurements and their</span>
+<span class="sd">            corresponding timestamps.</span>
+<span class="sd">        combination_method: The method to combine MIMS values across axes. Defaults to</span>
+<span class="sd">            &quot;sum&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">            A Measurement object with combined MIMS values and corresponding timestamps.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row_contains_negative</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">acceleration</span><span class="o">.</span><span class="n">measurements</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">combination_method</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
+        <span class="n">row_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">acceleration</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">combined_mims</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">row_contains_negative</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">row_sum</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">combination_method</span> <span class="o">==</span> <span class="s2">&quot;vector_magnitude&quot;</span><span class="p">:</span>
+        <span class="n">row_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">acceleration</span><span class="o">.</span><span class="n">measurements</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">combined_mims</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">row_contains_negative</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">row_norm</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid combination_method given:</span><span class="si">{</span><span class="n">combination_method</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">&quot;Must be &#39;sum&#39; or &#39;vector_magnitude&#39;. &quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">models</span><span class="o">.</span><span class="n">Measurement</span><span class="p">(</span><span class="n">measurements</span><span class="o">=</span><span class="n">combined_mims</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">acceleration</span><span class="o">.</span><span class="n">time</span><span class="p">)</span></div>
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Child Mind Institute
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>
