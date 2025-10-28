@@ -25,11 +25,11 @@ authors:
     affiliation: 1
 
 affiliations:
-  - name: Child Mind Institute, New York, USA
+  - name: Child Mind Institute, New York, United States of America
     index: 1
-  - name:  Center for Biomedical Imaging and Neuromodulation, Nathan Kline Institute, Orangeburg, NY, USA 
+  - name:  Center for Biomedical Imaging and Neuromodulation, Nathan Kline Institute, Orangeburg, NY, United States of America 
     index: 2
-  - name: Department of Psychiatry, NYU Grossman School of Medicine, New York, NY, USA 
+  - name: Department of Psychiatry, NYU Grossman School of Medicine, New York, NY, United States of America 
     index: 3
 date: 24 March 2025
 bibliography: paper.bib
@@ -47,9 +47,9 @@ bibliography: paper.bib
 
 Wearable accelerometers are increasingly used to measure both physical activity and sleep patterns as they provide a simple, effective, non-invasive, and low-cost alternative to clinical observation, allowing for large scale data to be acquired in realistic scenarios. While several commercial solutions exist, such as consumer-grade products providing aggregate data (e.g., FitBit) or research-focused proprietary software (e.g., such as those from Actigraph and ActivInsights), a need exists for device-agnostic open-source tools that can process raw accelerometer data with transparency, reproducibility, and scalability, both as a base for evaluation and methodological advancement.
 
-Several open-source packages have been developed, namely GGIR [@van_hees_ggir_2025], Scikit Digital Health (`skdh`) [@adamowicz_scikit_2022], and pyActigraphy [@hammad_pyactigraphy_2021]. GGIR is one of the most commonly used software packages to process and analyze actigraphy data from various watches and has been cited in hundreds of publications over the past decade. `skdh` is a Python package that can process data from GENEActiv watches (with extensibility to support data from other data streams after conversion to `.csv`) to compute physical activity metrics, sleep detection based on [@christakis_sleeppy_2019], novel wear detection [@vert_detecting_2022], gait detection, and numerous other functions for both processing and analyzing accelerometer data. Fruthermore, this package now supports combining multiple files into one data-stream for processing.
+Several open-source packages have been developed, namely GGIR [@van_hees_ggir_2025], Scikit Digital Health (`skdh`) [@adamowicz_scikit_2022], and pyActigraphy [@hammad_pyactigraphy_2021]. GGIR is one of the most commonly used software packages to process and analyze actigraphy data from various watches and has been cited in hundreds of publications over the past decade. `skdh` is a Python package that can process data from GENEActiv watches (with extensibility to support data from other data streams after conversion to `.csv`) to compute physical activity metrics, sleep detection based on [@christakis_sleeppy_2019], novel wear detection [@vert_detecting_2022], gait detection, and numerous other functions for both processing and analyzing accelerometer data. Furthermore, this package now supports combining multiple files into one data-stream for processing.
 
-Currently, none of these packages allow for the computation of multiple sleep windows within a day and, aside from `skdh`, these libraries do not extensibly support data from other sensors, including those on the devices they currently support (such as skin conductance and light). Furthermore, the implementation and utilization of these toolkits and pipelines may require some training on the end user side. Crucially, we have developed `wristpy` with the end user's experience in mind, creating a true `point and click solution`. It is a simple, inuitive, and light-weight toolbox. Additionally by expanding to a docker image, it is easy to run the same one-click implementation on servers. `wristpy` achieves these goals by providing a development environment and utilities that allow it to:
+Currently, none of these packages allow for the computation of multiple sleep windows within a day and, aside from `skdh`, these libraries do not extensibly support data from other sensors, including those on the devices they currently support (such as skin conductance and light). Furthermore, the implementation and utilization of these toolkits and pipelines may require some training on the end user side. Crucially, we have developed `wristpy` with the end user's experience in mind, creating a true `point and click solution`. It is a simple, intuitive, and light-weight toolbox. Additionally by expanding to a docker image, it is easy to run the same one-click implementation on servers. `wristpy` achieves these goals by providing a development environment and utilities that allow it to:
 - Process raw accelerometer data from various watch manufacturers, including both GENEActiv and Actigraph watches (with plans to support more research grade devices in future development).
 - Access to all sensors and metadata from these watches.
 - Support modular processing algorithms that can be easily extended while enforcing strict code quality guidelines, exhaustive test coverage, and documentation. Additionally, this documentation extends to a thorough and robust `logger` allowing users to easily track down and identify the source of any `WARNING` or `ERROR` messages.
