@@ -1,4 +1,5 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13883190.svg)](https://doi.org/10.5281/zenodo.13883190)
+[![status](https://joss.theoj.org/papers/88f3fdfdf621e967da12a9e8fde4785d/status.svg)](https://joss.theoj.org/papers/88f3fdfdf621e967da12a9e8fde4785d)
 
 # `wristpy` <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://media.githubusercontent.com/media/childmindresearch/wristpy/main/docs/source/_static/images/wristpy_logo_dark.png">

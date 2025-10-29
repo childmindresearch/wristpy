@@ -1,0 +1,56 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Santorelli
+  given-names: Adam
+  orcid: "https://orcid.org/0000-0002-8951-4619"
+- family-names: Perez
+  given-names: Freymon
+- family-names: Wael
+  given-names: Reinder Vos
+  name-particle: de
+- family-names: Rupprecht
+  given-names: Florian
+- family-names: d'Antonio-Bertagnolli
+  given-names: John Vito
+- family-names: Franco
+  given-names: Alexandre
+- family-names: Kiar
+  given-names: Gregory
+  orcid: "https://orcid.org/0000-0001-8915-496X"
+doi: 10.5281/zenodo.17289865
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Santorelli
+    given-names: Adam
+    orcid: "https://orcid.org/0000-0002-8951-4619"
+  - family-names: Perez
+    given-names: Freymon
+  - family-names: Wael
+    given-names: Reinder Vos
+    name-particle: de
+  - family-names: Rupprecht
+    given-names: Florian
+  - family-names: d'Antonio-Bertagnolli
+    given-names: John Vito
+  - family-names: Franco
+    given-names: Alexandre
+  - family-names: Kiar
+    given-names: Gregory
+    orcid: "https://orcid.org/0000-0001-8915-496X"
+  date-published: 2025-10-28
+  doi: 10.21105/joss.08637
+  issn: 2475-9066
+  issue: 114
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 8637
+  title: "wristpy: Fast, User-Friendly Python Processing of Wrist-worn
+    Accelerometer Data"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.08637"
+  volume: 10
+title: "wristpy: Fast, User-Friendly Python Processing of Wrist-worn
+  Accelerometer Data"
