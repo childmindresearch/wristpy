@@ -50,7 +50,7 @@ How To Cite
 --------------
 If you use wristpy in your research, please cite the following paper:
 
-Santorelli, A., Perez, F., de Wael, R. V., Rupprecht, F., d'Antonio-Bertagnolli, J. V., Franco, A., & Kiar, G. (2025). 
+Santorelli, A., Perez, F., de Wael, R. V., Rupprecht, F., d'Antonio-Bertagnolli, J. V., Franco, A., & Kiar, G. (2025).
 "wristpy: Fast, User-Friendly Python Processing of Wrist-worn Accelerometer Data", Journal of Open Source Software, 10(114), 8637. https://doi.org/10.21105/joss.08637
 
 Reference
