@@ -15,8 +15,8 @@ Wristpy Documentation
 
 |DOI| |Build| |codecov| |Ruff| |stability| |License| |docs|
 
-.. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.13883190.svg
-   :target: https://doi.org/10.5281/zenodo.13883190
+.. |DOI| image:: https://joss.theoj.org/papers/88f3fdfdf621e967da12a9e8fde4785d/status.svg
+   :target: https://joss.theoj.org/papers/88f3fdfdf621e967da12a9e8fde4785d
 
 .. |Build| image:: https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml/badge.svg?branch=main
    :target: https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml?query=branch%3Amain
@@ -50,8 +50,8 @@ How To Cite
 --------------
 If you use wristpy in your research, please cite the following paper:
 
-Santorelli A, Perez F, Vos de Wael R, Rupprecht F, d'Antonio-Bertagnolli JV,
-Franco A, Kiar G. *wristpy: Fast, User-Friendly Python Processing of Wrist-worn Accelerometer Data*. 2025. Under review. DOI: https://doi.org/10.5281/zenodo.13883190
+Santorelli, A., Perez, F., de Wael, R. V., Rupprecht, F., d'Antonio-Bertagnolli, J. V., Franco, A., & Kiar, G. (2025).
+"wristpy: Fast, User-Friendly Python Processing of Wrist-worn Accelerometer Data", Journal of Open Source Software, 10(114), 8637. https://doi.org/10.21105/joss.08637
 
 Reference
 ---------
