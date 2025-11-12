@@ -15,8 +15,8 @@ Wristpy Documentation
 
 |DOI| |Build| |codecov| |Ruff| |stability| |License| |docs|
 
-.. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.13883190.svg
-   :target: https://doi.org/10.5281/zenodo.13883190
+.. |DOI| image:: https://joss.theoj.org/papers/88f3fdfdf621e967da12a9e8fde4785d/status.svg
+   :target: https://joss.theoj.org/papers/88f3fdfdf621e967da12a9e8fde4785d
 
 .. |Build| image:: https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml/badge.svg?branch=main
    :target: https://github.com/childmindresearch/wristpy/actions/workflows/test.yaml?query=branch%3Amain
