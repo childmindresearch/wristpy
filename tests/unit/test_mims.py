@@ -59,12 +59,12 @@ def test_interpolate_time(
     )
     interpolated_ms = interpolated_acceleration.time.dt.epoch(time_unit="ms").to_numpy()
 
-    assert len(expected_time) == len(
-        interpolated_acceleration.time
-    ), "Timestamp series are not the same length."
-    assert np.allclose(
-        expected_ms, interpolated_ms, atol=10
-    ), "Timestamps don't match within tolerance. "
+    assert len(expected_time) == len(interpolated_acceleration.time), (
+        "Timestamp series are not the same length."
+    )
+    assert np.allclose(expected_ms, interpolated_ms, atol=10), (
+        "Timestamps don't match within tolerance. "
+    )
 
 
 def test_interpolate_data(
@@ -88,9 +88,9 @@ def test_interpolate_data(
             expected_acceleration.T[axis, :],
             interpolated_acceleration.measurements.T[axis, :],
         )
-        assert np.all(
-            correlation > 0.99
-        ), f"Axis:{axis} did not meet the threshold, current values: {correlation}"
+        assert np.all(correlation > 0.99), (
+            f"Axis:{axis} did not meet the threshold, current values: {correlation}"
+        )
 
 
 def test_extrapolate_points() -> None:
@@ -143,12 +143,12 @@ def test_brute_force_k() -> None:
     )
     result_probability = stats.gamma.cdf(standard_deviation, a=result, scale=scale)
 
-    assert (
-        k_min < result < k_max
-    ), f"Expected shape value between {k_min} and {k_max}, got: {result}"
-    assert np.isclose(
-        target_probability, result_probability, rtol=1e-3
-    ), f"Expected target probability of: {target_probability}, got:{result_probability}"
+    assert k_min < result < k_max, (
+        f"Expected shape value between {k_min} and {k_max}, got: {result}"
+    )
+    assert np.isclose(target_probability, result_probability, rtol=1e-3), (
+        f"Expected target probability of: {target_probability}, got:{result_probability}"
+    )
 
 
 @pytest.mark.parametrize("maxed_out_value", [-0.9, 0.9])
@@ -220,9 +220,9 @@ def test_extrapolate_edges() -> None:
     )
     result_sorted = result.sort("start")
 
-    assert (
-        result_sorted.shape[0] == 2
-    ), f"Expected 2 regions, got {result_sorted.shape[0]}."
+    assert result_sorted.shape[0] == 2, (
+        f"Expected 2 regions, got {result_sorted.shape[0]}."
+    )
     assert result_sorted["start"][0] == 2
     assert result_sorted["end"][0] == 4
     assert result_sorted["start"][1] == 6
@@ -365,12 +365,12 @@ def test_extrapolate_fit_happy_path() -> None:
     (peak_time, peak_value) = result[0]
 
     assert len(result) == 1, f"Expected 1 extrapolated peak, got {len(result)}."
-    assert np.isclose(
-        peak_time, 4.5, atol=1e-6
-    ), f"Expected middle_time=4.5, got {peak_time}"
-    assert np.isclose(
-        peak_value, 4.5, atol=0.5
-    ), f"Expected extrapolated value near 4.5, got {peak_value}"
+    assert np.isclose(peak_time, 4.5, atol=1e-6), (
+        f"Expected middle_time=4.5, got {peak_time}"
+    )
+    assert np.isclose(peak_value, 4.5, atol=0.5), (
+        f"Expected extrapolated value near 4.5, got {peak_value}"
+    )
 
 
 def test_extrapolate_fit_missing_fits() -> None:
@@ -425,9 +425,9 @@ def test_fit_weighted_valid_region() -> None:
 
     assert spline is not None
     predicted = spline(mid_time)
-    assert np.isclose(
-        predicted, 3.5, atol=0.1
-    ), f"Spline predicted={predicted}, expected=3.5"
+    assert np.isclose(predicted, 3.5, atol=0.1), (
+        f"Spline predicted={predicted}, expected=3.5"
+    )
 
 
 def test_fit_weighted_insufficient_data() -> None:
@@ -449,9 +449,9 @@ def test_fit_weighted_insufficient_data() -> None:
         neighborhood_size=0.05,
     )
 
-    assert (
-        spline is None
-    ), f"Expected None for insufficient data (only one point). Got {spline}."
+    assert spline is None, (
+        f"Expected None for insufficient data (only one point). Got {spline}."
+    )
 
 
 def test_fit_weighted_out_of_range() -> None:
@@ -522,9 +522,9 @@ def test_butterworth_filter(
             expected_acceleration.T[axis, :],
             filtered_data.measurements.T[axis, :],
         )
-        assert np.all(
-            correlation > 0.99
-        ), f"Axis:{axis} did not meet the threshold, current values: {correlation}"
+        assert np.all(correlation > 0.99), (
+            f"Axis:{axis} did not meet the threshold, current values: {correlation}"
+        )
 
 
 def test_aggregation_good(
@@ -548,9 +548,9 @@ def test_aggregation_good(
         truncate=False,
     )
 
-    assert np.allclose(
-        expected_acceleration, results.measurements, atol=0.001
-    ), f"Results did not match expectation. Results: {results.measurements}"
+    assert np.allclose(expected_acceleration, results.measurements, atol=0.001), (
+        f"Results did not match expectation. Results: {results.measurements}"
+    )
 
 
 def test_aggregation_few_samples(
@@ -568,9 +568,9 @@ def test_aggregation_few_samples(
         truncate=False,
     )
 
-    assert np.all(
-        expected_acceleration == results.measurements
-    ), f"Results did not match expectation. Results: {results.measurements}"
+    assert np.all(expected_acceleration == results.measurements), (
+        f"Results did not match expectation. Results: {results.measurements}"
+    )
 
 
 def test_aggregation_rectify() -> None:
@@ -590,9 +590,9 @@ def test_aggregation_rectify() -> None:
         truncate=False,
     )
 
-    assert np.all(
-        expected_acceleration == results.measurements
-    ), f"Results did not match expectation. Results: {results.measurements}"
+    assert np.all(expected_acceleration == results.measurements), (
+        f"Results did not match expectation. Results: {results.measurements}"
+    )
 
 
 def test_aggregation_max_value() -> None:
@@ -609,9 +609,9 @@ def test_aggregation_max_value() -> None:
         acceleration=max_value_measure, epoch=60, sampling_rate=100, truncate=False
     )
 
-    assert np.all(
-        expected_acceleration == results.measurements
-    ), f"Results did not match expectation. Results: {results.measurements}"
+    assert np.all(expected_acceleration == results.measurements), (
+        f"Results did not match expectation. Results: {results.measurements}"
+    )
 
 
 @pytest.mark.parametrize(
@@ -637,9 +637,9 @@ def test_combine_mims(
         combination_method=combination_method,
     )
 
-    assert np.array_equal(
-        results.measurements, expected_data
-    ), f"Expected array was {expected_data}, result was: {results.measurements}"
+    assert np.array_equal(results.measurements, expected_data), (
+        f"Expected array was {expected_data}, result was: {results.measurements}"
+    )
 
 
 def test_combine_mims_method_error(create_acceleration: pl.DataFrame) -> None:

@@ -118,7 +118,9 @@ def mean_amplitude_deviation(
     ).set_sorted("time")
 
     mad_df = (
-        mad_lf.group_by_dynamic(index_column="time", every=f"{int(epoch_length*1e9)}ns")
+        mad_lf.group_by_dynamic(
+            index_column="time", every=f"{int(epoch_length * 1e9)}ns"
+        )
         .agg(
             [
                 (
