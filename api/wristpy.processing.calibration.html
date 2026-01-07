@@ -1,0 +1,865 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="wristpy.processing.idle_sleep_mode_imputation" href="wristpy.processing.idle_sleep_mode_imputation.html" /><link rel="prev" title="wristpy.processing.analytics" href="wristpy.processing.analytics.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+        <title>wristpy.processing.calibration - wristpy 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">wristpy 0.2.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static/images/wristpy_logo_light.png" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static/images/wristpy_logo_dark.png" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">wristpy 0.2.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli_tutorial.html">Command Line Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_tutorial.html">Python Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker_tutorial.html">Docker Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="wristpy.core.html">core</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of core</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.cli.html">wristpy.core.cli</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.computations.html">wristpy.core.computations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.config.html">wristpy.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.exceptions.html">wristpy.core.exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.models.html">wristpy.core.models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.orchestrator.html">wristpy.core.orchestrator</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="wristpy.io.html">io</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of io</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="wristpy.io.readers.html">wristpy.io.readers</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of wristpy.io.readers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="wristpy.io.readers.readers.html">wristpy.io.readers.readers</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="wristpy.io.writers.html">wristpy.io.writers</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of wristpy.io.writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="wristpy.io.writers.writers.html">wristpy.io.writers.writers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="wristpy.processing.html">processing</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of processing</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="wristpy.processing.analytics.html">wristpy.processing.analytics</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">wristpy.processing.calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.processing.idle_sleep_mode_imputation.html">wristpy.processing.idle_sleep_mode_imputation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.processing.metrics.html">wristpy.processing.metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.processing.mims.html">wristpy.processing.mims</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.processing.processing_utils.html">wristpy.processing.processing_utils</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Development Guide</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/wristpy.processing.calibration.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-wristpy.processing.calibration">
+<span id="wristpy-processing-calibration"></span><h1>wristpy.processing.calibration<a class="headerlink" href="#module-wristpy.processing.calibration" title="Link to this heading">¶</a></h1>
+<p>Calibrate accelerometer data.</p>
+<p class="rubric">Functions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cast</span></code>(typ, val)</p></td>
+<td><p>Cast a value to a type.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataclass</span></code>([cls, init, repr, eq, order, ...])</p></td>
+<td><p>Add dunder methods based on the fields defined in the class.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#wristpy.processing.calibration.AbstractCalibrator" title="wristpy.processing.calibration.AbstractCalibrator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AbstractCalibrator</span></code></a>()</p></td>
+<td><p>Abstract class defining the interface for the different calibration methods.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#wristpy.processing.calibration.CalibrationDispatcher" title="wristpy.processing.calibration.CalibrationDispatcher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CalibrationDispatcher</span></code></a>(name)</p></td>
+<td><p>Class used to select and implement appropriate calibrator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#wristpy.processing.calibration.ConstrainedMinimizationCalibration" title="wristpy.processing.calibration.ConstrainedMinimizationCalibration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConstrainedMinimizationCalibration</span></code></a>([...])</p></td>
+<td><p>Calibrates accelerometer data using the default wristpy method.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Generator</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration" title="wristpy.processing.calibration.GgirCalibration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GgirCalibration</span></code></a>([chunked, min_acceleration, ...])</p></td>
+<td><p>Implements the GGIR calibration on accelerometer data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#wristpy.processing.calibration.LinearTransformation" title="wristpy.processing.calibration.LinearTransformation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearTransformation</span></code></a>(scale, offset)</p></td>
+<td><p>Data class that contains scale and offset values for calibration.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code>(year, month, day[, hour[, minute[, ...)</p></td>
+<td><p>The year, month and day arguments are required.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.AbstractCalibrator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">wristpy.processing.calibration.</span></span><span class="sig-name descname"><span class="pre">AbstractCalibrator</span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#AbstractCalibrator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.AbstractCalibrator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Abstract class defining the interface for the different calibration methods.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.AbstractCalibrator.run_calibration">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run_calibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#AbstractCalibrator.run_calibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.AbstractCalibrator.run_calibration" title="Link to this definition">¶</a></dt>
+<dd><p>The calibration method must contain a run_calibration function.</p>
+<p>The function must take the acceleration measurement object as input and return
+a measurement object that contains the calibrated acceleration data.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.CalibrationDispatcher">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">wristpy.processing.calibration.</span></span><span class="sig-name descname"><span class="pre">CalibrationDispatcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'ggir'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'gradient'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#CalibrationDispatcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.CalibrationDispatcher" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class used to select and implement appropriate calibrator.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.CalibrationDispatcher.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_input_on_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#CalibrationDispatcher.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.CalibrationDispatcher.run" title="Link to this definition">¶</a></dt>
+<dd><p>Runs calibration on acceleration data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>acceleration</strong> – the accelerometer data containing x,y,z axis
+data and time stamps.</p></li>
+<li><p><strong>return_input_on_error</strong> – If true, will return the input acceleration data
+if calibration fails. If false, will raise an exception.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Measurement object that contains the calibrated acceleration data.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="wristpy.core.exceptions.html#wristpy.core.exceptions.CalibrationError" title="wristpy.core.exceptions.CalibrationError"><strong>CalibrationError</strong></a> – If the calibration process fails to converge or the final
+    error exceeds the <cite>max_calibration_error</cite> threshold.</p></li>
+<li><p><a class="reference internal" href="wristpy.core.exceptions.html#wristpy.core.exceptions.SphereCriteriaError" title="wristpy.core.exceptions.SphereCriteriaError"><strong>SphereCriteriaError</strong></a> – If the sphere is not sufficiently populated, i.e. every
+    axis does not have at least 1 value both above and below  the + and
+    - value of min_acceleraiton.</p></li>
+<li><p><a class="reference internal" href="wristpy.core.exceptions.html#wristpy.core.exceptions.NoMotionError" title="wristpy.core.exceptions.NoMotionError"><strong>NoMotionError</strong></a> – If no portions of data meet no motion criteria as defined by
+    no_motion_check.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.ConstrainedMinimizationCalibration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">wristpy.processing.calibration.</span></span><span class="sig-name descname"><span class="pre">ConstrainedMinimizationCalibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_motion_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.013</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_calibration_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#ConstrainedMinimizationCalibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.ConstrainedMinimizationCalibration" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#wristpy.processing.calibration.AbstractCalibrator" title="wristpy.processing.calibration.AbstractCalibrator"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractCalibrator</span></code></a></p>
+<p>Calibrates accelerometer data using the default wristpy method.</p>
+<p>This is a modification of the method proposed by Van Hees et al. (2014), in which we
+use all available data, make use of the scipy optimize minimize function to solve
+for the scaling and offset parameters of a LinearTransformation that will be applied
+to the data. The minimization function looks to minimize the error between the
+no_motion_data and the unit sphere.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.ConstrainedMinimizationCalibration.acceleration">
+<span class="sig-name descname"><span class="pre">acceleration</span></span><a class="headerlink" href="#wristpy.processing.calibration.ConstrainedMinimizationCalibration.acceleration" title="Link to this definition">¶</a></dt>
+<dd><p>The accelerometer data that we want to calibrate.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.ConstrainedMinimizationCalibration.no_motion_threshold">
+<span class="sig-name descname"><span class="pre">no_motion_threshold</span></span><a class="headerlink" href="#wristpy.processing.calibration.ConstrainedMinimizationCalibration.no_motion_threshold" title="Link to this definition">¶</a></dt>
+<dd><p>Minimum standard deviation for no-motion detection.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.ConstrainedMinimizationCalibration._closest_point_fit">
+<span class="sig-name descname"><span class="pre">_closest_point_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_motion_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#wristpy.processing.calibration.LinearTransformation" title="wristpy.processing.calibration.LinearTransformation"><span class="pre">LinearTransformation</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#ConstrainedMinimizationCalibration._closest_point_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.ConstrainedMinimizationCalibration._closest_point_fit" title="Link to this definition">¶</a></dt>
+<dd><p>Find linear transformation parameters that minimizes distance to unit sphere.</p>
+<p>This function implements the scipy optimize.minimize function to find the
+optimal scale and offset parameters that will minimize the error function,
+which is defined as the distance of the no_motion acceleration data
+from the unit sphere (where the unit sphere represents the ideal data points
+under 1g acceleration due to Earth’s gravity). The initial guess for the
+scale and offset are chosen as 1/0, we provide constrained bounds for the
+scale and offset parameters to avoid the case where the scale can be
+set to 0 and offset to 1/sqrt(3) (exact unit sphere).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>no_motion_data</strong> – The acceleration data during periods of no motion.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A LinearTransformation object with scale and offset parameters to be applied
+to acceleration data for calibration.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="wristpy.core.exceptions.html#wristpy.core.exceptions.CalibrationError" title="wristpy.core.exceptions.CalibrationError"><strong>CalibrationError</strong></a> – If the optimization process fails to converge or if the
+    calibration error is not sufficiently minimized.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.ConstrainedMinimizationCalibration.run_calibration">
+<span class="sig-name descname"><span class="pre">run_calibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#ConstrainedMinimizationCalibration.run_calibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.ConstrainedMinimizationCalibration.run_calibration" title="Link to this definition">¶</a></dt>
+<dd><p>Runs calibration on acceleration data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>acceleration</strong> – the accelerometer data containing x,y,z axis
+data and time stamps.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Measurement object that contains the calibrated acceleration data.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="wristpy.core.exceptions.html#wristpy.core.exceptions.CalibrationError" title="wristpy.core.exceptions.CalibrationError"><strong>CalibrationError</strong></a> – If the calibration process fails to converge or the final
+    error exceeds the <cite>max_calibration_error</cite> threshold.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">wristpy.processing.calibration.</span></span><span class="sig-name descname"><span class="pre">GgirCalibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunked</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_calibration_hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">72</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_motion_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.013</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_calibration_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#GgirCalibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#wristpy.processing.calibration.AbstractCalibrator" title="wristpy.processing.calibration.AbstractCalibrator"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractCalibrator</span></code></a></p>
+<p>Implements the GGIR calibration on accelerometer data.</p>
+<p>This class implements methods for autocalibrating accelerometer data using either
+entire dataset or subsets, as determined by the settings. Depending on the settings
+a scale and offset value is determined and applied to the data which, if
+successful, is returned to the user.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration.chunked">
+<span class="sig-name descname"><span class="pre">chunked</span></span><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration.chunked" title="Link to this definition">¶</a></dt>
+<dd><p>If true will perform calibration on subsets of data if false will
+calibrate on entire dataset.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration.min_acceleration">
+<span class="sig-name descname"><span class="pre">min_acceleration</span></span><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration.min_acceleration" title="Link to this definition">¶</a></dt>
+<dd><p>Minimum acceleration for sphere criteria, in g-force.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration.min_calibration_hours">
+<span class="sig-name descname"><span class="pre">min_calibration_hours</span></span><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration.min_calibration_hours" title="Link to this definition">¶</a></dt>
+<dd><p>Minimum hours of data required for calibration.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration.no_motion_threshold">
+<span class="sig-name descname"><span class="pre">no_motion_threshold</span></span><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration.no_motion_threshold" title="Link to this definition">¶</a></dt>
+<dd><p>Minimum standard deviation for no-motion detection.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration.max_iterations">
+<span class="sig-name descname"><span class="pre">max_iterations</span></span><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration.max_iterations" title="Link to this definition">¶</a></dt>
+<dd><p>Maximum number of iterations for optimization.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration.error_tolerance">
+<span class="sig-name descname"><span class="pre">error_tolerance</span></span><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration.error_tolerance" title="Link to this definition">¶</a></dt>
+<dd><p>Tolerance for optimization convergence.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration.max_calibration_error">
+<span class="sig-name descname"><span class="pre">max_calibration_error</span></span><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration.max_calibration_error" title="Link to this definition">¶</a></dt>
+<dd><p>Threshold for the maximum allowable calibration error.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration._calibrate">
+<span class="sig-name descname"><span class="pre">_calibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#wristpy.processing.calibration.LinearTransformation" title="wristpy.processing.calibration.LinearTransformation"><span class="pre">LinearTransformation</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#GgirCalibration._calibrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration._calibrate" title="Link to this definition">¶</a></dt>
+<dd><p>Calibrates data and returns scale and offset values.</p>
+<p>The acceleration data is processed by the _extract_no_motion function, which
+returns the portions of the data where the subject was still. This data ideally
+should all have points with a norm of 1. If we take a unit sphere, all the
+points in no_motion_data should be found along it’s surface. As this is not the
+case we calibrate by finding offset and scale values that will most closely make
+the whole of our data lie along this unit sphere. This is done by the
+_closest_point_fit function. We then transform the data by applying the scale
+and offset values we have found, and if the error has been sufficiently reduced,
+these values are returned. If not calibration fails and raises a calibration
+error.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>acceleration</strong> – the accelerometer data containing x,y,z axis
+data and time stamps.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A LinearTransformation object with scale and offset attributes to be applied
+to acceleration data for calibration.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="wristpy.core.exceptions.html#wristpy.core.exceptions.CalibrationError" title="wristpy.core.exceptions.CalibrationError"><strong>CalibrationError</strong></a> – If the calibration process fails to converge or the final
+    error exceeds the <cite>max_calibration_error</cite> threshold.</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>van Hees VT, Fang Z, Langford J, et al. Autocalibration of accelerometer
+data for free-living physical activity assessment using local gravity
+and temperature: an evaluation on four continents. J Appl Physiol (1985)
+2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration._chunked_calibration">
+<span class="sig-name descname"><span class="pre">_chunked_calibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#wristpy.processing.calibration.LinearTransformation" title="wristpy.processing.calibration.LinearTransformation"><span class="pre">LinearTransformation</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#GgirCalibration._chunked_calibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration._chunked_calibration" title="Link to this definition">¶</a></dt>
+<dd><p>Chunks the data into subsets, to calibrate on smaller sections of data.</p>
+<p>The first chunk is determined by the min_calibration_hours. Should calibration
+fail on that subset of data, additional chunks of data are added to attempt
+calibration on. This continues until all data is tried, or calibration succeeds.
+Chunks are added in increments of 12 hours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>acceleration</strong> – the accelerometer data containing x,y,z axis
+data and time stamps.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A LinearTransformation object with scale and offset attributes to be applied
+to acceleration data for calibration.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="wristpy.core.exceptions.html#wristpy.core.exceptions.CalibrationError" title="wristpy.core.exceptions.CalibrationError"><strong>CalibrationError</strong></a> – If all possible chunks have been used and the calibration
+    process fails to get below the <cite>max_calibration_error</cite> threshold.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration._closest_point_fit">
+<span class="sig-name descname"><span class="pre">_closest_point_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_motion_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#wristpy.processing.calibration.LinearTransformation" title="wristpy.processing.calibration.LinearTransformation"><span class="pre">LinearTransformation</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#GgirCalibration._closest_point_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration._closest_point_fit" title="Link to this definition">¶</a></dt>
+<dd><p>Applies closest point fit to no motion data to calibrated accelerometer data.</p>
+<p>This method implements an iterative algorithm that finds the optimal scale and
+offset for calibrating accelerometer data. The ndarray it processes contains the
+periods of “no motion” identified by the _extract_no_motion method. This data is
+then fit to an idealized unit sphere which represents the accelerometer data
+under noiseless conditions. The scale and offset derived from this process are
+used to calibrate our data along each axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>no_motion_data</strong> – The acceleration data during periods of no
+motion, in order to determine scale and offset.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A LinearTransformation object with scale and offset attributes to be applied
+to acceleration data for calibration.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="wristpy.core.exceptions.html#wristpy.core.exceptions.SphereCriteriaError" title="wristpy.core.exceptions.SphereCriteriaError"><strong>SphereCriteriaError</strong></a> – If the sphere is not sufficiently populated, i.e. every
+    axis does not have at least 1 value both above and below  the + and
+    - value of min_acceleraiton.</p></li>
+<li><p><strong>ZeroScaleError</strong> – Numerical instability inherent to the algorithm may cause
+    values of the scale vector to tend toward zero under certain conditions.
+    This will cause calibration to fail.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>van Hees VT, Fang Z, Langford J, et al. Autocalibration of accelerometer
+data for free-living physical activity assessment using local gravity
+and temperature: an evaluation on four continents. J Appl Physiol (1985)
+2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration._get_chunk">
+<span class="sig-name descname"><span class="pre">_get_chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" title="(in Python v3.14)"><span class="pre">Generator</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#GgirCalibration._get_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration._get_chunk" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a subset of acceleration data to be used for calibration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>acceleration</strong> – the accelerometer data containing x,y,z axis
+data and time stamps.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The minimum hours of accelerometer data + additional 12 hour chunks of data
+every time the generator function is called.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration._get_sampling_rate">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_get_sampling_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#GgirCalibration._get_sampling_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration._get_sampling_rate" title="Link to this definition">¶</a></dt>
+<dd><p>Get the sampling rate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timestamps</strong> – polars series of datetime objects representing the time points</p></li>
+<li><p><strong>data.</strong> (<em>of each sample in the acceleration</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sampling rate in Hz.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.GgirCalibration.run_calibration">
+<span class="sig-name descname"><span class="pre">run_calibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#GgirCalibration.run_calibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.GgirCalibration.run_calibration" title="Link to this definition">¶</a></dt>
+<dd><p>Runs calibration on acceleration data based on settings.</p>
+<p>If the chunked argument is set to true, it will run calibration on an initial
+chunk of the data the size of which is set to min_calibration_hours. If it fails
+to calibrate based on this subset, it will add 12-hour chunks to the subset
+until calibration succeeds, or fails on the entire dataset. Otherwise, if
+chunked is false (default) calibration will be conducted on the whole of the
+dataset. Calibration is successful when scale and offset values, that
+sufficiently minimize error when applied to the data, are found. The scale and
+offset values are then applied to every data point in the dataset which is
+then returned as calibrated models.Measurement object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>acceleration</strong> – the accelerometer data containing x,y,z axis
+data and time stamps.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Measurement object that contains the calibrated acceleration data.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the acceleration data does not meet the specified minimum
+    hours of data as given by min_calibration_hours.</p></li>
+<li><p><a class="reference internal" href="wristpy.core.exceptions.html#wristpy.core.exceptions.SphereCriteriaError" title="wristpy.core.exceptions.SphereCriteriaError"><strong>SphereCriteriaError</strong></a> – If the sphere is not sufficiently populated, i.e. every
+    axis does not have at least 1 value both above and below  the + and
+    - value of min_acceleraiton.</p></li>
+<li><p><a class="reference internal" href="wristpy.core.exceptions.html#wristpy.core.exceptions.CalibrationError" title="wristpy.core.exceptions.CalibrationError"><strong>CalibrationError</strong></a> – If the calibration process fails to get below the
+    <cite>max_calibration_error</cite> threshold.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.LinearTransformation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">wristpy.processing.calibration.</span></span><span class="sig-name descname"><span class="pre">LinearTransformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#LinearTransformation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration.LinearTransformation" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Data class that contains scale and offset values for calibration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.LinearTransformation.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><a class="headerlink" href="#wristpy.processing.calibration.LinearTransformation.scale" title="Link to this definition">¶</a></dt>
+<dd><p>3-element 1-D array of floats used to scale accelerameter data for
+calibration. Each element corresponds to the scaling factor for each axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="wristpy.processing.calibration.LinearTransformation.offset">
+<span class="sig-name descname"><span class="pre">offset</span></span><a class="headerlink" href="#wristpy.processing.calibration.LinearTransformation.offset" title="Link to this definition">¶</a></dt>
+<dd><p>3-element 1-D array of floats used to offset accelerameter data for
+calibration. Each element corresponds to the offset value for each axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">offset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">scale</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></em><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.calibration._extract_no_motion">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.calibration.</span></span><span class="sig-name descname"><span class="pre">_extract_no_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_motion_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.013</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/calibration.html#_extract_no_motion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.calibration._extract_no_motion" title="Link to this definition">¶</a></dt>
+<dd><p>Identifies areas of stillness using standard deviation and mean.</p>
+<p>The function first takes a moving standard deviation and a moving mean of the
+acceleration data in 10 second epochs. These ndarrays are then used to identify
+the portions of the data that have a standard deviation below
+no_motion_threshold and a mean value &lt; 2. These epochs are determined to be
+the periods where the accelerometer was influenced by no motion beyond the
+force of gravity. If periods of no motion are found, the ndarray is returned,
+to be fit to the idealized unit sphere for the purposes of calibration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>acceleration</strong> – the accelerometer data containing x,y,z axis
+data and time stamps.</p></li>
+<li><p><strong>no_motion_threshold</strong> – Threshold for the standard deviaton of acceleration data
+used to find periods of no motion.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An ndarray containing the accelerometer data determined to have no motion.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="wristpy.core.exceptions.html#wristpy.core.exceptions.NoMotionError" title="wristpy.core.exceptions.NoMotionError"><strong>NoMotionError</strong></a> – If no portions of data meet no motion criteria as defined by
+    no_motion_check.</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>van Hees VT, Fang Z, Langford J, et al. Autocalibration of accelerometer
+data for free-living physical activity assessment using local gravity
+and temperature: an evaluation on four continents. J Appl Physiol (1985)
+2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014.</p>
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="wristpy.processing.idle_sleep_mode_imputation.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">wristpy.processing.idle_sleep_mode_imputation</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="wristpy.processing.analytics.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">wristpy.processing.analytics</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Child Mind Institute
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">wristpy.processing.calibration</a><ul>
+<li><a class="reference internal" href="#wristpy.processing.calibration.AbstractCalibrator"><code class="docutils literal notranslate"><span class="pre">AbstractCalibrator</span></code></a><ul>
+<li><a class="reference internal" href="#wristpy.processing.calibration.AbstractCalibrator.run_calibration"><code class="docutils literal notranslate"><span class="pre">AbstractCalibrator.run_calibration()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.CalibrationDispatcher"><code class="docutils literal notranslate"><span class="pre">CalibrationDispatcher</span></code></a><ul>
+<li><a class="reference internal" href="#wristpy.processing.calibration.CalibrationDispatcher.run"><code class="docutils literal notranslate"><span class="pre">CalibrationDispatcher.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.ConstrainedMinimizationCalibration"><code class="docutils literal notranslate"><span class="pre">ConstrainedMinimizationCalibration</span></code></a><ul>
+<li><a class="reference internal" href="#wristpy.processing.calibration.ConstrainedMinimizationCalibration.acceleration"><code class="docutils literal notranslate"><span class="pre">ConstrainedMinimizationCalibration.acceleration</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.ConstrainedMinimizationCalibration.no_motion_threshold"><code class="docutils literal notranslate"><span class="pre">ConstrainedMinimizationCalibration.no_motion_threshold</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.ConstrainedMinimizationCalibration._closest_point_fit"><code class="docutils literal notranslate"><span class="pre">ConstrainedMinimizationCalibration._closest_point_fit()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.ConstrainedMinimizationCalibration.run_calibration"><code class="docutils literal notranslate"><span class="pre">ConstrainedMinimizationCalibration.run_calibration()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration"><code class="docutils literal notranslate"><span class="pre">GgirCalibration</span></code></a><ul>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration.chunked"><code class="docutils literal notranslate"><span class="pre">GgirCalibration.chunked</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration.min_acceleration"><code class="docutils literal notranslate"><span class="pre">GgirCalibration.min_acceleration</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration.min_calibration_hours"><code class="docutils literal notranslate"><span class="pre">GgirCalibration.min_calibration_hours</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration.no_motion_threshold"><code class="docutils literal notranslate"><span class="pre">GgirCalibration.no_motion_threshold</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration.max_iterations"><code class="docutils literal notranslate"><span class="pre">GgirCalibration.max_iterations</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration.error_tolerance"><code class="docutils literal notranslate"><span class="pre">GgirCalibration.error_tolerance</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration.max_calibration_error"><code class="docutils literal notranslate"><span class="pre">GgirCalibration.max_calibration_error</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration._calibrate"><code class="docutils literal notranslate"><span class="pre">GgirCalibration._calibrate()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration._chunked_calibration"><code class="docutils literal notranslate"><span class="pre">GgirCalibration._chunked_calibration()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration._closest_point_fit"><code class="docutils literal notranslate"><span class="pre">GgirCalibration._closest_point_fit()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration._get_chunk"><code class="docutils literal notranslate"><span class="pre">GgirCalibration._get_chunk()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration._get_sampling_rate"><code class="docutils literal notranslate"><span class="pre">GgirCalibration._get_sampling_rate()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.GgirCalibration.run_calibration"><code class="docutils literal notranslate"><span class="pre">GgirCalibration.run_calibration()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.LinearTransformation"><code class="docutils literal notranslate"><span class="pre">LinearTransformation</span></code></a><ul>
+<li><a class="reference internal" href="#wristpy.processing.calibration.LinearTransformation.scale"><code class="docutils literal notranslate"><span class="pre">LinearTransformation.scale</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.calibration.LinearTransformation.offset"><code class="docutils literal notranslate"><span class="pre">LinearTransformation.offset</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">LinearTransformation.offset</span></code></a></li>
+<li><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">LinearTransformation.scale</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wristpy.processing.calibration._extract_no_motion"><code class="docutils literal notranslate"><span class="pre">_extract_no_motion()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

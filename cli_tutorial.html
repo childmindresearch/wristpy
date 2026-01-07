@@ -1,0 +1,580 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Python Tutorial" href="python_tutorial.html" /><link rel="prev" title="Getting Started" href="getting_started.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+        <title>Command Line Tutorial - wristpy 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">wristpy 0.2.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="_static/images/wristpy_logo_light.png" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="_static/images/wristpy_logo_dark.png" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">wristpy 0.2.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Command Line Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python_tutorial.html">Python Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker_tutorial.html">Docker Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/wristpy.core.html">core</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of core</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.cli.html">wristpy.core.cli</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.computations.html">wristpy.core.computations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.config.html">wristpy.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.exceptions.html">wristpy.core.exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.models.html">wristpy.core.models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.orchestrator.html">wristpy.core.orchestrator</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/wristpy.io.html">io</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of io</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/wristpy.io.readers.html">wristpy.io.readers</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of wristpy.io.readers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/wristpy.io.readers.readers.html">wristpy.io.readers.readers</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/wristpy.io.writers.html">wristpy.io.writers</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of wristpy.io.writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/wristpy.io.writers.writers.html">wristpy.io.writers.writers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/wristpy.processing.html">processing</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of processing</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.analytics.html">wristpy.processing.analytics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.calibration.html">wristpy.processing.calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.idle_sleep_mode_imputation.html">wristpy.processing.idle_sleep_mode_imputation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.metrics.html">wristpy.processing.metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.mims.html">wristpy.processing.mims</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.processing_utils.html">wristpy.processing.processing_utils</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development Guide</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/cli_tutorial.ipynb.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="command-line-tutorial">
+<h1>Command Line Tutorial<a class="headerlink" href="#command-line-tutorial" title="Link to this heading">¶</a></h1>
+<section id="default-pipeline">
+<h2>Default Pipeline<a class="headerlink" href="#default-pipeline" title="Link to this heading">¶</a></h2>
+<section id="running-a-single-file">
+<h3>Running a single file.<a class="headerlink" href="#running-a-single-file" title="Link to this heading">¶</a></h3>
+<p>The simplest way to run wristpy is to open up an instance of your command line terminal of choice, and entering a valid file path for the first positional argument, and an output path (-o) that ends in the name you want to give your save file. Valid save formats are .csv and .parquet.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>wristpy<span class="w"> </span>tutorial_data/three_nights.bin<span class="w"> </span>-o<span class="w"> </span>../build/three_nights_single_file_cli.csv
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-07 21:18:47,719 - wristpy - INFO - writers.py:79 - save_results - Results saved in: ../build/three_nights_single_file_cli.csv
+2026-01-07 21:18:47,721 - wristpy - INFO - orchestrator.py:466 - _run_file - Processing for three_nights completed successfully.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="running-a-directory">
+<h3>Running a Directory<a class="headerlink" href="#running-a-directory" title="Link to this heading">¶</a></h3>
+<p>To run an entire directory, use the path to the directory as the input. For the output, specify a path to dump the files in. Unlike in the first example, when running a directory, the output file names will be determined by the input file names. The user can use the -O flag to specify the output file type (default: .csv)</p>
+<div class="cell tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>wristpy<span class="w"> </span>tutorial_data/<span class="w"> </span>-o<span class="w"> </span>../build/<span class="w"> </span>-O<span class="w"> </span>.csv
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="customizing-your-pipeline">
+<h2>Customizing your pipeline<a class="headerlink" href="#customizing-your-pipeline" title="Link to this heading">¶</a></h2>
+<p>Wristpy allows for a number of arguments allowing you to customize your pipeline.</p>
+<section id="specify-a-calibrator">
+<h3>Specify a calibrator<a class="headerlink" href="#specify-a-calibrator" title="Link to this heading">¶</a></h3>
+<p>The default calibrator (‘gradient’) is a modified version of the original GGIR implementation. The GGIR implementation can be specified using the ‘ggir’ argument.
+See the following links for information on each calibration method: <a class="reference external" href="https://childmindresearch.github.io/wristpy/api/wristpy.processing.calibration.html#wristpy.processing.calibration.ConstrainedMinimizationCalibration"><code class="docutils literal notranslate"><span class="pre">gradient</span></code></a> and <a class="reference external" href="https://childmindresearch.github.io/wristpy/api/wristpy.processing.calibration.html#wristpy.processing.calibration.GgirCalibration"><code class="docutils literal notranslate"><span class="pre">ggir</span></code></a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>wristpy<span class="w"> </span>tutorial_data/three_nights.bin<span class="w"> </span>-o<span class="w"> </span>../build/three_nights_single_file_cli.csv<span class="w"> </span>-c<span class="w"> </span>gradient
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-07 21:19:08,387 - wristpy - INFO - writers.py:79 - save_results - Results saved in: ../build/three_nights_single_file_cli.csv
+2026-01-07 21:19:08,389 - wristpy - INFO - orchestrator.py:466 - _run_file - Processing for three_nights completed successfully.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="epoch-length">
+<h3>Epoch Length<a class="headerlink" href="#epoch-length" title="Link to this heading">¶</a></h3>
+<p>By default, epochs are set to 5 seconds, but the -e flag can be used to specify the desired epoch in seconds.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>wristpy<span class="w"> </span>tutorial_data/three_nights.bin<span class="w"> </span>-o<span class="w"> </span>../build/three_nights_single_file_cli.csv<span class="w"> </span>-c<span class="w"> </span>gradient<span class="w"> </span>-e<span class="w"> </span><span class="m">10</span><span class="w"> </span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-07 21:19:19,408 - wristpy - INFO - writers.py:79 - save_results - Results saved in: ../build/three_nights_single_file_cli.csv
+2026-01-07 21:19:19,410 - wristpy - INFO - orchestrator.py:466 - _run_file - Processing for three_nights completed successfully.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="choose-an-activity-metric">
+<h3>Choose an activity metric.<a class="headerlink" href="#choose-an-activity-metric" title="Link to this heading">¶</a></h3>
+<p>There are four different measures of physical activity that wristpy can generate from accelerometer data. The user can specify some or all of the available metrics to be generated in the report. If no option is given, the Euclidean Norm Minus One is used by default. The available metrics are enmo, mims, mad, and ag_count.  See <a class="reference external" href="https://childmindresearch.github.io/wristpy/getting_started.html#physical-activity-metrics-explained"><code class="docutils literal notranslate"><span class="pre">here</span></code></a> for details on each metric.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>wristpy<span class="w"> </span>tutorial_data/three_nights.bin<span class="w"> </span>-o<span class="w"> </span>../build/three_nights_single_file_cli.csv<span class="w"> </span>-c<span class="w"> </span>gradient<span class="w"> </span>-e<span class="w"> </span><span class="m">10</span><span class="w"> </span>-a<span class="w"> </span>enmo<span class="w"> </span>-a<span class="w"> </span>mad<span class="w"> </span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-07 21:19:31,064 - wristpy - INFO - writers.py:79 - save_results - Results saved in: ../build/three_nights_single_file_cli.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-07 21:19:31,066 - wristpy - INFO - orchestrator.py:466 - _run_file - Processing for three_nights completed successfully.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="physical-activity-levels">
+<h3>Physical activity levels<a class="headerlink" href="#physical-activity-levels" title="Link to this heading">¶</a></h3>
+<p>To specify your own activity thresholds, enter them in the same order as the corresponding metric. Make sure the values are triplets, contained within strings and separated with a space. In the following example, the threshold values for enmo would be 1, 2, 3 and the threshold values for mad would be 1.5, 2.5, 3.5.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>wristpy<span class="w"> </span>tutorial_data/three_nights.bin<span class="w"> </span>-o<span class="w"> </span>../build/three_nights_single_file_cli.csv<span class="w"> </span>-a<span class="w"> </span>enmo<span class="w"> </span>-a<span class="w"> </span>mad<span class="w"> </span>-t<span class="w"> </span><span class="s2">&quot;1 2 3&quot;</span><span class="w"> </span>-t<span class="w"> </span><span class="s2">&quot;1.5 2.5 3.5&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-01-07 21:19:40,850 - wristpy - INFO - writers.py:79 - save_results - Results saved in: ../build/three_nights_single_file_cli.csv
+2026-01-07 21:19:40,852 - wristpy - INFO - orchestrator.py:466 - _run_file - Processing for three_nights completed successfully.
+</pre></div>
+</div>
+</div>
+</div>
+<p>To see all available options run:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>wristpy<span class="w"> </span>--help
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Bold">                                                                                </span>
+<span class=" -Color -Color-Bold"> </span><span class=" -Color -Color-Bold -Color-Bold-Yellow">Usage: </span><span class=" -Color -Color-Bold">wristpy [OPTIONS] INPUT                                                 </span>
+<span class=" -Color -Color-Bold">                                                                                </span>
+ Run wristpy orchestrator with command line arguments.                          
+                                                                                
+                                                                                
+<span class=" -Color -Color-Faint">╭─ Arguments ──────────────────────────────────────────────────────────────────╮</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Red">*</span>    input      <span class=" -Color -Color-Bold -Color-Bold-Yellow">PATH</span>  Path to the input data. <span class=" -Color -Color-Faint">[default: None]</span> <span class=" -Color -Color-Faint -Color-Faint-Red">[required]</span>     <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">╰──────────────────────────────────────────────────────────────────────────────╯</span>
+<span class=" -Color -Color-Faint">╭─ Options ────────────────────────────────────────────────────────────────────╮</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--output</span>              <span class=" -Color -Color-Bold -Color-Bold-Green">-o</span>      <span class=" -Color -Color-Bold -Color-Bold-Yellow">PATH                  </span>  Path where data will   <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       be saved. Supports     <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       .csv and .parquet      <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       formats.               <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       <span class=" -Color -Color-Faint">[default: None]       </span> <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--output-filetype</span>     <span class=" -Color -Color-Bold -Color-Bold-Green">-O</span>      <span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">[</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">.csv</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">|</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">.parquet</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">]</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">       </span>  Format for save files  <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       when processing        <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       directories.           <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       <span class=" -Color -Color-Faint">[default: .csv]       </span> <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--calibrator</span>          <span class=" -Color -Color-Bold -Color-Bold-Green">-c</span>      <span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">[</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">none</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">|</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">ggir</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">|</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">gradient</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">]</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">  </span>  Pick which calibrator  <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       to use. Must choose    <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       one of &#39;none&#39;, &#39;ggir&#39;, <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       or &#39;gradient&#39;.         <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       <span class=" -Color -Color-Faint">[default: none]       </span> <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--activity-metric</span>     <span class=" -Color -Color-Bold -Color-Bold-Green">-a</span>      <span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">[</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">enmo</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">|</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">mad</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">|</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">ag_count</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">|</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">mim</span>  Metric(s) used for     <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                               <span class=" -Color -Color-Bold -Color-Bold-Yellow">s</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">]</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">                    </span>  physical activity      <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       categorization. Choose <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       from &#39;enmo&#39;, &#39;mad&#39;,    <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       &#39;ag_count&#39;, or &#39;mims&#39;. <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       Use multiple times for <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       multiple metrics: &#39;<span class=" -Color -Color-Bold -Color-Bold-Green">-a</span>  <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       enmo <span class=" -Color -Color-Bold -Color-Bold-Green">-a</span> mad&#39; etc.      <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       <span class=" -Color -Color-Faint">[default: enmo]       </span> <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--thresholds</span>          <span class=" -Color -Color-Bold -Color-Bold-Green">-t</span>      <span class=" -Color -Color-Bold -Color-Bold-Yellow">TEXT                  </span>  Provide three          <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       thresholds for light,  <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       moderate, and vigorous <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       activity. One          <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       threshold set per      <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       activity metric, in    <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       the same order as      <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       metrics. Format: three <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       space-separated values <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       &gt;= 0 in ascending      <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       order. Example: <span class=" -Color -Color-Bold -Color-Bold-Green">-t</span>     <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       &#39;0.1 1.0 1.5&#39; or <span class=" -Color -Color-Bold -Color-Bold-Green">-a</span>    <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       enmo <span class=" -Color -Color-Bold -Color-Bold-Green">-a</span> mad <span class=" -Color -Color-Bold -Color-Bold-Green">-t</span> &#39;0.1    <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       1.0 1.5&#39; <span class=" -Color -Color-Bold -Color-Bold-Green">-t</span> &#39;0.2 2.0   <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       3.0&#39;                   <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       <span class=" -Color -Color-Faint">[default: None]       </span> <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--nonwear-algorithm</span>   <span class=" -Color -Color-Bold -Color-Bold-Green">-n</span>      <span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">[</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">ggir</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">|</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">cta</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">|</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">detach</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">]</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">     </span>  Specify the non-wear   <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       detection algorithm(s) <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       to use. Specify one or <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       more of &#39;ggir&#39;, &#39;cta&#39;, <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       &#39;detach&#39;. (e.g. &#39;<span class=" -Color -Color-Bold -Color-Bold-Green">-n</span>    <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       ggir <span class=" -Color -Color-Bold -Color-Bold-Green">-n</span> cta&#39;). When    <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       multiple algorithms    <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       are specified,         <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       majority voting will   <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       be applied.            <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       <span class=" -Color -Color-Faint">[default: ggir]       </span> <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--epoch-length</span>        <span class=" -Color -Color-Bold -Color-Bold-Green">-e</span>      <span class=" -Color -Color-Bold -Color-Bold-Yellow">INTEGER RANGE [x&gt;=1</span><span class=" -Color -Color-Bold -Color-Bold-Faint -Color-Bold-Faint-Yellow">]</span><span class=" -Color -Color-Bold -Color-Bold-Yellow">  </span>  Specify the sampling   <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       rate in seconds for    <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       all metrics. Must be   <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       greater than or equal  <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       to 1.                  <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       <span class=" -Color -Color-Faint">[default: 5]          </span> <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--verbosity</span>           <span class=" -Color -Color-Bold -Color-Bold-Green">-v</span>      <span class=" -Color -Color-Bold -Color-Bold-Yellow">                      </span>  Determines the level   <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       of verbosity. Use <span class=" -Color -Color-Bold -Color-Bold-Green">-v</span>   <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       for DEBUG. Defaults to <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       INFO if not included.  <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--version</span>             <span class=" -Color -Color-Bold -Color-Bold-Green">-V</span>      <span class=" -Color -Color-Bold -Color-Bold-Yellow">                      </span>  Print the current      <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       version of wristpy and <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       exit.                  <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--install-completion</span>          <span class=" -Color -Color-Bold -Color-Bold-Yellow">                      </span>  Install completion for <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       the current shell.     <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--show-completion</span>             <span class=" -Color -Color-Bold -Color-Bold-Yellow">                      </span>  Show completion for    <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       the current shell, to  <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       copy it or customize   <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       the installation.      <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span> <span class=" -Color -Color-Bold -Color-Bold-Cyan">--help</span>                        <span class=" -Color -Color-Bold -Color-Bold-Yellow">                      </span>  Show this message and  <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">│</span>                                                       exit.                  <span class=" -Color -Color-Faint">│</span>
+<span class=" -Color -Color-Faint">╰──────────────────────────────────────────────────────────────────────────────╯</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="python_tutorial.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Python Tutorial</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="getting_started.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Getting Started</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Child Mind Institute
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Command Line Tutorial</a><ul>
+<li><a class="reference internal" href="#default-pipeline">Default Pipeline</a><ul>
+<li><a class="reference internal" href="#running-a-single-file">Running a single file.</a></li>
+<li><a class="reference internal" href="#running-a-directory">Running a Directory</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#customizing-your-pipeline">Customizing your pipeline</a><ul>
+<li><a class="reference internal" href="#specify-a-calibrator">Specify a calibrator</a></li>
+<li><a class="reference internal" href="#epoch-length">Epoch Length</a></li>
+<li><a class="reference internal" href="#choose-an-activity-metric">Choose an activity metric.</a></li>
+<li><a class="reference internal" href="#physical-activity-levels">Physical activity levels</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

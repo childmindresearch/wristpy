@@ -1,0 +1,779 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="wristpy.processing.processing_utils" href="wristpy.processing.processing_utils.html" /><link rel="prev" title="wristpy.processing.metrics" href="wristpy.processing.metrics.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+        <title>wristpy.processing.mims - wristpy 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">wristpy 0.2.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static/images/wristpy_logo_light.png" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static/images/wristpy_logo_dark.png" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">wristpy 0.2.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli_tutorial.html">Command Line Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_tutorial.html">Python Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker_tutorial.html">Docker Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="wristpy.core.html">core</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of core</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.cli.html">wristpy.core.cli</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.computations.html">wristpy.core.computations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.config.html">wristpy.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.exceptions.html">wristpy.core.exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.models.html">wristpy.core.models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.core.orchestrator.html">wristpy.core.orchestrator</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="wristpy.io.html">io</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of io</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="wristpy.io.readers.html">wristpy.io.readers</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of wristpy.io.readers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="wristpy.io.readers.readers.html">wristpy.io.readers.readers</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="wristpy.io.writers.html">wristpy.io.writers</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of wristpy.io.writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="wristpy.io.writers.writers.html">wristpy.io.writers.writers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="wristpy.processing.html">processing</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of processing</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="wristpy.processing.analytics.html">wristpy.processing.analytics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.processing.calibration.html">wristpy.processing.calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.processing.idle_sleep_mode_imputation.html">wristpy.processing.idle_sleep_mode_imputation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.processing.metrics.html">wristpy.processing.metrics</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">wristpy.processing.mims</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wristpy.processing.processing_utils.html">wristpy.processing.processing_utils</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Development Guide</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/wristpy.processing.mims.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-wristpy.processing.mims">
+<span id="wristpy-processing-mims"></span><h1>wristpy.processing.mims<a class="headerlink" href="#module-wristpy.processing.mims" title="Link to this heading">¶</a></h1>
+<p>Calculate Monitor Independent Movement Summary Units.</p>
+<p class="rubric">Functions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#wristpy.processing.mims.aggregate_mims" title="wristpy.processing.mims.aggregate_mims"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aggregate_mims</span></code></a>(acceleration[, epoch, ...])</p></td>
+<td><p>Calculate the area under the curve(AUC), per epoch, per axis.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#wristpy.processing.mims.butterworth_filter" title="wristpy.processing.mims.butterworth_filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">butterworth_filter</span></code></a>(acceleration[, ...])</p></td>
+<td><p>Apply butterworth IIR filter to acceleration data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#wristpy.processing.mims.combine_mims" title="wristpy.processing.mims.combine_mims"><code class="xref py py-obj docutils literal notranslate"><span class="pre">combine_mims</span></code></a>(acceleration[, combination_method])</p></td>
+<td><p>Combine MIMS values of xyz axis into one MIMS value.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#wristpy.processing.mims.extrapolate_points" title="wristpy.processing.mims.extrapolate_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extrapolate_points</span></code></a>(acceleration[, ...])</p></td>
+<td><p>Identify maxed out values, and extrapolate points.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#wristpy.processing.mims.interpolate_measure" title="wristpy.processing.mims.interpolate_measure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate_measure</span></code></a>(acceleration[, ...])</p></td>
+<td><p>Interpolate the measure to a new sampling rate using natural cubic spline.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims._aggregate_epoch">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">_aggregate_epoch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rectify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#_aggregate_epoch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims._aggregate_epoch" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the area under the curve(AUC), per epoch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group</strong> – The epoch given by .map_groups()</p></li>
+<li><p><strong>epoch</strong> – The desired epoch length in seconds that data will be aggregated over.
+Defaults to 1 minute as per MIMS-unit paper.</p></li>
+<li><p><strong>sampling_rate</strong> – The sampling rate of the accelerometer data in Hz.</p></li>
+<li><p><strong>rectify</strong> – Specifies if data should be rectified before integration. If True any
+value below -150 will assign the value of that axis to -1 for that epoch.
+Additionally the absolute value of accelerometer data will be used for
+integration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A polars DataFrame containing the XYZ AUC values for one epoch.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims._align_edges">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">_align_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">marker_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_of_range_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sign</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'hill'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'valley'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#_align_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims._align_edges" title="Link to this definition">¶</a></dt>
+<dd><p>Aligns left and right edges of maxed-out regions and handles edge cases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>marker_length</strong> – Length of marker array.</p></li>
+<li><p><strong>left</strong> – 1D vector of indices indicating the left edge of a potential maxed-out
+region.</p></li>
+<li><p><strong>right</strong> – 1D vector of indices indicating the right edge of a potential maxed-out
+region.</p></li>
+<li><p><strong>out_of_range_threshold</strong> – The number of samples that determines if an un matched
+edge extends beyond the data range, or if the edge is spurious. Typically 5
+seconds worth of data.</p></li>
+<li><p><strong>sign</strong> – Indicates if maxed out region is a hill or valley.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DataFrame with the left and right edges of each maxed-out region.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the difference in length between the left and right arrays is</p></li>
+<li><p><strong>greater than 1.</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims._brute_force_k">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">_brute_force_k</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">standard_deviation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_probability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.95</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#_brute_force_k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims._brute_force_k" title="Link to this definition">¶</a></dt>
+<dd><p>Find the shape parameter(k) for the gamma distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>standard_deviation</strong> – The point at which to evaluate the gamma cumulative
+distribution function, should be 3 times the noise.</p></li>
+<li><p><strong>k_max</strong> – Maximum value for the shape parameter search range.
+Default is 0.5.</p></li>
+<li><p><strong>k_min</strong> – Minimum value for the shape parameter search range.
+Default is 0.001.</p></li>
+<li><p><strong>k_step</strong> – Step size for the shape parameter search.</p></li>
+<li><p><strong>scale</strong> – Scale value (theta) for gamma distribution. Typically set at 1.</p></li>
+<li><p><strong>target_probability</strong> – Threshold used in determining the shape parameter (k) of the
+gamma distribution. Probability that a value 3 standard deviations from the
+buffer zone is maxed-out.</p></li>
+<li><p><strong>scale</strong> – Scale value (theta) for gamma distribution. Typically set at 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The optimal shape parameter that makes the gamma CDF at the given standard
+deviation approximately equal to the target probability.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims._extrapolate_edges">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">_extrapolate_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#_extrapolate_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims._extrapolate_edges" title="Link to this definition">¶</a></dt>
+<dd><p>Find edges of maxed out regions and identify them as hills(+) or valleys (-).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>marker</strong> – Array containing values that mark the probability that each sample is
+maxed-out. Values close to ±1 indicate high likelihood that the value is
+near the limit of the dynamic range, with the sign indicating if it’s near
+the upper bound, or lower bound. Values close to zero indicate low
+likelihood of being near range limit.</p></li>
+<li><p><strong>confidence_threshold</strong> – Threshold for what constitutes a significant change in
+marker values.</p></li>
+<li><p><strong>sampling_rate</strong> – Sampling rate of acceleration data, typically 100hz following
+interpolation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame containing indices for hills and valleys.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims._extrapolate_fit">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">_extrapolate_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_numeric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighbors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighborhood_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#_extrapolate_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims._extrapolate_fit" title="Link to this definition">¶</a></dt>
+<dd><p>Extrapolate peak of maxed regions by fitting weighted splines on nearby points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> – Original acceleration data along one axis.</p></li>
+<li><p><strong>time_numeric</strong> – Time series data given in epoch time (ns).</p></li>
+<li><p><strong>marker</strong> – Array the same size as axis, containing values that mark the
+probability that each sample is maxed-out. Values close to ±1 indicate
+high likelihood that the value is near the limit of the dynamic range, with
+the sign indicating if it’s near the upper bound, or lower bound. Values
+close to zero indicate low likelihood of being near range limit.</p></li>
+<li><p><strong>neighbors</strong> – A polars DataFrame containing the start and end indices for the
+maxed out regions, as well as the neighborhoods to the left and right of
+regions.</p></li>
+<li><p><strong>smoothing</strong> – Smoothing value for UniveriateSpline. Determines how closely the
+spline adheres to the data points. Higher values will give a smoother
+result.</p></li>
+<li><p><strong>neighborhood_size</strong> – Duration of neighborhood in seconds to use around each
+maxed-out region for regression fitting. Default is 0.05 (50ms).</p></li>
+<li><p><strong>sampling_rate</strong> – Sampling rate, default is 100Hz</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A List of Tuples representing the peaks of maxed out regions as
+(timestamp, value) pairs. Times are given in epoch time (ns).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims._extrapolate_interpolate">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">_extrapolate_interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_numeric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#_extrapolate_interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims._extrapolate_interpolate" title="Link to this definition">¶</a></dt>
+<dd><p>Interpolate the original signal with extrapolated points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> – Original acceleration data along one axis.</p></li>
+<li><p><strong>time_numeric</strong> – Time series data given in epoch time (ns).</p></li>
+<li><p><strong>marker</strong> – Array the same size as axis, containing values that mark the
+probability that each sample is maxed-out. Values close to ±1 indicate
+high likelihood that the value is near the limit of the dynamic range, with
+the sign indicating if it’s near the upper bound, or lower bound. Values
+close to zero indicate low likelihood of being near range limit.</p></li>
+<li><p><strong>points</strong> – List of tuples with extrapolated points (time, value). Times are given
+in epoch time (ns).</p></li>
+<li><p><strong>confidence_threshold</strong> – Threshold for maxed-out identification.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray of axis data, with extrapolated values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims._extrapolate_neighbors">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">_extrapolate_neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighborhood_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#_extrapolate_neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims._extrapolate_neighbors" title="Link to this definition">¶</a></dt>
+<dd><p>Find neighborhoods around maxed-out regions for regression fitting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>marker</strong> – Array containing values that mark the probability that each sample is
+maxed-out. Values close to ±1 indicate high likelihood that the value is
+near the limit of the dynamic range, with the sign indicating if it’s near
+the upper bound, or lower bound. Values close to zero indicate low
+likelihood of being near range limit.</p></li>
+<li><p><strong>confidence_threshold</strong> – Threshold for what constitutes a significant change in
+marker values.</p></li>
+<li><p><strong>neighborhood_size</strong> – Duration of neighborhood in seconds to use around each
+maxed-out region for regression fitting. Default is 0.05 (50ms).</p></li>
+<li><p><strong>sampling_rate</strong> – The sampling rate of the data in Hz. Default is 100Hz as data
+should be interpolated to 100hz prior to this step.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame containing the indices of maxed-out regions (start, end) and
+their expanded neighborhoods (left_neighborhood, right_neighborhood). A
+value of -1 indicates a boundary case where the region extends to the
+beginning or end of the data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims._find_markers">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">_find_markers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_probability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.95</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#_find_markers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims._find_markers" title="Link to this definition">¶</a></dt>
+<dd><p>Determine the likelihood that each sample is near the limits of the device range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> – Acceleration data along one axis.</p></li>
+<li><p><strong>dynamic_range</strong> – Tuple of floats indicating the device’s value range. This
+information can be gathered from watch metadata.</p></li>
+<li><p><strong>noise</strong> – Typical noise value for device.</p></li>
+<li><p><strong>scale</strong> – Scale value (theta) for gamma distribution. Typically set at 1.</p></li>
+<li><p><strong>target_probability</strong> – Threshold used in determining the shape parameter (k) of the
+gamma distribution. Probability that a value 3 standard deviations from the
+buffer zone is maxed-out.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array indicating the likelihood that corresponding value in the axis data is
+‘maxed-out’.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims._fit_weighted">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">_fit_weighted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_numeric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighborhood_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">UnivariateSpline</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#_fit_weighted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims._fit_weighted" title="Link to this definition">¶</a></dt>
+<dd><p>Fit weighted spline regression model to a section of the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> – Original acceleration data along one axis.</p></li>
+<li><p><strong>time_numeric</strong> – Time series data given in epoch time (ns).</p></li>
+<li><p><strong>marker</strong> – Array the same size as axis, containing values that mark the
+probability that each sample is maxed-out. Values close to ±1 indicate
+high likelihood that the value is near the limit of the dynamic range, with
+the sign indicating if it’s near the upper bound, or lower bound. Values
+close to zero indicate low likelihood of being near range limit.</p></li>
+<li><p><strong>start</strong> – Index marking the beginning of the maxed out zone.</p></li>
+<li><p><strong>end</strong> – Index marking end of maxed out zone.</p></li>
+<li><p><strong>smoothing</strong> – Smoothing value for UniveriateSpline. Determines how closely the
+spline adheres to the data points. Higher values will give a smoother
+result. Default is 0.6 as optimized in the MIMS-unit paper.</p></li>
+<li><p><strong>neighborhood_size</strong> – Duration of neighborhood in seconds to use around each
+maxed-out region for regression fitting. Default is 0.05 (50ms).</p></li>
+<li><p><strong>sampling_rate</strong> – Sampling rate, default is 100Hz</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A UnivariateSpline function fitted to the data segment with weights based on
+the probability of not being maxed-out. Returns None if the input data is
+insufficient or invalid (-1).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims.aggregate_mims">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">aggregate_mims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rectify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">truncate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#aggregate_mims"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims.aggregate_mims" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the area under the curve(AUC), per epoch, per axis.</p>
+<p>When an epoch has less than 90% of the expected values (based on the sampling rate
+and epoch length), the AUC for that epoch is given as -1 for each axis. If rectify
+is True, any axis with values below -150 will have the AUC value for that axis
+be -1 for that epoch. Finally, following integration, any value greater than (16 *
+sampling_rate * epoch) will be set to -1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>acceleration</strong> – Acceleration data to be aggregated.</p></li>
+<li><p><strong>epoch</strong> – The desired epoch length in seconds that data will be aggregated over.</p></li>
+<li><p><strong>sampling_rate</strong> – The sampling rate of the accelerometer data in Hz.</p></li>
+<li><p><strong>rectify</strong> – Specifies if data should be rectified before integration. If True any
+value below -150 will assign the value of that axis to -1 for that epoch.
+Additionally the absolute value of accelerometer data will be used for
+integration.</p></li>
+<li><p><strong>truncate</strong> – Specifies if data &lt;= 0.001 should be truncated to 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A models.Measurement instance with the area under the curve values for each
+epoch.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims.butterworth_filter">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">butterworth_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoffs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.2,</span> <span class="pre">5.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#butterworth_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims.butterworth_filter" title="Link to this definition">¶</a></dt>
+<dd><p>Apply butterworth IIR filter to acceleration data.</p>
+<p>Implements third portion of MIMS algorithm following interpolate, and extrapolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>acceleration</strong> – Acceleration data to be filtered.</p></li>
+<li><p><strong>sampling_rate</strong> – Sampling rate of acceleration data in Hz.</p></li>
+<li><p><strong>cutoffs</strong> – Cutoff values for bandpass filter.</p></li>
+<li><p><strong>order</strong> – Order of the filter, defaults to 4th order.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Acceleration Measurement of filtered data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims.combine_mims">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">combine_mims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">combination_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'sum'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'vector_magnitude'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sum'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#combine_mims"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims.combine_mims" title="Link to this definition">¶</a></dt>
+<dd><p>Combine MIMS values of xyz axis into one MIMS value.</p>
+<p>If any value in an epoch is -1, the ‘combined_mims’ value for that epoch will
+be set to -1 to flag it as an invalid epoch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>acceleration</strong> – An object containing per-axis MIMS measurements and their
+corresponding timestamps.</p></li>
+<li><p><strong>combination_method</strong> – The method to combine MIMS values across axes. Defaults to
+“sum”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Measurement object with combined MIMS values and corresponding timestamps.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims.extrapolate_points">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">extrapolate_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(-8.0,</span> <span class="pre">8.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_probability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighborhood_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#extrapolate_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims.extrapolate_points" title="Link to this definition">¶</a></dt>
+<dd><p>Identify maxed out values, and extrapolate points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>acceleration</strong> – Acceleration data that has been interpolated to 100Hz.</p></li>
+<li><p><strong>dynamic_range</strong> – Dynamic range of device used. This information can be gathered
+from device metadata.</p></li>
+<li><p><strong>noise</strong> – Device noise level.</p></li>
+<li><p><strong>smoothing</strong> – Smoothing parameter for spline function. A value of 0 fits the data
+exactly, higher values will fit the data more smoothly.</p></li>
+<li><p><strong>scale</strong> – Theta value, scale parameter for gamma distribution.</p></li>
+<li><p><strong>target_probability</strong> – Threshold used in determining the shape parameter (k) of the
+gamma distribution. Probability that a value 3 standard deviations from the
+buffer zone is maxed-out.</p></li>
+<li><p><strong>confidence_threshold</strong> – Threshold for what constitutes a major jump or drop in
+value.</p></li>
+<li><p><strong>neighborhood_size</strong> – Duration of neighborhood in seconds. This parameter
+determines how much data on each side of the maxed-out region is used
+for fitting the local regression model. The parameter is used to calculate
+the number of points to create in the oversampled data (n_over).</p></li>
+<li><p><strong>sampling_rate</strong> – The sampling rate in Hz. Assumed to take place after
+interpolation so it will typically be 100.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Measurement object with maxed out regions replaced with extrapolated values.</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="simple">
+<dt>John, D., Tang, Q., Albinali, F. and Intille, S., 2019. An Open-Source</dt><dd><p>Monitor-Independent Movement Summary for Accelerometer Data Processing.
+Journal for the Measurement of Physical Behaviour, 2(4), pp.268-281.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wristpy.processing.mims.interpolate_measure">
+<span class="sig-prename descclassname"><span class="pre">wristpy.processing.mims.</span></span><span class="sig-name descname"><span class="pre">interpolate_measure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acceleration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_frequency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="wristpy.core.models.html#wristpy.core.models.Measurement" title="wristpy.core.models.Measurement"><span class="pre">Measurement</span></a></span></span><a class="reference internal" href="../_modules/wristpy/processing/mims.html#interpolate_measure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wristpy.processing.mims.interpolate_measure" title="Link to this definition">¶</a></dt>
+<dd><p>Interpolate the measure to a new sampling rate using natural cubic spline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>acceleration</strong> – Accelerometer data and associated timestamps.</p></li>
+<li><p><strong>new_frequency</strong> – The new frequency the measure will be interpolated to in Hz. For
+the purposes of the MIMS algorithm defaults to 100Hz.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Measurement object with interpolated acceleration data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="wristpy.processing.processing_utils.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">wristpy.processing.processing_utils</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="wristpy.processing.metrics.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">wristpy.processing.metrics</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Child Mind Institute
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">wristpy.processing.mims</a><ul>
+<li><a class="reference internal" href="#wristpy.processing.mims._aggregate_epoch"><code class="docutils literal notranslate"><span class="pre">_aggregate_epoch()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims._align_edges"><code class="docutils literal notranslate"><span class="pre">_align_edges()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims._brute_force_k"><code class="docutils literal notranslate"><span class="pre">_brute_force_k()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims._extrapolate_edges"><code class="docutils literal notranslate"><span class="pre">_extrapolate_edges()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims._extrapolate_fit"><code class="docutils literal notranslate"><span class="pre">_extrapolate_fit()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims._extrapolate_interpolate"><code class="docutils literal notranslate"><span class="pre">_extrapolate_interpolate()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims._extrapolate_neighbors"><code class="docutils literal notranslate"><span class="pre">_extrapolate_neighbors()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims._find_markers"><code class="docutils literal notranslate"><span class="pre">_find_markers()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims._fit_weighted"><code class="docutils literal notranslate"><span class="pre">_fit_weighted()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims.aggregate_mims"><code class="docutils literal notranslate"><span class="pre">aggregate_mims()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims.butterworth_filter"><code class="docutils literal notranslate"><span class="pre">butterworth_filter()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims.combine_mims"><code class="docutils literal notranslate"><span class="pre">combine_mims()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims.extrapolate_points"><code class="docutils literal notranslate"><span class="pre">extrapolate_points()</span></code></a></li>
+<li><a class="reference internal" href="#wristpy.processing.mims.interpolate_measure"><code class="docutils literal notranslate"><span class="pre">interpolate_measure()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

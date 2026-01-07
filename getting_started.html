@@ -1,0 +1,481 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Command Line Tutorial" href="cli_tutorial.html" /><link rel="prev" title="Wristpy Documentation" href="index.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+        <title>Getting Started - wristpy 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">wristpy 0.2.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="_static/images/wristpy_logo_light.png" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="_static/images/wristpy_logo_dark.png" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">wristpy 0.2.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_tutorial.html">Command Line Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python_tutorial.html">Python Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker_tutorial.html">Docker Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/wristpy.core.html">core</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of core</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.cli.html">wristpy.core.cli</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.computations.html">wristpy.core.computations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.config.html">wristpy.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.exceptions.html">wristpy.core.exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.models.html">wristpy.core.models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.core.orchestrator.html">wristpy.core.orchestrator</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/wristpy.io.html">io</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of io</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/wristpy.io.readers.html">wristpy.io.readers</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of wristpy.io.readers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/wristpy.io.readers.readers.html">wristpy.io.readers.readers</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/wristpy.io.writers.html">wristpy.io.writers</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of wristpy.io.writers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/wristpy.io.writers.writers.html">wristpy.io.writers.writers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/wristpy.processing.html">processing</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of processing</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.analytics.html">wristpy.processing.analytics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.calibration.html">wristpy.processing.calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.idle_sleep_mode_imputation.html">wristpy.processing.idle_sleep_mode_imputation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.metrics.html">wristpy.processing.metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.mims.html">wristpy.processing.mims</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/wristpy.processing.processing_utils.html">wristpy.processing.processing_utils</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development Guide</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/getting_started.ipynb.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<p>Install the <code class="docutils literal notranslate"><span class="pre">wristpy</span></code> package from PyPI via:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>wristpy
+</pre></div>
+</div>
+</section>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>The main processing pipeline of the wristpy module can be described as follows:</p>
+<ul class="simple">
+<li><p><strong>Data loading</strong>: sensor data is loaded using <a class="reference external" href="https://github.com/childmindresearch/actfast"><code class="docutils literal notranslate"><span class="pre">actfast</span></code></a>, and a <code class="docutils literal notranslate"><span class="pre">WatchData</span></code> object is created to store all sensor data.</p></li>
+<li><p><strong>Data calibration</strong>: A post-manufacturer calibration step can be applied, to ensure that the acceleration sensor is measuring 1<em>g</em> force during periods of no motion. There are three possible options: <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">gradient</span></code>, <code class="docutils literal notranslate"><span class="pre">ggir</span></code>.</p></li>
+<li><p><em><strong>Data imputation</strong></em> In the special case when dealing with the Actigraph <code class="docutils literal notranslate"><span class="pre">idle_sleep_mode</span> <span class="pre">==</span> <span class="pre">enabled</span></code>, the gaps in acceleration are filled in after calibration, to avoid biasing the calibration phase.</p></li>
+<li><p><strong>Metrics Calculation</strong>: Calculates various activity metrics on the calibrated data, namely ENMO (Euclidean norm, minus one), MAD (mean amplitude deviation)<sup><a href="#ref1">1</a></sup>, Actigraph activity counts<sup><a href="#ref2">2</a></sup>, MIMS (monitor-independent movement summary) unit<sup><a href="#ref3">3</a></sup>, and angle-Z (angle of acceleration relative to the <em>x-y</em> axis).</p></li>
+<li><p><strong>Non-wear detection</strong>: We find periods of non-wear based on the acceleration data. Specifically, the standard deviation of the acceleration values in a given time window, along each axis, is used as a threshold to decide <code class="docutils literal notranslate"><span class="pre">wear</span></code> or <code class="docutils literal notranslate"><span class="pre">not</span> <span class="pre">wear</span></code>. Additionally, we can use the temperature sensor, when available, to augment the acceleration data. This is used in the CTA (combined temperature and acceleration) algorithm<sup><a href="#ref4">4</a></sup>, and in the <code class="docutils literal notranslate"><span class="pre">skdh</span></code> DETACH algorithm<sup><a href="#ref5">5</a></sup>. Furthermore, ensemble classification of non-wear periods is possible by providing a list (of any length) of non-wear algorithm options.</p></li>
+<li><p><strong>Sleep Detection</strong>: Using the HDCZ<sup><a href="#ref6">6</a></sup> and HSPT<sup><a href="#ref7">7</a></sup> algorithms to analyze changes in arm angle we are able to find periods of sleep. We find the sleep onset–wakeup times for all sleep windows detected. Any sleep periods that overlap with detected non-wear times are removed, and any remaining sleep periods shorter than 15 minutes (default value) are removed. Additionally, the SIB (sustained inactivity bouts) and the SPT (sleep period time) windows are provided as part of the output to aid in sleep metric post-processing.</p></li>
+<li><p><strong>Physical activity levels</strong>: Using the chosen physical activity metric (aggregated into time bins, 5-second default) we compute activity levels into the following categories: [<code class="docutils literal notranslate"><span class="pre">inactive</span></code>, <code class="docutils literal notranslate"><span class="pre">light</span></code>, <code class="docutils literal notranslate"><span class="pre">moderate</span></code>, <code class="docutils literal notranslate"><span class="pre">vigorous</span></code>]. The threshold values can be defined by the user, while the default values are chosen based on the specific activity metric and the values found in the literature <sup><a href="#ref8">8</a></sup><sup><a href="#ref9">9</a></sup><sup><a href="#ref10">10</a></sup>.</p></li>
+<li><p><strong>Data output</strong>: The output results can be saved in <code class="docutils literal notranslate"><span class="pre">.csv</span></code> or <code class="docutils literal notranslate"><span class="pre">.parquet</span></code> data formats, with the run-time configuration parameters saved in a <code class="docutils literal notranslate"><span class="pre">.json</span></code> dictionary.</p></li>
+</ul>
+</section>
+<section id="supported-formats-devices">
+<h2>Supported formats &amp; devices<a class="headerlink" href="#supported-formats-devices" title="Link to this heading">¶</a></h2>
+<p>The package currently supports the following formats:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Format</p></th>
+<th class="head"><p>Manufacturer</p></th>
+<th class="head"><p>Device</p></th>
+<th class="head"><p>Implementation status</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GT3X</p></td>
+<td><p>Actigraph</p></td>
+<td><p>wGT3X-BT</p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>BIN</p></td>
+<td><p>GENEActiv</p></td>
+<td><p>GENEActiv</p></td>
+<td><p>✅</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="physical-activity-metrics-explained">
+<h2>Physical Activity Metrics Explained<a class="headerlink" href="#physical-activity-metrics-explained" title="Link to this heading">¶</a></h2>
+<section id="enmo-euclidean-norm-minus-one">
+<h3><em>ENMO— Euclidean Norm Minus One</em><a class="headerlink" href="#enmo-euclidean-norm-minus-one" title="Link to this heading">¶</a></h3>
+<p>ENMO quantifies movement intensity from calibrated 3-axis acceleration by taking the vector magnitude and subtracting 1 g (gravity). Values below zero are set to 0 (they mostly reflect noise or tiny calibration errors).</p>
+<p><strong>References:</strong></p>
+<ul class="simple">
+<li><p>van Hees, V. T., Gorzelniak, L., Dean León, E. C., Eder, M., Pias, M., Taherian, S., Ekelund, U., Renström, F., Franks, P. W., Horsch, A., &amp; Brage, S. (2013). Separating movement and gravity components in an acceleration signal and implications for the assessment of human daily physical activity. <em>PLoS ONE, 8</em>(4), e61691. https://doi.org/10.1371/journal.pone.0061691</p></li>
+<li><p>Hildebrand, M., van Hees, V. T., Hansen, B. H., &amp; Ekelund, U. (2014). Age group comparability of raw accelerometer output from wrist- and hip-worn monitors. <em>Medicine &amp; Science in Sports &amp; Exercise, 46</em>(9), 1816–1824. https://doi.org/10.1249/MSS.0000000000000289</p></li>
+</ul>
+</section>
+<section id="mad-mean-amplitude-deviation">
+<h3><em>MAD — Mean Amplitude Deviation</em><a class="headerlink" href="#mad-mean-amplitude-deviation" title="Link to this heading">¶</a></h3>
+<p>MAD summarizes how much the acceleration magnitude fluctuates within an epoch. Specifically it’s the mean of the absolute deviations from the epoch’s mean acceleration magnitude. It correlates well with energy expenditure and is orientation-independent.</p>
+<p><strong>Reference:</strong></p>
+<ul class="simple">
+<li><p>Vähä-Ypyä, H., Vasankari, T., Husu, P., Suni, J., &amp; Sievänen, H. (2015). A universal, accurate intensity-based classification of different physical activities using raw data of accelerometer. <em>Clinical Physiology and Functional Imaging, 35</em>(1), 64–70. https://doi.org/10.1111/cpf.12127</p></li>
+</ul>
+</section>
+<section id="mims-monitor-independent-summary-units">
+<h3><em>MIMS — Monitor-Independent Summary Units</em><a class="headerlink" href="#mims-monitor-independent-summary-units" title="Link to this heading">¶</a></h3>
+<p>MIMS is a standardized, device-agnostic summary unit. The pipeline interpolates to a fixed frequency (100 Hz), extrapolates values outside device range, band-pass filters, integrates area-under-the-curve per axis over each epoch, then combines axes (sum or vector magnitude) with small-value truncation. It’s designed to be comparable across devices and studies. This metric is computationally intensive and will run significantly slower than the other algorithms.</p>
+<p><strong>Reference:</strong></p>
+<ul class="simple">
+<li><p>John, D., Tang, Q., Albinali, F., &amp; Intille, S. (2019). An open-source monitor-independent movement summary for accelerometer data processing. <em>Journal for the Measurement of Physical Behaviour, 2</em>(4), 268–281. https://doi.org/10.1123/jmpb.2019-0011</p></li>
+</ul>
+</section>
+<section id="actigraph-activity-counts-ag-counts">
+<h3><em>ActiGraph Activity Counts (ag_counts)</em><a class="headerlink" href="#actigraph-activity-counts-ag-counts" title="Link to this heading">¶</a></h3>
+<p>This reproduces the open ActiGraph counts method: resample to 30 Hz, apply the published IIR band-pass filter, scale to device units, threshold, downsample to 10 Hz, and sum within each epoch. The three axes are finally combined  to yield epoch-level “counts.”</p>
+<p><strong>Reference:</strong></p>
+<ul class="simple">
+<li><p>Neishabouri, A., Wilson, K. E., Williams, D. K., Keadle, S. K., Sampson, J., John, D., &amp; Staudenmayer, J. (2022). Quantification of acceleration as activity counts in ActiGraph wearable. <em>Scientific Reports, 12</em>(1), 11169. https://doi.org/10.1038/s41598-022-16003-x</p></li>
+</ul>
+</section>
+</section>
+<section id="a-special-note-on-idle-sleep-mode">
+<h2>A Special Note on Idle Sleep Mode.<a class="headerlink" href="#a-special-note-on-idle-sleep-mode" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">idle_sleep_mode</span></code> for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this <a class="reference external" href="https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained">here</a>). Consequently, this causes issues when implementing wristpy’s non-wear and sleep detection. As of this moment, we fill in the missing acceleration data with the assumption that the watch is perfectly idle in the face-up position (Acceleration vector = [0, 0, -1]). The data is filled in at the same sampling rate as the raw acceleration data. In the special circumstance when acceleration samples are not evenly spaced, the data is resampled to the highest effective sampling rate to ensure linearly sampled data.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<p><span id="ref1">[1]</span> Vähä-Ypyä H, Vasankari T, Husu P, Suni J, Sievänen H. A universal, accurate intensity-based classification of different physical activities using raw data of accelerometer. <em>Clin Physiol Funct Imaging</em>. 2015;35(1):64-70. doi: <a class="reference external" href="https://doi.org/10.1111/cpf.12127">https://doi.org/10.1111/cpf.12127</a>. PMID: 24393233.</p>
+<p><span id="ref2">[2]</span> Neishabouri A, Wilson KE, Williams DK, et al. Quantification of acceleration as activity counts in ActiGraph wearable. <em>Sci Rep</em>. 2022;12(1). doi: <a class="reference external" href="https://doi.org/10.1038/s41598-022-16003-x">https://doi.org/10.1038/s41598-022-16003-x</a>.</p>
+<p><span id="ref3">[3]</span> John D, Tang Q, Albinali F, Intille S. An Open-Source Monitor-Independent Movement Summary for Accelerometer Data Processing. <em>Journal for the Measurement of Physical Behaviour</em>. 2019;2(4):268–281.</p>
+<p><span id="ref4">[4]</span> Zhou S, Hill RA, Morgan K, et al. Classification of accelerometer wear and non-wear events in seconds for monitoring free-living physical activity. <em>BMJ Open</em>. 2015;5:e007447. doi: <a class="reference external" href="https://doi.org/10.1136/bmjopen-2014-007447">https://doi.org/10.1136/bmjopen-2014-007447</a>.</p>
+<p><span id="ref5">[5]</span> Vert A, et al. Detecting accelerometer non-wear periods using change in acceleration combined with rate-of-change in temperature. <em>BMC Med Res Methodol</em>. 2022;22(1):147. doi: <a class="reference external" href="https://doi.org/10.1186/s12874-022-01633-6">https://doi.org/10.1186/s12874-022-01633-6</a>.</p>
+<p><span id="ref6">[6]</span> van Hees VT, Sabia S, Jones SE, et al. Estimating sleep parameters using an accelerometer without sleep diary. <em>Sci Rep</em>. 2018;8:12975. doi: <a class="reference external" href="https://doi.org/10.1038/s41598-018-31266-z">https://doi.org/10.1038/s41598-018-31266-z</a>.</p>
+<p><span id="ref7">[7]</span> van Hees VT, et al. A Novel, Open Access Method to Assess Sleep Duration Using a Wrist-Worn Accelerometer. <em>PLoS One</em>. 2015;10:e0142533. doi: <a class="reference external" href="https://doi.org/10.1371/journal.pone.0142533">https://doi.org/10.1371/journal.pone.0142533</a>.</p>
+<p><span id="ref8">[8]</span> Hildebrand M, et al. Age group comparability of raw accelerometer output from wrist- and hip-worn monitors. <em>Med Sci Sports Exerc</em>. 2014;46(9):1816–1824. doi: <a class="reference external" href="https://doi.org/10.1249/mss.0000000000000289">https://doi.org/10.1249/mss.0000000000000289</a>.</p>
+<p><span id="ref9">[9]</span> Treuth MS, Schmitz K, Catellier DJ, et al. Defining accelerometer thresholds for activity intensities in adolescent girls. <em>Med Sci Sports Exerc</em>. 2004;36(7):1259–1266. PMID: 15235335; PMCID: PMC2423321.</p>
+<p><span id="ref10">[10]</span> Aittasalo M, Vähä-Ypyä H, Vasankari T, et al. Mean amplitude deviation calculated from raw acceleration data: a novel method for classifying the intensity of adolescents’ physical activity irrespective of accelerometer brand. <em>BMC Sports Sci Med Rehabil</em>. 2015;7:18. doi: <a class="reference external" href="https://doi.org/10.1186/s13102-015-0010-0">https://doi.org/10.1186/s13102-015-0010-0</a>.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="cli_tutorial.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Command Line Tutorial</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Home</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Child Mind Institute
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Getting Started</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#supported-formats-devices">Supported formats &amp; devices</a></li>
+<li><a class="reference internal" href="#physical-activity-metrics-explained">Physical Activity Metrics Explained</a><ul>
+<li><a class="reference internal" href="#enmo-euclidean-norm-minus-one"><em>ENMO— Euclidean Norm Minus One</em></a></li>
+<li><a class="reference internal" href="#mad-mean-amplitude-deviation"><em>MAD — Mean Amplitude Deviation</em></a></li>
+<li><a class="reference internal" href="#mims-monitor-independent-summary-units"><em>MIMS — Monitor-Independent Summary Units</em></a></li>
+<li><a class="reference internal" href="#actigraph-activity-counts-ag-counts"><em>ActiGraph Activity Counts (ag_counts)</em></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#a-special-note-on-idle-sleep-mode">A Special Note on Idle Sleep Mode.</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>
