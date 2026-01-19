@@ -6,6 +6,7 @@ from typing import Literal, cast
 import actfast
 import numpy as np
 import pytest
+import pytest_mock
 
 from wristpy.core import models
 from wristpy.io.readers import readers
@@ -145,13 +146,14 @@ def test_timezone_extraction_bin(sample_data_bin: pathlib.Path) -> None:
     ],
 )
 def test_allow_duplicates_option(
-    mocker: pytest.MonkeyPatch, file_type: str, mock_data: dict
+    mocker: pytest_mock.MockFixture, file_type: str, mock_data: dict
 ) -> None:
     """Test the allow_duplicates option in read_watch_data function."""
     mocker.patch("actfast.read", return_value=mock_data)
 
     watch_data = readers.read_watch_data(f"dummy{file_type}", allow_duplicates=True)
 
+    assert watch_data.lux is not None
     assert len(watch_data.acceleration.time) == 2
     assert len(watch_data.lux.time) == 2
     assert np.array_equal(

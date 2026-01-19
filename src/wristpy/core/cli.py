@@ -158,8 +158,8 @@ def main(
         "-d",
         "--allow-duplicates",
         help="Whether to allow duplicate timestamps in the sensor data. "
-        "If this flag is set, no error will be raised during Measurement validation and "
-        "processing can continue. Only unique timestamps and their corresponding "
+        "If this flag is set, no error will be raised during Measurement validation "
+        "and processing can continue. Only unique timestamps and their corresponding "
         "sensor values will be kept. "
         "The first occurrence of each timestamp is retained. Defaults to False. "
         "Note that the presence of duplicate timestamps may indicate sensor "
