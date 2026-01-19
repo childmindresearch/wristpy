@@ -28,7 +28,7 @@ def create_dummy_measurement(
     Returns:
         A Measurement object with dummy data for testing. The data will be either all
         a single value for trivial cases, or normalized random data depending on the
-        arguements given.
+        arguments given.
     """
     n_samples = int(sampling_rate * 3600 * duration_hours)
     start_time = datetime(2024, 5, 4, 12, 0, 0)
@@ -94,7 +94,7 @@ def test_sphere_error() -> None:
 
 
 def test_zero_scale_error() -> None:
-    """Test error due to scale becomeing zero values."""
+    """Test error due to scale becoming zero values."""
     data = np.array([[2.0, 2.0, 2.0], [2.0, 2.0, 2.0], [-0.001, -0.001, -0.001]])
 
     calibrator = calibration.GgirCalibration(min_acceleration=0)
