@@ -153,6 +153,18 @@ def main(
         "Must be greater than or equal to 1.",
         min=1,
     ),
+    allow_duplicates: bool = typer.Option(
+        False,
+        "-d",
+        "--allow-duplicates",
+        help="Whether to allow duplicate timestamps in the sensor data. "
+        "If this flag is set, no error will be raised during Measurement validation and "
+        "processing can continue. Only unique timestamps and their corresponding "
+        "sensor values will be kept. "
+        "The first occurrence of each timestamp is retained. Defaults to False. "
+        "Note that the presence of duplicate timestamps may indicate sensor "
+        "malfunction. Modifying this parameter should be done with caution.",
+    ),
     verbosity: bool = typer.Option(
         False,
         "-v",
@@ -194,6 +206,7 @@ def main(
             nonwear_algorithm=nonwear_algorithms,  # type: ignore[arg-type] # Covered by NonwearAlgorithm Enum class
             verbosity=log_level,
             output_filetype=output_filetype.value,
+            allow_duplicates=allow_duplicates,
         )
     except exceptions.EmptyDirectoryError as e:
         typer.echo(f"Error: {e}", err=True)
