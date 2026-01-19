@@ -96,6 +96,11 @@ class Measurement(BaseModel):
         if not isinstance(v.dtype, pl.datatypes.Datetime):
             raise ValueError("Time must be a datetime series")
         if not v.is_unique().all():
+            logger.warning(
+                "Duplicate timestamps found in time series. "
+                "See the `allow_duplicates` parameter if you "
+                "would want to process this data regardless."
+            )
             raise ValueError("Time series must contain unique entries")
         if not v.is_sorted():
             raise ValueError("Time series must be sorted")

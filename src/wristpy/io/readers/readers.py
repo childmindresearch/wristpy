@@ -7,18 +7,31 @@ import actfast
 import numpy as np
 import polars as pl
 
-from wristpy.core import models
+from wristpy.core import config, models
+
+logger = config.get_logger()
 
 
-def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
+def read_watch_data(
+    file_name: Union[pathlib.Path, str], allow_duplicates: bool = False
+) -> models.WatchData:
     """Read watch data from a file.
 
     Currently supported watch types are Actigraph .gt3x and GeneActiv .bin.
     Assigns the idle_sleep_mode_flag to false unless the watchtype is .gt3x and
     sleep_mode is enabled (based on watch metadata).
 
+    If requested, removes duplicate timestamps from the data, keeping only unique
+    timestamps and their corresponding sensor values.
+
     Args:
         file_name: The filename to read the watch data from.
+        allow_duplicates: Whether to allow duplicate timestamps in the data. If
+            False, duplicate timestamps will raise a ValueError in the
+            Measurement validation phase. If set to True, we will keep only the
+            unique timestamps and the associated sensor values. The first occurrence
+            of each timestamp is kept.
+            Default is False.
 
     Returns:
         WatchData class
@@ -39,7 +52,19 @@ def read_watch_data(file_name: Union[pathlib.Path, str]) -> models.WatchData:
 
     for timeseries in data["timeseries"].values():
         time = unix_epoch_time_to_polars_datetime(timeseries["datetime"])
+        if allow_duplicates:
+            logger.info(
+                "Keeping only unique timestamps as requested. "
+                "Please note that there may have been duplicate timestamps, "
+                "which is indicative of sensor malfunction."
+            )
+            unique_time_indices = time.arg_unique()
+            time = time.gather(unique_time_indices)
+
         for sensor_name, sensor_values in timeseries.items():
+            if allow_duplicates:
+                sensor_values = sensor_values[unique_time_indices.to_numpy()]
+
             measurements[sensor_name] = models.Measurement(
                 measurements=sensor_values, time=time
             )

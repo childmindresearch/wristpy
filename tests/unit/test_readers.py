@@ -4,6 +4,7 @@ import pathlib
 from typing import Literal, cast
 
 import actfast
+import numpy as np
 import pytest
 
 from wristpy.core import models
@@ -94,3 +95,66 @@ def test_timezone_extraction_bin(sample_data_bin: pathlib.Path) -> None:
     assert (
         watch_data.time_zone == expected_timezone
     ), f"Expected timezone of: {expected_timezone}, result was: {watch_data.time_zone}"
+
+
+@pytest.mark.parametrize(
+    "file_type,mock_data",
+    [
+        (
+            ".gt3x",
+            {
+                "timeseries": {
+                    "acceleration": {
+                        "datetime": np.array([1000000000, 1000000000, 2000000000]),
+                        "acceleration": np.array([[1, 2, 3], [2, 3, 4], [4, 5, 6]]),
+                    },
+                    "light": {
+                        "datetime": np.array([1000000000, 1000000000, 2000000000]),
+                        "light": np.array([10, 20, 30]),
+                    },
+                },
+                "metadata": {
+                    "device_feature_enabled": {"sleep_mode": "false"},
+                    "info": {
+                        "TimeZone": "-05:00:00",
+                        "Acceleration Min": "-8",
+                        "Acceleration Max": "8",
+                    },
+                },
+            },
+        ),
+        (
+            ".bin",
+            {
+                "timeseries": {
+                    "high_frequency": {
+                        "datetime": np.array([1000000000, 1000000000, 2000000000]),
+                        "acceleration": np.array([[1, 2, 3], [2, 3, 4], [4, 5, 6]]),
+                    },
+                    "low_frequency": {
+                        "datetime": np.array([1000000000, 1000000000, 2000000000]),
+                        "light": np.array([10, 20, 30]),
+                    },
+                },
+                "metadata": {
+                    "Device Capabilities": {"Accelerometer Range": "-8 to 8"},
+                    "Configuration Info": {"Time Zone": "UTC-05:00"},
+                },
+            },
+        ),
+    ],
+)
+def test_allow_duplicates_option(
+    mocker: pytest.MonkeyPatch, file_type: str, mock_data: dict
+) -> None:
+    """Test the allow_duplicates option in read_watch_data function."""
+    mocker.patch("actfast.read", return_value=mock_data)
+
+    watch_data = readers.read_watch_data(f"dummy{file_type}", allow_duplicates=True)
+
+    assert len(watch_data.acceleration.time) == 2
+    assert len(watch_data.lux.time) == 2
+    assert np.array_equal(
+        watch_data.acceleration.measurements, np.array([[1, 2, 3], [4, 5, 6]])
+    )
+    assert np.array_equal(watch_data.lux.measurements, np.array([10, 30]))
