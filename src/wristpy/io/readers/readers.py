@@ -13,7 +13,7 @@ logger = config.get_logger()
 
 
 def read_watch_data(
-    file_name: Union[pathlib.Path, str], allow_duplicates: bool = False
+    file_name: Union[pathlib.Path, str], *, allow_duplicates: bool = False
 ) -> models.WatchData:
     """Read watch data from a file.
 

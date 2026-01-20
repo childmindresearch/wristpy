@@ -98,9 +98,8 @@ def test_timezone_extraction_bin(sample_data_bin: pathlib.Path) -> None:
     ), f"Expected timezone of: {expected_timezone}, result was: {watch_data.time_zone}"
 
 
-@pytest.mark.parametrize(
-    "file_type,mock_data",
-    [
+@pytest.fixture(
+    params=[
         (
             ".gt3x",
             {
@@ -145,10 +144,16 @@ def test_timezone_extraction_bin(sample_data_bin: pathlib.Path) -> None:
         ),
     ],
 )
+def duplicate_data_scenarios(request: pytest.FixtureRequest) -> tuple[str, dict]:
+    """Fixture providing test data with duplicate timestamps."""
+    return request.param
+
+
 def test_allow_duplicates_option(
-    mocker: pytest_mock.MockFixture, file_type: str, mock_data: dict
+    mocker: pytest_mock.MockFixture, duplicate_data_scenarios: tuple[str, dict]
 ) -> None:
     """Test the allow_duplicates option in read_watch_data function."""
+    file_type, mock_data = duplicate_data_scenarios
     mocker.patch("actfast.read", return_value=mock_data)
 
     watch_data = readers.read_watch_data(f"dummy{file_type}", allow_duplicates=True)
@@ -160,3 +165,14 @@ def test_allow_duplicates_option(
         watch_data.acceleration.measurements, np.array([[1, 2, 3], [4, 5, 6]])
     )
     assert np.array_equal(watch_data.lux.measurements, np.array([10, 30]))
+
+
+def test_allow_duplicates_false(
+    mocker: pytest_mock.MockFixture, duplicate_data_scenarios: tuple[str, dict]
+) -> None:
+    """Test the allow_duplicates=False option in read_watch_data function."""
+    file_type, mock_data = duplicate_data_scenarios
+    mocker.patch("actfast.read", return_value=mock_data)
+
+    with pytest.raises(ValueError, match="Time series must contain unique entries"):
+        readers.read_watch_data(f"dummy{file_type}", allow_duplicates=False)
