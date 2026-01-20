@@ -36,6 +36,7 @@ def test_main_default(
         activity_metric=["enmo"],
         epoch_length=5,
         nonwear_algorithm=["ggir"],
+        allow_duplicates=False,
         verbosity=logging.INFO,
         output_filetype=".csv",
     )
@@ -69,6 +70,7 @@ def test_main_with_metrics(
         activity_metric=[metric],
         nonwear_algorithm=["ggir"],
         epoch_length=5,
+        allow_duplicates=False,
         verbosity=logging.INFO,
     )
 
@@ -93,6 +95,7 @@ def test_main_with_multiple_metrics(
         nonwear_algorithm=["ggir"],
         epoch_length=5,
         verbosity=logging.INFO,
+        allow_duplicates=False,
     )
 
 
@@ -125,6 +128,7 @@ def test_main_with_options(
                 "cta",
                 "-n",
                 "ggir",
+                "-d",
             ]
         ),
     )
@@ -139,6 +143,7 @@ def test_main_with_options(
         epoch_length=3,
         verbosity=logging.INFO,
         output_filetype=".csv",
+        allow_duplicates=True,
     )
 
 
@@ -191,6 +196,7 @@ def test_main_verbosity(
         nonwear_algorithm=["ggir"],
         verbosity=logging.DEBUG,
         output_filetype=".csv",
+        allow_duplicates=False,
     )
 
 

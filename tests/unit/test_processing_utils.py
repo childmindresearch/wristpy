@@ -90,7 +90,7 @@ def test_nonwear_dispatcher_default() -> None:
 
 
 def test_nonwear_dispatcher_multiple() -> None:
-    """Tests nonwear dispatcher with multiple nonwear alogirhtms requested."""
+    """Tests nonwear dispatcher with multiple nonwear algorithms requested."""
     num_samples = int(1e5)
     time_list = [
         datetime(2024, 5, 2) + timedelta(milliseconds=100 * i)

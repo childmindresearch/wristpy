@@ -79,7 +79,7 @@ def test_save_results(
 
 
 def test_validate_output_invalid_file_type(tmp_path: pathlib.Path) -> None:
-    """Test when a bad extention is given."""
+    """Test when a bad extension is given."""
     with pytest.raises(exceptions.InvalidFileTypeError):
         writers.OrchestratorResults.validate_output(tmp_path / "bad_file.oops")
 

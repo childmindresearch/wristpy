@@ -41,6 +41,7 @@ def run(
     epoch_length: float = 5,
     activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ["enmo"],
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
+    allow_duplicates: bool = False,
     verbosity: int = logging.WARNING,
     output_filetype: Literal[".csv", ".parquet"] = ".csv",
 ) -> Union[writers.OrchestratorResults, Dict[str, writers.OrchestratorResults]]:
@@ -70,6 +71,7 @@ def run(
         activity_metric: The metric(s) to be used for physical activity categorization.
             Multiple metrics can be specified as a sequence.
         nonwear_algorithm: The algorithm to be used for nonwear detection.
+        allow_duplicates: Whether to allow duplicate timestamps in the sensor data.
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files. Only used when
             processing directories.
@@ -133,6 +135,7 @@ def run(
             activity_metric=activity_metric,
             verbosity=verbosity,
             nonwear_algorithm=nonwear_algorithm,
+            allow_duplicates=allow_duplicates,
         )
 
     return _run_directory(
@@ -145,6 +148,7 @@ def run(
         verbosity=verbosity,
         output_filetype=output_filetype,
         nonwear_algorithm=nonwear_algorithm,
+        allow_duplicates=allow_duplicates,
     )
 
 
@@ -161,6 +165,7 @@ def _run_directory(
     verbosity: int = logging.WARNING,
     output_filetype: Literal[".csv", ".parquet"] = ".csv",
     activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ["enmo"],
+    allow_duplicates: bool = False,
 ) -> Dict[str, writers.OrchestratorResults]:
     """Runs main processing steps for wristpy on directories.
 
@@ -186,6 +191,7 @@ def _run_directory(
         output_filetype: Specifies the data format for the save files.
         activity_metric: The metric(s) to be used for physical activity categorization.
             Multiple metrics can be specified as a sequence.
+        allow_duplicates: Whether to allow duplicate timestamps in the sensor data.
 
     Returns:
         All calculated data in a save ready format as a dictionary of
@@ -256,6 +262,7 @@ def _run_directory(
                     verbosity=verbosity,
                     nonwear_algorithm=nonwear_algorithm,
                     activity_metric=activity_metric,
+                    allow_duplicates=allow_duplicates,
                 )
             except Exception as e:
                 logger.error("Did not run file: %s, Error: %s", file, e)
@@ -275,6 +282,7 @@ def _run_file(
     epoch_length: float = 5.0,
     activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ["enmo"],
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
+    allow_duplicates: bool = False,
     verbosity: int = logging.WARNING,
 ) -> writers.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
@@ -303,6 +311,10 @@ def _run_file(
             Multiple metrics can be specified as a sequence.
         nonwear_algorithm: The algorithm to be used for nonwear detection. A sequence of
             algorithms can be provided. If so, a majority vote will be taken.
+        allow_duplicates: Whether to allow duplicate timestamps in the sensor data.
+            If set to True, no error will be raised and we will keep only the unique
+            timestamps and their associated sensor values. The first occurrence of each
+            timestamp is kept.
         verbosity: The logging level for the logger.
 
     Returns:
@@ -346,7 +358,7 @@ def _run_file(
         logger.error(msg)
         raise ValueError(msg)
 
-    watch_data = readers.read_watch_data(input)
+    watch_data = readers.read_watch_data(input, allow_duplicates=allow_duplicates)
 
     if calibrator is None:
         logger.debug("Running without calibration")

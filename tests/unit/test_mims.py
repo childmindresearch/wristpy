@@ -94,7 +94,7 @@ def test_interpolate_data(
 
 
 def test_extrapolate_points() -> None:
-    """Test the succesful running of extrapolate points."""
+    """Test the successful running of extrapolate points."""
     test_data = create_clipped_sine_data()
     test_time = create_sine_data_time_stamps()
     test_measure = models.Measurement(measurements=test_data, time=test_time)
@@ -455,7 +455,7 @@ def test_fit_weighted_insufficient_data() -> None:
 
 
 def test_fit_weighted_out_of_range() -> None:
-    """Test that _fit_weighted returns None when recieving -1 indices(out of range)."""
+    """Test that _fit_weighted returns None when receiving -1 indices(out of range)."""
     axis = np.arange(10, dtype=float)
     time_numeric = np.arange(10, dtype=float)
     marker = np.zeros(10)
