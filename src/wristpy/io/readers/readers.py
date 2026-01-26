@@ -47,7 +47,10 @@ def read_watch_data(
         data = actfast.read(file_name, lenient=True)
         warnings = data.get("warnings", [])
         if warnings:
-            logger.warning(f"Recovered partial data with {len(warnings)} warnings")
+            logger.warning(
+                f"Recovered partial data for {file_name} "
+                f"with {len(warnings)} warnings."
+            )
     except Exception as e:
         raise IOError(f"Error reading file: {e}. File type is unsupported.") from e
 
