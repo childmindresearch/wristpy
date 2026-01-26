@@ -44,7 +44,10 @@ def read_watch_data(
     if file_type not in (".gt3x", ".bin"):
         raise ValueError(f"File type {file_type} is not supported.")
     try:
-        data = actfast.read(file_name)
+        data = actfast.read(file_name, lenient=True)
+        warnings = data.get("warnings", [])
+        if warnings:
+            logger.warning(f"Recovered partial data with {len(warnings)} warnings")
     except Exception as e:
         raise IOError(f"Error reading file: {e}. File type is unsupported.") from e
 
@@ -62,6 +65,8 @@ def read_watch_data(
             time = time.gather(unique_time_indices)
 
         for sensor_name, sensor_values in timeseries.items():
+            if not isinstance(sensor_values, np.ndarray):
+                continue
             if allow_duplicates:
                 sensor_values = sensor_values[unique_time_indices.to_numpy()]
 

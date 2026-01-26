@@ -121,6 +121,7 @@ def test_timezone_extraction_bin(sample_data_bin: pathlib.Path) -> None:
                         "Acceleration Max": "8",
                     },
                 },
+                "warnings": [],
             },
         ),
         (
@@ -140,6 +141,7 @@ def test_timezone_extraction_bin(sample_data_bin: pathlib.Path) -> None:
                     "Device Capabilities": {"Accelerometer Range": "-8 to 8"},
                     "Configuration Info": {"Time Zone": "UTC-05:00"},
                 },
+                "warnings": [],
             },
         ),
     ],
