@@ -1,6 +1,8 @@
 """Function to read accelerometer data from a file."""
 
+import datetime
 import pathlib
+import re
 from typing import Literal, Union
 
 import actfast
@@ -24,6 +26,12 @@ def read_watch_data(
     If requested, removes duplicate timestamps from the data, keeping only unique
     timestamps and their corresponding sensor values.
 
+    There is also support for .csv files that have been processed with ActiGraph
+    software and exported into csv format as part of the HBN Actigraphy data release.
+    For these files, we assume linearly sampled data based on the provided sampling
+    rate in the metadata, the timezone is set to New York,
+    and idle_sleep_mode_flag is set to False.
+
     Args:
         file_name: The filename to read the watch data from.
         allow_duplicates: Whether to allow duplicate timestamps in the data. If
@@ -41,8 +49,33 @@ def read_watch_data(
         IOError if the file cannot be read using actfast.
     """
     file_type = pathlib.Path(file_name).suffix
-    if file_type not in (".gt3x", ".bin"):
+    if file_type not in (".gt3x", ".bin", ".csv"):
         raise ValueError(f"File type {file_type} is not supported.")
+    if file_type == ".csv":
+        acceleration_data, metadata = _read_actigraph_csv(pathlib.Path(file_name))
+
+        n_samples = len(acceleration_data)
+        timestamps = [
+            metadata["start_datetime"]
+            + datetime.timedelta(seconds=i / metadata["sampling_rate"])
+            for i in range(n_samples)
+        ]
+        time_series = pl.Series(timestamps).cast(pl.Datetime)
+
+        acceleration_measurement = models.Measurement(
+            measurements=acceleration_data, time=time_series
+        )
+
+        return models.WatchData(
+            acceleration=acceleration_measurement,
+            lux=None,
+            battery=None,
+            capsense=None,
+            temperature=None,
+            idle_sleep_mode_flag=False,
+            dynamic_range=(-8, 8),
+            time_zone="America/New_York",
+        )
     try:
         data = actfast.read(file_name, lenient=True)
         warnings = data.get("warnings", [])
@@ -147,3 +180,44 @@ def unix_epoch_time_to_polars_datetime(
     """
     time_series = pl.Series(time)
     return pl.from_epoch(time_series, time_unit=units).alias("time")
+
+
+def _read_actigraph_csv(filepath: pathlib.Path) -> tuple[np.ndarray, dict]:
+    """Read ActiGraph CSV file with metadata headers.
+
+    This helper function is used to read raw actigraphy data that has been processed
+    with ActiGraph software and exported into csv format as part of the
+    HBN Actigraphy data release.
+
+    We assume linearly sampled data based on the provided sampling rate in the metadata,
+    the timezone is set to New York, and idle_sleep_mode_flag is set to False.
+    If no sampling rate is provided, we default to 60 Hz.
+
+    Args:
+        filepath: Path to the ActiGraph CSV file
+
+    Returns:
+        Tuple of (acceleration_data, metadata).
+    """
+    with open(filepath, "r") as f:
+        lines = [f.readline() for _ in range(12)]
+
+    hz_match = re.search(r"at (\d+) Hz", lines[0])
+    sampling_rate = int(hz_match.group(1)) if hz_match else int(60)
+
+    start_time = lines[2].strip().split()[-1]
+    start_date = lines[3].strip().split()[-1]
+    start_datetime = datetime.datetime.strptime(
+        f"{start_date} {start_time}", "%d/%m/%Y %H:%M:%S"
+    )
+
+    data = np.loadtxt(
+        filepath,
+        delimiter=",",
+        skiprows=12,
+        usecols=(0, 1, 2),
+    )
+
+    metadata = {"sampling_rate": sampling_rate, "start_datetime": start_datetime}
+
+    return data, metadata
