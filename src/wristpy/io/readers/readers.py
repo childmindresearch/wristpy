@@ -211,12 +211,16 @@ def _read_actigraph_csv(filepath: pathlib.Path) -> tuple[np.ndarray, dict]:
         f"{start_date} {start_time}", "%d/%m/%Y %H:%M:%S"
     )
 
-    data = np.loadtxt(
+    data = pl.read_csv(
         filepath,
-        delimiter=",",
-        skiprows=12,
-        usecols=(0, 1, 2),
-    )
+        skip_rows=12,
+        has_header=False,
+        schema_overrides={
+            "Accelerometer_X": pl.Float64,
+            "Accelerometer_Y": pl.Float64,
+            "Accelerometer_Z": pl.Float64,
+        },
+    ).to_numpy()
 
     metadata = {"sampling_rate": sampling_rate, "start_datetime": start_datetime}
 
