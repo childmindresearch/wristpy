@@ -60,7 +60,7 @@ def read_watch_data(
             + datetime.timedelta(seconds=i / metadata["sampling_rate"])
             for i in range(n_samples)
         ]
-        time_series = pl.Series(timestamps).cast(pl.Datetime)
+        time_series = pl.Series(timestamps).cast(pl.Datetime("ns"))
 
         acceleration_measurement = models.Measurement(
             measurements=acceleration_data, time=time_series
