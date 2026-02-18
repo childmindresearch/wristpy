@@ -199,7 +199,7 @@ def _read_actigraph_csv(filepath: pathlib.Path) -> tuple[np.ndarray, dict]:
     Returns:
         Tuple of (acceleration_data, metadata).
     """
-    with open(filepath, "r") as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         lines = [f.readline() for _ in range(12)]
 
     hz_match = re.search(r"at (\d+) Hz", lines[0])
