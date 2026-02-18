@@ -31,6 +31,12 @@ def sample_data_bin() -> pathlib.Path:
 
 
 @pytest.fixture
+def sample_data_csv() -> pathlib.Path:
+    """Test data for .csv data file."""
+    return pathlib.Path(__file__).parent / "sample_data" / "example_hbn_actigraph.csv"
+
+
+@pytest.fixture
 def sample_data_txt() -> pathlib.Path:
     """Text data to test invalid file types."""
     return pathlib.Path(__file__).parent / "sample_data" / "example_text.txt"

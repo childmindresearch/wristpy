@@ -42,6 +42,19 @@ def test_geneactiv_bin_loader(sample_data_bin: pathlib.Path) -> None:
     assert watch_data.idle_sleep_mode_flag is False
 
 
+def test_actigraph_csv_loader(sample_data_csv: pathlib.Path) -> None:
+    """Test the ActiGraph CSV loader."""
+    watch_data = readers.read_watch_data(sample_data_csv)
+    assert isinstance(watch_data, models.WatchData)
+    assert isinstance(watch_data.acceleration, models.Measurement)
+    assert watch_data.lux is None
+    assert watch_data.battery is None
+    assert watch_data.capsense is None
+    assert watch_data.temperature is None
+    assert watch_data.idle_sleep_mode_flag is False
+    assert watch_data.time_zone == "America/New_York"
+
+
 def test_nonexistent_file() -> None:
     """Test the correct error is raised for nonexistent file."""
     with pytest.raises(IOError, match="Error reading file:"):
