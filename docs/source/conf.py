@@ -12,7 +12,7 @@ copyright = "2025, Child Mind Institute"
 author = """ Adam Santorelli, Florian Rupprecht, Freymon Perez, Greg Kiar,
 Reinder Vos de Wael"""
 
-release = "0.2.0"
+release = "0.2.5"
 
 
 extensions = [
