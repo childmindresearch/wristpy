@@ -28,6 +28,10 @@ The package currently supports the following formats:
 | --- | --- | --- | --- |
 | GT3X | Actigraph | wGT3X-BT | ✅ |
 | BIN | GENEActiv | GENEActiv | ✅ |
+| CSV | Actigraph | wGT3X-BT | ✅ (HBN format only) |
+
+> [!Important]
+> **CSV Format Support**: We provide special support for CSV files that have been processed with ActiGraph software and exported in the specific format used in the Healthy Brain Network (HBN) actigraphy data release from 2026. Any other CSV files that match this specific formatting (12-line header with metadata including start time, start date, idle sleep mode status, and sample rate) can also be directly read using wristpy.
 
 **Special Note**
     The `idle_sleep_mode` for Actigraph watches will lead to uneven sampling rates during periods of no motion (read about this [here](https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained)). Consequently, this causes issues when implementing wristpy's non-wear and sleep detection. As of this moment, we fill in the missing acceleration data with the assumption that the watch is perfectly idle in the face-up position (Acceleration vector = [0, 0, -1]). The data is filled in at the same sampling rate as the raw acceleration data. In the special circumstance when acceleration samples are not evenly spaced, the data is resampled to the highest effective sampling rate to ensure linearly sampled data.
