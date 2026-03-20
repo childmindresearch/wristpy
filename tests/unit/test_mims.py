@@ -147,7 +147,8 @@ def test_brute_force_k() -> None:
         f"Expected shape value between {k_min} and {k_max}, got: {result}"
     )
     assert np.isclose(target_probability, result_probability, rtol=1e-3), (
-        f"Expected target probability of: {target_probability}, got:{result_probability}"
+        f"Expected target probability of: {target_probability}, "
+        f"got:{result_probability}"
     )
 
 
