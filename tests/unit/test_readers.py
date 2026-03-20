@@ -42,9 +42,26 @@ def test_geneactiv_bin_loader(sample_data_bin: pathlib.Path) -> None:
     assert watch_data.idle_sleep_mode_flag is False
 
 
-def test_actigraph_csv_loader(sample_data_csv: pathlib.Path) -> None:
+def test_actigraph_csv_loader(
+    sample_data_csv_idle_sleep_mode_true: pathlib.Path,
+) -> None:
     """Test the ActiGraph CSV loader."""
-    watch_data = readers.read_watch_data(sample_data_csv)
+    watch_data = readers.read_watch_data(sample_data_csv_idle_sleep_mode_true)
+    assert isinstance(watch_data, models.WatchData)
+    assert isinstance(watch_data.acceleration, models.Measurement)
+    assert watch_data.lux is None
+    assert watch_data.battery is None
+    assert watch_data.capsense is None
+    assert watch_data.temperature is None
+    assert watch_data.idle_sleep_mode_flag is True
+    assert watch_data.time_zone == "America/New_York"
+
+
+def test_actigraph_csv_loader_idle_sleep_mode_false(
+    sample_data_csv_idle_sleep_mode_false: pathlib.Path,
+) -> None:
+    """Test the ActiGraph CSV loader with idle_sleep_mode_flag set to False."""
+    watch_data = readers.read_watch_data(sample_data_csv_idle_sleep_mode_false)
     assert isinstance(watch_data, models.WatchData)
     assert isinstance(watch_data.acceleration, models.Measurement)
     assert watch_data.lux is None
@@ -53,6 +70,12 @@ def test_actigraph_csv_loader(sample_data_csv: pathlib.Path) -> None:
     assert watch_data.temperature is None
     assert watch_data.idle_sleep_mode_flag is False
     assert watch_data.time_zone == "America/New_York"
+
+
+def test_bad_csv_format(mims_r_version: pathlib.Path) -> None:
+    """Test the CSV reader with a file bad csv."""
+    with pytest.raises(IOError, match="Error reading CSV file:"):
+        readers.read_watch_data(mims_r_version)
 
 
 def test_nonexistent_file() -> None:
@@ -71,9 +94,9 @@ def test_extract_dynamic_range_bin(sample_data_bin: pathlib.Path) -> None:
         metadata=data["metadata"], file_type=file_type
     )
 
-    assert (
-        result == expected_dynamic_range
-    ), f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
+    assert result == expected_dynamic_range, (
+        f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
+    )
 
 
 def test_extract_dynamic_range_gt3x(sample_data_gt3x: pathlib.Path) -> None:
@@ -86,9 +109,9 @@ def test_extract_dynamic_range_gt3x(sample_data_gt3x: pathlib.Path) -> None:
         metadata=data["metadata"], file_type=file_type
     )
 
-    assert (
-        result == expected_dynamic_range
-    ), f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
+    assert result == expected_dynamic_range, (
+        f"Expected dynamic range of: {expected_dynamic_range}, result was: {result}"
+    )
 
 
 def test_timezone_extraction_gt3x(sample_data_gt3x: pathlib.Path) -> None:
@@ -96,9 +119,9 @@ def test_timezone_extraction_gt3x(sample_data_gt3x: pathlib.Path) -> None:
     expected_timezone = "-05:00:00"
     watch_data = readers.read_watch_data(sample_data_gt3x)
 
-    assert (
-        watch_data.time_zone == expected_timezone
-    ), f"Expected timezone of: {expected_timezone}, result was: {watch_data.time_zone}"
+    assert watch_data.time_zone == expected_timezone, (
+        f"Expected timezone of: {expected_timezone}, result was: {watch_data.time_zone}"
+    )
 
 
 def test_timezone_extraction_bin(sample_data_bin: pathlib.Path) -> None:
@@ -106,9 +129,9 @@ def test_timezone_extraction_bin(sample_data_bin: pathlib.Path) -> None:
     expected_timezone = "-05:00"
     watch_data = readers.read_watch_data(sample_data_bin)
 
-    assert (
-        watch_data.time_zone == expected_timezone
-    ), f"Expected timezone of: {expected_timezone}, result was: {watch_data.time_zone}"
+    assert watch_data.time_zone == expected_timezone, (
+        f"Expected timezone of: {expected_timezone}, result was: {watch_data.time_zone}"
+    )
 
 
 @pytest.fixture(

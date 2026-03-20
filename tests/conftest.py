@@ -31,9 +31,23 @@ def sample_data_bin() -> pathlib.Path:
 
 
 @pytest.fixture
-def sample_data_csv() -> pathlib.Path:
+def sample_data_csv_idle_sleep_mode_true() -> pathlib.Path:
     """Test data for .csv data file."""
-    return pathlib.Path(__file__).parent / "sample_data" / "example_hbn_actigraph.csv"
+    return (
+        pathlib.Path(__file__).parent
+        / "sample_data"
+        / "example_hbn_actigraph_idle_sleep_mode_true.csv"
+    )
+
+
+@pytest.fixture
+def sample_data_csv_idle_sleep_mode_false() -> pathlib.Path:
+    """Test data for .csv data file."""
+    return (
+        pathlib.Path(__file__).parent
+        / "sample_data"
+        / "example_hbn_actigraph_idle_sleep_mode_false.csv"
+    )
 
 
 @pytest.fixture

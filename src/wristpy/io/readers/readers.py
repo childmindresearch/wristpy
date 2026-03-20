@@ -52,15 +52,24 @@ def read_watch_data(
     if file_type not in (".gt3x", ".bin", ".csv"):
         raise ValueError(f"File type {file_type} is not supported.")
     if file_type == ".csv":
-        acceleration_data, metadata = _read_actigraph_csv(pathlib.Path(file_name))
+        try:
+            acceleration_data, metadata = _read_actigraph_csv(pathlib.Path(file_name))
+        except Exception as e:
+            raise IOError(
+                f"Error reading CSV file: {e}. "
+                "Please ensure the file matches the HBN ActiGraph CSV format "
+                "(12-line header with metadata)."
+            ) from e
 
         n_samples = len(acceleration_data)
-        timestamps = [
-            metadata["start_datetime"]
-            + datetime.timedelta(seconds=i / metadata["sampling_rate"])
-            for i in range(n_samples)
-        ]
-        time_series = pl.Series(timestamps).cast(pl.Datetime("ns"))
+        start_timestamp_ns = metadata["start_datetime"].timestamp() * 1_000_000_000
+        sampling_interval_ns = 1_000_000_000 / metadata["sampling_rate"]
+
+        timestamps_ns = (
+            start_timestamp_ns + np.arange(n_samples) * sampling_interval_ns
+        ).astype(np.int64)
+
+        time_series = pl.from_epoch(pl.Series(timestamps_ns), time_unit="ns")
 
         acceleration_measurement = models.Measurement(
             measurements=acceleration_data, time=time_series
@@ -72,7 +81,7 @@ def read_watch_data(
             battery=None,
             capsense=None,
             temperature=None,
-            idle_sleep_mode_flag=False,
+            idle_sleep_mode_flag=metadata["idle_sleep_mode_flag"],
             dynamic_range=(-8, 8),
             time_zone="America/New_York",
         )
@@ -81,8 +90,7 @@ def read_watch_data(
         warnings = data.get("warnings", [])
         if warnings:
             logger.warning(
-                f"Recovered partial data for {file_name} "
-                f"with {len(warnings)} warnings."
+                f"Recovered partial data for {file_name} with {len(warnings)} warnings."
             )
     except Exception as e:
         raise IOError(f"Error reading file: {e}. File type is unsupported.") from e
@@ -182,7 +190,9 @@ def unix_epoch_time_to_polars_datetime(
     return pl.from_epoch(time_series, time_unit=units).alias("time")
 
 
-def _read_actigraph_csv(filepath: pathlib.Path) -> tuple[np.ndarray, dict]:
+def _read_actigraph_csv(
+    filepath: pathlib.Path,
+) -> tuple[np.ndarray, dict]:
     """Read ActiGraph CSV file with metadata headers.
 
     This helper function is used to read raw actigraphy data that has been processed
@@ -190,8 +200,7 @@ def _read_actigraph_csv(filepath: pathlib.Path) -> tuple[np.ndarray, dict]:
     HBN Actigraphy data release.
 
     We assume linearly sampled data based on the provided sampling rate in the metadata,
-    the timezone is set to New York, and idle_sleep_mode_flag is set to False.
-    If no sampling rate is provided, we default to 60 Hz.
+    the timezone is set to New York.
 
     Args:
         filepath: Path to the ActiGraph CSV file
@@ -202,18 +211,18 @@ def _read_actigraph_csv(filepath: pathlib.Path) -> tuple[np.ndarray, dict]:
     with open(filepath, "r", encoding="utf-8") as f:
         lines = [f.readline() for _ in range(12)]
 
-    hz_match = re.search(r"at (\d+) Hz", lines[0])
-    sampling_rate = int(hz_match.group(1)) if hz_match else int(60)
-
     start_time = lines[2].strip().split()[-1]
     start_date = lines[3].strip().split()[-1]
     start_datetime = datetime.datetime.strptime(
         f"{start_date} {start_time}", "%d/%m/%Y %H:%M:%S"
     )
+    idle_sleep_mode_value = lines[4].strip().split()[-1]
+    idle_sleep_mode_flag = idle_sleep_mode_value.lower() == "true"
+    sampling_rate = int(lines[5].strip().split()[-1])
 
     data = pl.read_csv(
         filepath,
-        skip_rows=12,
+        skip_rows=14,
         has_header=False,
         schema_overrides={
             "Accelerometer_X": pl.Float64,
@@ -222,6 +231,10 @@ def _read_actigraph_csv(filepath: pathlib.Path) -> tuple[np.ndarray, dict]:
         },
     ).to_numpy()
 
-    metadata = {"sampling_rate": sampling_rate, "start_datetime": start_datetime}
+    metadata = {
+        "sampling_rate": sampling_rate,
+        "start_datetime": start_datetime,
+        "idle_sleep_mode_flag": idle_sleep_mode_flag,
+    }
 
     return data, metadata
