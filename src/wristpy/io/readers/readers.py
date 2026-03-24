@@ -72,6 +72,9 @@ def read_watch_data(
             pl.from_epoch(pl.Series(timestamps_ns), time_unit="ns")
             .dt.replace_time_zone("UTC")
             .dt.convert_time_zone("America/New_York")
+            .dt.replace_time_zone(
+                None
+            )  # stripping timezone to be consistent with actfast
         )
 
         acceleration_measurement = models.Measurement(
