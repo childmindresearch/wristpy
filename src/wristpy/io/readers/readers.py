@@ -68,7 +68,14 @@ def read_watch_data(
             start_timestamp_ns + np.arange(n_samples) * sampling_interval_ns
         ).astype(np.int64)
 
-        time_series = pl.from_epoch(pl.Series(timestamps_ns), time_unit="ns")
+        time_series = (
+            pl.from_epoch(pl.Series(timestamps_ns), time_unit="ns")
+            .dt.replace_time_zone("UTC")
+            .dt.convert_time_zone("America/New_York")
+            .dt.replace_time_zone(
+                None
+            )  # stripping timezone to be consistent with actfast
+        )
 
         acceleration_measurement = models.Measurement(
             measurements=acceleration_data, time=time_series
@@ -212,6 +219,7 @@ def _read_actigraph_csv(
 
     start_time = lines[2].strip().split()[-1]
     start_date = lines[3].strip().split()[-1]
+
     start_datetime = datetime.datetime.strptime(
         f"{start_date} {start_time}", "%d/%m/%Y %H:%M:%S"
     )
