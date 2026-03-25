@@ -2,6 +2,7 @@
 
 import datetime
 import pathlib
+import zoneinfo
 from typing import Literal, Union
 
 import actfast
@@ -220,9 +221,11 @@ def _read_actigraph_csv(
     start_time = lines[2].strip().split()[-1]
     start_date = lines[3].strip().split()[-1]
 
+    ny_tz = zoneinfo.ZoneInfo("America/New_York")
     start_datetime = datetime.datetime.strptime(
         f"{start_date} {start_time}", "%d/%m/%Y %H:%M:%S"
-    )
+    ).replace(tzinfo=ny_tz)
+
     idle_sleep_mode_value = lines[4].strip().split()[-1]
     idle_sleep_mode_flag = idle_sleep_mode_value.lower() == "true"
     sampling_rate = int(lines[5].strip().split()[-1])
