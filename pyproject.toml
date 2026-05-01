@@ -17,15 +17,15 @@ packages = [{include = "wristpy", from = "src"}]
 python = ">=3.10, <3.14"
 polars = "^1.21.0"
 scikit-learn = "^1.7.1"
-pyarrow = ">=18,<20"
+pyarrow = ">=18,<25"
 actfast = "^1.2.0"
 numpy = ">=2.1.0, <3.0.0"
 pydantic = "^2.11.1"
 pydantic-settings = "^2.3.4"
 scipy = "^1.14.1"
 typer = ">=0.20.0"
-rich = "^14.1.0"
-tzdata = "^2025.3"
+rich = ">=14.1,<16.0"
+tzdata = ">=2025.3,<2027.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
