@@ -4,7 +4,7 @@ from typing import Literal, Tuple
 
 import numpy as np
 import polars as pl
-from scipy import interpolate, signal
+from scipy import interpolate, signal, ndimage
 
 from wristpy.core import computations, config, models
 from wristpy.processing import _nimbaldetach, mims
@@ -77,6 +77,44 @@ def angle_relative_to_horizontal(
 
     angle_radians = np.arctan(acceleration.measurements[:, 2] / xy_projection_magnitute)
 
+    angle_degrees = np.degrees(angle_radians)
+
+    return computations.moving_mean(
+        models.Measurement(
+            measurements=angle_degrees,
+            time=acceleration.time,
+        ),
+        epoch_length,
+    )
+
+
+def angle_relative_to_horizontal_ggir(
+    acceleration: models.Measurement,
+    epoch_length: float = 5.0,
+) -> models.Measurement:
+    """Calculate the angle of the acceleration vector relative to the horizontal plane.
+
+    The data can be downsampled to a temporal resolution of `epoch_length` seconds.
+
+    Args:
+        acceleration: the three-dimensional accelerometer data.
+        sampling_rate: The sample frequency of the accelerometer data in Hz.
+        epoch_length: The temporal resolution of the downsampled anglez, in seconds.
+            Must be greater than 0. Defaults to 5.0s.
+        ggir_compatible: If True, applies GGIR's rolling-median preprocessing
+            (decimate → 5 s centered median → upsample) before computing the
+            angle, matching GGIR's ``angle_z`` output. Defaults to False.
+
+    Returns:
+        A Measurement instance containing the angle in degrees relative to the
+        horizontal plane, along with associated timestamps.
+    """
+    time_delta = (acceleration.time[1:] - acceleration.time[:-1]).median()
+    sf = round(1 / time_delta.total_seconds())
+    acceleration = _ggir_rolling_median(acceleration, sf)
+
+    xy_projection_magnitute = np.linalg.norm(acceleration.measurements[:, 0:2], axis=1)
+    angle_radians = np.arctan(acceleration.measurements[:, 2] / xy_projection_magnitute)
     angle_degrees = np.degrees(angle_radians)
 
     return computations.moving_mean(
@@ -701,3 +739,77 @@ def monitor_independent_movement_summary_units(
     )
     combined_mims.name = name
     return combined_mims
+
+
+def _ggir_rolling_median(
+    acceleration: models.Measurement,
+    sf: float,
+) -> models.Measurement:
+    """Apply GGIR-style rolling-median preprocessing to acceleration data.
+
+    GGIR decimates to ~10 Hz, applies a centered 5-second rolling median per
+    axis, then nearest-neighbour upsamples back to the original sample rate.
+
+    Args:
+        acceleration: Raw tri-axial acceleration data.
+        sf: Sample frequency of the input acceleration data in Hz.
+
+    Returns:
+        A new Measurement with the smoothed acceleration at the original rate.
+    """
+    stepsize = max(int(sf // 10), 1)
+    newsf = 10 if stepsize > 1 else sf
+
+    # Window length: ~5 s at the downsampled rate, forced odd
+    winsi = round(newsf * 5)
+    if winsi % 2 == 0:
+        winsi += 1
+
+    orig_len = len(acceleration.measurements)
+
+    # 1. Decimate by taking every stepsize-th sample
+    downsampled = acceleration.measurements[::stepsize]  # (N', 3)
+
+    # 2. Centered rolling median — mode='nearest' handles edges without zeros
+    smoothed = ndimage.median_filter(downsampled, size=(winsi, 1), mode="nearest")
+
+    # 3. Upsample by repeating each value stepsize times
+    upsampled = np.repeat(smoothed, stepsize, axis=0)
+
+    # 4. Trim or pad to original length
+    if len(upsampled) > orig_len:
+        upsampled = upsampled[:orig_len]
+    elif len(upsampled) < orig_len:
+        pad = np.tile(upsampled[-1], (orig_len - len(upsampled), 1))
+        upsampled = np.vstack([upsampled, pad])
+
+    return models.Measurement(measurements=upsampled, time=acceleration.time)
+
+
+def _sample_based_epoch_mean(
+    values: np.ndarray,
+    sf: int,
+    epoch_length: float,
+    time: pl.Series,
+) -> models.Measurement:
+    """Average values over fixed sample-count epochs, matching GGIR's averagePerEpoch.
+
+    Args:
+        values: 1D array of per-sample values.
+        sf: Sample frequency in Hz.
+        epoch_length: Epoch size in seconds.
+        time: Original timestamps; first timestamp of each epoch is used.
+
+    Returns:
+        Measurement with one value per epoch.
+    """
+    samples_per_epoch = round(sf * epoch_length)
+    n_epochs = len(values) // samples_per_epoch
+
+    trimmed = values[: n_epochs * samples_per_epoch]
+    epoch_means = trimmed.reshape(n_epochs, samples_per_epoch).mean(axis=1)
+
+    # Take the first timestamp of each epoch
+    epoch_times = time[::samples_per_epoch][:n_epochs]
+
+    return models.Measurement(measurements=epoch_means, time=epoch_times)

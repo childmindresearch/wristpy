@@ -376,7 +376,7 @@ def _run_file(
             )
         )
 
-    anglez = metrics.angle_relative_to_horizontal(
+    anglez = metrics.angle_relative_to_horizontal_ggir(
         calibrated_acceleration, epoch_length=epoch_length
     )
 
