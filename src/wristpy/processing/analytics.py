@@ -436,14 +436,14 @@ def sleep_bouts_cleanup(
     time_reference_measurement: models.Measurement,
     epoch_length: float,
 ) -> models.Measurement:
-    """This function will synchronize and filter the SPT and SIB windows.
+    """This function will synchronize and filter the SPT or SIB windows.
 
     The time sychrnoization is based on the time_reference_measurement, while the
     filtering is based on the nonwear_measurement.
 
     Args:
         sleep_parameter: The sleep parameter measurement data, which contains
-            either the SPT and SIB windows.
+            either the SPT or SIB windows.
         nonwear_measurement: The nonwear measurement data used for reference time
             stamps and to remove overlaps with periods of sleep.
         time_reference_measurement: The time reference measurement data used for
@@ -451,7 +451,7 @@ def sleep_bouts_cleanup(
         epoch_length: The epoch length in seconds, used for resampling the data.
 
     Returns:
-        A tuple of two Measurement instances with the cleaned SPT and SIB data.
+        A Measurement instance with the cleaned SPT or SIB data.
     """
     logger.debug("Starting the sleep bouts cleanup.")
     sleep_parameter_sync = processing_utils.synchronize_measurements(
@@ -496,3 +496,72 @@ def _sleep_windows_as_measurement(
             sleep_value[time_mask] = True
 
     return models.Measurement(time=ref_measurement_time, measurements=sleep_value)
+
+
+def new_sleep_cleanup(
+    sleep_windows: List[SleepWindow],
+    nonwear_measurement: models.Measurement,
+    nonwear_sleep_buffer: int = 0,
+) -> Tuple[models.Measurement, models.Measurement]:
+    """This function will filter the sleep windows based on the nonwear measurement.
+
+    The SleepWindows are first converted to a Measurement object with the same
+    timestamps as the reference measurement. Then any overlap with nonwear
+    is removed, and finally any blocks of sleep that are less than 15 minutes
+    long are removed.
+
+    A second pass then absorbs any nonwear run where sleep begins within
+    `nonwear_sleep_buffer` samples of the run's end — this covers both
+    nonwear immediately preceding sleep onset and nonwear embedded inside a
+    sleep window. The nonwear measurement is also updated to reflect any absorbed
+    nonwear runs that are subsequently removed.
+
+    Args:
+        sleep_windows: List of the sleep windows (Onset/Wake pairs).
+        nonwear_measurement: The nonwear measurement data used for reference time
+            stamps and to remove overlaps with periods of sleep.
+        nonwear_sleep_buffer: Number of non-sleep samples tolerated between
+            the end of a nonwear run and the start of sleep before the run is no
+            longer absorbed. Defaults to 0 (strictly adjacent only).
+
+    Returns:
+        A tuple of Measurement instances with the cleaned sleep data and the modified
+        nonwear data.
+    """
+    logger.debug("Starting the sleep Window cleanup.")
+    temporal_resolution = nonwear_measurement.time[1] - nonwear_measurement.time[0]
+    num_samples_15min = int(15 * 60 / temporal_resolution.total_seconds())
+
+    sleep = _sleep_windows_as_measurement(nonwear_measurement.time, sleep_windows)
+    nonwear_arr = nonwear_measurement.measurements.astype(bool)
+
+    filtered_sleep = np.logical_and(
+        sleep.measurements,
+        np.logical_not(nonwear_arr),
+    )
+    cleaned_sleep = np.logical_not(
+        _fill_false_blocks(np.logical_not(filtered_sleep), num_samples_15min)
+    )
+    logger.debug("Sleep Window cleanup first pass complete. Starting second pass.")
+    # Second pass: absorb nonwear runs that are adjacent to or embedded within sleep.
+    # For each nonwear run, look up to `nonwear_sleep_buffer` samples past
+    # the run end. If any of those samples are sleep, extend sleep back to the run
+    # start (and forward through the gap if one exists).
+    padded = np.diff(nonwear_arr.astype(int), prepend=0, append=0)
+    run_starts = np.where(padded == 1)[0]
+    run_ends = np.where(padded == -1)[0]  # exclusive
+
+    for s, e in zip(run_starts, run_ends):
+        look_ahead_end = min(e + nonwear_sleep_buffer + 1, len(cleaned_sleep))
+        look_ahead = cleaned_sleep[e:look_ahead_end]
+        if np.any(look_ahead):
+            logger.debug(
+                "Found sleep within buffer of nonwear, absorbing nonwear into sleep."
+            )
+            first_sleep_after = e + int(np.argmax(look_ahead))
+            cleaned_sleep[s:first_sleep_after] = True
+            nonwear_arr[s:first_sleep_after] = False
+
+    return models.Measurement(
+        time=sleep.time, measurements=cleaned_sleep
+    ), models.Measurement(time=nonwear_measurement.time, measurements=nonwear_arr)

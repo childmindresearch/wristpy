@@ -224,3 +224,122 @@ def test_sleep_cleanup() -> None:
 
     assert len(result.time) == 3600
     assert np.array_equal(result.measurements, expected_result)
+
+
+def test_new_sleep_cleanup_nonwear_preceding_sleep() -> None:
+    """Test that nonwear immediately preceding sleep is absorbed into sleep window."""
+    dummy_date = datetime.datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + datetime.timedelta(seconds=i) for i in range(3600)
+    ]
+    time = pl.Series("time", dummy_datetime_list)
+    nonwear_data = np.zeros(3600)
+    nonwear_data[0:600] = 1
+    nonwear_measurement = models.Measurement(measurements=nonwear_data, time=time)
+    sleep_windows = [
+        analytics.SleepWindow(
+            onset=dummy_date + datetime.timedelta(seconds=600),
+            wakeup=dummy_date + datetime.timedelta(seconds=3599),
+        )
+    ]
+
+    sleep_result, nonwear_result = analytics.new_sleep_cleanup(
+        sleep_windows=sleep_windows,
+        nonwear_measurement=nonwear_measurement,
+        nonwear_sleep_buffer=0,
+    )
+
+    assert np.all(sleep_result.measurements)
+    assert not np.any(nonwear_result.measurements)
+
+
+def test_new_sleep_cleanup_nonwear_embedded_in_sleep() -> None:
+    """Test that nonwear embedded inside a sleep window is absorbed into sleep."""
+    dummy_date = datetime.datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + datetime.timedelta(seconds=i) for i in range(3600)
+    ]
+    time = pl.Series("time", dummy_datetime_list)
+    nonwear_data = np.zeros(3600)
+    nonwear_data[1000:1200] = 1  # 200 s of nonwear inside a 3600 s sleep window
+    nonwear_measurement = models.Measurement(measurements=nonwear_data, time=time)
+    sleep_windows = [
+        analytics.SleepWindow(
+            onset=dummy_date,
+            wakeup=dummy_date + datetime.timedelta(seconds=3599),
+        )
+    ]
+
+    sleep_result, nonwear_result = analytics.new_sleep_cleanup(
+        sleep_windows=sleep_windows,
+        nonwear_measurement=nonwear_measurement,
+        nonwear_sleep_buffer=0,
+    )
+
+    assert np.all(sleep_result.measurements)
+    assert not np.any(nonwear_result.measurements)
+
+
+def test_new_sleep_cleanup_nonwear_gap_absorbed_only_with_sufficient_buffer() -> None:
+    """Test nonwear + gap is absorbed only when buffer >= gap length."""
+    dummy_date = datetime.datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + datetime.timedelta(seconds=i) for i in range(3600)
+    ]
+    time = pl.Series("time", dummy_datetime_list)
+    nonwear_data = np.zeros(3600)
+    nonwear_data[1000:1200] = 1
+    nonwear_measurement = models.Measurement(measurements=nonwear_data, time=time)
+    # second sleep window starts at 1500: gap of 300 samples after nonwear
+    sleep_windows = [
+        analytics.SleepWindow(
+            onset=dummy_date,
+            wakeup=dummy_date + datetime.timedelta(seconds=999),
+        ),
+        analytics.SleepWindow(
+            onset=dummy_date + datetime.timedelta(seconds=1500),
+            wakeup=dummy_date + datetime.timedelta(seconds=3599),
+        ),
+    ]
+    gap_block = 300
+    sleep_with_buffer, nonwear_with_buffer = analytics.new_sleep_cleanup(
+        sleep_windows=sleep_windows,
+        nonwear_measurement=nonwear_measurement,
+        nonwear_sleep_buffer=gap_block,
+    )
+
+    # buffer=300: gap is bridged; nonwear+gap absorbed into contiguous sleep
+    assert np.all(sleep_with_buffer.measurements)
+    assert not np.any(nonwear_with_buffer.measurements)
+
+
+def test_new_sleep_cleanup_nonwear_not_adjacent_to_sleep_unchanged() -> None:
+    """Test that nonwear with no sleep within buffer is left untouched."""
+    dummy_date = datetime.datetime(2024, 5, 2)
+    dummy_datetime_list = [
+        dummy_date + datetime.timedelta(seconds=i) for i in range(3600)
+    ]
+    time = pl.Series("time", dummy_datetime_list)
+    nonwear_data = np.zeros(3600)
+    nonwear_data[0:600] = 1  # nonwear ends at 600; sleep starts at 1200
+    nonwear_measurement = models.Measurement(measurements=nonwear_data, time=time)
+    sleep_windows = [
+        analytics.SleepWindow(
+            onset=dummy_date + datetime.timedelta(seconds=1200),
+            wakeup=dummy_date + datetime.timedelta(seconds=3599),
+        )
+    ]
+
+    expected_sleep = np.zeros(3600, dtype=bool)
+    expected_sleep[1200:3600] = True
+    expected_nonwear = np.zeros(3600, dtype=bool)
+    expected_nonwear[0:600] = True
+
+    sleep_result, nonwear_result = analytics.new_sleep_cleanup(
+        sleep_windows=sleep_windows,
+        nonwear_measurement=nonwear_measurement,
+        nonwear_sleep_buffer=0,
+    )
+
+    assert np.array_equal(sleep_result.measurements, expected_sleep)
+    assert np.array_equal(nonwear_result.measurements, expected_nonwear)
