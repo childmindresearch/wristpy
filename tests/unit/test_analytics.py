@@ -222,8 +222,8 @@ def test_sleep_cleanup() -> None:
         sleep_windows=sleep_windows, nonwear_measurement=nonwear_measurement
     )
 
-    assert len(result.time) == 3600
-    assert np.array_equal(result.measurements, expected_result)
+    assert len(result[0].time) == 3600
+    assert np.array_equal(result[0].measurements, expected_result)
 
 
 def test_new_sleep_cleanup_nonwear_preceding_sleep() -> None:
@@ -243,9 +243,10 @@ def test_new_sleep_cleanup_nonwear_preceding_sleep() -> None:
         )
     ]
 
-    sleep_result, nonwear_result = analytics.new_sleep_cleanup(
+    sleep_result, nonwear_result = analytics.sleep_cleanup(
         sleep_windows=sleep_windows,
         nonwear_measurement=nonwear_measurement,
+        adaptive=True,
         nonwear_sleep_buffer=0,
     )
 
@@ -270,9 +271,10 @@ def test_new_sleep_cleanup_nonwear_embedded_in_sleep() -> None:
         )
     ]
 
-    sleep_result, nonwear_result = analytics.new_sleep_cleanup(
+    sleep_result, nonwear_result = analytics.sleep_cleanup(
         sleep_windows=sleep_windows,
         nonwear_measurement=nonwear_measurement,
+        adaptive=True,
         nonwear_sleep_buffer=0,
     )
 
@@ -302,13 +304,13 @@ def test_new_sleep_cleanup_nonwear_gap_absorbed_only_with_sufficient_buffer() ->
         ),
     ]
     gap_block = 300
-    sleep_with_buffer, nonwear_with_buffer = analytics.new_sleep_cleanup(
+    sleep_with_buffer, nonwear_with_buffer = analytics.sleep_cleanup(
         sleep_windows=sleep_windows,
         nonwear_measurement=nonwear_measurement,
+        adaptive=True,
         nonwear_sleep_buffer=gap_block,
     )
 
-    # buffer=300: gap is bridged; nonwear+gap absorbed into contiguous sleep
     assert np.all(sleep_with_buffer.measurements)
     assert not np.any(nonwear_with_buffer.measurements)
 
@@ -335,9 +337,10 @@ def test_new_sleep_cleanup_nonwear_not_adjacent_to_sleep_unchanged() -> None:
     expected_nonwear = np.zeros(3600, dtype=bool)
     expected_nonwear[0:600] = True
 
-    sleep_result, nonwear_result = analytics.new_sleep_cleanup(
+    sleep_result, nonwear_result = analytics.sleep_cleanup(
         sleep_windows=sleep_windows,
         nonwear_measurement=nonwear_measurement,
+        adaptive=True,
         nonwear_sleep_buffer=0,
     )
 

@@ -422,7 +422,7 @@ def _run_file(
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_parameters = sleep_detector.run_sleep_detection()
-    sleep_array = analytics.sleep_cleanup(
+    sleep_array, nonwear_epoch = analytics.sleep_cleanup(
         sleep_windows=sleep_parameters.sleep_windows, nonwear_measurement=nonwear_epoch
     )
     spt_windows = analytics.sleep_bouts_cleanup(
