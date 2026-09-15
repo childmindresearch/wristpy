@@ -15,10 +15,10 @@ packages = [{include = "wristpy", from = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11, <3.14"
-polars = "^1.4.0"
+polars = "^1.41.0"
 scikit-learn = "^1.7.1"
 pyarrow = ">=18,<25"
-actfast = "^1.2.0"
+actfast = "^1.3.0"
 numpy = ">=2.3.0, <3.0.0"
 pydantic = "^2.11.1"
 pydantic-settings = "^2.3.4"
