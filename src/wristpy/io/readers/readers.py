@@ -235,9 +235,9 @@ def _read_actigraph_csv(
         skip_rows=14,
         has_header=False,
         schema_overrides={
-            "Accelerometer_X": pl.Float64,
-            "Accelerometer_Y": pl.Float64,
-            "Accelerometer_Z": pl.Float64,
+            "column_1": pl.Float64,
+            "column_2": pl.Float64,
+            "column_3": pl.Float64,
         },
     ).to_numpy()
 
