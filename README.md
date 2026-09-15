@@ -83,22 +83,21 @@ wristpy --help
 
 #### Running single files:
 ```Python
-
 from wristpy.core import orchestrator
 
 # Define input file path and output location
 # Support for saving as .csv and .parquet
-input_path = '/path/to/your/file.gt3x'
-output_path = '/path/to/save/file_name.csv'
+input_path = "/path/to/your/file.gt3x"
+output_path = "/path/to/save/file_name.csv"
 
 # Run the orchestrator
 results = orchestrator.run(
     input=input_path,
     output=output_path,
-    calibrator='gradient',  # Choose between 'ggir', 'gradient', or 'none'
+    calibrator="gradient",  # Choose between 'ggir', 'gradient', or 'none'
 )
 
-#Data available in results object
+# Data available in results object
 physical_activity_metric = results.physical_activity_metric
 anglez = results.anglez
 physical_activity_levels = results.physical_activity_levels
@@ -106,30 +105,28 @@ nonwear_array = results.nonwear_status
 sleep_windows = results.sleep_status
 sib_periods = results.sib_periods
 spt_periods = results.spt_periods
-
 ```
 #### Running entire directories:
 ```Python
-
 from wristpy.core import orchestrator
 
 # Define input file path and output location
 
-input_path = '/path/to/files/input_dir'
-output_path = '/path/to/files/output_dir'
+input_path = "/path/to/files/input_dir"
+output_path = "/path/to/files/output_dir"
 
 # Run the orchestrator
 # Specify the output file type, support for saving as .csv and .parquet
 results_dict = orchestrator.run(
     input=input_path,
     output=output_path,
-    calibrator='gradient',  # Choose between 'ggir', 'gradient', or 'none'
-    output_filetype = '.csv'
+    calibrator="gradient",  # Choose between 'ggir', 'gradient', or 'none'
+    output_filetype=".csv",
 )
 
 
-#Data available in dictionary of results.
-subject1 = results_dict['subject1']
+# Data available in dictionary of results.
+subject1 = results_dict["subject1"]
 
 physical_activity_metric = subject1.physical_activity_metric
 anglez = subject1.anglez
@@ -138,7 +135,6 @@ nonwear_array = subject1.nonwear_status
 sleep_windows = subject1.sleep_status
 sib_periods = subject1.sib_periods
 spt_periods = subject1.spt_periods
-
 ```
 
 ### Using Wristpy Through Docker
