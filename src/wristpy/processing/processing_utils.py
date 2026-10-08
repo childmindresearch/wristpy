@@ -181,6 +181,9 @@ def synchronize_measurements(
         reference_measurement: The reference measurement to use for resampling.
         epoch_length: The temporal resolution of the output, in seconds.
             Defaults to 5.0.
+        op_boolean: Boolean variable indicating the data type of
+            data_measurements.Measurement. True if it's boolean-valued. False
+            if continuous-valued.
 
     Returns:
         A new Measurement instance with the cleaned up nonwear detection,
