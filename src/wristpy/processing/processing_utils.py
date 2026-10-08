@@ -164,6 +164,7 @@ def synchronize_measurements(
     data_measurement: models.Measurement,
     reference_measurement: models.Measurement,
     epoch_length: float = 5.0,
+    op_boolean: bool = True,
 ) -> models.Measurement:
     """This function is used to match a Measurement object to a reference Measurement.
 
@@ -188,8 +189,14 @@ def synchronize_measurements(
     time_fix_nonwear = _time_fix(
         data_measurement, reference_measurement.time[-1], reference_measurement.time[0]
     )
-    resampled_nonwear = computations.resample(time_fix_nonwear, epoch_length)
-    binary_nonwear = np.where(resampled_nonwear.measurements >= 0.5, 1, 0)
+    if op_boolean:
+        resampled_nonwear = computations.resample_boolean(
+            time_fix_nonwear, epoch_length
+        )
+        binary_nonwear = resampled_nonwear.measurements.astype(bool)
+    else:
+        resampled_nonwear = computations.resample(time_fix_nonwear, epoch_length)
+        binary_nonwear = np.where(resampled_nonwear.measurements >= 0.5, 1, 0)
 
     ref_df = pl.DataFrame({"time": reference_measurement.time})
 

@@ -146,7 +146,7 @@ def test_find_onset_wakeup_times(sleep_detection: analytics.GgirSleepDetection) 
     ]
     expected_output = analytics.SleepWindow(
         onset=dummy_date + datetime.timedelta(hours=2),
-        wakeup=dummy_date + datetime.timedelta(hours=4),
+        wakeup=dummy_date + datetime.timedelta(hours=4, minutes=4, seconds=55),
     )
 
     result = sleep_detection._find_onset_wakeup_times(spt_periods, sib_periods)

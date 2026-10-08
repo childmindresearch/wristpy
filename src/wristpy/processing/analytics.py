@@ -230,7 +230,9 @@ class GgirSleepDetection:
                     if min_onset is None or inactivity_bout[0] < min_onset:
                         min_onset = inactivity_bout[0]
                     if max_wakeup is None or inactivity_bout[1] > max_wakeup:
-                        max_wakeup = inactivity_bout[1]
+                        max_wakeup = inactivity_bout[1] + datetime.timedelta(
+                            minutes=4, seconds=55
+                        )
             if min_onset is not None and max_wakeup is not None:
                 sleep_windows.append(SleepWindow(onset=min_onset, wakeup=max_wakeup))
         logger.debug("Sleep windows found: %s", len(sleep_windows))
@@ -458,6 +460,7 @@ def sleep_bouts_cleanup(
         data_measurement=sleep_parameter,
         reference_measurement=time_reference_measurement,
         epoch_length=epoch_length,
+        op_boolean=True,
     )
     sleep_parameter_sync.measurements = np.logical_and(
         sleep_parameter_sync.measurements,
