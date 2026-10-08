@@ -2,6 +2,7 @@
 
 import datetime
 import math
+from unittest.mock import patch
 
 import numpy as np
 import polars as pl
@@ -61,22 +62,56 @@ def test_compute_abs_diff_mean_anglez(
     assert np.array_equal(len(result.time), expected_length)
 
 
-def test_find_periods() -> None:
-    """Test the _find_periods method."""
+@pytest.mark.parametrize(
+    "bucket_duration",
+    [datetime.timedelta(seconds=5), datetime.timedelta(minutes=5)],
+    ids=["spt-5s", "sib-5m"],
+)
+@pytest.mark.parametrize(
+    ("window_data", "expected_indices"),
+    [
+        ([0, 1, 1, 1, 0, 1, 0, 0, 1, 1], [(1, 4), (5, 6), (8, 10)]),
+        ([1, 0, 0, 1, 0], [(0, 1), (3, 4)]),
+        ([0, 0, 0], []),
+        ([0], []),
+        ([1], [(0, 1)]),
+        ([0, 0], []),
+        ([1, 0], [(0, 1)]),
+        ([0, 1], [(1, 2)]),
+        ([1, 1], [(0, 2)]),
+    ],
+    ids=[
+        "mixed-runs-terminal-run",
+        "isolated-buckets",
+        "inactive",
+        "singleton-inactive",
+        "singleton-active",
+        "pair-inactive",
+        "pair-leading-active",
+        "pair-terminal-active",
+        "pair-active-run",
+    ],
+)
+def test_find_periods(
+    bucket_duration: datetime.timedelta,
+    window_data: list[int],
+    expected_indices: list[tuple[int, int]],
+) -> None:
+    """Return half-open runs including the full final active bucket."""
     dummy_date = datetime.datetime(2024, 5, 2)
     dummy_datetime_list = [
-        dummy_date + datetime.timedelta(seconds=i) for i in range(10)
+        dummy_date + i * bucket_duration for i in range(len(window_data))
     ]
     test_time = pl.Series("time", dummy_datetime_list)
-    window_data = np.array([0, 1, 1, 1, 0, 1, 0, 0, 0, 1])
-    window_measurement = models.Measurement(measurements=window_data, time=test_time)
+    window_measurement = models.Measurement(
+        measurements=np.array(window_data), time=test_time
+    )
     expected_result = [
-        (dummy_datetime_list[1], dummy_datetime_list[3]),
-        (dummy_datetime_list[5], dummy_datetime_list[5]),
-        (dummy_datetime_list[9], dummy_datetime_list[9]),
+        (dummy_date + start * bucket_duration, dummy_date + end * bucket_duration)
+        for start, end in expected_indices
     ]
 
-    result = analytics._find_periods(window_measurement)
+    result = analytics._find_periods(window_measurement, bucket_duration)
 
     assert result == expected_result, f"Expected {expected_result}, but got {result}"
 
@@ -153,6 +188,37 @@ def test_find_onset_wakeup_times(sleep_detection: analytics.GgirSleepDetection) 
 
     assert result[0].onset == expected_output.onset
     assert result[0].wakeup == expected_output.wakeup
+
+
+@pytest.mark.parametrize("sib_hours", [0, 3], ids=["touching-start", "touching-end"])
+def test_find_onset_wakeup_times_includes_touching_periods(
+    sleep_detection: analytics.GgirSleepDetection, sib_hours: int
+) -> None:
+    """Include boundary contact from overlap for half-open periods."""
+    dummy_date = datetime.datetime(2024, 5, 2)
+    expected_result = [
+        analytics.SleepWindow(
+            onset=dummy_date + datetime.timedelta(hours=max(0, sib_hours)),
+            wakeup=dummy_date + datetime.timedelta(hours=sib_hours + 1),
+        )
+    ]
+    spt_periods = [
+        (
+            dummy_date + datetime.timedelta(hours=1),
+            dummy_date + datetime.timedelta(hours=3),
+        )
+    ]
+    sib_periods = [
+        (
+            dummy_date + datetime.timedelta(hours=sib_hours),
+            dummy_date + datetime.timedelta(hours=sib_hours + 1),
+        )
+    ]
+
+    assert (
+        sleep_detection._find_onset_wakeup_times(spt_periods, sib_periods)
+        == expected_result
+    )
 
 
 def test_run_sleep_detection(sleep_detection: analytics.GgirSleepDetection) -> None:

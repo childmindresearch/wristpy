@@ -74,6 +74,9 @@ class GgirSleepDetection:
         sleep onset and wake up times are then calculated based on the overlap between
         the SPT windows and SIB periods.
 
+        Currently, the spt and sib window lengths are hardcoded to 5 seconds and 5
+        mintues, respectively to adhere to the published algorithm implementation.
+
         Returns:
             A SleepParameters instance containing the underlying sleep parameters:
                 - sleep_windows
@@ -81,10 +84,14 @@ class GgirSleepDetection:
                 - sib_periods
         """
         logger.debug("Beginning sleep detection.")
+        spt_window_length = datetime.timedelta(seconds=5)
+        sib_window_length = datetime.timedelta(minutes=5)
+
         spt_window = self._spt_window(self.anglez)
         sib_periods = self._calculate_sib_periods(self.anglez)
-        spt_window_periods = _find_periods(spt_window)
-        sib_window_periods = _find_periods(sib_periods)
+
+        spt_window_periods = _find_periods(spt_window, spt_window_length)
+        sib_window_periods = _find_periods(sib_periods, sib_window_length)
         sleep_onset_wakeup = self._find_onset_wakeup_times(
             spt_window_periods, sib_window_periods
         )
@@ -262,38 +269,37 @@ class GgirSleepDetection:
 
 def _find_periods(
     window_measurement: models.Measurement,
+    bucket_duration: datetime.timedelta,
 ) -> List[Tuple[datetime.datetime, datetime.datetime]]:
     """Find periods where window_measurement is equal to 1.
 
-    This is a helper function to return the periods in the format of
-    List [start_of_period, end_of_period], it is used in the
-    GGIRSleepDetection class.
+    Measurement timestamps label bucket starts. Each active run is returned as
+    a half-open interval [start, end), from the first active bucket's start to
+    the last active bucket's nominal end, including the final observation.
 
     Args:
         window_measurement: the Measurement instance, intended to be
             either the spt_window or sib_period.
+        bucket_duration: the duration of each bucket, five seconds for SPT
+            windows or five minutes for SIB periods.
 
     Returns:
         A list of tuples, where each tuple contains the start and end times of
-        a period. For isolated ones the function returns the same start
-        and end time. The list is sorted by time.
+        a period. An isolated active bucket spans one full bucket duration.
+        The list is sorted by time; all-inactive measurements return no periods.
     """
     logger.debug("Finding periods in window measurement.")
-    edge_detection = np.convolve([1, 3, 1], window_measurement.measurements, "same")
-    single_one = np.nonzero(edge_detection == 3)[0]
-
-    single_periods = [
-        (window_measurement.time.item(int(idx)), window_measurement.time.item(int(idx)))
-        for idx in single_one
+    active = window_measurement.measurements == 1
+    edges = np.diff(active.astype(int), prepend=0, append=0)
+    starts = np.flatnonzero(edges == 1)
+    ends = np.flatnonzero(edges == -1) - 1
+    all_periods = [
+        (
+            window_measurement.time.item(int(start)),
+            window_measurement.time.item(int(end)) + bucket_duration,
+        )
+        for start, end in zip(starts, ends)
     ]
-
-    blocked_one_edge = np.nonzero(edge_detection == 4)[0]
-    block_pairs = np.reshape(blocked_one_edge, (-1, 2))
-    block_periods = [
-        (window_measurement.time.item(idx[0]), window_measurement.time.item(idx[1]))
-        for idx in block_pairs
-    ]
-    all_periods = single_periods + block_periods
     all_periods.sort()
 
     logger.debug("Found %s periods.", len(all_periods))
