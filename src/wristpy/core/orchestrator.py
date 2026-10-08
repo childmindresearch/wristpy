@@ -418,6 +418,7 @@ def _run_file(
         data_measurement=nonwear_array,
         reference_measurement=anglez,
         epoch_length=epoch_length,
+        op_boolean=False,
     )
 
     sleep_detector = analytics.GgirSleepDetection(anglez)
