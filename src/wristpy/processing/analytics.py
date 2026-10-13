@@ -280,8 +280,7 @@ def _find_periods(
     Args:
         window_measurement: the Measurement instance, intended to be
             either the spt_window or sib_period.
-        bucket_duration: the duration of each bucket, five seconds for SPT
-            windows or five minutes for SIB periods.
+        bucket_duration: the duration of each bucket.
 
     Returns:
         A list of tuples, where each tuple contains the start and end times of
