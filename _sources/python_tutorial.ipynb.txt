@@ -1,0 +1,520 @@
+{
+    "cells": [
+        {
+            "cell_type": "markdown",
+            "id": "8a5edeed",
+            "metadata": {},
+            "source": [
+                "# Python Tutorial \n",
+                "\n",
+                "Wristpy is a Python library designed for processing and analyzing wrist-worn accelerometer data.\n",
+                "This tutorial will guide you through the basic steps of using `wristpy` to analyze your accelerometer data using python. Specifically,\n",
+                "we will cover the following topics through a few examples:\n",
+                "   - running the default processor, analyzing the output data, and visualizing the results.\n",
+                "   - loading data and plotting the raw signals.\n",
+                "   - how to calibrate the data, computing ENMO and angle-z from the calibrated data and then plotting those metrics.\n",
+                "   - how to obtain non-wear windows and visualize them.\n",
+                "   - how to obtain sleep windows and visualize them.\n",
+                "\n",
+                "\n",
+                "\n",
+                "\n",
+                "\n",
+                "### Example 1: Running the default processor\n",
+                "\n",
+                "#### Running files and directories\n",
+                "\n",
+                "\n",
+                "The `orchestrator` module of wristpy contains the default processor that will run the entire wristpy processing pipeline. This can be called as simply as:"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "6c7f1b9e",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "import warnings\n",
+                "warnings.filterwarnings('ignore', message='install \"ipywidgets\" for Jupyter support') #suprress warnings for cleaner output\n",
+                "import pathlib\n",
+                "\n",
+                "from wristpy.core import orchestrator\n",
+                "\n",
+                "input_directory = pathlib.Path('tutorial_data')\n",
+                "output_directory = pathlib.Path.cwd().parent / 'build'\n",
+                "\n",
+                "results = orchestrator.run(\n",
+                "   input = input_directory / 'three_nights.bin',  \n",
+                "   output = output_directory / 'three_nights_single_file.csv', \n",
+                ")"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "c0a397a3",
+            "metadata": {},
+            "source": [
+                "This runs the processing pipeline with all the default arguments, creates an output `.csv` file, a `.json` file with the pipeline configuration parameters, and will create a `results` object that contains the various output metrics (namely; the specified physical activity metric, angle-z, physical activity classification values, non-wear status, and sleep status).\n",
+                "\n",
+                "\n",
+                "The orchestrator can also process entire directories. The call to the orchestrator remains largely the same but now output is expected to be a directory and the desired filetype for the saved files can be specified through the output_filetype argument(default value is \".csv\"):"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "e67419e1",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "from wristpy.core import orchestrator\n",
+                "\n",
+                "results = orchestrator.run(\n",
+                "    input = input_directory,\n",
+                "    output = output_directory,\n",
+                "    output_filetype = \".csv\"\n",
+                ")"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "bfcb4604",
+            "metadata": {},
+            "source": [
+                "If users would prefer to process specific files instead of entire directories we recommend looping through a list of file names. The following code snippet will save results objects into a dictionary, and the output files into the desired directory:"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "3d5d9267",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "\n",
+                "file_names = [pathlib.Path(\"three_nights.bin\")] # Add more file names to list as needed\n",
+                "results_dict = {}\n",
+                "\n",
+                "for file in file_names:\n",
+                "    input_path = input_directory / file\n",
+                "    output_path = output_directory / file.with_suffix('.csv')\n",
+                "    result = orchestrator.run(\n",
+                "        input = input_path,\n",
+                "        output = output_path)\n",
+                "    results_dict[file.stem] = result"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "98831ff8",
+            "metadata": {},
+            "source": [
+                "#### Physical Activity Metrics & Results\n",
+                "\n",
+                "Wristpy is capable of calculating the following physical activity metrics from actigraphy data:\n",
+                "1. [Euclidean Norm Minus-One (ENMO)](https://childmindresearch.github.io/wristpy/getting_started.html#enmo-euclidean-norm-minus-one)\n",
+                "2. [Activity Counts (ag_count)](https://childmindresearch.github.io/wristpy/getting_started.html#actigraph-activity-counts-ag-counts)\n",
+                "3. [Mean Amplitude Deviation (MAD)](https://childmindresearch.github.io/wristpy/getting_started.html#mad-mean-amplitude-deviation)\n",
+                "4. [Monitor Independent Movement Summary Units (MIMS)](https://childmindresearch.github.io/wristpy/getting_started.html#mims-monitor-independent-summary-units)\n",
+                "\n",
+                "The default metric is ENMO, but you can pass any combination of supported metrics as a list to the orchestrator:"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "0a87085e",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "\n",
+                "results = orchestrator.run(\n",
+                "   input = input_directory / 'three_nights.bin',\n",
+                "   output = output_directory / 'three_nights_multiple_metrics.csv',\n",
+                "   activity_metric = ['enmo', 'mad',]\n",
+                ")"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "b5bad25f",
+            "metadata": {},
+            "source": [
+                "The resulting [OrchestratorResults](https://childmindresearch.github.io/wristpy/api/wristpy.io.writers.writers.html#wristpy.io.writers.writers.OrchestratorResults) object will contain the outputs for each metric in the order they were provided. The same applies to the physical activity levels associated with each metric."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "735bfc81",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "enmo = results.physical_activity_metric[0] \n",
+                "mad = results.physical_activity_metric[1] \n",
+                "\n",
+                "enmo_levels = results.physical_activity_levels[0] \n",
+                "mad_levels = results.physical_activity_levels[1] "
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "540fa698",
+            "metadata": {},
+            "source": [
+                "We can visualize some of the outputs within the `results` object, directly, with the following scripts:"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "a7f48f4c",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "#Plot the default physical activity metrics (ENMO) across the entire data set:\n",
+                "from matplotlib import pyplot as plt"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "7bf11cdf",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "plt.plot(results.physical_activity_metric[0].time, results.physical_activity_metric[0].measurements) "
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "a6528466",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "# Plot the sleep windows with normalized angle-z data:\n",
+                "\n",
+                "from matplotlib import pyplot as plt\n",
+                "\n",
+                "plt.plot(results.anglez.time, results.anglez.measurements/90) \n",
+                "plt.plot(results.sleep_status.time, results.sleep_status.measurements) \n",
+                "plt.legend(['Angle Z', 'Sleep Windows'])\n",
+                "plt.show()"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "13f3ff42",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "#We can also view and process these outputs from the saved `.csv` output file:\n",
+                "\n",
+                "import matplotlib.pyplot as plt\n",
+                "import polars as pl\n",
+                "\n",
+                "output_results = pl.read_csv(output_directory/ 'three_nights.csv', try_parse_dates=True)\n",
+                "\n",
+                "activity_mapping = {\n",
+                "    \"inactive\": 0,\n",
+                "    \"light\": 1,\n",
+                "    \"moderate\": 2,\n",
+                "    \"vigorous\": 3\n",
+                "}\n",
+                "\n",
+                "phys_activity = output_results['enmo physical activity levels'].replace(activity_mapping).cast(int)\n",
+                "\n",
+                "plt.plot(output_results['time'], phys_activity)"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "4f662530",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "# It is also possible to do some analysis on these output variables, for example, if we want to find the percent of time spent inactive, or in light, moderate, or vigorous physical activity:\n",
+                "\n",
+                "inactivity_count = sum(phys_activity == 0)\n",
+                "light_activity_count = sum(phys_activity == 1)\n",
+                "moderate_activity_count = sum(phys_activity == 2)\n",
+                "vigorous_activity_count = sum(phys_activity == 3)\n",
+                "total_activity_count = len(output_results['enmo physical activity levels'])\n",
+                "\n",
+                "print(f'Light activity percent: {light_activity_count*100/total_activity_count}')\n",
+                "print(f'Moderate activity percent: {moderate_activity_count*100/total_activity_count}')\n",
+                "print(f'Vigorous activity percent: {vigorous_activity_count*100/total_activity_count}')\n",
+                "print(f'Inactivity percent: {inactivity_count*100/total_activity_count}')"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "f3b4fbd1",
+            "metadata": {},
+            "source": [
+                "> #### Configuring a custom pipeline\n",
+                ">\n",
+                "> A custom processing pipeline can be easily created by modifying the input arguments to the `orchestrator.run` call.\n",
+                ">> Complete documentation on these parameters can be found [here](https://childmindresearch.github.io/wristpy/wristpy/core/orchestrator.html#run).\n",
+                ">> Example:\n"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "4e8e1c4b",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "results = orchestrator.run(input = input_directory / \"three_nights.bin\", output = output_directory / \"custom_pipeline.csv\", output_filetype = \".parquet\", calibrator=\"gradient\", activity_metric=[\"ag_count\"], nonwear_algorithm=[\"detach\"], epoch_length=10, thresholds=[(0.05, 0.1, 0.3)])"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "0c3e7197",
+            "metadata": {},
+            "source": [
+                "### Example 2: Loading data and plotting the raw signals\n",
+                "\n",
+                "\n",
+                "In this example we will go over the built-in functions to directly read the raw accelerometer and light data, and how to quickly visualize this information.\n",
+                "\n",
+                "The built-in `readers` module can be used to load all the sensor and metadata from one of the support wristwatches (`.gt3x` or `.bin`), the reader will automatically select the appropriate loading methodology."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "cb97a841",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "from wristpy.io.readers import readers\n",
+                "\n",
+                "watch_data = readers.read_watch_data(input_directory / \"three_nights.bin\")"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "9d2101aa",
+            "metadata": {},
+            "source": [
+                "We can then visualize the raw accelerometer and light sensor values very easily as follows:\n",
+                "\n",
+                "Plot the raw acceleration along the *x*-axis:"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "614cfd11",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "plt.plot(watch_data.acceleration.time, watch_data.acceleration.measurements[:,0])"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "4157e71a",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "#Plot the light data:\n",
+                "\n",
+                "plt.plot(watch_data.lux.time, watch_data.lux.measurements) "
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "9dfefa97",
+            "metadata": {},
+            "source": [
+                "### Example 3:  Plot the epoch-level measurements\n",
+                "\n",
+                "In this example we will expand on the skills learned in `Example 2`: we will load the sensor data, calibrate, and then calculate the ENMO and angle-z data in 5s windows (epoch-level data)."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "dd7128f8",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "from wristpy.core import computations\n",
+                "from wristpy.io.readers import readers\n",
+                "from wristpy.processing import calibration, metrics\n",
+                "\n",
+                "watch_data = readers.read_watch_data(input_directory / \"three_nights.bin\")\n",
+                "\n",
+                "#Calibration phase\n",
+                "calibrator_object = calibration.ConstrainedMinimizationCalibration()\n",
+                "calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)\n",
+                "\n",
+                "#Compute the desired metrics\n",
+                "enmo = metrics.euclidean_norm_minus_one(calibrated_data)\n",
+                "anglez = metrics.angle_relative_to_horizontal(calibrated_data)\n",
+                "\n",
+                "#Obtain the epoch-level data, default is 5s windows\n",
+                "enmo_epoch1 = computations.moving_mean(enmo)\n",
+                "anglez_epoch1 = computations.moving_mean(anglez)"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "2f24cf85",
+            "metadata": {},
+            "source": [
+                "We can then visualize the `epoch1` measurements as:"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "5767fb2b",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "\n",
+                "fig, ax1 = plt.subplots()\n",
+                "\n",
+                "\n",
+                "ax1.plot(enmo_epoch1.time, enmo_epoch1.measurements, color='blue')\n",
+                "ax1.set_ylabel('ENMO', color='blue')\n",
+                "\n",
+                "ax2 = ax1.twinx()\n",
+                "ax2.plot(anglez_epoch1.time, anglez_epoch1.measurements, color='red')\n",
+                "ax2.set_ylabel('Anglez', color='red')\n",
+                "\n",
+                "plt.show()"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "8ef53d4c",
+            "metadata": {},
+            "source": [
+                "### Example 4: Visualize the detected non-wear times\n",
+                "\n",
+                "In this example we will build on `Example 3` by also solving for the non-wear periods, as follows:"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "2e519326",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "from wristpy.io.readers import readers\n",
+                "from wristpy.processing import calibration, metrics\n",
+                "\n",
+                "watch_data = readers.read_watch_data(input_directory / \"three_nights.bin\")\n",
+                "calibrator_object = calibration.ConstrainedMinimizationCalibration()\n",
+                "calibrated_data = calibrator_object.run_calibration(watch_data.acceleration)\n",
+                "\n",
+                "#Find non-wear periods, using the DETACH algorithm\n",
+                "non_wear_array = metrics.detect_nonwear(calibrated_data)"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "3bc050dd",
+            "metadata": {},
+            "source": [
+                "We can then visualize the non-wear periods, in comparison to movement (ENMO at the epoch-level):"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "e4c52a99",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "from wristpy.core import computations\n",
+                "\n",
+                "enmo = metrics.euclidean_norm_minus_one(calibrated_data)\n",
+                "enmo_epoch1 = computations.moving_mean(enmo)\n",
+                "\n",
+                "\n",
+                "plt.plot(enmo_epoch1.time, enmo_epoch1.measurements)\n",
+                "plt.plot(non_wear_array.time, non_wear_array.measurements)\n",
+                "\n",
+                "plt.legend(['ENMO Epoch1', 'Non-wear'])"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "09b1727f",
+            "metadata": {},
+            "source": [
+                "### Example 5: Compute and plot the sleep windows\n",
+                "\n",
+                "\n",
+                "We can visualize the sleep periods in comparison to other metrics; in this example, we compare the sleep windows to the angle-z data and the non-wear periods. In the default pipeline any sleep periods that overlap with non-wear periods are filtered out.\n",
+                "This plot shows the sleep periods visualized by a blue trace, non-wear periods are visualized with a green trace, and the angle-z data with the semi-transparent red trace. These are all accessible directly from the results object created with the custom pipeline:"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": null,
+            "id": "68095128",
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "import matplotlib.pyplot as plt\n",
+                "\n",
+                "fig, ax1 = plt.subplots()\n",
+                "\n",
+                "ax1.plot(results.sleep_status.time, results.sleep_status.measurements, color='blue', label='Sleep Periods')\n",
+                "plt.plot(results.nonwear_status.time, results.nonwear_status.measurements, color='green')\n",
+                "ax2 = ax1.twinx()\n",
+                "ax2.plot(results.anglez.time, results.anglez.measurements, color='red', alpha=0.5)\n",
+                "ax2.set_ylabel('Anglez Epoch1', color='red')\n",
+                "\n",
+                "ax1.set_ylabel('Sleep Period/Non-wear')\n",
+                "ax1.set_ylim(0, 1.5)\n",
+                "\n",
+                "plt.show()"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "id": "d6811d21",
+            "metadata": {},
+            "source": []
+        }
+    ],
+    "metadata": {
+        "jupytext": {
+            "default_lexer": "ipython3",
+            "notebook_metadata_filter": "-all"
+        },
+        "kernelspec": {
+            "display_name": "wristpy-EsCYbWgY-py3.11",
+            "language": "python",
+            "name": "python3"
+        },
+        "language_info": {
+            "codemirror_mode": {
+                "name": "ipython",
+                "version": 3
+            },
+            "file_extension": ".py",
+            "mimetype": "text/x-python",
+            "name": "python",
+            "nbconvert_exporter": "python",
+            "pygments_lexer": "ipython3",
+            "version": "3.13.7"
+        }
+    },
+    "nbformat": 4,
+    "nbformat_minor": 5
+}
