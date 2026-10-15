@@ -172,3 +172,63 @@ def resample(measurement: models.Measurement, delta_t: float) -> models.Measurem
         measurements=new_measurement,
         time=resampled_df["time"],
     )
+
+
+def resample_boolean(
+    measurement: models.Measurement, delta_t: float
+) -> models.Measurement:
+    """Resamples a boolean-typed measurement to a different timescale.
+
+    Args:
+        measurement: The measurement to resample.
+        delta_t: The new time step, in seconds. This will be rounded to the nearest
+            nanosecond.
+
+    Returns:
+        The resampled measurement.
+
+    Raises:
+        ValueError: Raised for zero or negative delta_t.
+    """
+    if delta_t <= 0:
+        msg = "delta_t must be positive."
+        raise ValueError(msg)
+
+    time_delta_median = (measurement.time[1:] - measurement.time[:-1]).median()
+
+    n_nanoseconds_in_second = 1_000_000_000
+    current_delta_t = time_delta_median.total_seconds() * n_nanoseconds_in_second  # type: ignore[union-attr] #Guarded by Measurement validation for .time attribute
+    requested_delta_t = round(delta_t * n_nanoseconds_in_second)
+
+    measurement_df = (
+        pl.from_numpy(measurement.measurements)
+        .with_columns(time=measurement.time)
+        .set_sorted("time")
+    )
+
+    if current_delta_t >= requested_delta_t:
+        resampled_df = (
+            (
+                measurement_df.group_by_dynamic(
+                    "time", every=f"{requested_delta_t}ns", start_by="datapoint"
+                )
+            )
+            .agg(pl.exclude("time").mean())
+            .upsample(
+                time_column="time", every=f"{requested_delta_t}ns", maintain_order=True
+            )
+            .fill_null(strategy="forward")
+        )
+
+    else:
+        resampled_df = measurement_df.group_by_dynamic(
+            "time", every=f"{requested_delta_t}ns", start_by="datapoint"
+        ).agg(pl.exclude("time").mean())
+
+    new_measurement = (
+        resampled_df.drop("time").to_numpy().reshape((len(resampled_df), -1)).squeeze()
+    )
+    return models.Measurement(
+        measurements=new_measurement,
+        time=resampled_df["time"],
+    )
