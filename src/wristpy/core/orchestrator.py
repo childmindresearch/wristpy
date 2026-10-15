@@ -328,7 +328,7 @@ def _run_file(
         adaptive_nonwear: Optional flag to use an adaptive nonwear/sleep filter.
             The adaptive flag will cause any nonwear on the edge of sleep detection to
             be removed and considered as sleep instead (false positive of nonwear
-            immediately preceeding sleep).
+            immediately preceding sleep).
         verbosity: The logging level for the logger.
 
     Returns:
