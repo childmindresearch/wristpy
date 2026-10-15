@@ -39,6 +39,7 @@ def test_main_default(
         allow_duplicates=False,
         verbosity=logging.INFO,
         output_filetype=".csv",
+        adaptive_nonwear=True,
     )
 
 
@@ -71,6 +72,7 @@ def test_main_with_metrics(
         nonwear_algorithm=["ggir"],
         epoch_length=5,
         allow_duplicates=False,
+        adaptive_nonwear=True,
         verbosity=logging.INFO,
     )
 
@@ -96,6 +98,7 @@ def test_main_with_multiple_metrics(
         epoch_length=5,
         verbosity=logging.INFO,
         allow_duplicates=False,
+        adaptive_nonwear=True,
     )
 
 
@@ -129,6 +132,7 @@ def test_main_with_options(
                 "-n",
                 "ggir",
                 "-d",
+                "--no-adaptive-nonwear",
             ]
         ),
     )
@@ -144,6 +148,7 @@ def test_main_with_options(
         verbosity=logging.INFO,
         output_filetype=".csv",
         allow_duplicates=True,
+        adaptive_nonwear=False,
     )
 
 
@@ -197,6 +202,7 @@ def test_main_verbosity(
         verbosity=logging.DEBUG,
         output_filetype=".csv",
         allow_duplicates=False,
+        adaptive_nonwear=True,
     )
 
 

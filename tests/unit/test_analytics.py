@@ -356,24 +356,26 @@ def test_new_sleep_cleanup_nonwear_gap_absorbed_only_with_sufficient_buffer() ->
     time = pl.Series("time", dummy_datetime_list)
     nonwear_data = np.zeros(3600)
     nonwear_data[1000:1200] = 1
+    buffer_block = 301
+    gap_block = 250
     nonwear_measurement = models.Measurement(measurements=nonwear_data, time=time)
-    # second sleep window starts at 1500: gap of 300 samples after nonwear
+    # second sleep window starts at gap_block after nonwear
     sleep_windows = [
         analytics.SleepWindow(
             onset=dummy_date,
             wakeup=dummy_date + datetime.timedelta(seconds=999),
         ),
         analytics.SleepWindow(
-            onset=dummy_date + datetime.timedelta(seconds=1500),
+            onset=dummy_date + datetime.timedelta(seconds=1200 + gap_block),
             wakeup=dummy_date + datetime.timedelta(seconds=3599),
         ),
     ]
-    gap_block = 300
+
     sleep_with_buffer, nonwear_with_buffer = analytics.sleep_cleanup(
         sleep_windows=sleep_windows,
         nonwear_measurement=nonwear_measurement,
         adaptive=True,
-        nonwear_sleep_buffer=gap_block,
+        nonwear_sleep_buffer=buffer_block,
     )
 
     assert np.all(sleep_with_buffer.measurements)

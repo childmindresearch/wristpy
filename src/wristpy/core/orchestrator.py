@@ -44,6 +44,7 @@ def run(
     allow_duplicates: bool = False,
     verbosity: int = logging.WARNING,
     output_filetype: Literal[".csv", ".parquet"] = ".csv",
+    adaptive_nonwear: bool = True,
 ) -> Union[writers.OrchestratorResults, Dict[str, writers.OrchestratorResults]]:
     """Runs main processing steps for wristpy on single files, or directories.
 
@@ -75,6 +76,8 @@ def run(
         verbosity: The logging level for the logger.
         output_filetype: Specifies the data format for the save files. Only used when
             processing directories.
+        adaptive_nonwear: Whether to absorb detected nonwear immediately preceding
+            sleep into the sleep period. Enabled by default.
 
     Returns:
         All calculated data in a save ready format as a Results object or as a
@@ -136,6 +139,7 @@ def run(
             verbosity=verbosity,
             nonwear_algorithm=nonwear_algorithm,
             allow_duplicates=allow_duplicates,
+            adaptive_nonwear=adaptive_nonwear,
         )
 
     return _run_directory(
@@ -149,6 +153,7 @@ def run(
         output_filetype=output_filetype,
         nonwear_algorithm=nonwear_algorithm,
         allow_duplicates=allow_duplicates,
+        adaptive_nonwear=adaptive_nonwear,
     )
 
 
@@ -166,6 +171,7 @@ def _run_directory(
     output_filetype: Literal[".csv", ".parquet"] = ".csv",
     activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ["enmo"],
     allow_duplicates: bool = False,
+    adaptive_nonwear: bool = True,
 ) -> Dict[str, writers.OrchestratorResults]:
     """Runs main processing steps for wristpy on directories.
 
@@ -192,6 +198,8 @@ def _run_directory(
         activity_metric: The metric(s) to be used for physical activity categorization.
             Multiple metrics can be specified as a sequence.
         allow_duplicates: Whether to allow duplicate timestamps in the sensor data.
+        adaptive_nonwear: Whether to absorb detected nonwear immediately preceding
+            sleep into the sleep period. Enabled by default.
 
     Returns:
         All calculated data in a save ready format as a dictionary of
@@ -263,6 +271,7 @@ def _run_directory(
                     nonwear_algorithm=nonwear_algorithm,
                     activity_metric=activity_metric,
                     allow_duplicates=allow_duplicates,
+                    adaptive_nonwear=adaptive_nonwear,
                 )
             except Exception as e:
                 logger.error("Did not run file: %s, Error: %s", file, e)
@@ -283,6 +292,7 @@ def _run_file(
     activity_metric: Sequence[Literal["enmo", "mad", "ag_count", "mims"]] = ["enmo"],
     nonwear_algorithm: Sequence[Literal["ggir", "cta", "detach"]] = ["ggir"],
     allow_duplicates: bool = False,
+    adaptive_nonwear: bool = True,
     verbosity: int = logging.WARNING,
 ) -> writers.OrchestratorResults:
     """Runs main processing steps for wristpy and returns data for analysis.
@@ -315,6 +325,10 @@ def _run_file(
             If set to True, no error will be raised and we will keep only the unique
             timestamps and their associated sensor values. The first occurrence of each
             timestamp is kept.
+        adaptive_nonwear: Optional flag to use an adaptive nonwear/sleep filter.
+            The adaptive flag will cause any nonwear on the edge of sleep detection to
+            be removed and considered as sleep instead (false positive of nonwear
+            immediately preceeding sleep).
         verbosity: The logging level for the logger.
 
     Returns:
@@ -423,7 +437,9 @@ def _run_file(
     sleep_detector = analytics.GgirSleepDetection(anglez)
     sleep_parameters = sleep_detector.run_sleep_detection()
     sleep_array, nonwear_epoch = analytics.sleep_cleanup(
-        sleep_windows=sleep_parameters.sleep_windows, nonwear_measurement=nonwear_epoch
+        sleep_windows=sleep_parameters.sleep_windows,
+        nonwear_measurement=nonwear_epoch,
+        adaptive=adaptive_nonwear,
     )
     spt_windows = analytics.sleep_bouts_cleanup(
         sleep_parameter=sleep_parameters.spt_windows,

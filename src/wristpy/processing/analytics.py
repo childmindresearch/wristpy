@@ -2,7 +2,7 @@
 
 import datetime
 from dataclasses import dataclass
-from typing import List, Tuple, Union
+from typing import Iterable, List, Tuple, Union
 
 import numpy as np
 import polars as pl
@@ -401,9 +401,9 @@ def compute_physical_activty_categories(
 
 
 def sleep_cleanup(
-    sleep_windows: List[SleepWindow],
+    sleep_windows: Iterable[SleepWindow],
     nonwear_measurement: models.Measurement,
-    adaptive: bool = False,
+    adaptive: bool | None = None,
     nonwear_sleep_buffer: int = 0,
 ) -> Tuple[models.Measurement, models.Measurement]:
     """This function will filter the sleep windows based on the nonwear measurement.
@@ -424,7 +424,8 @@ def sleep_cleanup(
         nonwear_measurement: The nonwear measurement data used for reference time
             stamps and to remove overlaps with periods of sleep.
         adaptive: Whether to perform the second pass of absorbing nonwear runs into
-            sleep when sleep immediately follows nonwear. Defaults to False.
+            sleep when sleep immediately follows nonwear. Defaults to None, equivalent
+            to false.
         nonwear_sleep_buffer: The number of samples to look ahead when performing
             the adaptive sleep cleanup. Defaults to 0.
 
@@ -435,10 +436,8 @@ def sleep_cleanup(
     logger.debug("Starting the sleep Window cleanup.")
     temporal_resolution = nonwear_measurement.time[1] - nonwear_measurement.time[0]
     num_samples_15min = int(15 * 60 / temporal_resolution.total_seconds())
-    nonwear_arr = nonwear_measurement.measurements.astype(bool)
 
     sleep = _sleep_windows_as_measurement(nonwear_measurement.time, sleep_windows)
-
     filtered_sleep = np.logical_and(
         sleep.measurements,
         np.logical_not(nonwear_measurement.measurements.astype(bool)),
@@ -446,34 +445,34 @@ def sleep_cleanup(
     cleaned_sleep = np.logical_not(
         _fill_false_blocks(np.logical_not(filtered_sleep), num_samples_15min)
     )
+    cleaned_sleep_measurement = models.Measurement(
+        time=sleep.time, measurements=cleaned_sleep
+    )
 
-    if adaptive:
-        logger.debug(
-            "Sleep Window cleanup first pass complete. Starting adaptive pass."
-        )
-        nonwear_change = np.diff(nonwear_arr.astype(int), prepend=0, append=0)
-        nw_run_starts = np.where(nonwear_change == 1)[0]
-        nw_run_ends = np.where(nonwear_change == -1)[0]
+    if not adaptive:
+        return cleaned_sleep_measurement, nonwear_measurement
 
-        for s, e in zip(nw_run_starts, nw_run_ends):
-            look_ahead_end = min(e + nonwear_sleep_buffer + 1, len(cleaned_sleep))
-            look_ahead = cleaned_sleep[e:look_ahead_end]
-            if np.any(look_ahead):
-                logger.debug(
-                    "Found sleep within buffer of nonwear end,"
-                    " absorbing nonwear into sleep."
-                )
-                first_sleep_after = e + int(np.argmax(look_ahead))
-                cleaned_sleep[s:first_sleep_after] = True
-                nonwear_arr[s:first_sleep_after] = False
+    logger.debug("Sleep Window cleanup first pass complete. Starting adaptive pass.")
+    nonwear_arr = nonwear_measurement.measurements.astype(bool)
+    nonwear_change = np.diff(nonwear_arr.astype(int), prepend=0, append=0)
+    nw_run_starts = np.where(nonwear_change == 1)[0]
+    nw_run_ends = np.where(nonwear_change == -1)[0]
 
-        return models.Measurement(
-            time=sleep.time, measurements=cleaned_sleep
-        ), models.Measurement(time=nonwear_measurement.time, measurements=nonwear_arr)
+    for s, e in zip(nw_run_starts, nw_run_ends, strict=True):
+        look_ahead_end = min(e + nonwear_sleep_buffer + 1, len(cleaned_sleep))
+        look_ahead = cleaned_sleep[e:look_ahead_end]
+        if np.any(look_ahead):
+            logger.debug(
+                "Found sleep within buffer of nonwear end, "
+                "absorbing nonwear into sleep."
+            )
+            first_sleep_after = e + int(np.argmax(look_ahead))
+            cleaned_sleep[s:first_sleep_after] = True
+            nonwear_arr[s:first_sleep_after] = False
 
     return models.Measurement(
         time=sleep.time, measurements=cleaned_sleep
-    ), nonwear_measurement
+    ), models.Measurement(time=nonwear_measurement.time, measurements=nonwear_arr)
 
 
 def sleep_bouts_cleanup(
@@ -514,7 +513,7 @@ def sleep_bouts_cleanup(
 
 
 def _sleep_windows_as_measurement(
-    ref_measurement_time: pl.Series, sleep_windows: List[SleepWindow]
+    ref_measurement_time: pl.Series, sleep_windows: Iterable[SleepWindow]
 ) -> models.Measurement:
     """Helper function to convert list of sleep windows to a Measurement instance.
 
