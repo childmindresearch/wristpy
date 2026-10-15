@@ -420,19 +420,27 @@ def sleep_cleanup(
     non-wear detection.
 
     Args:
-        sleep_windows:  List of the sleep windows (Onset/Wake up pairs).
+        sleep_windows: Iterable of sleep windows (onset/wakeup pairs).
         nonwear_measurement: The nonwear measurement data used for reference time
             stamps and to remove overlaps with periods of sleep.
         adaptive: Whether to perform the second pass of absorbing nonwear runs into
-            sleep when sleep immediately follows nonwear. Defaults to None, equivalent
-            to false.
+            sleep when sleep follows nonwear within the configured buffer. Defaults
+            to None, which is equivalent to False.
         nonwear_sleep_buffer: The number of samples to look ahead when performing
-            the adaptive sleep cleanup. Defaults to 0.
+            adaptive cleanup. Defaults to 0, which only includes the first sample
+            after a nonwear run. Must be non-negative.
 
     Returns:
-        A tuple of Measurement instances with the cleaned sleep data and the updated
-        nonwear data.
+        A tuple containing the cleaned sleep Measurement and the nonwear Measurement.
+        If adaptive cleanup is enabled, the returned nonwear data excludes runs
+        absorbed into sleep; otherwise the original nonwear Measurement is returned.
+
+    Raises:
+        ValueError: If nonwear_sleep_buffer is negative.
     """
+    if nonwear_sleep_buffer < 0:
+        raise ValueError("nonwear_sleep_buffer must be non-negative.")
+
     logger.debug("Starting the sleep Window cleanup.")
     temporal_resolution = nonwear_measurement.time[1] - nonwear_measurement.time[0]
     num_samples_15min = int(15 * 60 / temporal_resolution.total_seconds())

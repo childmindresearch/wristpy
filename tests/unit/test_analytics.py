@@ -291,6 +291,26 @@ def test_sleep_cleanup() -> None:
     assert np.array_equal(result[0].measurements, expected_result)
 
 
+def test_sleep_cleanup_rejects_negative_nonwear_sleep_buffer() -> None:
+    """Reject negative look-ahead buffers, even when adaptive cleanup is disabled."""
+    dummy_date = datetime.datetime(2024, 5, 2)
+    time = pl.Series(
+        "time",
+        [dummy_date, dummy_date + datetime.timedelta(seconds=1)],
+    )
+    nonwear_measurement = models.Measurement(measurements=np.zeros(2), time=time)
+
+    with pytest.raises(
+        ValueError, match=r"nonwear_sleep_buffer must be non-negative\."
+    ):
+        analytics.sleep_cleanup(
+            sleep_windows=[],
+            nonwear_measurement=nonwear_measurement,
+            adaptive=False,
+            nonwear_sleep_buffer=-1,
+        )
+
+
 def test_new_sleep_cleanup_nonwear_preceding_sleep() -> None:
     """Test that nonwear immediately preceding sleep is absorbed into sleep window."""
     dummy_date = datetime.datetime(2024, 5, 2)
