@@ -8,6 +8,7 @@ from typing import Literal, Optional, Sequence
 import numpy as np
 import polars as pl
 import pytest
+import pytest_mock
 
 from wristpy.core import exceptions, models, orchestrator
 from wristpy.io.writers import writers
@@ -99,6 +100,35 @@ def test_run_single_file(
 
     assert output_file_path.exists()
     assert isinstance(results, writers.OrchestratorResults)
+
+
+def test_run_forwards_adaptive_nonwear_to_single_file(
+    mocker: pytest_mock.MockerFixture,
+    sample_data_gt3x: pathlib.Path,
+) -> None:
+    """Forward the adaptive setting through the public single-file entry point."""
+    mock_run_file = mocker.patch.object(orchestrator, "_run_file")
+
+    orchestrator.run(input=sample_data_gt3x, adaptive_nonwear=False)
+
+    mock_run_file.assert_called_once()
+    assert mock_run_file.call_args.kwargs["adaptive_nonwear"] is False
+
+
+def test_run_directory_forwards_adaptive_nonwear(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """Forward the adaptive setting to every file in a directory."""
+    input_dir = pathlib.Path(__file__).parent.parent / "sample_data"
+    mock_run_file = mocker.patch.object(orchestrator, "_run_file")
+
+    orchestrator._run_directory(input=input_dir, adaptive_nonwear=False)
+
+    assert mock_run_file.call_count > 0
+    assert all(
+        call.kwargs["adaptive_nonwear"] is False
+        for call in mock_run_file.call_args_list
+    )
 
 
 def test_run_single_file_agcount_default(

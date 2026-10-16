@@ -165,6 +165,11 @@ def main(
         "Note that the presence of duplicate timestamps may indicate sensor "
         "malfunction. Modifying this parameter should be done with caution.",
     ),
+    adaptive_nonwear: bool = typer.Option(
+        True,
+        "--adaptive-nonwear/--no-adaptive-nonwear",
+        help="Absorb nonwear immediately preceding detected sleep. Enabled by default.",
+    ),
     verbosity: bool = typer.Option(
         False,
         "-v",
@@ -207,6 +212,7 @@ def main(
             verbosity=log_level,
             output_filetype=output_filetype.value,
             allow_duplicates=allow_duplicates,
+            adaptive_nonwear=adaptive_nonwear,
         )
     except exceptions.EmptyDirectoryError as e:
         typer.echo(f"Error: {e}", err=True)
