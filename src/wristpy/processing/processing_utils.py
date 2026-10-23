@@ -185,26 +185,66 @@ def synchronize_measurements(
         A new Measurement instance with the cleaned up nonwear detection,
         returned as a boolean (True == nonwear).
     """
-    time_fix_nonwear = _time_fix(
+    time_fixed_measurement = _time_fix(
         data_measurement, reference_measurement.time[-1], reference_measurement.time[0]
     )
-    resampled_nonwear = computations.resample(time_fix_nonwear, epoch_length)
-    binary_nonwear = np.where(resampled_nonwear.measurements >= 0.5, 1, 0)
+    resampled_measurement = computations.resample(time_fixed_measurement, epoch_length)
+    binary_measurement = np.where(resampled_measurement.measurements >= 0.5, 1, 0)
 
     ref_df = pl.DataFrame({"time": reference_measurement.time})
 
-    nonwear_df = pl.DataFrame(
+    data_df = pl.DataFrame(
         {
-            "time": resampled_nonwear.time,
-            "idx": pl.arange(0, len(resampled_nonwear.time), eager=True),
+            "time": resampled_measurement.time,
+            "idx": pl.arange(0, len(resampled_measurement.time), eager=True),
         }
     )
 
-    joined = ref_df.join(nonwear_df, on="time", how="inner")
+    joined_df = ref_df.join(data_df, on="time", how="inner")
 
-    matched_indices = joined["idx"].to_numpy()
-    matched_values = binary_nonwear[matched_indices]
+    matched_indices = joined_df["idx"].to_numpy()
+    matched_values = binary_measurement[matched_indices]
 
     return models.Measurement(
-        measurements=matched_values.astype(bool), time=joined["time"]
+        measurements=matched_values.astype(bool), time=joined_df["time"]
     )
+
+
+def _synchronize_sleep_bouts(
+    data_measurement: models.Measurement,
+    reference_measurement: models.Measurement,
+) -> models.Measurement:
+    """Resample sleep data_measurement to reference_measurement's sampling rate.
+
+    When resampling data_measurement to match reference_measurement's
+    sampling rate, in case of up-sampling, the nulls will be filled using
+    the last non-null value (via join_asof with strategy=`backward`). To
+    handle trailing and leading nulls, fill_null(strategy=`forward`) and
+    fill_null(strategy=`backward`) will fill them, respectively.
+
+    Args:
+        data_measurement: The binary block Measurement to align (e.g. SIB/SPT).
+        reference_measurement: The reference Measurement to align to.
+
+    Returns:
+        A new boolean-valued Measurement based on reference_measurement time points.
+    """
+    data_df = pl.DataFrame(
+        {
+            "time": data_measurement.time,
+            "value": data_measurement.measurements.astype(bool),
+        }
+    ).set_sorted("time")
+
+    ref_df = pl.DataFrame({"time": reference_measurement.time}).set_sorted("time")
+
+    joined = ref_df.join_asof(data_df, on="time", strategy="backward")
+    # to handle trailing and leading nulls, respectively
+    values = (
+        joined["value"]
+        .fill_null(strategy="forward")
+        .fill_null(strategy="backward")
+        .to_numpy()
+    )
+
+    return models.Measurement(measurements=values, time=ref_df["time"])

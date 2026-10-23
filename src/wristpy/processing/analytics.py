@@ -504,13 +504,12 @@ def sleep_bouts_cleanup(
         epoch_length: The epoch length in seconds, used for resampling the data.
 
     Returns:
-        A Measurement instance with the cleaned SPT or SIB data.
+        A Measurement object with the SPT or SIB cleaned data.
     """
     logger.debug("Starting the sleep bouts cleanup.")
-    sleep_parameter_sync = processing_utils.synchronize_measurements(
-        data_measurement=sleep_parameter,
-        reference_measurement=time_reference_measurement,
-        epoch_length=epoch_length,
+    sleep_parameter_sync = processing_utils._synchronize_sleep_bouts(
+        sleep_parameter,
+        time_reference_measurement,
     )
     sleep_parameter_sync.measurements = np.logical_and(
         sleep_parameter_sync.measurements,
