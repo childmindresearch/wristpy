@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta
 
 import numpy as np
+import numpy.testing as npt
 import polars as pl
 import pytest
 
@@ -144,3 +145,124 @@ def test_nonwear_dispatcher_missing_temperature() -> None:
         processing_utils.get_nonwear_measurements(
             acceleration, non_wear_algorithms=["cta"]
         )
+
+
+def test_nonwear_default_synchronize_measurements() -> None:
+    """Tests synchronize function for nonwear measurement.
+
+    Tests synchronize_measurements() function with default parameters
+    for nonwear measurement object.
+    """
+    nonwear_period_len = 15  # in min
+    num_periods = 19
+    num_samples = int(nonwear_period_len * num_periods * 12)
+    data_time_list = [
+        datetime(2024, 12, 8) + timedelta(minutes=i * nonwear_period_len)
+        for i in range(num_periods)
+    ]
+
+    ref_time_list = [
+        datetime(2024, 12, 8) + timedelta(seconds=5 * i) for i in range(num_samples)
+    ]
+
+    data_time = pl.Series("time", data_time_list, dtype=pl.Datetime("ns"))
+    ref_time = pl.Series("time", ref_time_list, dtype=pl.Datetime("ns"))
+
+    poisson_x = [0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]
+    poisson_time = range(
+        0, len(poisson_x) * nonwear_period_len * 12, nonwear_period_len * 12
+    )
+    resampled_time = range(0, len(poisson_x) * nonwear_period_len * 12, 1)
+    expected_nonwear_epoch = np.interp(resampled_time, poisson_time, poisson_x)
+    binary_nonwear_epoch = [1 if item >= 0.5 else 0 for item in expected_nonwear_epoch]
+
+    nonwear_array = models.Measurement(
+        measurements=np.asarray(poisson_x), time=data_time
+    )
+    ref_measurement = models.Measurement(
+        measurements=np.ones((num_periods * nonwear_period_len,)), time=ref_time
+    )
+
+    nonwear_epoch = processing_utils.synchronize_measurements(
+        data_measurement=nonwear_array,
+        reference_measurement=ref_measurement,
+        epoch_length=5,
+    )
+
+    npt.assert_array_equal(nonwear_epoch.measurements, np.asarray(binary_nonwear_epoch))
+
+
+def test_sib_default_synchronize_sleep_bouts() -> None:
+    """Tests synchronize function for sib measurement.
+
+    Tests _synchronize_sleep_bouts() with default parameters for
+    sustained inactivity bout.
+    """
+    nonwear_period_len = 15  # in min
+    num_periods = 19
+    num_samples = int(nonwear_period_len * num_periods * 12)
+    data_time_list = [
+        datetime(2024, 12, 8) + timedelta(minutes=i * nonwear_period_len)
+        for i in range(num_periods)
+    ]
+
+    ref_time_list = [
+        datetime(2024, 12, 8) + timedelta(seconds=5 * i) for i in range(num_samples)
+    ]
+
+    data_time = pl.Series("time", data_time_list, dtype=pl.Datetime("ns"))
+    ref_time = pl.Series("time", ref_time_list, dtype=pl.Datetime("ns"))
+
+    poisson_x = [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0]
+    expected_sib = [
+        bool(item) for item in poisson_x for _ in range(nonwear_period_len * 12)
+    ]
+
+    sib_array = models.Measurement(measurements=np.asarray(poisson_x), time=data_time)
+    ref_measurement = models.Measurement(
+        measurements=np.ones((num_periods * nonwear_period_len,)), time=ref_time
+    )
+
+    sleep_parameter_sync = processing_utils._synchronize_sleep_bouts(
+        sib_array,
+        ref_measurement,
+    )
+
+    npt.assert_array_equal(sleep_parameter_sync.measurements, np.asarray(expected_sib))
+
+
+def test_spt_default_synchronize_sleep_bouts() -> None:
+    """Tests synchronize function for spt measurement.
+
+    Tests _synchronize_sleep_bouts() with default parameters for
+    sleep period time.
+    """
+    nonwear_period_len = 5 / 60  # in min
+    num_periods = 19
+    num_samples = int(num_periods)
+    data_time_list = [
+        datetime(2024, 12, 8) + timedelta(minutes=i * nonwear_period_len)
+        for i in range(num_periods)
+    ]
+
+    ref_time_list = [
+        datetime(2024, 12, 8) + timedelta(seconds=5 * i) for i in range(num_samples)
+    ]
+
+    data_time = pl.Series("time", data_time_list, dtype=pl.Datetime("ns"))
+    ref_time = pl.Series("time", ref_time_list, dtype=pl.Datetime("ns"))
+
+    poisson_x = [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0]
+    expected_sib = [bool(item) for item in poisson_x for _ in range(1)]
+
+    sib_array = models.Measurement(measurements=np.asarray(poisson_x), time=data_time)
+    ref_measurement = models.Measurement(
+        measurements=np.ones((num_periods,)), time=ref_time
+    )
+
+    sleep_parameter_sync = processing_utils._synchronize_sleep_bouts(
+        sib_array,
+        ref_measurement,
+    )
+
+    npt.assert_array_equal(sleep_parameter_sync.measurements, np.asarray(expected_sib))
