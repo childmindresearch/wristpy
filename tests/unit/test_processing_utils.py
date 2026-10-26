@@ -3,12 +3,23 @@
 from datetime import datetime, timedelta
 
 import numpy as np
-import numpy.testing as npt
 import polars as pl
 import pytest
 
 from wristpy.core import models
 from wristpy.processing import processing_utils
+
+_SLEEP_START = datetime(2024, 12, 8)
+
+
+def _sleep_measurement(seconds: list[int], values: list[bool]) -> models.Measurement:
+    """Create a small sleep-bout measurement with offsets from a fixed start."""
+    time = pl.Series(
+        "time",
+        [_SLEEP_START + timedelta(seconds=second) for second in seconds],
+        dtype=pl.Datetime("ns"),
+    )
+    return models.Measurement(measurements=np.asarray(values), time=time)
 
 
 def test_nonwear_majority_vote() -> None:
@@ -147,122 +158,121 @@ def test_nonwear_dispatcher_missing_temperature() -> None:
         )
 
 
-def test_nonwear_default_synchronize_measurements() -> None:
-    """Tests synchronize function for nonwear measurement.
-
-    Tests synchronize_measurements() function with default parameters
-    for nonwear measurement object.
-    """
-    nonwear_period_len = 15  # in min
-    num_periods = 19
-    num_samples = int(nonwear_period_len * num_periods * 12)
-    data_time_list = [
-        datetime(2024, 12, 8) + timedelta(minutes=i * nonwear_period_len)
-        for i in range(num_periods)
-    ]
-
-    ref_time_list = [
-        datetime(2024, 12, 8) + timedelta(seconds=5 * i) for i in range(num_samples)
-    ]
-
-    data_time = pl.Series("time", data_time_list, dtype=pl.Datetime("ns"))
-    ref_time = pl.Series("time", ref_time_list, dtype=pl.Datetime("ns"))
-
-    poisson_x = [0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]
-    poisson_time = range(
-        0, len(poisson_x) * nonwear_period_len * 12, nonwear_period_len * 12
+def test_synchronize_measurements_upsample_extrapolate() -> None:
+    """Tests upsampling and extrapolation for synchronize_measurements() function."""
+    expected_result = np.asarray(
+        [False, False, False, False, True, True, True, False, False, False, False],
+        dtype=bool,
     )
-    resampled_time = range(0, len(poisson_x) * nonwear_period_len * 12, 1)
-    expected_nonwear_epoch = np.interp(resampled_time, poisson_time, poisson_x)
-    binary_nonwear_epoch = [1 if item >= 0.5 else 0 for item in expected_nonwear_epoch]
-
-    nonwear_array = models.Measurement(
-        measurements=np.asarray(poisson_x), time=data_time
+    data = _sleep_measurement(
+        seconds=[0, 3, 6],
+        values=[False, True, False],
     )
-    ref_measurement = models.Measurement(
-        measurements=np.ones((num_periods * nonwear_period_len,)), time=ref_time
+    reference = _sleep_measurement(
+        seconds=[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8],
+        values=[False] * 11,
     )
 
-    nonwear_epoch = processing_utils.synchronize_measurements(
-        data_measurement=nonwear_array,
-        reference_measurement=ref_measurement,
-        epoch_length=5,
+    result = processing_utils.synchronize_measurements(data, reference, 1)
+
+    assert np.array_equal(result.measurements, expected_result)
+    assert result.time.equals(reference.time)
+    assert result.measurements.dtype == np.bool_
+
+
+def test_synchronize_measurements_upsample_truncate() -> None:
+    """Tests upsampling and truncation for synchronize_measurements() function."""
+    expected_result = np.asarray([True, True, True], dtype=bool)
+    data = _sleep_measurement(
+        seconds=[0, 3, 6],
+        values=[False, True, False],
+    )
+    reference = _sleep_measurement(
+        seconds=[2, 3, 4],
+        values=[False] * 3,
     )
 
-    npt.assert_array_equal(nonwear_epoch.measurements, np.asarray(binary_nonwear_epoch))
+    result = processing_utils.synchronize_measurements(data, reference, 1)
+
+    assert np.array_equal(result.measurements, expected_result)
+    assert result.time.equals(reference.time)
+    assert result.measurements.dtype == np.bool_
 
 
-def test_sib_default_synchronize_sleep_bouts() -> None:
-    """Tests synchronize function for sib measurement.
-
-    Tests _synchronize_sleep_bouts() with default parameters for
-    sustained inactivity bout.
-    """
-    nonwear_period_len = 15  # in min
-    num_periods = 19
-    num_samples = int(nonwear_period_len * num_periods * 12)
-    data_time_list = [
-        datetime(2024, 12, 8) + timedelta(minutes=i * nonwear_period_len)
-        for i in range(num_periods)
-    ]
-
-    ref_time_list = [
-        datetime(2024, 12, 8) + timedelta(seconds=5 * i) for i in range(num_samples)
-    ]
-
-    data_time = pl.Series("time", data_time_list, dtype=pl.Datetime("ns"))
-    ref_time = pl.Series("time", ref_time_list, dtype=pl.Datetime("ns"))
-
-    poisson_x = [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0]
-    expected_sib = [
-        bool(item) for item in poisson_x for _ in range(nonwear_period_len * 12)
-    ]
-
-    sib_array = models.Measurement(measurements=np.asarray(poisson_x), time=data_time)
-    ref_measurement = models.Measurement(
-        measurements=np.ones((num_periods * nonwear_period_len,)), time=ref_time
+def test_synchronize_measurements_downsample() -> None:
+    """Tests downsampling for synchronize_measurements() function."""
+    expected_result = np.asarray([False, True, False], dtype=bool)
+    data = _sleep_measurement(
+        seconds=[0, 1, 2, 3, 4, 5, 6],
+        values=[False, False, False, True, True, True, False],
+    )
+    reference = _sleep_measurement(
+        seconds=[0, 3, 6],
+        values=[False] * 3,
     )
 
-    sleep_parameter_sync = processing_utils._synchronize_sleep_bouts(
-        sib_array,
-        ref_measurement,
+    result = processing_utils.synchronize_measurements(data, reference, 3)
+
+    assert np.array_equal(result.measurements, expected_result)
+    assert result.time.equals(reference.time)
+    assert result.measurements.dtype == np.bool_
+
+
+def test_synchronize_sleep_bouts_upsample_extrapolate() -> None:
+    """Tests upsampling and extrapolation for synchronize_sleep_bouts() function."""
+    expected_result = np.asarray(
+        [False, False, False, True, True, False, False],
+        dtype=bool,
+    )
+    data = _sleep_measurement(
+        seconds=[0, 10, 20],
+        values=[False, True, False],
+    )
+    reference = _sleep_measurement(
+        seconds=[-5, 0, 5, 10, 15, 20, 25],
+        values=[False] * 7,
     )
 
-    npt.assert_array_equal(sleep_parameter_sync.measurements, np.asarray(expected_sib))
+    result = processing_utils._synchronize_sleep_bouts(data, reference)
+
+    assert np.array_equal(result.measurements, expected_result)
+    assert result.time.equals(reference.time)
+    assert result.measurements.dtype == np.bool_
 
 
-def test_spt_default_synchronize_sleep_bouts() -> None:
-    """Tests synchronize function for spt measurement.
-
-    Tests _synchronize_sleep_bouts() with default parameters for
-    sleep period time.
-    """
-    nonwear_period_len = 5 / 60  # in min
-    num_periods = 19
-    num_samples = int(num_periods)
-    data_time_list = [
-        datetime(2024, 12, 8) + timedelta(minutes=i * nonwear_period_len)
-        for i in range(num_periods)
-    ]
-
-    ref_time_list = [
-        datetime(2024, 12, 8) + timedelta(seconds=5 * i) for i in range(num_samples)
-    ]
-
-    data_time = pl.Series("time", data_time_list, dtype=pl.Datetime("ns"))
-    ref_time = pl.Series("time", ref_time_list, dtype=pl.Datetime("ns"))
-
-    poisson_x = [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0]
-    expected_sib = [bool(item) for item in poisson_x for _ in range(1)]
-
-    sib_array = models.Measurement(measurements=np.asarray(poisson_x), time=data_time)
-    ref_measurement = models.Measurement(
-        measurements=np.ones((num_periods,)), time=ref_time
+def test_synchronize_sleep_bouts_upsample_truncate() -> None:
+    """Tests upsampling and truncation for syncrhonize_sleep_bouts() function."""
+    expected_result = np.asarray([False, True, True], dtype=bool)
+    data = _sleep_measurement(
+        seconds=[0, 10, 20],
+        values=[False, True, False],
+    )
+    reference = _sleep_measurement(
+        seconds=[5, 10, 15],
+        values=[False] * 3,
     )
 
-    sleep_parameter_sync = processing_utils._synchronize_sleep_bouts(
-        sib_array,
-        ref_measurement,
+    result = processing_utils._synchronize_sleep_bouts(data, reference)
+
+    assert np.array_equal(result.measurements, expected_result)
+    assert result.time.equals(reference.time)
+    assert result.measurements.dtype == np.bool_
+
+
+def test_synchronize_sleep_bouts_downsample() -> None:
+    """Tests downsampling for syncrhonize_sleep_bouts() function."""
+    expected_result = np.asarray([False, True, True], dtype=bool)
+    data = _sleep_measurement(
+        seconds=[0, 5, 10, 15, 20],
+        values=[False, True, True, False, True],
+    )
+    reference = _sleep_measurement(
+        seconds=[0, 10, 20],
+        values=[False] * 3,
     )
 
-    npt.assert_array_equal(sleep_parameter_sync.measurements, np.asarray(expected_sib))
+    result = processing_utils._synchronize_sleep_bouts(data, reference)
+
+    assert np.array_equal(result.measurements, expected_result)
+    assert result.time.equals(reference.time)
+    assert result.measurements.dtype == np.bool_
