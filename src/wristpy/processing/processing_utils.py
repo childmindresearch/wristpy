@@ -170,10 +170,10 @@ def synchronize_measurements(
     This function ensures that a Measurement object and reference Measurement times
     are synced up. This is accomplished by first resampling a Measurement object to
     the specified temporal resolution.
-    It also ensures that a Measurement object is a binary array, where 1 indicates
-    nonwear and 0 indicates wear.
-    It then truncates a Measurement object to match the reference
-    Measurement time points.
+    It also ensures that a Measurement object is a boolean-valued array. When
+    applied to nonwear data, 1 indicates nonwear and 0 indicates wear.
+    It then synchronize a Measurement object to match the reference
+    Measurement's time points.
 
     Args:
         data_measurement: The Measurement object that requires time syncing.
@@ -182,8 +182,7 @@ def synchronize_measurements(
             Defaults to 5.0.
 
     Returns:
-        A new Measurement instance with the cleaned up nonwear detection,
-        returned as a boolean (True == nonwear).
+        A synchronized boolean-valued Measurement instance.
     """
     time_fixed_measurement = _time_fix(
         data_measurement, reference_measurement.time[-1], reference_measurement.time[0]
@@ -214,12 +213,13 @@ def _synchronize_sleep_bouts(
     data_measurement: models.Measurement,
     reference_measurement: models.Measurement,
 ) -> models.Measurement:
-    """Resample sleep data_measurement to reference_measurement's sampling rate.
+    """Synchronize sleep data_measurement to reference_measurement's time.
 
-    When resampling data_measurement to match reference_measurement's
-    sampling rate, in case of up-sampling, the nulls will be filled using
-    the last non-null value (via join_asof with strategy=`backward`). To
-    handle trailing and leading nulls, fill_null(strategy=`forward`) and
+    Helper function for preprocessed sleep bouts (SIB and SPT).
+    When synchronizing data_measurement to match reference_measurement's
+    time vector, nulls will be filled using the last non-null value
+    (via join_asof with strategy=`backward`). To handle trailing and
+    leading nulls, fill_null(strategy=`forward`) and
     fill_null(strategy=`backward`) will fill them, respectively.
 
     Args:
@@ -239,7 +239,6 @@ def _synchronize_sleep_bouts(
     ref_df = pl.DataFrame({"time": reference_measurement.time}).set_sorted("time")
 
     joined = ref_df.join_asof(data_df, on="time", strategy="backward")
-    # to handle trailing and leading nulls, respectively
     values = (
         joined["value"]
         .fill_null(strategy="forward")

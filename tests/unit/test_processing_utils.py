@@ -158,121 +158,154 @@ def test_nonwear_dispatcher_missing_temperature() -> None:
         )
 
 
-def test_synchronize_measurements_upsample_extrapolate() -> None:
-    """Tests upsampling and extrapolation for synchronize_measurements() function."""
-    expected_result = np.asarray(
-        [False, False, False, False, True, True, True, False, False, False, False],
-        dtype=bool,
-    )
+@pytest.mark.parametrize(
+    (
+        "data_seconds",
+        "data_values",
+        "reference_seconds",
+        "reference_values",
+        "interval",
+        "expected_result",
+    ),
+    [
+        pytest.param(
+            [0, 3, 6],
+            [False, True, False],
+            [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8],
+            [False] * 11,
+            1,
+            [
+                False,
+                False,
+                False,
+                False,
+                True,
+                True,
+                True,
+                False,
+                False,
+                False,
+                False,
+            ],
+            id="upsample-extrapolate",
+        ),
+        pytest.param(
+            [0, 3, 6],
+            [False, True, False],
+            [2, 3, 4],
+            [False] * 3,
+            1,
+            [True, True, True],
+            id="upsample-truncate",
+        ),
+        pytest.param(
+            [0, 1, 2, 3, 4, 5, 6],
+            [False, False, False, True, True, True, False],
+            [0, 3, 6],
+            [False] * 3,
+            3,
+            [False, True, False],
+            id="downsample",
+        ),
+    ],
+)
+def test_synchronize_measurements(
+    data_seconds: list[int],
+    data_values: list[bool],
+    reference_seconds: list[int],
+    reference_values: list[bool],
+    interval: int,
+    expected_result: list[bool],
+) -> None:
+    """Test synchronization of measurements across different test cases."""
     data = _sleep_measurement(
-        seconds=[0, 3, 6],
-        values=[False, True, False],
+        seconds=data_seconds,
+        values=data_values,
     )
     reference = _sleep_measurement(
-        seconds=[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8],
-        values=[False] * 11,
+        seconds=reference_seconds,
+        values=reference_values,
     )
 
-    result = processing_utils.synchronize_measurements(data, reference, 1)
+    result = processing_utils.synchronize_measurements(
+        data,
+        reference,
+        interval,
+    )
 
-    assert np.array_equal(result.measurements, expected_result)
+    assert np.array_equal(
+        result.measurements,
+        np.asarray(expected_result, dtype=bool),
+    )
     assert result.time.equals(reference.time)
     assert result.measurements.dtype == np.bool_
 
 
-def test_synchronize_measurements_upsample_truncate() -> None:
-    """Tests upsampling and truncation for synchronize_measurements() function."""
-    expected_result = np.asarray([True, True, True], dtype=bool)
+@pytest.mark.parametrize(
+    (
+        "data_seconds",
+        "data_values",
+        "reference_seconds",
+        "reference_values",
+        "expected_result",
+    ),
+    [
+        pytest.param(
+            [0, 10, 20],
+            [False, True, False],
+            [-5, 0, 5, 10, 15, 20, 25],
+            [False] * 7,
+            [
+                False,
+                False,
+                False,
+                True,
+                True,
+                False,
+                False,
+            ],
+            id="upsample-extrapolate",
+        ),
+        pytest.param(
+            [0, 10, 20],
+            [False, True, False],
+            [5, 10, 15],
+            [False] * 3,
+            [False, True, True],
+            id="upsample-truncate",
+        ),
+        pytest.param(
+            [0, 5, 10, 15, 20],
+            [False, True, True, False, True],
+            [0, 10, 20],
+            [False] * 3,
+            [False, True, True],
+            id="downsample",
+        ),
+    ],
+)
+def test_synchronize_sleep_bouts(
+    data_seconds: list[int],
+    data_values: list[bool],
+    reference_seconds: list[int],
+    reference_values: list[bool],
+    expected_result: list[bool],
+) -> None:
+    """Test synchronization of sleep bouts across different test cases."""
     data = _sleep_measurement(
-        seconds=[0, 3, 6],
-        values=[False, True, False],
+        seconds=data_seconds,
+        values=data_values,
     )
     reference = _sleep_measurement(
-        seconds=[2, 3, 4],
-        values=[False] * 3,
-    )
-
-    result = processing_utils.synchronize_measurements(data, reference, 1)
-
-    assert np.array_equal(result.measurements, expected_result)
-    assert result.time.equals(reference.time)
-    assert result.measurements.dtype == np.bool_
-
-
-def test_synchronize_measurements_downsample() -> None:
-    """Tests downsampling for synchronize_measurements() function."""
-    expected_result = np.asarray([False, True, False], dtype=bool)
-    data = _sleep_measurement(
-        seconds=[0, 1, 2, 3, 4, 5, 6],
-        values=[False, False, False, True, True, True, False],
-    )
-    reference = _sleep_measurement(
-        seconds=[0, 3, 6],
-        values=[False] * 3,
-    )
-
-    result = processing_utils.synchronize_measurements(data, reference, 3)
-
-    assert np.array_equal(result.measurements, expected_result)
-    assert result.time.equals(reference.time)
-    assert result.measurements.dtype == np.bool_
-
-
-def test_synchronize_sleep_bouts_upsample_extrapolate() -> None:
-    """Tests upsampling and extrapolation for synchronize_sleep_bouts() function."""
-    expected_result = np.asarray(
-        [False, False, False, True, True, False, False],
-        dtype=bool,
-    )
-    data = _sleep_measurement(
-        seconds=[0, 10, 20],
-        values=[False, True, False],
-    )
-    reference = _sleep_measurement(
-        seconds=[-5, 0, 5, 10, 15, 20, 25],
-        values=[False] * 7,
+        seconds=reference_seconds,
+        values=reference_values,
     )
 
     result = processing_utils._synchronize_sleep_bouts(data, reference)
 
-    assert np.array_equal(result.measurements, expected_result)
-    assert result.time.equals(reference.time)
-    assert result.measurements.dtype == np.bool_
-
-
-def test_synchronize_sleep_bouts_upsample_truncate() -> None:
-    """Tests upsampling and truncation for syncrhonize_sleep_bouts() function."""
-    expected_result = np.asarray([False, True, True], dtype=bool)
-    data = _sleep_measurement(
-        seconds=[0, 10, 20],
-        values=[False, True, False],
+    assert np.array_equal(
+        result.measurements,
+        np.asarray(expected_result, dtype=bool),
     )
-    reference = _sleep_measurement(
-        seconds=[5, 10, 15],
-        values=[False] * 3,
-    )
-
-    result = processing_utils._synchronize_sleep_bouts(data, reference)
-
-    assert np.array_equal(result.measurements, expected_result)
-    assert result.time.equals(reference.time)
-    assert result.measurements.dtype == np.bool_
-
-
-def test_synchronize_sleep_bouts_downsample() -> None:
-    """Tests downsampling for syncrhonize_sleep_bouts() function."""
-    expected_result = np.asarray([False, True, True], dtype=bool)
-    data = _sleep_measurement(
-        seconds=[0, 5, 10, 15, 20],
-        values=[False, True, True, False, True],
-    )
-    reference = _sleep_measurement(
-        seconds=[0, 10, 20],
-        values=[False] * 3,
-    )
-
-    result = processing_utils._synchronize_sleep_bouts(data, reference)
-
-    assert np.array_equal(result.measurements, expected_result)
     assert result.time.equals(reference.time)
     assert result.measurements.dtype == np.bool_
