@@ -9,6 +9,18 @@ import pytest
 from wristpy.core import models
 from wristpy.processing import processing_utils
 
+_SLEEP_START = datetime(2024, 12, 8)
+
+
+def _sleep_measurement(seconds: list[int], values: list[bool]) -> models.Measurement:
+    """Create a small sleep-bout measurement with offsets from a fixed start."""
+    time = pl.Series(
+        "time",
+        [_SLEEP_START + timedelta(seconds=second) for second in seconds],
+        dtype=pl.Datetime("ns"),
+    )
+    return models.Measurement(measurements=np.asarray(values), time=time)
+
 
 def test_nonwear_majority_vote() -> None:
     """Tests the majority vote function for nonwear."""
@@ -144,3 +156,156 @@ def test_nonwear_dispatcher_missing_temperature() -> None:
         processing_utils.get_nonwear_measurements(
             acceleration, non_wear_algorithms=["cta"]
         )
+
+
+@pytest.mark.parametrize(
+    (
+        "data_seconds",
+        "data_values",
+        "reference_seconds",
+        "reference_values",
+        "interval",
+        "expected_result",
+    ),
+    [
+        pytest.param(
+            [0, 3, 6],
+            [False, True, False],
+            [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8],
+            [False] * 11,
+            1,
+            [
+                False,
+                False,
+                False,
+                False,
+                True,
+                True,
+                True,
+                False,
+                False,
+                False,
+                False,
+            ],
+            id="upsample-extrapolate",
+        ),
+        pytest.param(
+            [0, 3, 6],
+            [False, True, False],
+            [2, 3, 4],
+            [False] * 3,
+            1,
+            [True, True, True],
+            id="upsample-truncate",
+        ),
+        pytest.param(
+            [0, 1, 2, 3, 4, 5, 6],
+            [False, False, False, True, True, True, False],
+            [0, 3, 6],
+            [False] * 3,
+            3,
+            [False, True, False],
+            id="downsample",
+        ),
+    ],
+)
+def test_synchronize_measurements(
+    data_seconds: list[int],
+    data_values: list[bool],
+    reference_seconds: list[int],
+    reference_values: list[bool],
+    interval: int,
+    expected_result: list[bool],
+) -> None:
+    """Test synchronization of measurements across different test cases."""
+    data = _sleep_measurement(
+        seconds=data_seconds,
+        values=data_values,
+    )
+    reference = _sleep_measurement(
+        seconds=reference_seconds,
+        values=reference_values,
+    )
+
+    result = processing_utils.synchronize_measurements(
+        data,
+        reference,
+        interval,
+    )
+
+    assert np.array_equal(
+        result.measurements,
+        np.asarray(expected_result, dtype=bool),
+    )
+    assert result.time.equals(reference.time)
+    assert result.measurements.dtype == np.bool_
+
+
+@pytest.mark.parametrize(
+    (
+        "data_seconds",
+        "data_values",
+        "reference_seconds",
+        "reference_values",
+        "expected_result",
+    ),
+    [
+        pytest.param(
+            [0, 10, 20],
+            [False, True, False],
+            [-5, 0, 5, 10, 15, 20, 25],
+            [False] * 7,
+            [
+                False,
+                False,
+                False,
+                True,
+                True,
+                False,
+                False,
+            ],
+            id="upsample-extrapolate",
+        ),
+        pytest.param(
+            [0, 10, 20],
+            [False, True, False],
+            [5, 10, 15],
+            [False] * 3,
+            [False, True, True],
+            id="upsample-truncate",
+        ),
+        pytest.param(
+            [0, 5, 10, 15, 20],
+            [False, True, True, False, True],
+            [0, 10, 20],
+            [False] * 3,
+            [False, True, True],
+            id="downsample",
+        ),
+    ],
+)
+def test_synchronize_sleep_bouts(
+    data_seconds: list[int],
+    data_values: list[bool],
+    reference_seconds: list[int],
+    reference_values: list[bool],
+    expected_result: list[bool],
+) -> None:
+    """Test synchronization of sleep bouts across different test cases."""
+    data = _sleep_measurement(
+        seconds=data_seconds,
+        values=data_values,
+    )
+    reference = _sleep_measurement(
+        seconds=reference_seconds,
+        values=reference_values,
+    )
+
+    result = processing_utils._synchronize_sleep_bouts(data, reference)
+
+    assert np.array_equal(
+        result.measurements,
+        np.asarray(expected_result, dtype=bool),
+    )
+    assert result.time.equals(reference.time)
+    assert result.measurements.dtype == np.bool_
