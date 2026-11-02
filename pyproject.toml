@@ -14,7 +14,7 @@ readme = "README.md"
 packages = [{ include = "wristpy", from = "src" }]
 
 [tool.poetry.dependencies]
-python = ">=3.11, <3.14"
+python = ">=3.11, <3.16"
 polars = "^1.41.0"
 scikit-learn = "^1.7.1"
 pyarrow = ">=18,<25"
