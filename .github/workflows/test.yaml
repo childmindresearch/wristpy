@@ -37,39 +37,11 @@ jobs:
         poetry run uv pip install --resolution=${{ matrix.resolution }} .
         poetry install --only dev
       shell: bash
-    - name: Diagnosis info
-      shell: bash
-      run: |
-        echo "Pytest executable:"
-        poetry run python -c "import shutil; print(shutil.which('pytest'))"
-        echo "Pytest module:"
-        poetry run python -m pytest --version
-        echo "Pytest executable invocation:"
-        poetry run pytest --version
-    - name: Test run
-      id: test-running
-      shell: bash
-      env:
-        PYTHONFAULTHANDLER: '1'
-      run: |
-        set -x
-        echo "Checking pytest configuration"
-        poetry run python -m pytest --trace-config --collect-only -vv -s
-        echo "Running tests without coverage"
-        poetry run python -m pytest \
-          --log-level=DEBUG \
-          --verbose \
-          -s
-    - name: Show installed dependencies
-      shell: bash
-      run: |
-        poetry run python -m pip check
-        poetry run python -m pip freeze
     - name: Run tests
       id: run-tests
       run: |
         poetry env info
-        poetry run python -m pytest \
+        poetry run pytest \
           --junitxml=pytest.xml \
           --cov-report=term-missing:skip-covered \
           --cov-report=xml:coverage.xml \
