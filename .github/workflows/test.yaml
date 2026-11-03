@@ -37,6 +37,15 @@ jobs:
         poetry run uv pip install --resolution=${{ matrix.resolution }} .
         poetry install --only dev
       shell: bash
+    - name: Diagnosis info
+      shell: bash
+      run: |
+        echo "Pytest executable:"
+        poetry run python -c "import shutil; print(shutil.which('pytest'))"
+        echo "Pytest module:"
+        poetry run python -m pytest --version
+        echo "Pytest executable invocation:"
+        poetry run pytest --version
     - name: Run tests
       id: run-tests
       run: |
