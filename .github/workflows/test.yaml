@@ -39,7 +39,8 @@ jobs:
       shell: bash
     - name: Run tests
       id: run-tests
-      run: >
+      run: |
+        poetry env info
         poetry run python -m pytest \
           --junitxml=pytest.xml \
           --cov-report=term-missing:skip-covered \
