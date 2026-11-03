@@ -54,7 +54,8 @@ jobs:
           --junitxml=pytest.xml \
           --cov-report=term-missing:skip-covered \
           --cov-report=xml:coverage.xml \
-          --cov=src tests \
+          --cov=src \
+          --cov=tests \
           --log-level=DEBUG \
           --verbose
       shell: bash
