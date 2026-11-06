@@ -1,0 +1,59 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "# Docker Tutorial \n",
+    "\n",
+    "1. **Install Docker**: Ensure you have Docker installed on your system. [Get Docker](https://docs.docker.com/get-docker/)\n",
+    "\n",
+    "2. **Pull the Docker image**:\n",
+    "   ```bash\n",
+    "   docker pull cmidair/wristpy:main\n",
+    "   ```\n",
+    "\n",
+    "3. **Run the Docker image** with your data:\n",
+    "   ```bash\n",
+    "   docker run -it --rm \\\n",
+    "     -v \"/local/path/to/data:/data\" \\\n",
+    "     -v \"/local/path/to/output:/output\" \\\n",
+    "     cmidair/wristpy:main\n",
+    "   ```\n",
+    "   Replace `/local/path/to/data` with the path to your input data directory and `/local/path/to/output` with where you want results saved.\n",
+    "\n",
+    "   To run a single file, we simply need to modify the mounting structure for the docker call slightly:\n",
+    "    ```bash\n",
+    "    docker run -it --rm \\\n",
+    "     -v \"/local/path/to/data/file.bin:/data/file.bin\" \\\n",
+    "     -v \"/local/path/to/output:/output\" \\\n",
+    "     cmidair/wristpy:main\n",
+    "   ```\n",
+    "\n",
+    "4. **Customizing the Pipeline**:\n",
+    "\n",
+    "The Docker image supports multiple input variables to customize processing. You can set these by simply chaining these inputs as you would for the CLI input:\n",
+    "\n",
+    "  ```bash\n",
+    "  docker run -it --rm \\\n",
+    "    -v \"/local/path/to/data/file.bin:/data/file.bin\" \\\n",
+    "    -v \"/local/path/to/output:/output\" \\\n",
+    "    cmidair/wristpy:main /data --output /output --epoch-length 5 --nonwear-algorithm ggir --nonwear-algorithm detach --thresholds 0.1 0.2 0.4\n",
+    "  ```\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": []
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
