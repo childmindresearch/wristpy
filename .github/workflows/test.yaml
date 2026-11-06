@@ -39,14 +39,12 @@ jobs:
       shell: bash
     - name: Run tests
       id: run-tests
-      run: |
-        poetry env info
+      run: >
         poetry run pytest \
           --junitxml=pytest.xml \
           --cov-report=term-missing:skip-covered \
           --cov-report=xml:coverage.xml \
-          --cov=src \
-          --cov=tests \
+          --cov=src tests \
           --log-level=DEBUG \
           --verbose
       shell: bash
