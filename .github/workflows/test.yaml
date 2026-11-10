@@ -29,12 +29,12 @@ jobs:
         python-version: ${{ matrix.python-version }}
         enable-cache: true
         # Install a specific version of uv.
-        version: "0.13.7"
+        version: 0.13.7
 
     - name: Install dependencies
       run: uv sync --locked --resolution=${{ matrix.resolution }} --all-extras --dev
       shell: bash
- 
+
     - name: Run tests
       id: run-tests
       run: >
@@ -65,35 +65,35 @@ jobs:
         enable-cache: true
 
     - name: Set up Python
-        run: uv python install
-        shell: bash
+      run: uv python install
+      shell: bash
 
-      - name: Install dependencies
-        run: uv sync --extra dev
+    - name: Install dependencies
+      run: uv sync --extra dev
 
-      - name: Ruff format
-        run: uv run ruff format --check
+    - name: Ruff format
+      run: uv run ruff format --check
 
-      - name: Ruff check
-        run: uv run ruff check
+    - name: Ruff check
+      run: uv run ruff check
 
   mypy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
+    - uses: actions/checkout@v7
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
-        with:
-          enable-cache: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      with:
+        enable-cache: true
 
-      - name: Set up Python
-        run: uv python install 3.14
-        shell: bash
+    - name: Set up Python
+      run: uv python install 3.14
+      shell: bash
 
-      - name: Install dependencies
-        run: uv sync --extra dev
+    - name: Install dependencies
+      run: uv sync --extra dev
 
-      - name: Run mypy
-        run: uv run mypy .
+    - name: Run mypy
+      run: uv run mypy .

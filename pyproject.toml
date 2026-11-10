@@ -1,30 +1,29 @@
-
 [project]
 name = "wristpy"
 version = "0.2.11"
 description = "wristpy is a Python package designed for processing and analyzing wrist-worn accelerometer data."
 authors = [
-    { name = "Adam Santorelli", email = "adam.santorelli@childmind.org" },
-    { name = "Florian Rupprecht", email = "florian.rupprecht@childmind.org" },
-    { name = "Freymon Perez", email = "freymon.perez@childmind.org" },
-    { name = "Greg Kiar", email = "gregory.kiar@childmind.org" },
-    { name = "Reinder Vos de Wael", email = "reinder.vosdewael@childmind.org" },
+  { name = "Adam Santorelli", email = "adam.santorelli@childmind.org" },
+  { name = "Florian Rupprecht", email = "florian.rupprecht@childmind.org" },
+  { name = "Freymon Perez", email = "freymon.perez@childmind.org" },
+  { name = "Greg Kiar", email = "gregory.kiar@childmind.org" },
+  { name = "Reinder Vos de Wael", email = "reinder.vosdewael@childmind.org" }
 ]
 license = { text = "LGPL-2.1" }
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
 dependencies = [
-    "polars>=1.41.0,<2.0.0",
-    "scikit-learn>=1.7.2,<2.0.0",
-    "pyarrow>=22,<27",
-    "actfast>=1.3.0,<2.0.0",
-    "numpy>=2.3.2,<3.0.0",
-    "pydantic>=2.12.5,<3.0.0",
-    "pydantic-settings>=2.12.0",
-    "scipy>=1.16.1,<2.0.0",
-    "typer>=0.27.0",
-    "rich>=14.1,<16.0",
-    "tzdata>=2025.3,<2027.0",
+  "polars>=1.41.0,<2.0.0",
+  "scikit-learn>=1.7.2,<2.0.0",
+  "pyarrow>=22,<27",
+  "actfast>=1.3.0,<2.0.0",
+  "numpy>=2.3.2,<3.0.0",
+  "pydantic>=2.12.5,<3.0.0",
+  "pydantic-settings>=2.12.0",
+  "scipy>=1.16.1,<2.0.0",
+  "typer>=0.27.0",
+  "rich>=14.1,<16.0",
+  "tzdata>=2025.3,<2027.0"
 ]
 
 [project.scripts]
@@ -32,38 +31,34 @@ wristpy = "wristpy.__main__:run_main"
 
 [dependency-groups]
 dev = [
-    "pytest>=9.2.0,<10",
-    "mypy>=1.14.1,<2.0.0",
-    "pre-commit>=4.0.1,<5.0.0",
-    "pytest-cov>=7.1.0",
-    "ruff>=0.10",
-    "pytest-mock>=3.14.1,<4.0.0",
+  "pytest>=9.2.0,<10",
+  "mypy>=1.14.1,<2.0.0",
+  "pre-commit>=4.0.1,<5.0.0",
+  "pytest-cov>=7.1.0",
+  "ruff>=0.10",
+  "pytest-mock>=3.14.1,<4.0.0"
 ]
 docs = [
-    "sphinx>=7.0.0,<8.0.0",
-    "furo>=2024.1.0",
-    "myst-parser>=2.0.0,<3.0.0",
-    "myst-nb>=1.3,<2.0",
-    "sphinx-copybutton>=0.5.2,<0.6.0",
-    "sphinx-design>=0.5.0,<0.6.0",
-    "ipykernel>=6.29.0,<7.0.0",
-    "sphinx-autobuild>=2024.2.4",
+  "sphinx>=7.0.0,<8.0.0",
+  "furo>=2024.1.0",
+  "myst-parser>=2.0.0,<3.0.0",
+  "myst-nb>=1.3,<2.0",
+  "sphinx-copybutton>=0.5.2,<0.6.0",
+  "sphinx-design>=0.5.0,<0.6.0",
+  "ipykernel>=6.29.0,<7.0.0",
+  "sphinx-autobuild>=2024.2.4"
 ]
 
 [tool.uv.build-backend]
 module-name = "wristpy"
 module-root = "src"
 
-[build-system]
-requires = ["uv_build>=0.13.7,<0.14"]
-build-backend = "uv_build"
-
 [tool.pytest.ini_options]
 pythonpath = [
-    "src"
+  "src"
 ]
 testpaths = [
-    "tests"
+  "tests"
 ]
 
 [tool.mypy]
@@ -72,28 +67,28 @@ exclude = ["docs/"]
 
 [tool.ruff]
 exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "venv",
-    "*.ipynb"
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".git-rewrite",
+  ".hg",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "venv",
+  "*.ipynb"
 ]
 line-length = 88
 indent-width = 4
@@ -102,8 +97,8 @@ src = ["src"]
 [tool.ruff.lint]
 select = ["ANN", "D", "E", "F", "I", "INP"]
 ignore = [
-    "ANN101",  # self should not be annotated.
-    "ANN102"   # cls should not be annotated.
+  "ANN101",  # self should not be annotated.
+  "ANN102"  # cls should not be annotated.
 ]
 fixable = ["ALL"]
 unfixable = []
@@ -121,3 +116,7 @@ convention = "google"
 [tool.ruff.per-file-ignores]
 "tests/**/*.py" = []
 "docs/source/conf.py" = ["INP001"]
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14"]
+build-backend = "uv_build"
