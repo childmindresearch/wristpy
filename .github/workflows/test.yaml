@@ -11,7 +11,7 @@ on:
 
 
 jobs:
-  unit:
+  unit-highest:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -19,7 +19,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python_version: ['3.11', '3.12', '3.13', '3.14']
-        resolution: [lowest-direct, highest]
     steps:
     - uses: actions/checkout@v7
 
@@ -32,22 +31,65 @@ jobs:
         version: 0.13.7
 
     - name: Install dependencies
-      run: uv sync --locked --resolution=${{ matrix.resolution }} --all-extras --dev
+      run: uv sync --locked --resolution=highest --all-extras --dev
       shell: bash
 
     - name: Run tests
       id: run-tests
       run: >
-        uv run --frozen pytest
-          --junitxml=pytest.xml
-          --cov-report=term-missing:skip-covered
-          --cov-report=xml:coverage.xml
-          --cov=src tests
-          --log-level=DEBUG
+        uv run --frozen pytest \
+          --junitxml=pytest.xml \
+          --cov-report=term-missing:skip-covered \
+          --cov-report=xml:coverage.xml \
+          --cov=src tests \
+          --log-level=DEBUG \
           --verbose
       shell: bash
 
     - name: Upload coverage to Codecov
+      if: matrix.os == 'ubuntu-latest' && matrix.python_version == '3.14'
+      uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        verbose: true
+
+  unit-lowest-direct:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python_version: ['3.11', '3.12', '3.13', '3.14']
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Install uv and set Python version
+      uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      with:
+        python-version: ${{ matrix.python_version }}
+        enable-cache: true
+        # Install a specific version of uv.
+        version: 0.13.7
+
+    - name: Install dependencies
+      run: uv sync --resolution=lowest-direct --all-extras --dev
+      shell: bash
+
+    - name: Run tests
+      id: run-tests
+      run: >
+        uv run --frozen pytest \
+          --junitxml=pytest.xml \
+          --cov-report=term-missing:skip-covered \
+          --cov-report=xml:coverage.xml \
+          --cov=src tests \
+          --log-level=DEBUG \
+          --verbose
+      shell: bash
+
+    - name: Upload coverage to Codecov
+      if: matrix.os == 'ubuntu-latest' && matrix.python_version == '3.14'
       uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -69,7 +111,7 @@ jobs:
       shell: bash
 
     - name: Install dependencies
-      run: uv sync --extra dev
+      run: uv sync --group dev
 
     - name: Ruff format
       run: uv run ruff format --check
@@ -93,7 +135,7 @@ jobs:
       shell: bash
 
     - name: Install dependencies
-      run: uv sync --extra dev
+      run: uv sync --group dev
 
     - name: Run mypy
       run: uv run mypy .
