@@ -39,9 +39,6 @@ jobs:
     - name: Build
       run: uv build
 
-    - name: Generate PEP 740 attestations
-      uses: astral-sh/attest-action@39b6ce43875c196a579e31635b11aa2a2036384a # v0.0.7
-
     - name: Publish to PyPi.
       uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e
       with:

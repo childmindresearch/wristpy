@@ -7,7 +7,8 @@ authors = [
   { name = "Florian Rupprecht", email = "florian.rupprecht@childmind.org" },
   { name = "Freymon Perez", email = "freymon.perez@childmind.org" },
   { name = "Greg Kiar", email = "gregory.kiar@childmind.org" },
-  { name = "Reinder Vos de Wael", email = "reinder.vosdewael@childmind.org" }
+  { name = "Reinder Vos de Wael", email = "reinder.vosdewael@childmind.org" },
+  { name = "Matthew Ning", email = "matthew.ning@childmind.org" }
 ]
 license = { text = "LGPL-2.1" }
 readme = "README.md"
