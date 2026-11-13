@@ -13,27 +13,27 @@ on:
 
 jobs:
   build-and-publish-docs:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
       with:
         persist-credentials: false
         lfs: true
-    - name: Install uv and set Python version
+    - name: Install uv
       uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
       with:
-        python-version: ${{ matrix.python_version }}
         enable-cache: true
-        version: 0.13.7
+        python-version: '3.14'
     - name: Install dependencies
-      run: uv sync --locked --resolution=highest --group --docs
+      run: uv sync --only-group docs
       shell: bash
     - name: Build Sphinx docs
       working-directory: docs
       run: |
         uv run --locked make -C docs html
-        touch docs/build/html/.nojekyll
-        ls -la docs/build/html | sed 's/^/BUILD: /'
+        touch build/html/.nojekyll
+        ls -la build/html | sed 's/^/BUILD: /'
     - name: Deploy to gh-pages
       uses: JamesIves/github-pages-deploy-action@6c2d9db40f9296374acc17b90404b6e8864128c8
       with:
