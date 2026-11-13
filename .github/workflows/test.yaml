@@ -36,9 +36,9 @@ jobs:
       shell: bash
       run: |
         if [[ "${{ matrix.resolution }}" == "highest" ]]; then
-          uv sync --locked --only-binary --resolution=highest --all-extras --dev
+          uv sync --locked --resolution=highest --all-extras --dev
         else
-          uv sync --only-binary --resolution=lowest-direct --all-extras --dev
+          uv sync --resolution=lowest-direct --all-extras --dev
         fi
 
     - name: Run tests

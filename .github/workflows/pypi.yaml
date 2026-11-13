@@ -19,6 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v7
       with:
+        persist-credentials: false
         fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
 
     - name: Skip if version did not change.
