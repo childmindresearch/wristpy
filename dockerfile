@@ -1,20 +1,14 @@
-FROM python:3.11-bookworm
+FROM python:3.12-slim-trixie
+
+COPY --from=ghcr.io/astral-sh/uv:0.13.7 /uv /bin/
 
 WORKDIR /app
 COPY . /app/
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    gfortran \
-    && rm -rf /var/lib/apt/lists/*
+RUN uv sync --locked --no-dev --no-cache \
+    && mkdir -p /data /output
 
-RUN pip install poetry && \
-    poetry config virtualenvs.create false && \
-    poetry install --only main
-
-RUN mkdir -p /data /output
-
-ENTRYPOINT ["poetry", "run", "wristpy"]
+ENTRYPOINT ["/app/.venv/bin/wristpy"]
 
 CMD ["/data", "--output", "/output", "--output-filetype", ".csv", "--calibrator", "none", \
      "--activity-metric", "enmo", "--epoch-length", "5", "--nonwear-algorithm", "ggir"]
