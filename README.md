@@ -172,7 +172,7 @@ The Docker image supports multiple input variables to customize processing. You 
 docker run -it --rm \
   -v "/local/path/to/data/file.bin:/data/file.bin" \
   -v "/local/path/to/output:/output" \
-  cmidair/wristpy:main /data --output /output --epoch-length 5 --nonwear-algorithm ggir --nonwear-algorithm detach --thresholds 0.1 0.2 0.4
+  cmidair/wristpy:main /data --output /output --epoch-length 5 --nonwear-algorithm ggir --nonwear-algorithm detach --thresholds "0.1 0.2 0.4"
 ```
 
 
