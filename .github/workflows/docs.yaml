@@ -31,7 +31,7 @@ jobs:
     - name: Build Sphinx docs
       working-directory: docs
       run: |
-        uv run --locked make -C docs html
+        uv run --locked make html
         touch build/html/.nojekyll
         ls -la build/html | sed 's/^/BUILD: /'
     - name: Deploy to gh-pages
